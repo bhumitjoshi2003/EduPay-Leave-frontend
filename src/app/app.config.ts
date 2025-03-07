@@ -12,10 +12,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
 
-    // ✅ Include HTTP Client with Interceptor
     provideHttpClient(withInterceptors([AuthInterceptor])),
 
-    // ✅ Provide Keycloak Service
     KeycloakService
   ]
 };

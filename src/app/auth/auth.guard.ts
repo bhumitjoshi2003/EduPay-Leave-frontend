@@ -9,10 +9,10 @@ export class AuthGuard implements CanActivate {
   constructor(private keycloak: KeycloakService, private router: Router) {}
 
   canActivate(): boolean {
-    if (this.keycloak.getToken()) {
+    if (this.keycloak.isAuthenticated()) {
       return true;
     } else {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/home']);
       return false;
     }
   }

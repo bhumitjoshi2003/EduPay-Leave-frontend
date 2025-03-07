@@ -1,6 +1,9 @@
 <div class="home-container">
+    @if(!authenticated){
       <button mat-button class="login-button" (click)="login()">Login</button>
-
+    }@else{
+      <button mat-button class="login-button" (click)="logout()">Logout</button>
+    }
       <div class="content">
         <img src="assets/LOGO.avif" alt="School Logo" class="logo">
           <h1 style="font-family:Verdana, Geneva, Tahoma, sans-serif">Indra Academy Sr. Sec. School</h1>

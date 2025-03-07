@@ -21,7 +21,6 @@ export class HomeComponent {
   }
 
   login() {
-    console.log("Login button clicked");
     this.keycloakService.login();
   }
 

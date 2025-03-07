@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { KeycloakService } from '../../services/keycloak.service';
 
 @Component({
@@ -8,14 +8,14 @@ import { KeycloakService } from '../../services/keycloak.service';
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   authenticated = false;
 
   constructor(private keycloakService: KeycloakService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.keycloakService.authStatus$.subscribe(authenticated =>{
-      this.authenticated = authenticated;
+    this.keycloakService.authStatus$.subscribe((status) =>{
+      this.authenticated = status;
       this.cdr.detectChanges();
     })
   }

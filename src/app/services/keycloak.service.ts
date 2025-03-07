@@ -30,7 +30,6 @@ export class KeycloakService {
       console.log('Refresh Token:', this.keycloak.refreshToken);
       console.log('Authenticated:', this.keycloak.authenticated);
 
-      // 🔥 Automatically refresh token before it expires
       this.authStatus.next(authenticated);
       this.scheduleTokenRefresh();
     } else {

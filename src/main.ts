@@ -5,7 +5,7 @@ import { KeycloakService } from './app/services/keycloak.service';
 import { inject } from '@angular/core';
 
 bootstrapApplication(AppComponent, appConfig).then(appRef => {
-  const keycloakService = appRef.injector.get(KeycloakService); // ✅ Use Angular's injector
+  const keycloakService = appRef.injector.get(KeycloakService); 
   return keycloakService.init();
 }).then(() => {
   console.log("✅ Keycloak initialized. User can see the home page.");

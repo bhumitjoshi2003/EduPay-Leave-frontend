@@ -7,7 +7,7 @@ export class KeycloakService {
     url: 'http://localhost:8080', // ✅ Ensure it's HTTP (unless using SSL)
     realm: 'ias',
     clientId: 'ias-client'
-  });efvon
+  });
 
   async init(): Promise<boolean> {
     try {
@@ -22,7 +22,7 @@ export class KeycloakService {
         console.log('Refresh Token:', this.keycloak.refreshToken);
       }
       else{
-        console.log("Wfcwd");
+        console.log("NOT AUTHENTICATED");
       }
   
       return authenticated;

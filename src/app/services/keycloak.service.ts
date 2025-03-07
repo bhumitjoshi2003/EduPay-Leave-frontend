@@ -4,41 +4,45 @@ import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class KeycloakService {
-  private keycloak = new Keycloak({
+
+  private keycloak!: Keycloak;
+  private authStatus = new BehaviorSubject<boolean>(false);
+  authStatus$ = this.authStatus.asObservable();
+
+  async init(): Promise<boolean> {
+    this.keycloak = new Keycloak({
     url: 'http://localhost:8080', // ✅ Ensure it's HTTP (unless using SSL)
     realm: 'ias',
     clientId: 'ias-client'
   });
 
-  private authStatus = new BehaviorSubject<boolean>(false);
-  authStatus$ = this.authStatus.asObservable();
+  try {
+    const authenticated = await this.keycloak.init({
+      onLoad: 'check-sso',
+      checkLoginIframe: false,
+      pkceMethod: 'S256'
+    });
 
-  async init(): Promise<boolean> {
-    try {
-      const authenticated = await this.keycloak.init({
-        onLoad: 'check-sso',
-        checkLoginIframe: false
-      });
+    
+    if (authenticated) {
+      console.log('Access Token:', this.keycloak.token);
+      console.log('ID Token:', this.keycloak.idToken);
+      console.log('Refresh Token:', this.keycloak.refreshToken);
+      console.log('Authenticated:', this.keycloak.authenticated);
 
-      this.authStatus.next(authenticated);
-      if (authenticated) {
-        console.log('Access Token:', this.keycloak.token);
-        console.log('ID Token:', this.keycloak.idToken);
-        console.log('Refresh Token:', this.keycloak.refreshToken);
-        console.log('Authenticated:', this.keycloak.authenticated);
-
-        // 🔥 Automatically refresh token before it expires
-        this.scheduleTokenRefresh();
-      } else {
-        console.log("NOT AUTHENTICATED");
-      }
-
-      return authenticated;
-    } catch (error) {
-      console.error('Keycloak initialization failed', error);
-      return false;
+      // 🔥 Automatically refresh token before it expires
+      this.scheduleTokenRefresh();
+    } else {
+      console.log("NOT AUTHENTICATED");
     }
+    
+
+    return authenticated;
+  } catch (error) {
+    console.error('Keycloak initialization failed', error);
+    return false;
   }
+}
 
   getToken(): string | null {
     return this.keycloak.token ?? null;
@@ -62,7 +66,6 @@ export class KeycloakService {
   }
 
   login(): void {
-    console.log("Redirecting to Keycloak login...");
     this.keycloak.login();
   }
 

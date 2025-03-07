@@ -20,11 +20,6 @@ export class HomeComponent {
     })
   }
 
-
-  hari(){
-    console.log("HARIBOL");
-  }
-
   login() {
     console.log("Login button clicked");
     this.keycloakService.login();

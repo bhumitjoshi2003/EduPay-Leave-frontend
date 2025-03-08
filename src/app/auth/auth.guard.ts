@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { KeycloakService } from '../services/keycloak.service';
 
 @Injectable({
@@ -8,12 +8,13 @@ import { KeycloakService } from '../services/keycloak.service';
 export class AuthGuard implements CanActivate {
   constructor(private keycloak: KeycloakService, private router: Router) {}
 
-  canActivate(): boolean {
-    if (this.keycloak.isAuthenticated()) {
-      return true;
-    } else {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    if (!this.keycloak || !this.keycloak.isAuthenticated()) {
       this.router.navigate(['/home']);
       return false;
+    } else {
+      this.router.navigate(['/student']);
+      return true;
     }
   }
 }

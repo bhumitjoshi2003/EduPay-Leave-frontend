@@ -1,0 +1,24 @@
+<div class="payment-tracker">
+    <div class="year-select-wrapper">
+      <select [(ngModel)]="selectedYear" (change)="onYearChange()">
+        <option *ngFor="let year of [2023, 2024, 2025]" [value]="year">{{ year }}</option>
+      </select>
+    </div>
+  
+    <div class="month-grid">
+      <div *ngFor="let month of months" class="month"
+           [ngClass]="{ 'paid': month.paid, 'unpaid': !month.paid, 'selected': month.selected }"
+           (click)="toggleMonthSelection(month)"
+           [title]="month.paid ? 'Already Paid' : 'Click to Select'">
+        {{ month.name }}
+        <div class="month-status">
+          <span *ngIf="month.paid">Paid</span>
+          <span *ngIf="!month.paid">₹{{ month.fee }}</span>
+        </div>
+      </div>
+    </div>
+  
+    <div class="total-amount">
+      Total Amount to Pay: ₹{{ totalAmountToPay }}
+    </div>
+  </div>

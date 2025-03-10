@@ -1,0 +1,86 @@
+.payment-tracker {
+    font-family: sans-serif;
+    padding: 20px;
+  }
+  
+  /* Style the year selection */
+  .year-select-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 15px;
+  }
+  
+  .year-select-wrapper select {
+    padding: 12px 40px 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    appearance: none;
+    background-color: #fff;
+    width: 150px;
+  }
+  
+  .year-select-wrapper select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  .year-select-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #333;
+    pointer-events: none;
+  }
+  
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .month {
+    padding: 15px;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .paid {
+    background-color: lightgreen;
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+  
+  .unpaid {
+    background-color: lightcoral;
+  }
+  
+  .month:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .month.selected {
+    background-color: rgb(244, 188, 85);
+  }
+  
+  .unpaid.selected {
+    background-color: orange;
+  }
+  
+  .month-status {
+    margin-top: 5px;
+    font-size: 0.8em;
+  }
+  
+  .total-amount {
+    margin-top: 20px;
+    font-weight: bold;
+  }

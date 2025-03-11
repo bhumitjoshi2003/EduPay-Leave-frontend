@@ -60,11 +60,11 @@
   }
   
   .unpaid {
-    background-color: lightcoral;
+    background-color: rgb(248, 116, 116);
   }
   
   .month:hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2);
   }
   
   .month.selected {

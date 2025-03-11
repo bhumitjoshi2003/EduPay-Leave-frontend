@@ -29,6 +29,10 @@ export class BusFeesComponent implements OnInit {
     this.originalBusFees = JSON.parse(JSON.stringify(this.busFees));
   }
 
+  canEdit(): boolean {
+    return false;
+  }
+
   edit(): void {
     this.isEditing = true;
   }

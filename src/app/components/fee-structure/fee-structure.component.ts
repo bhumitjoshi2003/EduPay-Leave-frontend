@@ -37,6 +37,10 @@ export class FeeStructureComponent implements OnInit {
     this.originalFeeStructure = JSON.parse(JSON.stringify(this.feeStructure));
   }
 
+  canEdit(): boolean {
+    return true;
+  }
+
   edit(): void {
     this.isEditing = true;
   }

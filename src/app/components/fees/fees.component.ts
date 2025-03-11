@@ -12,18 +12,18 @@ import { CommonModule } from '@angular/common';
 export class PaymentTrackerComponent implements OnInit {
   selectedYear: number = new Date().getFullYear();
   months = [
-    { name: 'January', number: 1, paid: true, fee: 0, selected: false },
+    { name: 'January', number: 1, paid: true, fee: 100, selected: false },
     { name: 'February', number: 2, paid: false, fee: 100, selected: false },
     { name: 'March', number: 3, paid: false, fee: 100, selected: false },
-    { name: 'April', number: 4, paid: true, fee: 0, selected: false },
+    { name: 'April', number: 4, paid: true, fee: 100, selected: false },
     { name: 'May', number: 5, paid: false, fee: 100, selected: false },
-    { name: 'June', number: 6, paid: true, fee: 0, selected: false },
+    { name: 'June', number: 6, paid: true, fee: 100, selected: false },
     { name: 'July', number: 7, paid: false, fee: 100, selected: false },
     { name: 'August', number: 8, paid: false, fee: 100, selected: false },
-    { name: 'September', number: 9, paid: true, fee: 0, selected: false },
+    { name: 'September', number: 9, paid: true, fee: 100, selected: false },
     { name: 'October', number: 10, paid: false, fee: 100, selected: false },
     { name: 'November', number: 11, paid: false, fee: 100, selected: false },
-    { name: 'December', number: 12, paid: true, fee: 0, selected: false }
+    { name: 'December', number: 12, paid: true, fee: 100, selected: false }
   ];
   totalAmountToPay: number = 0;
   selectedMonthsByYear: { [year: number]: number[] } = {};

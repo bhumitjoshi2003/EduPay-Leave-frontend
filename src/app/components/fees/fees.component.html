@@ -12,7 +12,7 @@
            [title]="month.paid ? 'Already Paid' : 'Click to Select'">
         {{ month.name }}
         <div class="month-status">
-          <span *ngIf="month.paid">Paid</span>
+          <span *ngIf="month.paid">Paid &nbsp;₹{{ month.fee }}</span>
           <span *ngIf="!month.paid">₹{{ month.fee }}</span>
         </div>
       </div>

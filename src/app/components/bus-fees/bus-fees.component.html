@@ -2,8 +2,8 @@
     <div class="header">
       <h2>Bus Fees Structure</h2>
       <div class="actions">
-        <button *ngIf="!isEditing" (click)="edit()">Edit</button>
-        <div *ngIf="isEditing">
+        <button *ngIf="!isEditing && canEdit()" (click)="edit()">Edit</button>
+        <div *ngIf="isEditing && canEdit()">
           <button (click)="save()">Save</button>
           <button (click)="cancel()">Cancel</button>
         </div>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, input } from '@angular/core';
 import { RazorpayService } from '../../services/razorpay.service';
 
 declare var Razorpay: any;
@@ -13,24 +13,34 @@ export class PaymentComponent {
 
   constructor(private razorpayService: RazorpayService) {}
 
-  initiatePayment() {
-    const amount = 50000; // Example amount (₹500.00)
+  @Input() amount!: number;
 
-    this.razorpayService.createOrder(amount).subscribe((response: any) => {
+  initiatePayment() {
+    // Receive the amount from FeesComponent
+    console.log(`Making a payment of ${this.amount}`);
+
+    this.razorpayService.createOrder(this.amount*100).subscribe((response: any) => {
+      console.log(response);
       const options = {
-        key: 'your_razorpay_key_id',  // Replace with Razorpay Key ID
-        amount: response.amount,      // Amount in paisa (100 INR = 10000 paisa)
+        key: 'rzp_test_uzFJONVXH4vqou',  
+        amount: response.amount,      
         currency: 'INR',
         name: 'Indra Academy School',
         description: 'School Fee Payment',
         order_id: response.orderId,   // Order ID from backend
         prefill: {
-          name: 'John Doe',  // Prefill name
-          email: 'john@example.com',
-          contact: '9876543210'
+          name: 'Hari Narayan',  // Prefill name
+          email: 'bhumitharidas@example.com',
+          contact: '7906341843'
         },
         theme: {
           color: '#3399cc'  // Customize color
+        },
+        method: {
+          netbanking: true,
+          card: true,
+          upi: true,  // ✅ Enable UPI
+          wallet: false
         },
         handler: (paymentResponse: any) => {
           console.log('Payment Success:', paymentResponse);

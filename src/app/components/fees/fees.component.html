@@ -21,4 +21,8 @@
     <div class="total-amount">
       Total Amount to Pay: ₹{{ totalAmountToPay }}
     </div>
+
+    <div>
+        <app-payment [amount]="totalAmountToPay"></app-payment>
+    </div>
   </div>

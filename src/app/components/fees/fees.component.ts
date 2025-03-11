@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { PaymentComponent } from "../payment/payment.component";
 
 @Component({
   selector: 'app-payment-tracker',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, PaymentComponent],
   templateUrl: './fees.component.html',
   styleUrls: ['./fees.component.css']
 })
@@ -15,9 +16,9 @@ export class PaymentTrackerComponent implements OnInit {
     { name: 'January', number: 1, paid: true, fee: 100, selected: false },
     { name: 'February', number: 2, paid: false, fee: 100, selected: false },
     { name: 'March', number: 3, paid: false, fee: 100, selected: false },
-    { name: 'April', number: 4, paid: true, fee: 100, selected: false },
-    { name: 'May', number: 5, paid: false, fee: 100, selected: false },
-    { name: 'June', number: 6, paid: true, fee: 100, selected: false },
+    { name: 'April', number: 4, paid: true, fee: 1, selected: false },
+    { name: 'May', number: 5, paid: false, fee: 1, selected: false },
+    { name: 'June', number: 6, paid: true, fee: 1, selected: false },
     { name: 'July', number: 7, paid: false, fee: 100, selected: false },
     { name: 'August', number: 8, paid: false, fee: 100, selected: false },
     { name: 'September', number: 9, paid: true, fee: 100, selected: false },

@@ -1,0 +1,21 @@
+.payment-container {
+    text-align: center;
+    padding: 20px;
+  }
+  .pay-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  .pay-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .pay-btn:disabled {
+    cursor: not-allowed !important;  
+    opacity: 0.6;
+}

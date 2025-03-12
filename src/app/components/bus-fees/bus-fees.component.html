@@ -1,0 +1,38 @@
+<div class="bus-fees-container">
+    <div class="header">
+      <h2>Bus Fees Structure</h2>
+      <div class="actions">
+        <button *ngIf="!isEditing && canEdit()" (click)="edit()">Edit</button>
+        <div *ngIf="isEditing && canEdit()">
+          <button (click)="save()">Save</button>
+          <button (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  
+    <table class="bus-fees-table">
+      <thead>
+        <tr>
+          <th>Min Distance (Km)</th>
+          <th>Max Distance (Km)</th>
+          <th>Fee (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fee of busFees">
+          <td>
+            <input *ngIf="isEditing" type="number" [(ngModel)]="fee.minDistance" />
+            <span *ngIf="!isEditing">{{ fee.minDistance }}</span>
+          </td>
+          <td>
+            <input *ngIf="isEditing" type="number" [(ngModel)]="fee.maxDistance" />
+            <span *ngIf="!isEditing">{{ fee.maxDistance !== null ? fee.maxDistance : 'Above' }}</span>
+          </td>
+          <td>
+            <input *ngIf="isEditing" type="number" [(ngModel)]="fee.fee" />
+            <span *ngIf="!isEditing">{{ fee.fee }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>

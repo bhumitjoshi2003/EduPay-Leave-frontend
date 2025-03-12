@@ -4,7 +4,7 @@ import { AppComponent } from './app/app.component';
 import { KeycloakService } from './app/services/keycloak.service';
 import { inject } from '@angular/core';
 
-bootstrapApplication(AppComponent, appConfig).then(appRef => {
+bootstrapApplication(AppComponent, appConfig).then( async appRef => {
   const keycloakService = appRef.injector.get(KeycloakService); 
   return keycloakService.init();
 }).then(() => {

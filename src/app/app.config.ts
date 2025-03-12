@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { AuthInterceptor } from './auth/auth.interceptor';
+// import { AuthInterceptor } from './auth/auth.interceptor';
 import { KeycloakService } from './services/keycloak.service';
 
 export const appConfig: ApplicationConfig = {
@@ -11,9 +11,8 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-
-    provideHttpClient(withInterceptors([AuthInterceptor])),
-
+    provideHttpClient(),
+    // provideHttpClient(withInterceptors([AuthInterceptor])),
     KeycloakService
   ]
 };

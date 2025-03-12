@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { KeycloakService } from '../../services/keycloak.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -11,7 +12,8 @@ import { KeycloakService } from '../../services/keycloak.service';
 export class HomeComponent implements OnInit {
   authenticated = false;
 
-  constructor(private keycloakService: KeycloakService, private cdr: ChangeDetectorRef) {}
+  constructor(private keycloakService: KeycloakService, private cdr: ChangeDetectorRef,private route: ActivatedRoute,
+    private router: Router) {}
 
   ngOnInit(): void {
     this.keycloakService.authStatus$.subscribe((status) =>{
@@ -21,8 +23,14 @@ export class HomeComponent implements OnInit {
   }
 
   login() {
-    this.keycloakService.login();
+    this.keycloakService.login(); // Trigger login
+    this.keycloakService.authStatus$.subscribe((status) => {
+      if (status) 
+        this.router.navigate(['/student']);
+    });
   }
+  
+  
 
   logout() {
     this.keycloakService.logout();

@@ -66,7 +66,8 @@ export class KeycloakService {
   }
 
   login(): void {
-    this.keycloak.login();
+    const redirectUri = window.location.origin + '/student'; // Redirect after login
+    this.keycloak.login({ redirectUri });
   }
 
   logout(): void {
@@ -74,6 +75,10 @@ export class KeycloakService {
   }
 
   isAuthenticated(): boolean {
+    if (!this.keycloak) {
+      console.error("❌ Keycloak instance is undefined.");
+      return false;
+    }
     return this.keycloak.authenticated ?? false;
   }
 }

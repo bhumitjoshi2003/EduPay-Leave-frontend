@@ -1,12 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface BusFee {
-  minDistance: number;
-  maxDistance: number | null;
-  fee: number;
-}
+import { BusFeesService, BusFee } from '../../services/bus-fees.service';
 
 @Component({
   selector: 'app-bus-fees',
@@ -16,32 +11,34 @@ interface BusFee {
   styleUrls: ['./bus-fees.component.css']
 })
 export class BusFeesComponent implements OnInit {
-  sessions: string[] = ['2023-24', '2024-25']; // Available academic sessions
-  currentSession: string = '2024-25'; // Default selected session
-  isNewSession: boolean = false; // Track if a new session is being created
-
-  busFeeStructures: { [key: string]: BusFee[] } = {
-    '2023-24': [
-      { minDistance: 0, maxDistance: 3, fee: 800 },
-      { minDistance: 4, maxDistance: 8, fee: 1000 },
-      { minDistance: 9, maxDistance: null, fee: 1200 }
-    ],
-    '2024-25': [
-      { minDistance: 0, maxDistance: 3, fee: 900 },
-      { minDistance: 4, maxDistance: 8, fee: 1100 },
-      { minDistance: 9, maxDistance: null, fee: 1300 }
-    ]
-  };
-
+  academicYears: string[] = [];
+  currentSession: string = '';
+  isNewSession: boolean = false;
+  busFeeStructures: BusFee[] = [];
   isEditing = false;
   originalBusFees: BusFee[] = [];
 
+  constructor(private busFeesService: BusFeesService) {}
+
   ngOnInit(): void {
-    this.originalBusFees = JSON.parse(JSON.stringify(this.busFeeStructures[this.currentSession]));
+    this.fetchAcademicYears();
   }
 
-  canEdit(): boolean {
-    return true;
+  fetchAcademicYears(): void {
+    this.busFeesService.getAcademicYears().subscribe(years => {
+      this.academicYears = years;
+      if (this.academicYears.length > 0) {
+        this.currentSession = this.academicYears[this.academicYears.length - 1]; // Default to the latest year
+        this.fetchBusFees();
+      }
+    });
+  }
+
+  fetchBusFees(): void {
+    this.busFeesService.getBusFees(this.currentSession).subscribe(fees => {
+      this.busFeeStructures = fees;
+      this.originalBusFees = JSON.parse(JSON.stringify(this.busFeeStructures));
+    });
   }
 
   changeSession(session: string): void {
@@ -49,32 +46,46 @@ export class BusFeesComponent implements OnInit {
       const confirmChange = confirm("Unsaved changes will be lost. Do you want to continue?");
       if (!confirmChange) return;
     }
-
     this.currentSession = session;
     this.isNewSession = false;
     this.isEditing = false;
-    this.originalBusFees = JSON.parse(JSON.stringify(this.busFeeStructures[this.currentSession]));
+    this.fetchBusFees();
   }
 
   startNewAcademicYear(): void {
-    const lastSession = this.sessions[this.sessions.length - 1];
-    const [lastYear] = lastSession.split('-'); 
-    const newYear = `${parseInt(lastYear) + 1}-${parseInt(lastYear) + 2}`;
+    const lastSession = this.academicYears[this.academicYears.length - 1];
+    const [lastYearStr] = lastSession.split('-');
+    const lastYear = parseInt(lastYearStr);
+    const newYear = `${lastYear+1}-${lastYear+2}`;
 
     const confirmation = confirm(`Start new academic year ${newYear}?`);
 
-    if(confirmation){
-      if (this.sessions.includes(newYear)){
-          alert("This academic year already exists.");
-          return;
-        }
-
-        this.sessions.push(newYear);
-        this.busFeeStructures[newYear] = JSON.parse(JSON.stringify(this.busFeeStructures[lastSession])); // Copy last year's fees
-        this.currentSession = newYear;
-        this.isEditing = true;
-        this.isNewSession = true;
+    if (confirmation) {
+      if (this.academicYears.includes(newYear)) {
+        alert("This academic year already exists.");
+        return;
       }
+      this.academicYears.push(newYear);
+      this.fetchBusFees();
+      this.currentSession = newYear;
+      this.isEditing = true;
+      this.isNewSession = true;
+    }
+  }
+
+  addRow(): void {
+    this.busFeeStructures.push({
+      academicYear: this.currentSession,
+      minDistance: 0,
+      maxDistance: null,
+      fees: 0,
+    });
+  }
+
+  removeRow(): void {
+    if (this.busFeeStructures.length > 1) {
+      this.busFeeStructures.pop();
+    }
   }
 
   edit(): void {
@@ -84,18 +95,28 @@ export class BusFeesComponent implements OnInit {
   save(): void {
     this.isEditing = false;
     this.isNewSession = false;
-    this.originalBusFees = JSON.parse(JSON.stringify(this.busFeeStructures[this.currentSession]));
-    console.log(`Bus fee structure for ${this.currentSession} saved:`, this.busFeeStructures[this.currentSession]);
+    this.busFeesService.updateBusFees(this.currentSession, this.busFeeStructures).subscribe(() => {
+      this.originalBusFees = JSON.parse(JSON.stringify(this.busFeeStructures));
+      console.log(`Bus fee structure for ${this.currentSession} saved:`, this.busFeeStructures);
+    });
   }
 
   cancel(): void {
     if (this.isNewSession) {
-      delete this.busFeeStructures[this.currentSession]; 
-      this.sessions.pop(); 
-      this.currentSession = this.sessions[this.sessions.length - 1];
+      this.academicYears.pop();
+      this.currentSession = this.academicYears[this.academicYears.length - 1];
       this.isNewSession = false;
     }
-
     this.isEditing = false;
+    this.busFeeStructures = JSON.parse(JSON.stringify(this.originalBusFees));
+  }
+
+  canEdit(): boolean {
+    return true;
+  }
+
+  getFormattedSession(session: string): string {
+    const parts = session.split('-');
+    return `${parts[0]}-${parts[1].slice(2)}`; 
   }
 }

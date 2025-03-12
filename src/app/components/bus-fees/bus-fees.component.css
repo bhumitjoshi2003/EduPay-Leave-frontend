@@ -126,3 +126,8 @@
     font-size: 16px;
     margin-right: 8px; /* Add some spacing between label and select */
 }
+
+:disabled {
+  cursor: not-allowed !important;  
+  opacity: 0.6;
+}

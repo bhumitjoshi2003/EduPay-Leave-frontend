@@ -1,26 +1,42 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 export interface BusFee {
-  id: number;
+  id?: number;
   academicYear: string;
-  fees: number;
   minDistance: number;
-  maxDistance: number;
+  maxDistance: number | null;
+  fees: number;
 }
-
 
 @Injectable({
   providedIn: 'root'
 })
-export class BusFeesService {
 
+export class BusFeesService {
   private apiUrl = 'http://localhost:8081/bus-fees';
 
   constructor(private http: HttpClient) {}
 
+  getAcademicYears(): Observable<string[]> {
+    return this.http.get<BusFee[]>(this.apiUrl).pipe(
+      map(fees => {
+        const years = new Set(fees.map(fee => fee.academicYear));
+        return Array.from(years).sort();
+      })
+    );
+  }
+
   getBusFees(year: string): Observable<BusFee[]> {
     return this.http.get<BusFee[]>(`${this.apiUrl}/${year}`);
-  } 
+  }
+
+  updateBusFees(year: string, busFees: BusFee[]): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${year}`, busFees);
+  }
+
+  createNewSession(fromSession: string, toSession: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}`, { fromSession, toSession });
+  }
 }

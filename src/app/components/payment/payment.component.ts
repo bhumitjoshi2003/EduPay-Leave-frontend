@@ -1,4 +1,4 @@
-import { Component, Input, input } from '@angular/core';
+import { Component, EventEmitter, Input, input, Output } from '@angular/core';
 import { RazorpayService } from '../../services/razorpay.service';
 
 declare var Razorpay: any;
@@ -14,6 +14,7 @@ export class PaymentComponent {
   constructor(private razorpayService: RazorpayService) {}
 
   @Input() amount!: number;
+  @Output() paymentSuccess = new EventEmitter<void>();
 
   initiatePayment() {
     // Receive the amount from FeesComponent
@@ -63,6 +64,7 @@ export class PaymentComponent {
     this.razorpayService.verifyPayment(paymentResponse).subscribe((result: any) => {
       if (result.success) {
         alert('Payment Successful!');
+        this.paymentSuccess.emit(); 
       } else {
         alert('Payment Verification Failed!');
       }

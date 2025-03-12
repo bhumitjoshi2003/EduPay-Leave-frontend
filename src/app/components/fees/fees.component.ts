@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PaymentComponent } from "../payment/payment.component";
+import { ChangeDetectorRef, NgZone } from '@angular/core';
 
 @Component({
   selector: 'app-payment-tracker',
@@ -11,6 +12,9 @@ import { PaymentComponent } from "../payment/payment.component";
   styleUrls: ['./fees.component.css']
 })
 export class PaymentTrackerComponent implements OnInit {
+
+  constructor(private cdr: ChangeDetectorRef, private ngZone: NgZone) {}
+
   selectedYear: number = new Date().getFullYear();
   months = [
     { name: 'January', number: 1, paid: true, fee: 100, selected: false },
@@ -76,5 +80,23 @@ export class PaymentTrackerComponent implements OnInit {
         });
       }
     });
+  }
+
+  handleSuccessfulPayment() {
+    console.log("mark it as green works");
+  
+    this.ngZone.run(() => {
+      this.months.forEach(month => {
+        if (month.selected) {
+          month.selected = false;  // Unselect after payment
+          month.paid = true;  // Mark as paid
+        }
+      });
+  
+      this.totalAmountToPay = 0;
+      this.selectedMonthsByYear[this.selectedYear] = [];
+      this.cdr.detectChanges();
+    });
+    alert('Payment successful! Months marked as paid.');
   }
 }

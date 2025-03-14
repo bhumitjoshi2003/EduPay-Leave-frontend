@@ -3,6 +3,9 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PaymentComponent } from "../payment/payment.component";
 import { ChangeDetectorRef, NgZone } from '@angular/core';
+import { FeesService } from '../../services/fees.service';
+import { FeeStructureService } from '../../services/fee-structure.service';
+import { StudentService } from '../../services/student.service';
 
 @Component({
   selector: 'app-payment-tracker',
@@ -13,58 +16,121 @@ import { ChangeDetectorRef, NgZone } from '@angular/core';
 })
 export class PaymentTrackerComponent implements OnInit {
 
-  constructor(private cdr: ChangeDetectorRef, private ngZone: NgZone) {}
+  constructor(private cdr: ChangeDetectorRef, private ngZone: NgZone, private feesService: FeesService, private feeStructureService: FeeStructureService, private studentService: StudentService) {}
 
   selectedYear: number = new Date().getFullYear();
-  months = [
-    { name: 'January', number: 1, paid: true, fee: 100, selected: false },
-    { name: 'February', number: 2, paid: false, fee: 100, selected: false },
-    { name: 'March', number: 3, paid: false, fee: 100, selected: false },
-    { name: 'April', number: 4, paid: true, fee: 1, selected: false },
-    { name: 'May', number: 5, paid: false, fee: 1, selected: false },
-    { name: 'June', number: 6, paid: true, fee: 1, selected: false },
-    { name: 'July', number: 7, paid: false, fee: 100, selected: false },
-    { name: 'August', number: 8, paid: false, fee: 100, selected: false },
-    { name: 'September', number: 9, paid: true, fee: 100, selected: false },
-    { name: 'October', number: 10, paid: false, fee: 100, selected: false },
-    { name: 'November', number: 11, paid: false, fee: 100, selected: false },
-    { name: 'December', number: 12, paid: true, fee: 100, selected: false }
-  ];
+  months: any[] = [];
   totalAmountToPay: number = 0;
   selectedMonthsByYear: { [year: number]: number[] } = {};
+  studentId: string = 'S101';
+  className: string = '';
+  session: string = `${this.selectedYear}-${this.selectedYear + 1}`;
+  years: string[] = [];
 
   ngOnInit() {
-    this.updateMonthData();
-    this.calculateTotalAmount(); // Calculate initial amount
+    this.fetchSessions();
+    this.fetchStudentDetails();
   }
 
-  onYearChange() {
-    this.updateMonthData();
+  fetchSessions() {
+    this.feesService.getDistinctYearsByStudentId(this.studentId).subscribe(
+      (sessions) => {
+        this.years = sessions;
+        if (this.years.length > 0) {
+          this.session = this.years[this.years.length - 1];
+          this.selectedYear = parseInt(this.session.split('-')[0]);
+        }
+      },
+      (error) => {
+        console.error('Error fetching sessions:', error);
+      }
+    );
   }
 
-  updateMonthData() {
-    if (this.selectedMonthsByYear[this.selectedYear]) {
-      this.months.forEach(month => {
-        month.selected = this.selectedMonthsByYear[this.selectedYear].includes(month.number);
-      });
-    } else {
-      this.months.forEach(month => month.selected = false);
-    }
-    this.calculateTotalAmount(); // Recalculate on year change
+  onYearChange(event: any) {
+    this.selectedYear = parseInt(event.target.value);
+    this.session = `${this.selectedYear}-${this.selectedYear + 1}`;
+    this.fetchFees();
+  }
+
+  fetchStudentDetails() {
+    this.studentService.getStudent(this.studentId).subscribe(
+      (student) => {
+        this.className = student.className;
+        this.fetchFees();
+      },
+      (error) => {
+        console.error('Error fetching student details:', error);
+      }
+    );
+  }
+
+  fetchFees() {
+    const formattedYear = `${this.selectedYear}-${this.selectedYear + 1}`;
+    this.feesService.getStudentFees(this.studentId, formattedYear).subscribe(
+      (fees) => {
+        this.feeStructureService.getFeeStructure(formattedYear, this.className).subscribe(
+          (feeStructure) => {
+            if (feeStructure) {
+              this.months = fees.map(fee => ({
+                ...fee,
+                name: this.getMonthName(fee.month),
+                selected: this.isMonthSelected(fee.month, this.selectedYear),
+                fee: feeStructure.tuitionFee
+              }));
+            } else {
+              console.error('Fee structure not found.');
+              this.months = fees.map(fee => ({
+                ...fee,
+                name: this.getMonthName(fee.month),
+                selected: this.isMonthSelected(fee.month, this.selectedYear),
+                fee: 0
+              }));
+            }
+            this.calculateTotalAmount();
+          },
+          (error) => {
+            console.error('Error fetching fee structure:', error);
+            this.months = fees.map(fee => ({
+              ...fee,
+              name: this.getMonthName(fee.month),
+              selected: this.isMonthSelected(fee.month, this.selectedYear),
+              fee: 0
+            }));
+            this.calculateTotalAmount();
+          }
+        );
+      },
+      (error) => {
+        console.error('Error fetching fees:', error);
+      }
+    );
+  }
+
+  getMonthName(monthNumber: number): string {
+    const months = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
+    return months[monthNumber - 1];
+  }
+
+  isMonthSelected(monthNumber: number, year: number): boolean {
+    return this.selectedMonthsByYear[year]?.includes(monthNumber) || false;
   }
 
   toggleMonthSelection(month: any) {
     if (!month.paid) {
-      month.selected = !month.selected;
-      this.updateSelectedMonthsByYear();
-      this.calculateTotalAmount(); // Recalculate on selection change
+      const year = this.selectedYear; // Use the current selected year
+      if (!this.selectedMonthsByYear[year]) {
+        this.selectedMonthsByYear[year] = [];
+      }
+      const index = this.selectedMonthsByYear[year].indexOf(month.month);
+      if (index === -1) {
+        this.selectedMonthsByYear[year].push(month.month);
+      } else {
+        this.selectedMonthsByYear[year].splice(index, 1);
+      }
+      month.selected = this.isMonthSelected(month.month, year);
+      this.calculateTotalAmount();
     }
-  }
-
-  updateSelectedMonthsByYear() {
-    this.selectedMonthsByYear[this.selectedYear] = this.months
-      .filter(month => month.selected)
-      .map(month => month.number);
   }
 
   calculateTotalAmount() {
@@ -73,28 +139,35 @@ export class PaymentTrackerComponent implements OnInit {
       const year = parseInt(yearKey, 10);
       if (this.selectedMonthsByYear[year]) {
         this.selectedMonthsByYear[year].forEach((monthNumber) => {
-          const month = this.months.find((m) => m.number === monthNumber);
-          if (month) {
-            this.totalAmountToPay += month.fee;
-          }
+          const formattedYear = `${year}-${year + 1}`;
+          this.feesService.getStudentFee(this.studentId, formattedYear, monthNumber).subscribe(fee => {
+            this.feeStructureService.getFeeStructure(formattedYear, this.className).subscribe(feeStructure => {
+              if (feeStructure) {
+                this.totalAmountToPay += feeStructure.tuitionFee;
+              }
+            });
+          });
         });
       }
     });
   }
 
   handleSuccessfulPayment() {
-    console.log("mark it as green works");
-  
     this.ngZone.run(() => {
-      this.months.forEach(month => {
-        if (month.selected) {
-          month.selected = false;  // Unselect after payment
-          month.paid = true;  // Mark as paid
-        }
+      Object.keys(this.selectedMonthsByYear).forEach(yearKey => {
+        const year = parseInt(yearKey, 10);
+        const formattedYear = `${year}-${year + 1}`;
+        this.selectedMonthsByYear[year].forEach(monthNumber => {
+          this.feesService.getStudentFee(this.studentId, formattedYear, monthNumber).subscribe(fee => {
+            fee.paid = true;
+            this.feesService.updateStudentFees(fee).subscribe(() => {
+              this.fetchFees();
+            });
+          });
+        });
       });
-  
       this.totalAmountToPay = 0;
-      this.selectedMonthsByYear[this.selectedYear] = [];
+      this.selectedMonthsByYear = {};
       this.cdr.detectChanges();
     });
     alert('Payment successful! Months marked as paid.');

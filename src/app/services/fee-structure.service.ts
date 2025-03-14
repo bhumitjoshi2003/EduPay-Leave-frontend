@@ -18,12 +18,12 @@ export interface FeeStructure {
   providedIn: 'root'
 })
 export class FeeStructureService {
-  private apiUrl = 'http://localhost:8081/fee-structure'; 
+  private baseUrl = 'http://localhost:8081/fee-structure'; 
 
   constructor(private http: HttpClient) {}
 
   getAcademicYears(): Observable<string[]> {
-    return this.http.get<FeeStructure[]>(this.apiUrl).pipe(
+    return this.http.get<FeeStructure[]>(this.baseUrl).pipe(
       map(fees => {
         const years = new Set(fees.map(fee => fee.academicYear));
         return Array.from(years).sort();
@@ -31,15 +31,19 @@ export class FeeStructureService {
     );
   }
 
+  getFeeStructure(session: string, className: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${session}/${className}`);
+  }
+
   getFeeStructures(year: string): Observable<FeeStructure[]> {
-    return this.http.get<FeeStructure[]>(`${this.apiUrl}/${year}`);
+    return this.http.get<FeeStructure[]>(`${this.baseUrl}/${year}`);
   }
 
   updateFeeStructures(year: string, feeStructures: FeeStructure[]): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${year}`, feeStructures);
+    return this.http.put<void>(`${this.baseUrl}/${year}`, feeStructures);
   }
 
   createNewSession(fromSession: string, toSession: string, feeStructures: FeeStructure[]): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${toSession}`, feeStructures);
+    return this.http.post<void>(`${this.baseUrl}/${toSession}`, feeStructures);
   }
 }

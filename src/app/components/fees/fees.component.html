@@ -1,9 +1,9 @@
 <div class="payment-tracker">
-    <div class="year-select-wrapper">
-      <select [(ngModel)]="selectedYear" (change)="onYearChange()">
-        <option *ngFor="let year of [2023, 2024, 2025]" [value]="year">{{ year }}</option>
-      </select>
-    </div>
+  <div class="year-select-wrapper">
+    <select [(ngModel)]="session" (change)="onYearChange($event)">
+      <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+    </select>
+  </div>
   
     <div class="month-grid">
       <div *ngFor="let month of months" class="month"

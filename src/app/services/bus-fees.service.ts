@@ -26,10 +26,14 @@ export class BusFeesService {
         return Array.from(years).sort();
       })
     );
-  }
+  } 
 
   getBusFees(year: string): Observable<BusFee[]> {
     return this.http.get<BusFee[]>(`${this.apiUrl}/${year}`);
+  }
+
+  getBusFeesOfDistance(distance: number, academicYear: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/${distance}/${academicYear}`);
   }
 
   updateBusFees(year: string, busFees: BusFee[]): Observable<void> {

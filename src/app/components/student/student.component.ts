@@ -8,18 +8,9 @@ import { StudentService } from '../../services/student.service';
   styleUrl: './student.component.css'
 })
 export class StudentComponent implements OnInit{
-  studentDetails: any;
 
   constructor(private studentService: StudentService) {}
 
-  ngOnInit(): void {
-    this.getStudentDetails();
-  }
-
-  getStudentDetails(){
-    this.studentService.getStudentDetails().subscribe({
-      next: (response) => this.studentDetails.set(response),
-      error: (error) => console.error('Error fetching student details:', error)
-    });
-  }
+  ngOnInit(): void {}
+  
 }

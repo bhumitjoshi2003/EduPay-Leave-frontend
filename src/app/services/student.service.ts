@@ -1,17 +1,16 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StudentService {
-
-  private baseUrl = 'http://localhost:8081/student';
+  private baseUrl = 'http://localhost:8081/students'; // Replace with your backend URL
 
   constructor(private http: HttpClient) {}
 
-  getStudentDetails(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/details`); // Token is handled by interceptor
+  getStudent(studentId: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${studentId}`);
   }
 }

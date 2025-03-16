@@ -1,103 +1,121 @@
-# EduPay-Leave-frontend
+# 🎓 EduPay-Leave-Frontend
 
-This repository contains the frontend application for the IAS Management system. It's built using Angular and provides a user interface for managing student fees, payments, and related information.
+Welcome to the **EduPay-Leave-Frontend** repository! 🚀 This is the frontend application for the **IAS Management System**, designed to facilitate student fee management, payments, and leave tracking with an intuitive user interface.
 
-## Technologies Used
+---
 
-* **Angular:** A platform for building client-side web applications.
-* **TypeScript:** A statically typed superset of JavaScript.
-* **Keycloak:** For user authentication and authorization.
-* **Razorpay:** For payment gateway integration.
+## 🛠️ Technologies Used
 
-## Prerequisites
+- **🌐 Angular** - A powerful framework for building dynamic web applications.
+- **📜 TypeScript** - A statically typed superset of JavaScript.
+- **🛡️ Keycloak** - Handles user authentication and authorization.
+- **💳 Razorpay** - Seamless payment gateway integration.
 
-Before you begin, ensure you have the following installed:
+---
 
-* **Node.js:** (Version X.X.X or higher) - [https://nodejs.org/](https://nodejs.org/)
-* **npm (Node Package Manager) or Yarn:** (Usually installed with Node.js)
-* **Angular CLI:** (Install globally using `npm install -g @angular/cli` or `yarn global add @angular/cli`)
-* **Keycloak Server:** A running Keycloak server instance.
-* **Razorpay Account:** A Razorpay account with API keys.
+## 📋 Prerequisites
 
-## Installation
+Before getting started, ensure you have the following installed:
 
-1.  **Clone the repository:**
+✅ **Node.js** (vX.X.X or higher) - [Download](https://nodejs.org/)  
+✅ **npm** (or **Yarn**) - Installed with Node.js  
+✅ **Angular CLI** - Install globally using:  
+   ```bash
+   npm install -g @angular/cli  # or yarn global add @angular/cli
+   ```
+✅ **Keycloak Server** - A running Keycloak instance for authentication  
+✅ **Razorpay Account** - An account with API keys for handling payments
 
-    ```bash
-    git clone https://github.com/bhumitjoshi2003/EduPay-Leave-frontend.git
-    cd EduPay-Leave-frontend
-    ```
+---
 
-2.  **Install dependencies:**
+## 📥 Installation
 
-    ```bash
-    npm install  # or yarn install
-    ```
+1️⃣ **Clone the repository:**
+   ```bash
+   git clone https://github.com/bhumitjoshi2003/EduPay-Leave-frontend.git
+   cd EduPay-Leave-frontend
+   ```
 
-## Configuration
+2️⃣ **Install dependencies:**
+   ```bash
+   npm install  # or yarn install
+   ```
 
-1.  **Keycloak Configuration:**
-    * Locate the Keycloak configuration file (e.g., `keycloak.json` or within `environment.ts` if using Angular Keycloak libraries).
-    * Update the Keycloak configuration with your Keycloak server URL, realm, and client ID.
-    * Example using `environment.ts`:
+---
 
-        ```typescript
-        // environment.ts
-        export const environment = {
-          production: false,
-          apiUrl: 'http://your-backend-api-url',
-          keycloak: {
-            issuer: 'YOUR_KEYCLOAK_ISSUER_URL', //Example: http://localhost:8080/auth/realms/your-realm
-            realm: 'YOUR_KEYCLOAK_REALM',
-            clientId: 'YOUR_KEYCLOAK_CLIENT_ID'
-          }
-        };
-        ```
+## ⚙️ Configuration
 
-2.  **Razorpay Configuration:**
-    * Ensure your payment component or service is configured with your Razorpay API key.
-    * Handle the Razorpay API key securely. Avoid storing it directly in the frontend code if possible.
-    * Ideally, the backend should handle the creation of Razorpay order ids. The frontend will pass the order id to the razorpay payment widget.
+### 🔐 Keycloak Configuration
+1. Locate the Keycloak config file (e.g., `keycloak.json` or within `environment.ts`).
+2. Update it with your Keycloak **server URL, realm, and client ID**.
+3. Example `environment.ts` setup:
 
-3.  **API Configuration:**
-    * Ensure that the `environment.ts` (or `environment.prod.ts`) file is configured with the correct backend API endpoint URL.
+   ```typescript
+   export const environment = {
+     production: false,
+     apiUrl: 'http://your-backend-api-url',
+     keycloak: {
+       issuer: 'YOUR_KEYCLOAK_ISSUER_URL', // Example: http://localhost:8080/auth/realms/your-realm
+       realm: 'YOUR_KEYCLOAK_REALM',
+       clientId: 'YOUR_KEYCLOAK_CLIENT_ID'
+     }
+   };
+   ```
 
-        ```typescript
-        // environment.ts
-        export const environment = {
-          production: false,
-          apiUrl: 'http://your-backend-api-url'
-        };
-        ```
+### 💳 Razorpay Configuration
+1. Ensure the **payment component/service** is configured with your Razorpay API key.
+2. Store API keys **securely** (avoid hardcoding them in the frontend!).
+3. Backend should handle the creation of Razorpay order IDs.
 
-## Running the Project
+### 🔗 API Configuration
+1. Update `environment.ts` with the correct backend API URL.
+   ```typescript
+   export const environment = {
+     production: false,
+     apiUrl: 'http://your-backend-api-url'
+   };
+   ```
 
-1.  **Start Keycloak Server:**
-    * Ensure your Keycloak server is running.
+---
 
-2.  **Start the Angular Application:**
+## 🚀 Running the Project
 
-    ```bash
-    ng serve  # or yarn start
-    ```
+1️⃣ **Start Keycloak Server:** Ensure your Keycloak instance is running.
 
-3.  **Access the Application:**
-    * Open your browser and navigate to `http://localhost:4200/`.
-    * You will be redirected to the Keycloak login page.
-    * Log in with your Keycloak credentials.
+2️⃣ **Run the Angular Application:**
+   ```bash
+   ng serve  # or yarn start
+   ```
 
-4.  **Razorpay Payment:**
-    * When you initiate a payment, the Razorpay payment gateway will be displayed.
-    * Use your Razorpay test or live credentials to complete the payment.
+3️⃣ **Access the Application:** Open your browser and go to:
+   🔗 `http://localhost:4200/`
+   - You'll be redirected to the **Keycloak login page**.
+   - Log in using your Keycloak credentials.
 
-## Running this project for other users.
+4️⃣ **Razorpay Payment Flow:**
+   - When making a payment, the Razorpay widget will open.
+   - Use **test/live credentials** to complete the transaction.
 
-1.  **Obtain the code:** Clone the git repository.
-2.  **Install prerequisites:** Node.js, npm/yarn, Angular CLI, and a running Keycloak server.
-3.  **Configure Keycloak:** Update the `environment.ts` file with their Keycloak server details.
-4.  **Configure Razorpay:** If using Razorpay, add their Razorpay API keys or ensure the backend is handling order creation.
-5.  **Configure API URL:** Update the `environment.ts` file with their backend API URL.
-6.  **Install dependencies:** Run `npm install` or `yarn install`.
-7.  **Run the application:** Run `ng serve` or `yarn start`.
-8.  **Access the application:** Open a browser and navigate to `http://localhost:4200`.
+---
+
+## 🌍 Running this Project for Other Users
+
+👨‍💻 **Steps to set up:**
+1. **Clone the repository** and navigate to the project directory.
+2. **Install prerequisites** (Node.js, npm/yarn, Angular CLI, Keycloak server).
+3. **Update `environment.ts`** with their Keycloak and backend details.
+4. **Configure Razorpay** if applicable.
+5. **Install dependencies** using:
+   ```bash
+   npm install  # or yarn install
+   ```
+6. **Start the application** with:
+   ```bash
+   ng serve  # or yarn start
+   ```
+7. **Access the app** at `http://localhost:4200`.
+
+---
+
+### 🎯 Happy Coding! 🚀
 

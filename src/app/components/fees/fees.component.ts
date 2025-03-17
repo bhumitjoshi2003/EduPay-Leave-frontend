@@ -8,6 +8,7 @@ import { FeeStructureService } from '../../services/fee-structure.service';
 import { StudentService } from '../../services/student.service';
 import { BusFeesService } from '../../services/bus-fees.service';
 import Swal from 'sweetalert2';
+import { PaymentData } from '../../interfaces/payment-data';
 
 @Component({
   selector: 'app-payment-tracker',
@@ -30,14 +31,29 @@ export class PaymentTrackerComponent implements OnInit {
   months: any[] = [];
   totalAmountToPay: number = 0;
   selectedMonthsByYear: { [year: number]: number[] } = {};
-  studentId: string = 'S102';
+  studentId: string = 'S101';
   className: string = '';
-  session: string = `<span class="math-inline">\{this\.selectedYear\}\-</span>{this.selectedYear + 1}`;
+  session: string = ``;
   years: string[] = [];
   newAdmission: boolean = false;
   selectedMonthDetails: any = null;
   lastSelectedMonth: any = null;
-  monthsSelectedInCurrentSession: boolean = false;
+  studentName: string = '';
+
+  paymentData: PaymentData = {
+    totalAmount: 0,
+    monthSelectionString: "000000000000",
+    totalTuitionFee: 0,
+    totalAnnualCharges: 0,
+    totalLabCharges: 0,
+    totalEcaProject: 0,
+    totalBusFee: 0,
+    totalExaminationFee: 0,
+    studentId: "",
+    studentName: "",
+    className: "",
+    session: "",
+  };
 
   ngOnInit() {
     this.fetchSessions();
@@ -91,8 +107,14 @@ export class PaymentTrackerComponent implements OnInit {
               this.months = fees.map(fee => ({
                 ...fee,
                 name: this.getMonthName(fee.month),
+                monthNumber: fee.month,
                 selected: this.isMonthSelected(fee.month, this.selectedYear),
-                fee: feeStructure.tuitionFee + ((fee.month !== 1) ? 0 : feeStructure.annualCharges + feeStructure.ecaProject + feeStructure.examinationFee + feeStructure.labCharges),
+                fee: feeStructure.tuitionFee + ((fee.month!==1) ? 0 : feeStructure.annualCharges + feeStructure.ecaProject + feeStructure.examinationFee + feeStructure.labCharges),
+                tuitionFee: feeStructure.tuitionFee,
+                annualCharges: (fee.month !== 1) ? 0 : feeStructure.annualCharges,
+                ecaProject: (fee.month !== 1) ? 0 : feeStructure.ecaProject,
+                examinationFee: (fee.month !== 1) ? 0 : feeStructure.examinationFee,  
+                labCharges: (fee.month !== 1) ? 0 : feeStructure.labCharges, 
                 busFee: 0
               }));
               this.fetchBusFees();
@@ -147,14 +169,19 @@ export class PaymentTrackerComponent implements OnInit {
 
       const index = this.selectedMonthsByYear[year].indexOf(month.month);
       if (index === -1) {
-        this.totalAmountToPay += month.fee + (month.busFee || 0);
+        this.totalAmountToPay += month.fee + month.busFee;
         this.selectedMonthsByYear[year].push(month.month);
-        this.lastSelectedMonth = month; // Update last selected
+        this.lastSelectedMonth = month; 
         this.populateMonthDetails(month);
-        this.monthsSelectedInCurrentSession = true;
+
+        this.updatePaymentData(month, true);
+
       } else {
-        this.totalAmountToPay -= month.fee + (month.busFee || 0);
+        this.totalAmountToPay -= month.fee + month.busFee;
         this.selectedMonthsByYear[year].splice(index, 1);
+
+        this.updatePaymentData(month, false);
+
         if(this.lastSelectedMonth === month){
           if(this.selectedMonthsByYear[year].length > 0){
             let lastSelectedIndex = this.selectedMonthsByYear[year][this.selectedMonthsByYear[year].length -1];
@@ -173,8 +200,28 @@ export class PaymentTrackerComponent implements OnInit {
         }
       }
       month.selected = !month.selected;
-      this.monthsSelectedInCurrentSession = Object.keys(this.selectedMonthsByYear).some(key => this.selectedMonthsByYear[parseInt(key)].length > 0);
     }
+  }
+
+  updatePaymentData(month: any, add: boolean) {
+    let months = this.paymentData.monthSelectionString;
+    this.paymentData.monthSelectionString =  months.substring(0, month.monthNumber-1) + ((add) ? '1' : '0') + months.substring(month.monthNumber);  
+
+
+    this.paymentData.totalAmount =  this.totalAmountToPay;
+    this.paymentData.totalTuitionFee += add ? month.tuitionFee : -month.tuitionFee;
+    this.paymentData.totalAnnualCharges += add ? month.annualCharges :  -month.annualCharges;
+    this.paymentData.totalBusFee += add ? month.busFee : -month.busFee;
+    this.paymentData.totalEcaProject += add ? month.ecaProject : -month.ecaProject;
+    this.paymentData.totalLabCharges += add ? month.labCharges : -month.labCharges;
+    this.paymentData.totalExaminationFee += add ? month.examinationFee : -month.examinationFee;
+
+    this.paymentData.studentId = this.studentId;
+    this.paymentData.studentName = this.studentName;
+    this.paymentData.className = this.className;
+    this.paymentData.session = this.session;
+
+    console.log(this.paymentData);
   }
 
 
@@ -184,14 +231,16 @@ export class PaymentTrackerComponent implements OnInit {
         this.feeStructureService.getFeeStructure(this.session, this.className).subscribe({
           next: (feeStructure) => {
             if (feeStructure) {
+              this.studentName = student.name;
               this.selectedMonthDetails = {
-                studentName: student.name,
                 studentId: this.studentId,
                 studentClass: student.className,
+                studentName: this.studentName,
                 tuitionFee: feeStructure.tuitionFee,
                 annualCharges: (month.month==1) ? feeStructure.annualCharges : 0,
                 labCharges: (month.month==1) ? feeStructure.labCharges : 0,
                 ecaProject: (month.month==1) ? feeStructure.ecaProject : 0,
+                examinationFee: (month.month==1) ? feeStructure.examinationFee : 0,
                 busFee: month.busFee,
                 monthName: month.name
               };
@@ -213,6 +262,7 @@ export class PaymentTrackerComponent implements OnInit {
   handleSuccessfulPayment() {
     this.ngZone.run(() => {
       const promises: Promise<any>[] = [];
+
       Object.keys(this.selectedMonthsByYear).forEach(yearKey => {
         const year = parseInt(yearKey, 10);
         const formattedYear = `${year}-${year + 1}`;
@@ -227,6 +277,8 @@ export class PaymentTrackerComponent implements OnInit {
           }));
         });
       });
+
+      this.initPaymentData();
 
       Promise.all(promises).then(() => {
         this.fetchFees();
@@ -244,5 +296,20 @@ export class PaymentTrackerComponent implements OnInit {
         });
       });
     });
+  }
+
+  initPaymentData(){
+    this.paymentData.totalAmount= 0,
+    this.paymentData.monthSelectionString= "000000000000",
+    this.paymentData.totalTuitionFee= 0,
+    this.paymentData.totalAnnualCharges= 0,
+    this.paymentData.totalLabCharges= 0,
+    this.paymentData.totalEcaProject= 0,
+    this.paymentData.totalBusFee= 0,
+    this.paymentData.totalExaminationFee= 0,
+    this.paymentData.studentId= "",
+    this.paymentData.studentName= "",
+    this.paymentData.className= "",
+    this.paymentData.session= "";
   }
 }

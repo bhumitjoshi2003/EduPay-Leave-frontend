@@ -22,12 +22,10 @@
     </div>
   </div>
 
-
-
   <div *ngIf="selectedMonthDetails" class="month-details-container">
     <div class="month-details">
       <h2>{{selectedMonthDetails.monthName}} - Details</h2>
-  
+
       <div class="details-grid">
         <div class="student-details">
           <h3>Student Details</h3>
@@ -44,7 +42,7 @@
             <span>{{ selectedMonthDetails.studentClass }}</span>
           </div>
         </div>
-  
+
         <div class="fee-details">
           <h3>Academic Fee Details</h3>
           <div class="detail-item">
@@ -63,6 +61,10 @@
             <strong>E.C.A/Project:</strong>
             <span>₹{{ selectedMonthDetails.ecaProject }}</span>
           </div>
+          <div class="detail-item" *ngIf="selectedMonthDetails.examinationFee">
+            <strong>Examination Fee:</strong>
+            <span>₹{{ selectedMonthDetails.examinationFee }}</span>
+          </div>
           <div class="detail-item" *ngIf="selectedMonthDetails.busFee">
             <strong>Bus Fees:</strong>
             <span>₹{{ selectedMonthDetails.busFee }}</span>
@@ -73,9 +75,12 @@
   </div>
 
   <div class="sticky-footer">
-   <div class="total-amount-bottom">
-    Total Amount to Pay: ₹{{ totalAmountToPay }}
-   </div>
-   <app-payment [amount]="totalAmountToPay" (paymentSuccess)="handleSuccessfulPayment()"></app-payment>
+    <div class="total-amount-bottom">
+      Total Amount to Pay: ₹{{ totalAmountToPay }}
+    </div>
+    <app-payment
+      [paymentData]="paymentData"
+      (paymentSuccess)="handleSuccessfulPayment()"
+    ></app-payment>
   </div>
 </div>

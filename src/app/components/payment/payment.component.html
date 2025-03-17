@@ -1,4 +1,4 @@
 
 <div class="payment-container">
-  <button (click)="initiatePayment()" class="pay-btn" [disabled]="amount === 0">Pay Now</button>
+  <button (click)="initiatePayment()" class="pay-btn" [disabled]="this.paymentData.totalAmount === 0">Pay Now</button>
 </div>

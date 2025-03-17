@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, input, Output } from '@angular/core';
 import { RazorpayService } from '../../services/razorpay.service';
+import { PaymentData } from '../../interfaces/payment-data';
+import Swal from 'sweetalert2';
 
 declare var Razorpay: any;
 
@@ -13,14 +15,26 @@ export class PaymentComponent {
 
   constructor(private razorpayService: RazorpayService) {}
 
-  @Input() amount!: number;
+  @Input() paymentData: PaymentData = {
+    totalAmount: 0,
+    monthSelectionString: "000000000000",
+    totalTuitionFee: 0,
+    totalAnnualCharges: 0,
+    totalLabCharges: 0,
+    totalEcaProject: 0,
+    totalBusFee: 0,
+    totalExaminationFee:0,
+    studentId: "",
+    studentName: "",
+    className: "",
+    session: "",
+  };
+
   @Output() paymentSuccess = new EventEmitter<void>();
 
   initiatePayment() {
-    // Receive the amount from FeesComponent
-    console.log(`Making a payment of ${this.amount}`);
-
-    this.razorpayService.createOrder(this.amount*100).subscribe((response: any) => {
+    this.paymentData.totalAmount *= 100;
+    this.razorpayService.createOrder(this.paymentData).subscribe((response: any) => {
       console.log(response);
       const options = {
         key: 'rzp_test_uzFJONVXH4vqou',  
@@ -45,11 +59,22 @@ export class PaymentComponent {
         },
         handler: (paymentResponse: any) => {
           console.log('Payment Success:', paymentResponse);
-          this.verifyPayment(paymentResponse);
+          console.log(response);
+          this.verifyPayment(paymentResponse, response);
         },
         modal: {
           ondismiss: function () {
-            alert('Payment popup closed');
+            Swal.fire({
+              icon: "warning",
+              title: "Payment Cancelled!",
+              text: "Please try again if you wish to proceed.",
+              confirmButtonText: "Okay",
+              confirmButtonColor: "#ff6b6b",
+              background: "#fef2f2",
+              color: "#b91c1c",
+              timer: 4000,
+              timerProgressBar: true
+            });
           }
         }
       };
@@ -59,8 +84,8 @@ export class PaymentComponent {
     });
   }
 
-  verifyPayment(paymentResponse: any) {
-    this.razorpayService.verifyPayment(paymentResponse).subscribe((result: any) => {
+  verifyPayment(paymentResponse: any, orderDetails : any) {
+    this.razorpayService.verifyPayment(paymentResponse, orderDetails).subscribe((result: any) => {
       if (result.success) {
         this.paymentSuccess.emit(); 
       } else {

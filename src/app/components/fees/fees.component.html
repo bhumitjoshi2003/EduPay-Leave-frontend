@@ -1,7 +1,7 @@
 <div class="payment-tracker">
   <div class="header">
     <div class="year-select-wrapper">
-      <select [(ngModel)]="session" (change)="onYearChange($event)">
+      <select [disabled]="lastSelectedMonth" [(ngModel)]="session" (change)="onYearChange($event)">
         <option *ngFor="let year of years" [value]="year">{{ year }}</option>
       </select>
     </div>

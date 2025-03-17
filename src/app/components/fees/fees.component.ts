@@ -7,7 +7,7 @@ import { FeesService } from '../../services/fees.service';
 import { FeeStructureService } from '../../services/fee-structure.service';
 import { StudentService } from '../../services/student.service';
 import { BusFeesService } from '../../services/bus-fees.service';
-import { forkJoin } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-payment-tracker',
@@ -30,7 +30,7 @@ export class PaymentTrackerComponent implements OnInit {
   months: any[] = [];
   totalAmountToPay: number = 0;
   selectedMonthsByYear: { [year: number]: number[] } = {};
-  studentId: string = 'S101';
+  studentId: string = 'S102';
   className: string = '';
   session: string = `<span class="math-inline">\{this\.selectedYear\}\-</span>{this.selectedYear + 1}`;
   years: string[] = [];
@@ -60,11 +60,6 @@ export class PaymentTrackerComponent implements OnInit {
   }
 
   onYearChange(event: any) {
-    if (this.monthsSelectedInCurrentSession) {
-      alert("You cannot change the year while months are selected.");
-      event.target.value = this.session; // Reset the select value
-      return;
-    }
     this.selectedYear = parseInt(event.target.value);
     this.session = `${this.selectedYear}-${this.selectedYear + 1}`;
     this.fetchFees();
@@ -236,9 +231,17 @@ export class PaymentTrackerComponent implements OnInit {
       Promise.all(promises).then(() => {
         this.fetchFees();
         this.selectedMonthsByYear = {};
-        this.totalAmountToPay=0;
+        this.totalAmountToPay = 0;
         this.cdr.detectChanges();
-        alert('Payment successful!');
+        
+        Swal.fire({
+          title: '🎉 Payment Successful!',
+          text: 'Your payment has been processed successfully.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+          timer: 3000,
+          timerProgressBar: true,
+        });
       });
     });
   }

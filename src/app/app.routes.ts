@@ -4,6 +4,7 @@ import { StudentComponent } from './components/student/student.component';
 import { PaymentTrackerComponent } from './components/fees/fees.component';
 import { FeeStructureComponent } from './components/fee-structure/fee-structure.component';
 import { PaymentComponent } from './components/payment/payment.component';
+import { BusFeesComponent } from './components/bus-fees/bus-fees.component';
 
 // import { AuthGuard } from './auth/auth.guard';
 
@@ -13,6 +14,7 @@ export const routes: Routes = [
     { path: 'fee-structure', component: FeeStructureComponent },
     { path: 'fees', component: PaymentTrackerComponent },
     { path: 'payment', component: PaymentComponent },
+    { path: 'bus-fees', component: BusFeesComponent },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },
 ];
 

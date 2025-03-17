@@ -1,86 +1,219 @@
 .payment-tracker {
-    font-family: sans-serif;
-    padding: 20px;
-  }
-  
-  /* Style the year selection */
-  .year-select-wrapper {
-    position: relative;
-    display: inline-block;
-    margin-bottom: 15px;
-  }
-  
-  .year-select-wrapper select {
-    padding: 12px 40px 12px 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    appearance: none;
-    background-color: #fff;
-    width: 150px;
-  }
-  
-  .year-select-wrapper select:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-  }
-  
-  .year-select-wrapper::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 15px;
-    transform: translateY(-50%);
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-top: 8px solid #333;
-    pointer-events: none;
-  }
-  
-  .month-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 20px;
-  }
-  
-  .month {
-    padding: 15px;
-    text-align: center;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .paid {
-    background-color: lightgreen;
-    cursor: not-allowed;
-    opacity: 0.8;
-  }
-  
-  .unpaid {
-    background-color: rgb(248, 116, 116);
-  }
-  
-  .month:hover {
-    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2);
-  }
-  
-  .month.selected {
-    background-color: rgb(244, 188, 85);
-  }
-  
-  .unpaid.selected {
-    background-color: orange;
-  }
-  
-  .month-status {
-    margin-top: 5px;
-    font-size: 0.8em;
-  }
-  
-  .total-amount {
-    margin-top: 20px;
-    font-weight: bold;
-  }
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 30px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  margin: 20px auto;
+  width: 95%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.year-select-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.year-select-wrapper select {
+  padding: 12px 40px 12px 15px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  appearance: none;
+  background-color: #fff;
+  width: 180px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.year-select-wrapper select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.year-select-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid #333;
+  pointer-events: none;
+}
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* 6 columns */
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.month {
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+  border: 1px solid #ddd;
+}
+
+.paid {
+  background-color: #d4edda;
+  color: #155724;
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+.unpaid {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.month:hover {
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+.month.selected {
+  background-color: #e0f2fe; 
+  color: #1e88e5; 
+}
+
+.unpaid.selected {
+  background-color: #f7d156; 
+  color: #100d05;
+}
+
+.month-name {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.month-status {
+  font-size: 0.9em;
+}
+
+.total-amount {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.month-details-container {
+  margin-top: 30px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+}
+
+.month-details h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.section h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.section p {
+  line-height: 1.6;
+  color: #555;
+}
+
+
+
+
+
+.month-details-container {
+  margin-top: 40px;
+  background-color: #ebe9e9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding-top: 5px;
+}
+
+.month-details h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 100%; 
+}
+
+.student-details,
+.fee-details {
+  padding: 15px;
+  border: 1px solid #faf5f5;
+  border-radius: 8px;
+  background-color: #f9fdfd;
+}
+
+.student-details h3,
+.fee-details h3 {
+  font-size: 20px;
+  margin-top: 0%;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px dashed #ddd;
+}
+
+.detail-item strong {
+  font-weight: 600;
+  color: #555;
+}
+
+.detail-item span {
+  color: #777;
+}
+
+
+
+
+.sticky-footer {
+  border-radius: 10px;
+  margin-top: 20px;
+  position: sticky;
+  bottom: 0;
+  background-color: #f0f0f0;
+  padding-left: 20px;
+  padding-right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-amount-bottom {
+  font-weight: 600;
+  font-size: 18px;
+  color: #333;
+}

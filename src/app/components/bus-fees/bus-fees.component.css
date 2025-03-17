@@ -1,5 +1,5 @@
 .bus-fees-container {
-    width: 60%;
+    width: 90%;
     margin: 30px auto;
     background-color: #f0f8ff;
     border-radius: 12px;
@@ -40,6 +40,14 @@
     font-weight: 500;
     transition: background-color 0.3s ease, transform 0.2s ease;
   }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap; /* Allows buttons to wrap to next line if needed */
+    align-items: center;
+    gap: 10px; /* Adds spacing between elements */
+}
+
   
   .actions button:hover {
     background-color: #206498;
@@ -70,11 +78,11 @@
   }
   
   .bus-fees-table tr:nth-child(even) {
-    background-color: #f0f0f0;
+    background-color: #f5f5e6;
   }
   
   .bus-fees-table tr:hover {
-    background-color: #e8f5e9;
+    background-color: #e4f9e6;
     transition: background-color 0.3s ease;
   }
   
@@ -95,4 +103,31 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     overflow: hidden;
+}
+
+.actions select {
+    padding: 10px 15px;
+    border: 1px solid #a9a9a9; /* Dark gray border */
+    border-radius: 6px;
+    font-size: 16px;
+    color: #444;
+    background-color: white; /* White background */
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.actions select:focus {
+    border-color: #008080; /* Teal focus border */
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 128, 128, 0.5); /* Teal focus shadow */
+}
+
+.actions label {
+    font-size: 16px;
+    margin-right: 8px; /* Add some spacing between label and select */
+}
+
+:disabled {
+  cursor: not-allowed !important;  
+  opacity: 0.6;
 }

@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { PaymentData } from '../interfaces/payment-data';
 
 @Injectable({
   providedIn: 'root'
@@ -10,11 +11,11 @@ export class RazorpayService {
 
   constructor(private http: HttpClient) { }
 
-  createOrder(amount: number){
-    return this.http.post(`${this.backendUrl}/create`, {amount});
+  createOrder(paymentData: PaymentData) {
+    return this.http.post(`${this.backendUrl}/create`, { paymentData } );
   }
 
-  verifyPayment(paymentData: any) {
-    return this.http.post(`${this.backendUrl}/verify`, paymentData);
+  verifyPayment(paymentResponse: any, orderDetails: any) {
+    return this.http.post(`${this.backendUrl}/verify`,{ paymentResponse, orderDetails } );
   }
 }

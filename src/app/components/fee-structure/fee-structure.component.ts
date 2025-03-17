@@ -1,17 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BusFeesComponent } from '../bus-fees/bus-fees.component'; // Adjust path
-
-interface FeeStructure {
-  class: string;
-  tuitionFee: number;
-  admissionFee: number;
-  annualCharges: number;
-  ecaProject: number;
-  examinationFee: number;
-  labCharges: number; // Added lab charges
-}
+import { BusFeesComponent } from '../bus-fees/bus-fees.component';
+import { FeeStructure, FeeStructureService } from '../../services/fee-structure.service';
 
 @Component({
   selector: 'app-fee-structure',
@@ -21,24 +12,75 @@ interface FeeStructure {
   styleUrls: ['./fee-structure.component.css']
 })
 export class FeeStructureComponent implements OnInit {
-  feeStructure: FeeStructure[] = [
-    { class: 'Nursery', tuitionFee: 10000, admissionFee: 5000, annualCharges: 2000, ecaProject: 1000, examinationFee: 500, labCharges: 0 },
-    { class: 'LKG', tuitionFee: 12000, admissionFee: 5500, annualCharges: 2200, ecaProject: 1200, examinationFee: 600, labCharges: 0 },
-    { class: 'UKG', tuitionFee: 14000, admissionFee: 6000, annualCharges: 2400, ecaProject: 1400, examinationFee: 700, labCharges: 0 },
-    { class: '1st', tuitionFee: 16000, admissionFee: 6500, annualCharges: 2600, ecaProject: 1600, examinationFee: 800, labCharges: 500 },
-    { class: '2nd', tuitionFee: 18000, admissionFee: 7000, annualCharges: 2800, ecaProject: 1800, examinationFee: 900, labCharges: 500 },
-    { class: '3rd', tuitionFee: 20000, admissionFee: 7500, annualCharges: 3000, ecaProject: 2000, examinationFee: 1000, labCharges: 500 },
-  ];
-
+  sessions: string[] = [];
+  currentSession: string = '';
   isEditing = false;
+  isNewSessionStarted = false;
+  newSessionYear: string = '';
+  feeStructures: FeeStructure[] = [];
   originalFeeStructure: FeeStructure[] = [];
 
+  constructor(private feeStructureService: FeeStructureService) {}
+
   ngOnInit(): void {
-    this.originalFeeStructure = JSON.parse(JSON.stringify(this.feeStructure));
+    this.fetchSessions();
   }
 
-  canEdit(): boolean {
-    return true;
+  fetchSessions(): void {
+    this.feeStructureService.getAcademicYears().subscribe(sessions => {
+      this.sessions = sessions;
+      if (this.sessions.length > 0) {
+        this.currentSession = this.sessions[this.sessions.length - 1];
+        this.fetchFeeStructures();
+      }
+    });
+  }
+
+  fetchFeeStructures(): void {
+    this.feeStructureService.getFeeStructures(this.currentSession).subscribe(feeStructures => {
+      this.feeStructures = feeStructures;
+      this.originalFeeStructure = JSON.parse(JSON.stringify(this.feeStructures));
+    });
+  }
+
+  changeSession(session: string): void {
+    if (this.isEditing) {
+      const confirmChange = confirm("Unsaved changes will be lost. Do you want to continue?");
+      if (!confirmChange) return;
+    }
+
+    this.currentSession = session;
+    this.isEditing = false;
+    this.isNewSessionStarted = false;
+    this.fetchFeeStructures();
+  }
+
+  startNewAcademicYear(): void {
+    const nextSession = this.getNextAvailableSession();
+    const confirmation = confirm(`Start new academic year ${nextSession}?`);
+
+    if (confirmation) {
+      this.isNewSessionStarted = true;
+      this.newSessionYear = nextSession;
+
+      const latestSession = this.sessions[this.sessions.length - 1];
+      const newFeeStructures = this.feeStructures.map(fee => ({ ...fee, academicYear: nextSession }));
+
+        this.sessions.push(nextSession);
+        this.currentSession = nextSession;
+        this.isEditing = true;
+    }
+  }
+
+  getNextAvailableSession(): string {
+    let [startYear, endYear] = this.sessions[this.sessions.length - 1].split('-').map(Number);
+
+    while (this.sessions.includes(`${startYear + 1}-${endYear + 1}`)) {
+      startYear++;
+      endYear++;
+    }
+
+    return `${startYear + 1}-${endYear + 1}`;
   }
 
   edit(): void {
@@ -47,13 +89,42 @@ export class FeeStructureComponent implements OnInit {
 
   save(): void {
     this.isEditing = false;
-    // Implement your save logic here (e.g., send to backend)
-    console.log('Fee structure saved:', this.feeStructure);
-    this.originalFeeStructure = JSON.parse(JSON.stringify(this.feeStructure));
+    this.isNewSessionStarted = false;
+    this.feeStructureService.updateFeeStructures(this.currentSession, this.feeStructures).subscribe(() => {
+        this.originalFeeStructure = JSON.parse(JSON.stringify(this.feeStructures));
+        console.log(`Fee structure for ${this.currentSession} saved:`, this.feeStructures);
+    });
   }
 
   cancel(): void {
+    if (this.isNewSessionStarted) {
+      this.sessions.pop();
+      this.currentSession = this.sessions[this.sessions.length - 1];
+      this.isNewSessionStarted = false;
+    }
+
     this.isEditing = false;
-    this.feeStructure = JSON.parse(JSON.stringify(this.originalFeeStructure));
+    this.feeStructures = JSON.parse(JSON.stringify(this.originalFeeStructure));
+  }
+
+  addRow(): void {
+    if (this.isEditing) {
+      this.feeStructures.push({
+        academicYear: this.currentSession,
+        className: 'New Class',
+        tuitionFee: 0,
+        admissionFee: 0,
+        annualCharges: 0,
+        ecaProject: 0,
+        examinationFee: 0,
+        labCharges: 0,
+      });
+    }
+  }
+
+  removeRow(): void {
+    if (this.isEditing && this.feeStructures.length > 0) {
+      this.feeStructures.pop();
+    }
   }
 }

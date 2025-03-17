@@ -1,28 +1,86 @@
 <div class="payment-tracker">
+  <div class="header">
     <div class="year-select-wrapper">
-      <select [(ngModel)]="selectedYear" (change)="onYearChange()">
-        <option *ngFor="let year of [2023, 2024, 2025]" [value]="year">{{ year }}</option>
+      <select [disabled]="lastSelectedMonth" [(ngModel)]="session" (change)="onYearChange($event)">
+        <option *ngFor="let year of years" [value]="year">{{ year }}</option>
       </select>
     </div>
-  
-    <div class="month-grid">
-      <div *ngFor="let month of months" class="month"
-           [ngClass]="{ 'paid': month.paid, 'unpaid': !month.paid, 'selected': month.selected }"
-           (click)="toggleMonthSelection(month)"
-           [title]="month.paid ? 'Already Paid' : 'Click to Select'">
-        {{ month.name }}
-        <div class="month-status">
-          <span *ngIf="month.paid">Paid &nbsp;₹{{ month.fee }}</span>
-          <span *ngIf="!month.paid">₹{{ month.fee }}</span>
-        </div>
-      </div>
-    </div>
-  
     <div class="total-amount">
       Total Amount to Pay: ₹{{ totalAmountToPay }}
     </div>
+  </div>
 
-    <div>
-        <app-payment [amount]="totalAmountToPay" (paymentSuccess)="handleSuccessfulPayment()"></app-payment>
+  <div class="month-grid">
+    <div *ngFor="let month of months" class="month"
+         [ngClass]="{ 'paid': month.paid, 'unpaid': !month.paid, 'selected': month.selected }"
+         (click)="toggleMonthSelection(month)">
+      <div class="month-name">{{ month.name }}</div>
+      <div class="month-status">
+        <span *ngIf="month.paid">Paid ₹{{ month.fee + (month.busFee || 0) }}</span>
+        <span *ngIf="!month.paid">₹{{ month.fee + (month.busFee || 0) }}</span>
+      </div>
     </div>
   </div>
+
+  <div *ngIf="selectedMonthDetails" class="month-details-container">
+    <div class="month-details">
+      <h2>{{selectedMonthDetails.monthName}} - Details</h2>
+
+      <div class="details-grid">
+        <div class="student-details">
+          <h3>Student Details</h3>
+          <div class="detail-item">
+            <strong>Student Name:</strong>
+            <span>{{ selectedMonthDetails.studentName }}</span>
+          </div>
+          <div class="detail-item">
+            <strong>Student ID:</strong>
+            <span>{{ selectedMonthDetails.studentId }}</span>
+          </div>
+          <div class="detail-item">
+            <strong>Student Class:</strong>
+            <span>{{ selectedMonthDetails.studentClass }}</span>
+          </div>
+        </div>
+
+        <div class="fee-details">
+          <h3>Academic Fee Details</h3>
+          <div class="detail-item">
+            <strong>Tuition Fee:</strong>
+            <span>₹{{ selectedMonthDetails.tuitionFee }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedMonthDetails.annualCharges">
+            <strong>Annual Charges:</strong>
+            <span>₹{{ selectedMonthDetails.annualCharges }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedMonthDetails.labCharges">
+            <strong>Lab Charges:</strong>
+            <span>₹{{ selectedMonthDetails.labCharges }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedMonthDetails.ecaProject">
+            <strong>E.C.A/Project:</strong>
+            <span>₹{{ selectedMonthDetails.ecaProject }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedMonthDetails.examinationFee">
+            <strong>Examination Fee:</strong>
+            <span>₹{{ selectedMonthDetails.examinationFee }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedMonthDetails.busFee">
+            <strong>Bus Fees:</strong>
+            <span>₹{{ selectedMonthDetails.busFee }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sticky-footer">
+    <div class="total-amount-bottom">
+      Total Amount to Pay: ₹{{ totalAmountToPay }}
+    </div>
+    <app-payment
+      [paymentData]="paymentData"
+      (paymentSuccess)="handleSuccessfulPayment()"
+    ></app-payment>
+  </div>
+</div>

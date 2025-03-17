@@ -45,7 +45,6 @@ export class PaymentComponent {
         },
         handler: (paymentResponse: any) => {
           console.log('Payment Success:', paymentResponse);
-          // Verify the payment on backend
           this.verifyPayment(paymentResponse);
         },
         modal: {
@@ -63,7 +62,6 @@ export class PaymentComponent {
   verifyPayment(paymentResponse: any) {
     this.razorpayService.verifyPayment(paymentResponse).subscribe((result: any) => {
       if (result.success) {
-        alert('Payment Successful!');
         this.paymentSuccess.emit(); 
       } else {
         alert('Payment Verification Failed!');

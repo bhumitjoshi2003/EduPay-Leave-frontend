@@ -78,11 +78,11 @@
   }
   
   .bus-fees-table tr:nth-child(even) {
-    background-color: #f0f0f0;
+    background-color: #f5f5e6;
   }
   
   .bus-fees-table tr:hover {
-    background-color: #e8f5e9;
+    background-color: #e4f9e6;
     transition: background-color 0.3s ease;
   }
   

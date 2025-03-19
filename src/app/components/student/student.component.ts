@@ -8,9 +8,10 @@ import { StudentService } from '../../services/student.service';
   styleUrl: './student.component.css'
 })
 export class StudentComponent implements OnInit{
+  studentDetails: any;
 
   constructor(private studentService: StudentService) {}
 
-  ngOnInit(): void {}
-  
+  ngOnInit(): void { }
+
 }

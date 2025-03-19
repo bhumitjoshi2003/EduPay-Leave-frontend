@@ -9,6 +9,7 @@ import { StudentService } from '../../services/student.service';
 import { BusFeesService } from '../../services/bus-fees.service';
 import Swal from 'sweetalert2';
 import { PaymentData } from '../../interfaces/payment-data';
+import { concatMap } from 'rxjs';
 
 @Component({
   selector: 'app-payment-tracker',
@@ -33,7 +34,7 @@ export class PaymentTrackerComponent implements OnInit {
   selectedMonthsByYear: { [year: number]: number[] } = {};
   studentId: string = 'S101';
   className: string = '';
-  session: string = ``;
+  session: string = '';
   years: string[] = [];
   newAdmission: boolean = false;
   selectedMonthDetails: any = null;
@@ -57,7 +58,6 @@ export class PaymentTrackerComponent implements OnInit {
 
   ngOnInit() {
     this.fetchSessions();
-    this.fetchFees();
   }
 
   fetchSessions() {
@@ -68,6 +68,7 @@ export class PaymentTrackerComponent implements OnInit {
           this.session = this.years[this.years.length - 1];
           this.selectedYear = parseInt(this.session.split('-')[0]);
         }
+        this.fetchFees();
       },
       error: (error) => {
         console.error('Error fetching sessions:', error);
@@ -307,7 +308,6 @@ export class PaymentTrackerComponent implements OnInit {
     this.paymentData.totalEcaProject= 0,
     this.paymentData.totalBusFee= 0,
     this.paymentData.totalExaminationFee= 0,
-    this.paymentData.studentId= "",
     this.paymentData.studentName= "",
     this.paymentData.className= "",
     this.paymentData.session= "";

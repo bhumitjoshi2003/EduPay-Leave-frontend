@@ -7,15 +7,15 @@ import { PaymentData } from '../interfaces/payment-data';
 })
 export class RazorpayService {
 
-  private backendUrl = 'http://localhost:8081/api/payments';
+  private baseUrl = 'http://localhost:8081/api/payments';
 
   constructor(private http: HttpClient) { }
 
   createOrder(paymentData: PaymentData) {
-    return this.http.post(`${this.backendUrl}/create`, { paymentData } );
+    return this.http.post(`${this.baseUrl}/create`, { paymentData } );
   }
 
   verifyPayment(paymentResponse: any, orderDetails: any) {
-    return this.http.post(`${this.backendUrl}/verify`,{ paymentResponse, orderDetails } );
+    return this.http.post(`${this.baseUrl}/verify`,{ paymentResponse, orderDetails } );
   }
 }

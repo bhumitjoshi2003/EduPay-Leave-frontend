@@ -1,0 +1,80 @@
+<div class="payment-details-container">
+  <h2>Fee Receipt</h2>
+
+  <div *ngIf="loading" class="loading-message">Loading payment details...</div>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <div class="details-table-container" *ngIf="paymentDetails">
+    <h3>Student Details</h3>
+    <table>
+      <tr>
+        <td class="label">Student ID:</td>
+        <td>{{ paymentDetails.studentId }}</td>
+      </tr>
+      <tr>
+        <td class="label">Student Name:</td>
+        <td>{{ paymentDetails.studentName }}</td>
+      </tr>
+      <tr>
+        <td class="label">Class Name:</td>
+        <td>{{ paymentDetails.className }}</td>
+      </tr>
+    </table>
+
+    <h3>Fee Details</h3>
+    <table>
+      <tr>
+        <td class="label">Payment ID:</td>
+        <td>{{ paymentDetails.paymentId }}</td>
+      </tr>
+      <tr>
+        <td class="label">Order ID:</td>
+        <td>{{ paymentDetails.orderId }}</td>
+      </tr>
+      <tr>
+        <td class="label">Month:</td>
+        <td>{{months}}</td>
+      </tr>
+      <tr>
+        <td class="label">Session:</td>
+        <td>{{ paymentDetails.session }}</td>
+      </tr>
+      <tr>
+        <td class="label">Payment Date:</td>
+        <td>{{ paymentDetails.paymentDate | date: 'MMM d, y, h:mm a' }}</td>
+      </tr>
+      <tr>
+        <td class="label">Status:</td>
+        <td [ngClass]="{'status-success': paymentDetails.status === 'success'}">{{ paymentDetails.status | uppercase }}</td>
+      </tr>
+      <tr>
+        <td class="label">Tuition Fee:</td>
+        <td>{{ paymentDetails.tuitionFee | currency: 'INR' }}</td>
+      </tr>
+      <tr>
+        <td class="label">Bus Fee:</td>
+        <td>{{ paymentDetails.busFee | currency: 'INR' }}</td>
+      </tr>
+      <tr>
+        <td class="label">Annual Charges:</td>
+        <td>{{ paymentDetails.annualCharges | currency: 'INR' }}</td>
+      </tr>
+      <tr>
+        <td class="label">Lab Charges:</td>
+        <td>{{ paymentDetails.labCharges | currency: 'INR' }}</td>
+      </tr>
+      <tr>
+        <td class="label">ECA Project:</td>
+        <td>{{ paymentDetails.ecaProject | currency: 'INR' }}</td>
+      </tr>
+      <tr>
+        <td class="label">Examination Fee:</td>
+        <td>{{ paymentDetails.examinationFee | currency: 'INR' }}</td>
+      </tr>
+      <tr>
+        <td class="label">Amount:</td>
+        <td>{{ paymentDetails.amount | currency: 'INR' }}</td>
+      </tr>
+    </table>
+  </div>
+</div>

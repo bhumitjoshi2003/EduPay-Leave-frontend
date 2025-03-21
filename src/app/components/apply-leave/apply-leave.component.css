@@ -1,0 +1,125 @@
+/* apply-leave.component.css CSS*/
+.apply-leave-container {
+    max-width: 500px;
+    margin: 4rem auto;
+    padding: 3rem;
+    background: linear-gradient(135deg, #e0f7fa, #e8f5e9);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    font-family: 'Poppins', sans-serif;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .apply-leave-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  .apply-leave-container h2 {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    color: #333;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    padding-bottom: 1rem;
+  }
+  
+  .apply-leave-container h2::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    height: 3px;
+    width: 50px;
+    background-color: #4caf50;
+  }
+  
+  .form-group {
+    margin-bottom: 2rem;
+    position: relative;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.8rem;
+    color: #555;
+    font-weight: 500;
+    transition: transform 0.3s ease;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 1.2rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: #f9f9f9;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #4caf50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+  }
+  
+  button[type="submit"] {
+    width: 100%;
+    padding: 1.2rem;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #43a047;
+    transform: translateY(-2px);
+  }
+  
+  .error-message,
+  .success-message {
+    padding: 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 500;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .error-message {
+    background-color: #ffe0e0;
+    color: #d32f2f;
+    border: 1px solid #f9bdbb;
+  }
+  
+  .success-message {
+    background-color: #b5f0c3;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    .apply-leave-container {
+      padding: 2rem;
+      margin: 2rem auto;
+    }
+  }

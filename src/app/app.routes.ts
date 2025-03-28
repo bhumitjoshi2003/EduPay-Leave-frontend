@@ -9,6 +9,7 @@ import { PaymentHistoryComponent } from './components/payment-history/payment-hi
 import { PaymentDetailsComponent } from './components/payment-details/payment-details.component';
 import { ApplyLeaveComponent } from './components/apply-leave/apply-leave.component';
 import { AuthGuard } from './auth/auth.guard';
+import { TeacherAttendanceComponent } from './components/teacher-attendance/teacher-attendance.component';
 
 // import { AuthGuard } from './auth/auth.guard';
 
@@ -22,6 +23,7 @@ export const routes: Routes = [
     { path: 'payment-history', component: PaymentHistoryComponent },
     { path: 'payment-history-details/:paymentId', component: PaymentDetailsComponent },
     { path: 'apply-leave', component: ApplyLeaveComponent },
+    { path: 'teacher-attendance', component: TeacherAttendanceComponent },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },
 ];
 

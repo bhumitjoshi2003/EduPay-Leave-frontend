@@ -1,0 +1,22 @@
+<div class="teacher-attendance-container">
+  <h2>Teacher Attendance</h2>
+  <div class="top-section">
+    <mat-form-field class="custom-datepicker">
+      <input matInput [matDatepicker]="picker" placeholder="Choose a date" [(ngModel)]="attendanceDate" (dateChange)="onDateChange($event)">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+    <button class="attendance-button save" (click)="saveAttendance()">Save</button>
+  </div>
+  <ul class="student-list">
+    <li *ngFor="let student of students" class="student-item" [class.absent]="student.absent">
+      <div class="student-info">
+        {{ student.name }} ({{ student.studentId }})
+      </div>
+      <div class="attendance-buttons">
+        <button *ngIf="!student.absent" (click)="markAbsent(student.studentId)" class="attendance-button absent">Mark Absent</button>
+        <button *ngIf="student.absent" (click)="markPresent(student.studentId)" class="attendance-button present">Mark Present</button>
+      </div>
+    </li>
+  </ul>
+</div>

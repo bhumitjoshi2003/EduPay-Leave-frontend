@@ -19,4 +19,8 @@ export class AttendanceService {
   getAttendanceByDateAndClass(absentDate: string, className: string): Observable<AttendanceData[]> {
     return this.http.get<AttendanceData[]>(`${this.apiUrl}/date/${absentDate}/class/${className}`);
   }
+
+  getAttendanceCounts(studentId: string, year: number, month: number): Observable<{ studentAbsent: number; totalAbsent: number }> {
+    return this.http.get<{ studentAbsent: number; totalAbsent: number }>(`${this.apiUrl}/counts/${studentId}/${year}/${month}`);
+  }
 }

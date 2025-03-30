@@ -32,7 +32,7 @@ export class TeacherAttendanceComponent implements OnInit {
   students: Student[] = [];
   leaves: string[] = [];
   attendanceDate: Date = new Date();
-  selectedClass: string = '2';
+  selectedClass: string = '1';
   absentStudents: string[] = [];
 
   constructor(

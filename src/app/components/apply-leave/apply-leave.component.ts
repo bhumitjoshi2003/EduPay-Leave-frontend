@@ -16,8 +16,8 @@ import { LeaveRequest } from '../../interfaces/leave-request';
 export class ApplyLeaveComponent implements OnInit {
   leaveForm: FormGroup;
   errorMessage: string = '';
-  studentId: string = 'S102';
-  className = '2';
+  studentId: string = 'S101';
+  className = '1';
   leaves: { leaveDate: string; reason: string }[] = [];
   today: string = '';
 

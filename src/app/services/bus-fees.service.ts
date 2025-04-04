@@ -20,6 +20,7 @@ export class BusFeesService {
   constructor(private http: HttpClient) {}
 
   getAcademicYears(): Observable<string[]> {
+    console.log("edce");
     return this.http.get<BusFee[]>(this.apiUrl).pipe(
       map(fees => {
         const years = new Set(fees.map(fee => fee.academicYear));

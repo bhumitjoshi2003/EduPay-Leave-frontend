@@ -1,14 +1,35 @@
-<div class="home-container">
-    @if(!authenticated){
-      <button mat-button class="login-button" (click)="login()">Login</button>
-    }@else{
-      <button mat-button class="login-button" (click)="logout()">Logout</button>
+<div class="home-container" [class.login-active]="loginState === 'loginActive'">
+  @if (!authenticated) {
+    @if (!showLoginForm) {
+      <button mat-button style="color: rgb(211, 207, 207);" class="login-button" (click)="login()">Login</button>
+    } @else {
+      <div class="login-form">
+        <mat-card>
+          <mat-card-title>Login</mat-card-title>
+          <mat-card-content>
+            <mat-form-field appearance="outline">
+              <mat-label>Student ID</mat-label>
+              <input matInput [(ngModel)]="studentId" placeholder="Enter your student ID">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Password</mat-label>
+              <input matInput type="password" [(ngModel)]="password" placeholder="Enter your password">
+            </mat-form-field>
+            <button mat-raised-button color="primary" (click)="submitLogin()">Login</button>
+            <button mat-button (click)="cancelLogin()">Cancel</button>
+          </mat-card-content>
+        </mat-card>
+      </div>
     }
-    <div class="content">
-      <img src="/LOGO.avif" alt="School Logo" class="logo">
-        <h1 style="font-family:Verdana, Geneva, Tahoma, sans-serif">Indra Academy Sr. Sec. School</h1>
-        <h2 style="font-family:Verdana, Geneva, Tahoma, sans-serif" >Nainital, Haldwani</h2>
-        <hr style="width: 50%; border: 1px solid white;">
-        <h3 style="font-family:Verdana, Geneva, Tahoma, sans-serif">Affiliated to CBSE, New Delhi</h3>
-    </div>
+  } @else {
+    <button mat-button style="color: rgb(211, 207, 207);" class="login-button" (click)="logout()">Logout</button>
+  }
+  <div class="content">
+    <img src="/LOGO.avif" alt="School Logo" class="logo">
+    <h1 style="font-family: Verdana, Geneva, Tahoma, sans-serif">Indra Academy Sr. Sec. School</h1>
+    <h2 style="font-family: Verdana, Geneva, Tahoma, sans-serif">Haldwani, Nainital</h2>
+    <span class="custom-hr"></span>
+    <hr class="login-active-hr">
+    <h3 style="font-family: Verdana, Geneva, Tahoma, sans-serif">Affiliated to CBSE, New Delhi</h3>
+  </div>
 </div>

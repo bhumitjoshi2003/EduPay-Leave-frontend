@@ -1,16 +1,22 @@
-// import { HttpInterceptorFn } from '@angular/common/http';
-// import { inject } from '@angular/core';
-// import { KeycloakService } from '../services/keycloak.service';
+import { Injectable } from '@angular/core';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-// export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
-//   const keycloakService = inject(KeycloakService);
-//   const token = keycloakService.getToken(); // Get the token from Keycloak service
+@Injectable({ providedIn: 'root' })  // ✅ Ensure it's available in DI
+export class AuthInterceptor implements HttpInterceptor {
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    console.log("✅ Interceptor is running...");  // ✅ This should now log
+    const token = localStorage.getItem('token');
 
-//   const clonedRequest = req.clone({
-//     setHeaders: {
-//       Authorization: token ? `Bearer ${token}` : ''
-//     }
-//   });
+    if (token) {
+      request = request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      console.log("🔹 Modified Request: ", request);
+    }
 
-//   return next(clonedRequest);
-// };
+    return next.handle(request);
+  }
+}

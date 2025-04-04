@@ -1,12 +1,8 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
-import { KeycloakService } from './app/services/keycloak.service';
-import { inject } from '@angular/core';
+import { appConfig } from './app/app.config';
 
-bootstrapApplication(AppComponent, appConfig).then( async appRef => {
-  const keycloakService = appRef.injector.get(KeycloakService); 
-  return keycloakService.init();
-}).then(() => {
-  console.log("✅ Keycloak initialized. User can see the home page.");
-}).catch((err) => console.error("❌ Bootstrap error:", err));
+bootstrapApplication(AppComponent, appConfig)
+  .catch((err) => console.error(err));  
+
+  

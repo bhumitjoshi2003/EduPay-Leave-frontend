@@ -1,68 +1,271 @@
+/* Home container with a sleek background overlay */
 .home-container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background: url('/IASbuilding.avif') center/cover no-repeat;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: white;
-  }
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: url('/IASbuilding.avif') center/cover no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  transition: all 0.3s ease-in-out;
+}
 
-  .home-container::before {
-    content: "";
+.home-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px); /* Subtle blur effect */
+  z-index: 1;
+}
+
+/* Animated Logo */
+.logo {
+  width: 150px;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.1); /* Slight zoom on hover */
+}
+
+.content {
+  font-family: 'Poppins', sans-serif;
+  z-index: 2;
+  transition: all 0.3s ease;
+  position: relative; /* Add relative positioning */
+}
+
+h1 {
+  margin-top: 10px;
+  font-size: 32px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+h2, h3 {
+  font-size: 23px;
+  margin-top: 5px;
+  font-style: italic;
+  color: #f8f8f8;
+}
+
+/* Beautiful custom divider */
+.custom-hr {
+  display: block;
+  width: 25%; /* Reduced width for a sharper look */
+  border-bottom: 4px solid white;
+  margin: 20px auto;
+  opacity: 0.8;
+}
+
+/* Elegant Glassmorphism Login Form */
+.login-form {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+
+  width: 450px; 
+  padding: 20px;
+
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)); /* More pronounced gradient */
+  backdrop-filter: blur(15px); /* Increased blur */
+  border-radius: 25px; /* More rounded corners */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); /* Stronger shadow */
+  color: white;
+  animation: fadeIn 0.8s ease-out; /* Slightly longer animation */
+  border: 2px solid rgba(255, 255, 255, 0.3); /* More visible border */
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -70%); } /* Increased initial translateY */
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+/* Enhanced Login Title */
+.login-form mat-card-title {
+  text-align: center;
+  margin-bottom: 25px;
+  margin-top: 25px; 
+  font-size: 32px; /* Larger title */
+  font-weight: 700; /* Bolder title */
+  color: #595b5b; /* Light blue title */
+  text-shadow: 2px 2px 6px rgba(186, 185, 185, 0.5); /* Stronger text shadow */
+}
+
+/* Styled Input Fields */
+.login-form input {
+  width: 100%;
+  font-size: 20px;
+  line-height: 1.5;
+  border: 2px solid rgba(255, 255, 255, 0.4); 
+  border-radius: 12px; /* More rounded inputs */
+  background: rgba(255, 255, 255, 0.2);
+  color: black;
+  transition: 0.4s; /* Slightly longer transition */
+}
+
+.login-form mat-form-field {
+  display: block; 
+  width: 100%;
+
+}
+
+.login-form input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Modern Buttons */
+.login-form button {
+  width: 100%;
+  padding: 18px; /* Increased padding */
+  border: none;
+  border-radius: 12px; /* More rounded buttons */
+  font-weight: 700; /* Bolder button text */
+  cursor: pointer;
+  transition: all 0.4s ease-in-out; /* Slightly longer transition */
+}
+
+/* Primary Button */
+.login-form button[mat-raised-button] {
+  background: linear-gradient(135deg, #61b3de, #299cda); /* Vibrant gradient */
+  color: white;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Stronger shadow */
+}
+
+.login-form button[mat-raised-button]:hover {
+  background: linear-gradient(135deg, #46a9de, #1695d9); /* Slightly darker hover gradient */
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4); /* Stronger hover shadow */
+}
+
+/* Transparent Cancel Button */
+.login-form button[mat-button] {
+  color: rgb(255, 255, 255);
+  background: linear-gradient(135deg, #46a9de, #1695d9);
+  margin-top: 25px; /* Increased margin */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.login-form button[mat-button]:hover {
+  background: linear-gradient(135deg, #46a9de, #1695d9);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4); /* Stronger hover shadow */
+}
+
+/* Stylish Login Button */
+.login-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #686969;
+  color: rgb(211, 207, 207);
+  padding: 8px 30px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 3;
+  transition: all 0.3s ease;
+  border: 1px solid #484848; /* Added a 1px solid border */
+}
+
+.login-button:hover {
+  background: #5a5a5a;
+  border: 1px solid #bbb; /* Slightly lighter border on hover */
+}
+
+
+/* Logout Button */
+.logout-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #6a11cb;
+  color: white;
+  padding: 8px 26px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 3;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background: #2575fc;
+}
+
+.login-active .content {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.75); /* 50% transparent black */
-    z-index: 1;
-  }
-  
-  /* Login button at the top right */
-  .login-button {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: #e0e1e0;
-    color: rgb(66, 67, 67);
-    padding: 7px 24px;
-    border-radius: 20px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 3
-  }
+}
 
-  .login-button:hover{
-    background: rgb(114, 115, 115);
-    color: #fdfffd;
-  }
-  
-  /* Logo and text */
-  .content {
-    font-family:Verdana, Geneva, Tahoma, sans-serif;
-    z-index: 2;
-  }
-  
-  .logo {
-    width: 120px;
-    height: auto;
-  }
-  
-  h1 {
-    margin-top: 10px;
-    font-size: 32px;
-    font-weight: bold;
-  }
-  
-  .location {
-    margin-top: 5px;
-    font-size: 18px;
+.login-active .logo {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 150px;
+}
+
+.login-active h1 {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+}
+
+.login-active .custom-hr {
+  display: none;
+}
+
+.login-active h2 {
+  position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    margin-top: 75px;
     font-style: italic;
-    color: #f0f0f0;
-  }
-  
+    color: #f8f8f8;
+}
+
+.login-active h3 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    margin-top: 45px;
+    font-style: italic;
+    color: #f8f8f8;
+}
+
+.login-active h3 {
+    top: 65px;
+}
+
+/* Added CSS for horizontal line */
+.login-active-hr {
+  display: none; /* Initially hide the line */
+}
+
+.login-active .login-active-hr {
+  display: block; /* Show the line when login is active */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%; /* Adjust the width as needed */
+  border: 1px solid #f8f8f8; /* Adjust the color and thickness as needed */
+  top: 50px; /* Adjusted the top property */
+}

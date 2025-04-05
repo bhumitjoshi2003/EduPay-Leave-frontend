@@ -14,6 +14,7 @@ export class AuthGuard implements CanActivate {
     if (localStorage.getItem('token')) {
       return true; // User is authenticated
     } else {
+      localStorage.setItem('redirectUrl', state.url); // Store attempted URL
       this.router.navigate(['/home']); // Redirect to login if not authenticated
       return false;
     }

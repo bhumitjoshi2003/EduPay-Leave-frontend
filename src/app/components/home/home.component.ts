@@ -52,7 +52,11 @@ export class HomeComponent implements OnInit {
         this.showLoginForm = false;
         this.loginState = 'initial'; // Reset state
         this.snackBar.open('Login successful!', 'Close', { duration: 3000 });
-        this.router.navigate(['/dashboard']);
+  
+
+        const redirectUrl = localStorage.getItem('redirectUrl') || '/dashboard';
+        localStorage.removeItem('redirectUrl'); // Clear stored URL after redirecting
+        this.router.navigateByUrl(redirectUrl);
       },
       error: (error) => {
         this.snackBar.open('Login failed. Invalid credentials.', 'Close', { duration: 3000 });
@@ -60,6 +64,7 @@ export class HomeComponent implements OnInit {
       }
     });
   }
+  
 
   logout() {
     if (typeof localStorage !== 'undefined') {

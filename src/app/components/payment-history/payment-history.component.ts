@@ -41,6 +41,6 @@ export class PaymentHistoryComponent implements OnInit {
   }
 
   viewPaymentDetails(paymentId: string): void {
-    window.open(`/payment-history-details/${paymentId}`, '_blank');
+    this.router.navigate(['dashboard/payment-history-details', paymentId]); 
   }
 }

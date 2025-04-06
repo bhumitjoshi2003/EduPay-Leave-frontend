@@ -1,0 +1,21 @@
+<div class="dashboard-container">
+    <div class="header-area">
+      <div class="logo-container">
+        <img src="IASName.png" alt="School Logo" class="logo">
+      </div>
+  
+      <nav mat-tab-nav-bar class="custom-tab-nav">
+        <a mat-tab-link routerLink="/dashboard/fees" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">Fees</a>
+        <a mat-tab-link routerLink="/dashboard/fee-structure" routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">Fee Structure</a>
+        <a mat-tab-link routerLink="/dashboard/payment-history" routerLinkActive #rla5="routerLinkActive" [active]="rla5.isActive">Payment History</a>
+        <a mat-tab-link routerLink="/dashboard/apply-leave" routerLinkActive #rla6="routerLinkActive" [active]="rla6.isActive">Apply Leave</a>
+        <a mat-tab-link routerLink="/dashboard/teacher-attendance" routerLinkActive #rla7="routerLinkActive" [active]="rla7.isActive">Teacher Attendance</a>
+        <a mat-tab-link routerLink="/dashboard/student-attendance" routerLinkActive #rla8="routerLinkActive" [active]="rla8.isActive">Student Attendance</a>
+      </nav>
+    </div>
+  
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+  

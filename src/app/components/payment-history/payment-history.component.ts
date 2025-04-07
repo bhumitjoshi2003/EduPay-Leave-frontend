@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PaymentHistory } from '../../interfaces/payment-history';
 import { PaymentHistoryService } from '../../services/payment-history.service';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-payment-history',
@@ -12,7 +13,7 @@ import { PaymentHistoryService } from '../../services/payment-history.service';
   styleUrls: ['./payment-history.component.css']
 })
 export class PaymentHistoryComponent implements OnInit {
-  studentId: string = 'S101';
+  studentId: string = '';
   paymentHistory: PaymentHistory[] = [];
   loading: boolean = true;
   error: string = '';
@@ -20,7 +21,16 @@ export class PaymentHistoryComponent implements OnInit {
   constructor(private http: HttpClient, private router: Router, private paymentHistoryService: PaymentHistoryService) {}
 
   ngOnInit(): void {
+    this.getStudentId();
     this.fetchPaymentHistory();
+  }
+
+  getStudentId(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      this.studentId = decodedToken.studentId; // Extract studentId from token
+    }
   }
 
   fetchPaymentHistory(): void {
@@ -41,6 +51,6 @@ export class PaymentHistoryComponent implements OnInit {
   }
 
   viewPaymentDetails(paymentId: string): void {
-    window.open(`/payment-history-details/${paymentId}`, '_blank');
+    this.router.navigate(['dashboard/payment-history-details', paymentId]);
   }
 }

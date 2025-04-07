@@ -3,6 +3,7 @@ import Chart from 'chart.js/auto';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { AttendanceService } from '../../services/attendance.service';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-student-attendance',
@@ -11,7 +12,7 @@ import { AttendanceService } from '../../services/attendance.service';
   imports: [CommonModule],
 })
 export class StudentAttendanceComponent implements OnInit, AfterViewInit {
-  studentId = 'S101';
+  studentId = '';
   attendanceData: { month: string; presentDays: number; absentDays: number }[] = [];
   overallData: { presentDays: number; absentDays: number } = { presentDays: 0, absentDays: 0 };
   monthlyCharts: any[] = [];
@@ -25,8 +26,17 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.createCharts(); 
   }
+  
+  getStudentId(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      this.studentId = decodedToken.studentId; 
+    }
+  }
 
   ngOnInit(): void {
+    this.getStudentId();
     this.fetchAttendanceData();
   }
 

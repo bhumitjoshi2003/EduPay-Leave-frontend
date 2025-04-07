@@ -6,6 +6,7 @@ import { LeaveService } from '../../services/leave.service';
 import { StudentService } from '../../services/student.service';
 import Swal from 'sweetalert2';
 import { LeaveRequest } from '../../interfaces/leave-request';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-apply-leave',
@@ -16,7 +17,7 @@ import { LeaveRequest } from '../../interfaces/leave-request';
 export class ApplyLeaveComponent implements OnInit {
   leaveForm: FormGroup;
   errorMessage: string = '';
-  studentId: string = 'S101';
+  studentId: string = '';
   className = '1';
   leaves: { leaveDate: string; reason: string }[] = [];
   today: string = '';
@@ -34,14 +35,19 @@ export class ApplyLeaveComponent implements OnInit {
 
   ngOnInit(): void {
     const today = new Date();
-    const dayAfterTomorrow = new Date(today); 
-    dayAfterTomorrow.setDate(today.getDate() + 2); 
-  
-    this.today = formatDate(dayAfterTomorrow, 'yyyy-MM-dd', 'en');
-
-    // this.today = formatDate(new Date(), 'yyyy-MM-dd', 'en');
+    this.today = formatDate(today, 'yyyy-MM-dd', 'en');
+    this.getStudentId();
     this.loadStudentLeaves();
   }
+
+  getStudentId(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      this.studentId = decodedToken.studentId;
+    }
+  }
+
 
   loadStudentLeaves(): void {
     this.leaveService.getStudentLeaves(this.studentId).subscribe((data) => {

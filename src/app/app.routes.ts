@@ -1,6 +1,5 @@
 import { provideRouter, Routes } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
-import { StudentComponent } from './components/student/student.component';
 import { PaymentTrackerComponent } from './components/fees/fees.component';
 import { FeeStructureComponent } from './components/fee-structure/fee-structure.component';
 import { PaymentComponent } from './components/payment/payment.component';
@@ -11,24 +10,31 @@ import { ApplyLeaveComponent } from './components/apply-leave/apply-leave.compon
 import { AuthGuard } from './auth/auth.guard';
 import { TeacherAttendanceComponent } from './components/teacher-attendance/teacher-attendance.component';
 import { StudentAttendanceComponent } from './components/student-attendance/student-attendance.component';
-
-// import { AuthGuard } from './auth/auth.guard';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 export const routes: Routes = [
-    { path: '', redirectTo: '/home', pathMatch: 'full'},
+    { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: HomeComponent },
-    { path: 'fee-structure', component: FeeStructureComponent, canActivate: [AuthGuard] },
-    { path: 'fees', component: PaymentTrackerComponent, canActivate: [AuthGuard] },
-    { path: 'payment', component: PaymentComponent, canActivate: [AuthGuard] },
-    { path: 'bus-fees', component: BusFeesComponent, canActivate: [AuthGuard] },
-    { path: 'payment-history', component: PaymentHistoryComponent, canActivate: [AuthGuard] },
-    { path: 'payment-history-details/:paymentId', component: PaymentDetailsComponent, canActivate: [AuthGuard] },
-    { path: 'apply-leave', component: ApplyLeaveComponent, canActivate: [AuthGuard] },
-    { path: 'teacher-attendance', component: TeacherAttendanceComponent, canActivate: [AuthGuard] },
-    { path: 'student-attendance', component: StudentAttendanceComponent, canActivate: [AuthGuard] },
+    {
+        path: 'dashboard',
+        component: DashboardComponent,
+        canActivate: [AuthGuard],
+        children: [
+            { path: 'fee-structure', component: FeeStructureComponent },
+            { path: 'fees', component: PaymentTrackerComponent },
+            { path: 'payment', component: PaymentComponent },
+            { path: 'bus-fees', component: BusFeesComponent },
+            { path: 'payment-history', component: PaymentHistoryComponent },
+            { path: 'payment-history-details/:paymentId', component: PaymentDetailsComponent },
+            { path: 'apply-leave', component: ApplyLeaveComponent },
+            { path: 'teacher-attendance', component: TeacherAttendanceComponent },
+            { path: 'student-attendance', component: StudentAttendanceComponent },
+            { path: '', redirectTo: 'fees', pathMatch: 'full' }, // default route for dashboard
+        ],
+    },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },
 ];
 
 export const AppRoutingModule = {
-    provideRouter: () => provideRouter(routes)
+    provideRouter: () => provideRouter(routes),
 };

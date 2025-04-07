@@ -45,8 +45,8 @@ export class PaymentComponent {
         order_id: response.orderId,   // Order ID from backend
         prefill: {
           name: 'Hari Narayan',  // Prefill name
-          email: 'bhumitharidas@example.com',
-          contact: '7906341843'
+          email: 'haridas@example.com',
+          contact: '9999999999'
         },
         theme: {
           color: '#3399cc'  // Customize color

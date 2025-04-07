@@ -9,6 +9,7 @@ import { StudentService } from '../../services/student.service';
 import { BusFeesService } from '../../services/bus-fees.service';
 import Swal from 'sweetalert2';
 import { PaymentData } from '../../interfaces/payment-data';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-payment-tracker',
@@ -31,7 +32,7 @@ export class PaymentTrackerComponent implements OnInit {
   months: any[] = [];
   totalAmountToPay: number = 0;
   selectedMonthsByYear: { [year: number]: number[] } = {};
-  studentId: string = 'S101';
+  studentId: string = '';
   className: string = '';
   session: string = '';
   years: string[] = [];
@@ -56,7 +57,16 @@ export class PaymentTrackerComponent implements OnInit {
   };
 
   ngOnInit() {
+    this.getStudentId();
     this.fetchSessions();
+  }
+
+  getStudentId(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      this.studentId = decodedToken.studentId; // Extract studentId from token
+    }
   }
 
   fetchSessions() {

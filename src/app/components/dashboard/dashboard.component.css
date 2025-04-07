@@ -4,39 +4,40 @@
     min-height: 100vh;
     background: linear-gradient(to bottom right, #f7faff, #e0ecff);
     font-family: 'Segoe UI', sans-serif;
-  }
-  
-  /* Header Section */
-  .header-area {
+}
+
+/* Header Section */
+.header-area {
     background-color: #ffffff;
     padding: 2px 150px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     animation: fadeSlideDown 1s ease-in-out;
-  }
-  
-  /* Logo Section */
-  .logo-container {
+    position: relative;
+}
+
+/* Logo Section */
+.logo-container {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 15px;
-  }
-  
-  .logo {
+}
+
+.logo {
     width: 60%;
     transition: transform 0.3s ease;
-  }
-  
-  /* Navigation Tabs */
-  .custom-tab-nav {
+}
+
+/* Navigation Tabs */
+.custom-tab-nav {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
     gap: 10px;
     animation: fadeSlideUp 1s ease-in-out;
-  }
-  
-  .custom-tab-nav a {
+}
+
+.custom-tab-nav a {
     font-size: 16px;
     font-family: 'Serif', serif;
     margin: 1px;
@@ -45,44 +46,144 @@
     color: #161616;
     text-decoration: none;
     transition: all 0.3s ease;
-  }
-  
-  .custom-tab-nav a.active {
+}
+
+.custom-tab-nav a.active {
     background-color: #232424;
     color: #ffffff;
-  }
-  
-  .custom-tab-nav a:hover {
+}
+
+.custom-tab-nav a:hover {
     background-color: #7fd11b;
     transform: translateY(-2px);
-  }
-  
-  /* Main Content Area */
-  .content-area {
+}
+
+/* Main Content Area */
+.content-area {
     flex-grow: 1;
     padding: 30px;
-  }
-  
-  /* Animations */
-  @keyframes fadeSlideDown {
+}
+
+/* Animations */
+@keyframes fadeSlideDown {
     0% {
-      opacity: 0;
-      transform: translateY(-30px);
+        opacity: 0;
+        transform: translateY(-30px);
     }
     100% {
-      opacity: 1;
-      transform: translateY(0);
+        opacity: 1;
+        transform: translateY(0);
     }
-  }
-  
-  @keyframes fadeSlideUp {
+}
+
+@keyframes fadeSlideUp {
     0% {
-      opacity: 0;
-      transform: translateY(30px);
+        opacity: 0;
+        transform: translateY(30px);
     }
     100% {
-      opacity: 1;
-      transform: translateY(0);
+        opacity: 1;
+        transform: translateY(0);
     }
-  }
-  
+}
+
+/* Enhanced Profile Area */
+.profile-area {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+
+.profile-area button {
+    background: linear-gradient(135deg, #6ab545, #b5d54b); 
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-area button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Updated Profile Dropdown Styling */
+.profile-details {
+    padding: 12px 16px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    width: 160px;
+    font-family: 'Segoe UI', sans-serif;
+    color: #2c3e50;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease-in-out;
+}
+
+.profile-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 6px 0;
+}
+
+.profile-row:not(:last-of-type) {
+    border-bottom: 1px solid #ccc;
+}
+
+.profile-row .label {
+    font-weight: 600;
+    color: #1e88e5;
+}
+
+.profile-row .value {
+    color: #37474f;
+}
+
+/* Logout Button Styling */
+.profile-details hr {
+    display: none;
+}
+
+.profile-details button {
+    margin-top: 10px;
+    background-color: transparent;
+    color: #e53935;
+    border: 1px solid #e53935;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.7s ease, color 0.7s ease;
+}
+
+.profile-details button:hover {
+    background-color: #e53935;
+    color: white;
+    border-color: #c62828;
+    transform: translateY(-1px);
+}
+
+/* Dropdown Animation */
+@keyframes slideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

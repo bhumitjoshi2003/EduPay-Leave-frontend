@@ -9,11 +9,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatSnackBarModule, FormsModule],
+  imports: [MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatSnackBarModule, FormsModule, MatIconModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -22,13 +23,15 @@ export class HomeComponent implements OnInit {
   showLoginForm = false;
   studentId = '';
   password = '';
-  loginState = 'initial'; // Added state variable
+  loginState = 'initial';
+  hidePassword = true; 
 
   constructor(private authService: AuthService, private snackBar: MatSnackBar, private router: Router) { }
 
   ngOnInit() {
-    if (typeof localStorage !== 'undefined') {
-      this.authenticated = !!localStorage.getItem('token');
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('token')) {
+      this.authenticated = true;
+      this.router.navigate(['/dashboard']);
     }
   }
 
@@ -51,7 +54,6 @@ export class HomeComponent implements OnInit {
         this.authenticated = true;
         this.showLoginForm = false;
         this.loginState = 'initial'; // Reset state
-        this.snackBar.open('Login successful!', 'Close', { duration: 3000 });
   
 
         const redirectUrl = localStorage.getItem('redirectUrl') || '/dashboard';
@@ -59,7 +61,12 @@ export class HomeComponent implements OnInit {
         this.router.navigateByUrl(redirectUrl);
       },
       error: (error) => {
-        this.snackBar.open('Login failed. Invalid credentials.', 'Close', { duration: 3000 });
+        this.snackBar.open('Incorrect Credentials', 'Okay', {
+          duration: 5000,
+          panelClass: ['error-snackbar'], 
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
         console.error('Login error:', error);
       }
     });
@@ -71,6 +78,9 @@ export class HomeComponent implements OnInit {
       localStorage.removeItem('token');
     }
     this.authenticated = false;
-    this.snackBar.open('Logout successful!', 'Close', { duration: 3000 });
+  }
+
+  togglePasswordVisibility() {
+    this.hidePassword = !this.hidePassword;
   }
 }

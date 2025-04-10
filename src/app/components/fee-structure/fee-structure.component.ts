@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BusFeesComponent } from '../bus-fees/bus-fees.component';
 import { FeeStructure, FeeStructureService } from '../../services/fee-structure.service';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-fee-structure',
@@ -126,5 +127,14 @@ export class FeeStructureComponent implements OnInit {
     if (this.isEditing && this.feeStructures.length > 0) {
       this.feeStructures.pop();
     }
+  }
+
+  canEdit(): boolean {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      if(decodedToken.role === "ADMIN") return true;
+    }
+    return false;
   }
 }

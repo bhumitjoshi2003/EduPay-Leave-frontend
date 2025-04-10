@@ -20,8 +20,8 @@ export const routes: Routes = [
         component: DashboardComponent,
         canActivate: [AuthGuard],
         children: [
-            { path: 'fee-structure', component: FeeStructureComponent },
             { path: 'fees', component: PaymentTrackerComponent },
+            { path: 'fee-structure', component: FeeStructureComponent },
             { path: 'payment', component: PaymentComponent },
             { path: 'bus-fees', component: BusFeesComponent },
             { path: 'payment-history', component: PaymentHistoryComponent },
@@ -29,7 +29,6 @@ export const routes: Routes = [
             { path: 'apply-leave', component: ApplyLeaveComponent },
             { path: 'teacher-attendance', component: TeacherAttendanceComponent },
             { path: 'student-attendance', component: StudentAttendanceComponent },
-            { path: '', redirectTo: 'fees', pathMatch: 'full' }, // default route for dashboard
         ],
     },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },

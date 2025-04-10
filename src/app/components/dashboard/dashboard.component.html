@@ -1,41 +1,46 @@
 <div class="dashboard-container">
-    <div class="header-area">
-      <div class="logo-container">
-        <img src="IASName.png" alt="School Logo" class="logo" />
-      </div>
-  
-      <nav mat-tab-nav-bar class="custom-tab-nav">
-        <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/fees" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">Fees</a>
-        <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/fee-structure" routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">Fee Structure</a>
-        <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/payment-history" routerLinkActive #rla5="routerLinkActive" [active]="rla5.isActive">Payment History</a>
-        <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/apply-leave" routerLinkActive #rla6="routerLinkActive" [active]="rla6.isActive">Apply Leave</a>
-        <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/student-attendance" routerLinkActive #rla8="routerLinkActive" [active]="rla8.isActive">Student Attendance</a>
-        <a *ngIf="isTeacherOrAdmin()" mat-tab-link routerLink="/dashboard/teacher-attendance" routerLinkActive #rla7="routerLinkActive" [active]="rla7.isActive">Teacher Attendance</a>
-      </nav>
-  
-      <div class="profile-area">
-        <button mat-icon-button [matMenuTriggerFor]="profileMenu">
-          <mat-icon>account_circle</mat-icon>
-        </button>
-        <mat-menu #profileMenu="matMenu" class="custom-profile-menu">
-          <div class="profile-details">
-            <div class="profile-row">
-              <span class="label">ID:</span>
-              <span class="value">{{ Id }}</span>
-            </div>
-            <div class="profile-row">
-              <span class="label">Role:</span>
-              <span class="value">{{ Role }}</span>
-            </div>
-            <hr />
-            <button mat-menu-item class="logout-button" (click)="logout()">Logout</button>
-          </div>
-        </mat-menu>
-      </div>
+  <div class="header-area">
+    <div class="logo-container">
+      <img src="IASName.png" alt="School Logo" class="logo" />
     </div>
-  
+
+    <nav mat-tab-nav-bar class="custom-tab-nav" #tabNav [tabPanel]="tabPanel">
+      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/fees" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">Fees</a>
+      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/fee-structure" routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">Fee Structure</a>
+      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/payment-history" routerLinkActive #rla5="routerLinkActive" [active]="rla5.isActive">Payment History</a>
+      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/apply-leave" routerLinkActive #rla6="routerLinkActive" [active]="rla6.isActive">Apply Leave</a>
+      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/student-attendance" routerLinkActive #rla8="routerLinkActive" [active]="rla8.isActive">Student Attendance</a>
+      <a *ngIf="isTeacherOrAdmin()" mat-tab-link routerLink="/dashboard/teacher-attendance" routerLinkActive #rla7="routerLinkActive" [active]="rla7.isActive">Teacher Attendance</a>
+    </nav>
+
+    <div class="profile-area">
+      <button mat-icon-button [matMenuTriggerFor]="profileMenu">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      <mat-menu #profileMenu="matMenu" class="custom-profile-menu">
+        <div class="profile-details">
+          <div class="profile-row">
+            <span class="label">ID:</span>
+            <span class="value">{{ Id }}</span>
+          </div>
+          <div class="profile-row" *ngIf="isStudent()">
+            <span class="label">Name:</span>
+            <span class="value">{{ Name }}</span>
+          </div>
+          <div class="profile-row" *ngIf="isStudent()">
+            <span class="label">Class:</span>
+            <span class="value">{{ Class }}</span>
+          </div>
+          <hr />
+          <button mat-menu-item class="logout-button" (click)="logout()">Logout</button>
+        </div>
+      </mat-menu>
+    </div>
+  </div>
+
+  <mat-tab-nav-panel #tabPanel>
     <div class="content-area">
       <router-outlet></router-outlet>
     </div>
-  </div>
-  
+  </mat-tab-nav-panel>
+</div>

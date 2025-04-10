@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BusFeesService, BusFee } from '../../services/bus-fees.service';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-bus-fees',
@@ -28,7 +29,7 @@ export class BusFeesComponent implements OnInit {
     this.busFeesService.getAcademicYears().subscribe(years => {
       this.academicYears = years;
       if (this.academicYears.length > 0) {
-        this.currentSession = this.academicYears[this.academicYears.length - 1]; // Default to the latest year
+        this.currentSession = this.academicYears[this.academicYears.length - 1]; 
         this.fetchBusFees();
       }
     });
@@ -83,7 +84,7 @@ export class BusFeesComponent implements OnInit {
   }
 
   removeRow(): void {
-    if (this.busFeeStructures.length > 1) {
+    if (this.busFeeStructures.length > 0) {
       this.busFeeStructures.pop();
     }
   }
@@ -112,7 +113,12 @@ export class BusFeesComponent implements OnInit {
   }
 
   canEdit(): boolean {
-    return true;
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      if(decodedToken.role === "ADMIN") return true;
+    }
+    return false;
   }
 
   getFormattedSession(session: string): string {

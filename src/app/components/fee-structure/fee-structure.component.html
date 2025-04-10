@@ -10,8 +10,8 @@
         </select>
       </div>
 
-      <button *ngIf="!(isNewSessionStarted || isEditing)" (click)="startNewAcademicYear()">Start New Academic Year</button>
-      <button *ngIf="!isEditing" (click)="edit()">Edit</button>
+      <button *ngIf="!(isNewSessionStarted || isEditing) && canEdit()" (click)="startNewAcademicYear()">Start New Academic Year</button>
+      <button *ngIf="!isEditing && canEdit()" (click)="edit()">Edit</button>
 
       <div *ngIf="isEditing">
         <button (click)="save()">Save</button>

@@ -11,7 +11,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideClientHydration(withEventReplay()),
     provideAnimations(),
     provideHttpClient(withInterceptorsFromDi()), // ✅ Use `withInterceptorsFromDi()`
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }

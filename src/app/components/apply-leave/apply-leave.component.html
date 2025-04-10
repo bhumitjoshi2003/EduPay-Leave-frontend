@@ -20,7 +20,6 @@
   </form>
 </div>
 
-
 <div *ngIf="leaves.length" class="leave-list-container">
   <h2 class="section-title">Applied Leaves</h2>
   <div class="leave-table-container">
@@ -37,7 +36,7 @@
           <td>{{ leave.leaveDate }}</td>
           <td>{{ leave.reason }}</td>
           <td>
-            <button [disabled]="leave.leaveDate <= today" (click)="deleteLeave(leave.leaveDate.toString())" class="delete-button" [title]="leave.leaveDate <= today ? 'Cannot delete past leaves' : ''">
+            <button [disabled]="leave.originalLeaveDate <= today" (click)="deleteLeave(leave.originalLeaveDate)" class="delete-button" [title]="leave.originalLeaveDate <= today ? 'Cannot delete past leaves' : ''">
               Delete
             </button>
           </td>

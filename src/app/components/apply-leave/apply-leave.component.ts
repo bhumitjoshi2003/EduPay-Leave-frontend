@@ -19,7 +19,7 @@ export class ApplyLeaveComponent implements OnInit {
   errorMessage: string = '';
   studentId: string = '';
   className = '1';
-  leaves: { leaveDate: string; reason: string }[] = [];
+  leaves: { originalLeaveDate: string; leaveDate: string; reason: string }[] = [];
   today: string = '';
 
   constructor(
@@ -51,11 +51,13 @@ export class ApplyLeaveComponent implements OnInit {
 
   loadStudentLeaves(): void {
     this.leaveService.getStudentLeaves(this.studentId).subscribe((data) => {
-      console.log("Fetched Leaves:", data);
-      this.leaves = data.map((leave) => ({
-        leaveDate: leave.leaveDate,
-        reason: leave.reason
-      }));
+      this.leaves = data
+        .sort((a, b) => new Date(b.leaveDate).getTime() - new Date(a.leaveDate).getTime())
+        .map((leave) => ({
+          originalLeaveDate: leave.leaveDate, 
+          leaveDate: formatDate(leave.leaveDate, 'dd-MMM-yyyy', 'en'), 
+          reason: leave.reason
+        }));
     });
   }
 

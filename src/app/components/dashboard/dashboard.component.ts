@@ -6,9 +6,10 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
  import { MatDividerModule } from '@angular/material/divider';
  import { AuthService } from '../../auth/auth.service';
  import { MatSnackBar } from '@angular/material/snack-bar';
- import { jwtDecode } from 'jwt-decode'; // Correct Import
+ import { jwtDecode } from 'jwt-decode';
  import { CommonModule } from '@angular/common';
- import { StudentService } from '../../services/student.service'; 
+ import { StudentService } from '../../services/student.service';
+ import { TeacherService } from '../../services/teacher.service'; // Import TeacherService
 
  @Component({
    selector: 'app-dashboard',
@@ -22,12 +23,14 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
    Id: string = '';
    Name: string = '';
    Class: string = '';
+   ClassTeacher: string = '';
 
    constructor(
      private router: Router,
      private authService: AuthService,
      private snackBar: MatSnackBar,
-     private studentService: StudentService, // Inject StudentService
+     private studentService: StudentService,
+     private teacherService: TeacherService // Inject TeacherService
    ) { }
 
    ngOnInit() {
@@ -40,8 +43,8 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
      if (token) {
        const decodedToken: any = jwtDecode(token);
        this.Role = decodedToken.role;
-       this.Id = decodedToken.studentId || decodedToken.teacherId || decodedToken.adminId || decodedToken['sub-adminId'] || null;
-       this.fetchUserDetails(); 
+       this.Id = decodedToken.userId;
+       this.fetchUserDetails();
      }
    }
 
@@ -56,7 +59,19 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
            console.error('Error fetching student details:', error);
          }
        });
+     } else if (this.Role === 'TEACHER' && this.Id) {
+      console.log("Fetching teacher with ID:", this.Id);
+       this.teacherService.getTeacher(this.Id).subscribe({
+         next: (teacher) => {
+           this.Name = teacher.name;
+           this.ClassTeacher = teacher.classTeacher;
+         },
+         error: (error) => {
+           console.error('Error fetching teacher details:', error);
+         }
+       });
      }
+     // Add similar logic for 'ADMIN' and 'SUB-ADMIN' if needed
    }
 
    handleInitialNavigation(): void {

@@ -29,7 +29,7 @@ export class PaymentHistoryComponent implements OnInit {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken: any = jwtDecode(token);
-      this.studentId = decodedToken.studentId; // Extract studentId from token
+      this.studentId = decodedToken.userId; 
     }
   }
 

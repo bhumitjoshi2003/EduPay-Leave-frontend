@@ -31,7 +31,7 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken: any = jwtDecode(token);
-      this.studentId = decodedToken.studentId; 
+      this.studentId = decodedToken.userId; 
     }
   }
 

@@ -10,6 +10,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import Swal from 'sweetalert2';
 import { AttendanceData } from '../../interfaces/atendance-data';
 import { AttendanceService } from '../../services/attendance.service';
+import { jwtDecode } from 'jwt-decode';
+import { TeacherService } from '../../services/teacher.service';
 
 interface Student {
   studentId: string;
@@ -32,18 +34,70 @@ export class TeacherAttendanceComponent implements OnInit {
   students: Student[] = [];
   leaves: string[] = [];
   attendanceDate: Date = new Date();
-  selectedClass: string = '1';
+  selectedClass: string = '';
   absentStudents: string[] = [];
+  teacherId: string = '';
+  isValidDate: boolean = true;
 
   constructor(
     private leaveService: LeaveService,
     private studentService: StudentService,
-    private attendanceService: AttendanceService 
+    private attendanceService: AttendanceService,
+    private teacherService: TeacherService
   ) {}
 
   ngOnInit(): void {
-    this.loadStudents();
-    this.loadLeaves();
+    this.getTeacherId();
+  }
+
+  dateFilter = (date: Date | null): boolean => {
+    if (!date) {
+      return false;
+    }
+    const today = new Date();
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(today.getDate() - 2);
+    twoDaysAgo.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    tomorrow.setHours(23, 59, 59, 999);
+
+    const selectedDate = new Date(date);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    return selectedDate >= twoDaysAgo && selectedDate <= tomorrow;
+  };
+
+  onDateChange(event: any): void {
+    const selectedDate = event.value;
+    if (selectedDate) {
+      const offset = selectedDate.getTimezoneOffset() * 60000;
+      const adjustedDate = new Date(selectedDate.getTime() - offset);
+      this.attendanceDate = adjustedDate;
+      this.isValidDate = this.dateFilter(adjustedDate);
+      this.loadLeaves();
+    } else {
+      this.isValidDate = false;
+    }
+  }
+
+  getTeacherId(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      this.teacherId = decodedToken.userId;
+      this.teacherService.getTeacher(this.teacherId).subscribe({
+        next: (teacher: any) => {
+          this.selectedClass = teacher.classTeacher;
+          this.loadStudents();
+          this.loadLeaves();
+        },
+        error: (error: any) => {
+          console.error('Error fetching teacher details:', error);
+        }
+      });
+    }
   }
 
   loadStudents(): void {
@@ -78,7 +132,6 @@ export class TeacherAttendanceComponent implements OnInit {
           }
         });
       } else {
-        console.log("leave");
         this.leaveService.getLeavesByDateAndClass(formattedDate, this.selectedClass).subscribe((leaves) => {
           this.absentStudents = leaves;
 
@@ -112,54 +165,65 @@ export class TeacherAttendanceComponent implements OnInit {
     }
   }
 
-  onDateChange(event: any): void {
-    const selectedDate = event.value;
-    if (selectedDate) {
-        const offset = selectedDate.getTimezoneOffset() * 60000;
-        const adjustedDate = new Date(selectedDate.getTime() - offset);
-        this.attendanceDate = adjustedDate;
-        this.loadLeaves();
-    }
-  }
-
   saveAttendance(): void {
-    const attendanceData: AttendanceData[] = this.students
-      .filter((student) => student.absent)
-      .map((student) => ({
-        studentId: student.studentId,
-        chargePaid: student.chargePaid,
+    const today = new Date();
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(today.getDate() - 2);
+    twoDaysAgo.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    tomorrow.setHours(23, 59, 59, 999);
+
+    const selectedDate = new Date(this.attendanceDate);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate >= twoDaysAgo && selectedDate <= tomorrow) {
+      const attendanceData: AttendanceData[] = this.students
+        .filter((student) => student.absent)
+        .map((student) => ({
+          studentId: student.studentId,
+          chargePaid: student.chargePaid,
+          absentDate: this.attendanceDate.toISOString().split('T')[0],
+          className: this.selectedClass,
+        }));
+
+      attendanceData.push({
+        studentId: 'X',
+        chargePaid: true,
         absentDate: this.attendanceDate.toISOString().split('T')[0],
         className: this.selectedClass,
-      }));
+      });
 
-    attendanceData.push({
-      studentId: 'X',
-      chargePaid: true, 
-      absentDate: this.attendanceDate.toISOString().split('T')[0],
-      className: this.selectedClass,
-    });
-
-    const formattedDate = this.attendanceDate.toISOString().split('T')[0];
-    this.attendanceService.saveAttendance(attendanceData).subscribe({
-      next: () => {
-        Swal.fire({
-          title: 'Attendance Saved!',
-          text: 'Attendance data saved successfully.',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      },
-      error: (error) => {
-        console.error('Error saving attendance:', error);
-        Swal.fire({
-          title: 'Error!',
-          text: 'Failed to save attendance. Please try again.',
-          icon: 'error',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      },
-    });
+      this.attendanceService.saveAttendance(attendanceData).subscribe({
+        next: () => {
+          Swal.fire({
+            title: 'Attendance Saved!',
+            text: 'Attendance data saved successfully.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false,
+          });
+        },
+        error: (error) => {
+          console.error('Error saving attendance:', error);
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to save attendance. Please try again.',
+            icon: 'error',
+            timer: 2000,
+            showConfirmButton: false,
+          });
+        },
+      });
+    } else {
+      Swal.fire({
+        title: 'Invalid Date!',
+        text: 'You can only save attendance for the past 2 days up to tomorrow.',
+        icon: 'warning',
+        timer: 2500,
+        showConfirmButton: false,
+      });
+    }
   }
 }

@@ -4,9 +4,9 @@
     <mat-form-field class="custom-datepicker">
       <input matInput [matDatepicker]="picker" placeholder="Choose a date" [(ngModel)]="attendanceDate" (dateChange)="onDateChange($event)">
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
+      <mat-datepicker #picker [matDatepickerFilter]="dateFilter"></mat-datepicker>
     </mat-form-field>
-    <button class="attendance-button save" (click)="saveAttendance()">Save</button>
+    <button class="attendance-button save" (click)="saveAttendance()" [disabled]="!isValidDate">Save</button>
   </div>
   <ul class="student-list">
     <li *ngFor="let student of students" class="student-item" [class.absent]="student.absent">
@@ -14,8 +14,8 @@
         {{ student.name }} ({{ student.studentId }})
       </div>
       <div class="attendance-buttons">
-        <button *ngIf="!student.absent" (click)="markAbsent(student.studentId)" class="attendance-button absent">Mark Absent</button>
-        <button *ngIf="student.absent" (click)="markPresent(student.studentId)" class="attendance-button present">Mark Present</button>
+        <button *ngIf="!student.absent" (click)="markAbsent(student.studentId)" class="attendance-button absent" [disabled]="!isValidDate">Mark Absent</button>
+        <button *ngIf="student.absent" (click)="markPresent(student.studentId)" class="attendance-button present" [disabled]="!isValidDate">Mark Present</button>
       </div>
     </li>
   </ul>

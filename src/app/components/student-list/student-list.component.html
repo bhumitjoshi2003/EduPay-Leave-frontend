@@ -1,0 +1,8 @@
+<div class="student-list-container">
+    <h2>Students of Class {{ selectedClass }}</h2>
+    <ul class="student-list">
+      <li *ngFor="let student of students" class="student-item" (click)="viewStudentDetails(student.studentId)">
+        {{ student.name }} ({{ student.studentId }})
+      </li>
+    </ul>
+  </div>

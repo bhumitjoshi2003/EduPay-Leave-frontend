@@ -10,6 +10,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import Swal from 'sweetalert2';
 import { AttendanceData } from '../../interfaces/atendance-data';
 import { AttendanceService } from '../../services/attendance.service';
+import { jwtDecode } from 'jwt-decode';
+import { TeacherService } from '../../services/teacher.service';
 
 interface Student {
   studentId: string;
@@ -32,18 +34,40 @@ export class TeacherAttendanceComponent implements OnInit {
   students: Student[] = [];
   leaves: string[] = [];
   attendanceDate: Date = new Date();
-  selectedClass: string = '1';
+  selectedClass: string = '';
   absentStudents: string[] = [];
+  teacherId: string = '';
 
   constructor(
     private leaveService: LeaveService,
     private studentService: StudentService,
-    private attendanceService: AttendanceService 
+    private attendanceService: AttendanceService,
+    private teacherService: TeacherService 
   ) {}
 
   ngOnInit(): void {
-    this.loadStudents();
-    this.loadLeaves();
+    this.getTeacherId();
+    if (this.attendanceDate.getDay() === 0) {
+      this.students = [];
+    }
+  }
+
+  getTeacherId(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      this.teacherId = decodedToken.userId; 
+      this.teacherService.getTeacher(this.teacherId).subscribe({
+        next: (teacher: any) => {
+          this.selectedClass = teacher.classTeacher;
+          this.loadStudents();
+          this.loadLeaves();
+        },
+        error: (error: any) => {
+          console.error('Error fetching teacher details:', error);
+        }
+      });
+    }
   }
 
   loadStudents(): void {
@@ -78,7 +102,6 @@ export class TeacherAttendanceComponent implements OnInit {
           }
         });
       } else {
-        console.log("leave");
         this.leaveService.getLeavesByDateAndClass(formattedDate, this.selectedClass).subscribe((leaves) => {
           this.absentStudents = leaves;
 
@@ -139,7 +162,6 @@ export class TeacherAttendanceComponent implements OnInit {
       className: this.selectedClass,
     });
 
-    const formattedDate = this.attendanceDate.toISOString().split('T')[0];
     this.attendanceService.saveAttendance(attendanceData).subscribe({
       next: () => {
         Swal.fire({
@@ -161,5 +183,29 @@ export class TeacherAttendanceComponent implements OnInit {
         });
       },
     });
+  }
+
+  isDateWithinAllowedRange(): boolean {
+    const today = new Date();
+    const lowerBound = new Date(today);
+    const upperBound = new Date(today);
+  
+    lowerBound.setDate(today.getDate() - 2);
+    upperBound.setDate(today.getDate() + 1);
+  
+    const selected = new Date(this.attendanceDate);
+    selected.setHours(0, 0, 0, 0); 
+  
+    return selected >= lowerBound && selected <= upperBound;
+  }
+  
+  getRelativeDate(offset: number): string {
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    return date.toISOString().split('T')[0];
+  }
+  
+  isSunday(date: Date | null): boolean {
+    return date ? new Date(date).getDay() === 0 : false;
   }
 }

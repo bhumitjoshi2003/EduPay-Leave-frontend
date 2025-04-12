@@ -1,0 +1,20 @@
+<div class="student-details-container" *ngIf="studentDetails">
+    <h2>Student Details</h2>
+    <p><strong>Name:</strong> {{ studentDetails.name }}</p>
+    <p><strong>Student ID:</strong> {{ studentDetails.studentId }}</p>
+    <p><strong>Class:</strong> {{ studentDetails.className }}</p>
+    <p><strong>Phone Number:</strong> {{ studentDetails.phoneNumber }}</p>
+    <p><strong>Email:</strong> {{ studentDetails.email }}</p>
+    <p><strong>Date of Birth:</strong> {{ studentDetails.dob }}</p>
+    <p><strong>Father's Name:</strong> {{ studentDetails.fatherName }}</p>
+    <p><strong>Mother's Name:</strong> {{ studentDetails.motherName }}</p>
+
+    <div class="actions">
+      <button (click)="viewAttendance()">View Attendance</button>
+    </div>
+    <button (click)="router.navigate(['dashboard/student-list'])">Back to Student List</button>
+  </div>
+  
+  <div *ngIf="!studentDetails">
+    <p>Loading student details...</p>
+  </div>

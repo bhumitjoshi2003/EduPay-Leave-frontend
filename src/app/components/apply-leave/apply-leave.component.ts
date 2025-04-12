@@ -18,7 +18,7 @@ export class ApplyLeaveComponent implements OnInit {
   leaveForm: FormGroup;
   errorMessage: string = '';
   studentId: string = '';
-  className = '1';
+  className = '';
   leaves: { originalLeaveDate: string; leaveDate: string; reason: string }[] = [];
   today: string = '';
 
@@ -37,14 +37,22 @@ export class ApplyLeaveComponent implements OnInit {
     const today = new Date();
     this.today = formatDate(today, 'yyyy-MM-dd', 'en');
     this.getStudentId();
-    this.loadStudentLeaves();
   }
 
   getStudentId(): void {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken: any = jwtDecode(token);
-      this.studentId = decodedToken.studentId;
+      this.studentId = decodedToken.userId;
+      this.studentService.getStudent(this.studentId).subscribe({
+        next: (student) => {
+          this.className = student.className;
+          this.loadStudentLeaves();
+        },
+        error: (error) => {
+          console.error('Error fetching student details:', error);
+        }
+      });
     }
   }
 

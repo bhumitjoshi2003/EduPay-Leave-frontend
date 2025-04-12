@@ -13,7 +13,7 @@ interface StudentLeaveDTO {
 
 
 export class StudentService {
-  private baseUrl = 'http://localhost:8081/students'; // Replace with your backend URL
+  private baseUrl = 'http://localhost:8081/students'; 
 
   constructor(private http: HttpClient) {}
 

@@ -1,0 +1,96 @@
+.student-details-container {
+  padding: 40px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f0f8ff, #e6f7ff); /* Light blue gradient */
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.8s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Reduced gap between main elements */
+}
+
+.student-details-container h2 {
+  color: #1e88e5; /* Blue accent color */
+  margin-bottom: 15px; /* Reduced gap below the heading */
+  text-align: center;
+  border-bottom: 3px solid #64b5f6;
+  padding-bottom: 10px; /* Slightly reduced padding below the border */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.student-details-container p {
+  color: #333;
+  font-size: 1.1em;
+  line-height: 1.5; /* Slightly reduced line height */
+  margin-bottom: -15px; /* Reduced gap below each detail */
+  padding: 12px; /* Slightly reduced padding inside each detail */
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); /* Subtler shadow */
+}
+
+.student-details-container p strong {
+  font-weight: bold;
+  color: #2196f3;
+  margin-right: 5px;
+}
+
+.actions {
+  display: flex;
+  gap: 15px; /* Reduced gap between buttons */
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.actions button,
+.student-details-container button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  font-size: 0.95em; /* Slightly smaller button font size */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.actions button {
+  background: linear-gradient(135deg, #64b5f6, #1e88e5); /* Blueish for View Attendance */
+}
+
+.actions button:hover,
+.student-details-container button:hover {
+  transform: scale(1.03); /* Subtler hover scale */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.student-details-container button:last-child {
+  background: linear-gradient(135deg, #ffab91, #ff7043); /* Orangeish for Back to Student List */
+  margin-top: 20px;
+  padding: 10px 20px; /* Ensure consistent padding */
+  border-radius: 8px; /* Ensure consistent border radius */
+  color: white; /* Ensure consistent text color */
+  font-weight: bold; /* Ensure consistent font weight */
+  font-size: 0.95em; /* Ensure consistent font size */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Ensure consistent box shadow */
+  text-transform: uppercase; /* Ensure consistent text transform */
+  letter-spacing: 0.5px; /* Ensure consistent letter spacing */
+}
+
+.loading-message {
+  text-align: center;
+  font-size: 1.1em;
+  color: #777;
+  font-style: italic;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

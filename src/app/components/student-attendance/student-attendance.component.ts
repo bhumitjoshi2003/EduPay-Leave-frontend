@@ -4,6 +4,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { AttendanceService } from '../../services/attendance.service';
 import { jwtDecode } from 'jwt-decode';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-student-attendance',
@@ -17,34 +18,49 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
   overallData: { presentDays: number; absentDays: number } = { presentDays: 0, absentDays: 0 };
   monthlyCharts: any[] = [];
   overallChart: any;
+  role: string = '';
 
   @ViewChildren('monthlyChart') monthlyCanvas!: QueryList<ElementRef>;
   @ViewChild('overallChart') overallCanvas!: ElementRef;
 
-  constructor(private attendanceService: AttendanceService, @Inject(PLATFORM_ID) private platformId: Object) {}
-  
+  constructor(
+    private attendanceService: AttendanceService,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private route: ActivatedRoute
+  ) {}
+
   ngAfterViewInit(): void {
-    this.createCharts(); 
-  }
-  
-  getStudentId(): void {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      this.studentId = decodedToken.userId; 
-    }
+    this.createCharts();
   }
 
   ngOnInit(): void {
-    this.getStudentId();
-    this.fetchAttendanceData();
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      this.role = decodedToken.role;
+
+      if (this.role === 'STUDENT') {
+        this.studentId = decodedToken.userId;
+      } else {
+        this.route.params.subscribe(params => {
+          const routeStudentId = params['studentId'];
+          if (routeStudentId) { this.studentId = routeStudentId; }
+        });
+      }
+      this.fetchAttendanceData();
+    }
   }
 
   fetchAttendanceData(): void {
+    if (!this.studentId) {
+      console.error('Student ID is missing.');
+      return;
+    }
+
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
-    const startMonth = 4; // April
-    const endMonth = 3; // March
+    const startMonth = 4;
+    const endMonth = 3;
 
     const observables = [];
 
@@ -65,7 +81,6 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
         const year = index < 9 ? currentYear : currentYear + 1;
         const month = index < 9 ? startMonth + index : 1 + index - 9;
 
-        // If there are no working days, make a grey chart
         if (workingDays === 0) {
           return {
             month: new Date(year, month - 1).toLocaleString('default', { month: 'short' }),
@@ -101,22 +116,19 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
           let labels, datasetData, backgroundColors;
 
           if (totalDays === 0) {
-            // If no working days, make it fully grey
             labels = ['No Attendance Recorded'];
-            datasetData = [100]; // Entire pie is one section
-            backgroundColors = ['#A9A9A9']; // Darker Grey
+            datasetData = [100];
+            backgroundColors = ['#A9A9A9'];
           } else {
-            // Calculate percentages
             const presentPercentage = ((data.presentDays / totalDays) * 100).toFixed(1);
             const absentPercentage = ((data.absentDays / totalDays) * 100).toFixed(1);
 
             labels = [`Absent (${absentPercentage}%)`, `Present (${presentPercentage}%)`];
             datasetData = [data.absentDays, data.presentDays];
-            backgroundColors = ['#F08080', '#90EE90']; // Vibrant Red, Vibrant Blue
+            backgroundColors = ['#F08080', '#90EE90'];
           }
 
-          // Get the full month name
-          const fullMonthName = new Date(new Date().getFullYear(), new Date(data.month+'1').getMonth()).toLocaleString('default', { month: 'long' });
+          const fullMonthName = new Date(new Date().getFullYear(), new Date(data.month + '1').getMonth()).toLocaleString('default', { month: 'long' });
 
           this.monthlyCharts[index] = new Chart(canvas.nativeElement, {
             type: 'pie',
@@ -133,7 +145,7 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
               plugins: {
                 title: {
                   display: true,
-                  text: fullMonthName, 
+                  text: fullMonthName,
                   font: { size: 14 },
                 },
                 legend: { display: true },

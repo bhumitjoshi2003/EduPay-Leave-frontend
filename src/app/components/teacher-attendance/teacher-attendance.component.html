@@ -16,7 +16,7 @@
 
     <button
       class="attendance-button save"
-      [disabled]="!isDateWithinAllowedRange()"
+      [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
       (click)="saveAttendance()"
     >
       Save
@@ -45,7 +45,7 @@
           *ngIf="!student.absent"
           (click)="markAbsent(student.studentId)"
           class="attendance-button absent"
-          [disabled]="!isDateWithinAllowedRange()"
+          [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
         >
           Mark Absent
         </button>
@@ -53,7 +53,7 @@
           *ngIf="student.absent"
           (click)="markPresent(student.studentId)"
           class="attendance-button present"
-          [disabled]="!isDateWithinAllowedRange()"
+          [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
         >
           Mark Present
         </button>

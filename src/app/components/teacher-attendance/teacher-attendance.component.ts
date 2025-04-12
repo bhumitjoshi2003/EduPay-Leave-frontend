@@ -37,48 +37,18 @@ export class TeacherAttendanceComponent implements OnInit {
   selectedClass: string = '';
   absentStudents: string[] = [];
   teacherId: string = '';
-  isValidDate: boolean = true;
 
   constructor(
     private leaveService: LeaveService,
     private studentService: StudentService,
     private attendanceService: AttendanceService,
-    private teacherService: TeacherService
+    private teacherService: TeacherService 
   ) {}
 
   ngOnInit(): void {
     this.getTeacherId();
-  }
-
-  dateFilter = (date: Date | null): boolean => {
-    if (!date) {
-      return false;
-    }
-    const today = new Date();
-    const twoDaysAgo = new Date();
-    twoDaysAgo.setDate(today.getDate() - 2);
-    twoDaysAgo.setHours(0, 0, 0, 0);
-
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-    tomorrow.setHours(23, 59, 59, 999);
-
-    const selectedDate = new Date(date);
-    selectedDate.setHours(0, 0, 0, 0);
-
-    return selectedDate >= twoDaysAgo && selectedDate <= tomorrow;
-  };
-
-  onDateChange(event: any): void {
-    const selectedDate = event.value;
-    if (selectedDate) {
-      const offset = selectedDate.getTimezoneOffset() * 60000;
-      const adjustedDate = new Date(selectedDate.getTime() - offset);
-      this.attendanceDate = adjustedDate;
-      this.isValidDate = this.dateFilter(adjustedDate);
-      this.loadLeaves();
-    } else {
-      this.isValidDate = false;
+    if (this.attendanceDate.getDay() === 0) {
+      this.students = [];
     }
   }
 
@@ -86,7 +56,7 @@ export class TeacherAttendanceComponent implements OnInit {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken: any = jwtDecode(token);
-      this.teacherId = decodedToken.userId;
+      this.teacherId = decodedToken.userId; 
       this.teacherService.getTeacher(this.teacherId).subscribe({
         next: (teacher: any) => {
           this.selectedClass = teacher.classTeacher;
@@ -165,65 +135,77 @@ export class TeacherAttendanceComponent implements OnInit {
     }
   }
 
+  onDateChange(event: any): void {
+    const selectedDate = event.value;
+    if (selectedDate) {
+        const offset = selectedDate.getTimezoneOffset() * 60000;
+        const adjustedDate = new Date(selectedDate.getTime() - offset);
+        this.attendanceDate = adjustedDate;
+        this.loadLeaves();
+    }
+  }
+
   saveAttendance(): void {
-    const today = new Date();
-    const twoDaysAgo = new Date();
-    twoDaysAgo.setDate(today.getDate() - 2);
-    twoDaysAgo.setHours(0, 0, 0, 0);
-
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-    tomorrow.setHours(23, 59, 59, 999);
-
-    const selectedDate = new Date(this.attendanceDate);
-    selectedDate.setHours(0, 0, 0, 0);
-
-    if (selectedDate >= twoDaysAgo && selectedDate <= tomorrow) {
-      const attendanceData: AttendanceData[] = this.students
-        .filter((student) => student.absent)
-        .map((student) => ({
-          studentId: student.studentId,
-          chargePaid: student.chargePaid,
-          absentDate: this.attendanceDate.toISOString().split('T')[0],
-          className: this.selectedClass,
-        }));
-
-      attendanceData.push({
-        studentId: 'X',
-        chargePaid: true,
+    const attendanceData: AttendanceData[] = this.students
+      .filter((student) => student.absent)
+      .map((student) => ({
+        studentId: student.studentId,
+        chargePaid: student.chargePaid,
         absentDate: this.attendanceDate.toISOString().split('T')[0],
         className: this.selectedClass,
-      });
+      }));
 
-      this.attendanceService.saveAttendance(attendanceData).subscribe({
-        next: () => {
-          Swal.fire({
-            title: 'Attendance Saved!',
-            text: 'Attendance data saved successfully.',
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false,
-          });
-        },
-        error: (error) => {
-          console.error('Error saving attendance:', error);
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to save attendance. Please try again.',
-            icon: 'error',
-            timer: 2000,
-            showConfirmButton: false,
-          });
-        },
-      });
-    } else {
-      Swal.fire({
-        title: 'Invalid Date!',
-        text: 'You can only save attendance for the past 2 days up to tomorrow.',
-        icon: 'warning',
-        timer: 2500,
-        showConfirmButton: false,
-      });
-    }
+    attendanceData.push({
+      studentId: 'X',
+      chargePaid: true, 
+      absentDate: this.attendanceDate.toISOString().split('T')[0],
+      className: this.selectedClass,
+    });
+
+    this.attendanceService.saveAttendance(attendanceData).subscribe({
+      next: () => {
+        Swal.fire({
+          title: 'Attendance Saved!',
+          text: 'Attendance data saved successfully.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      },
+      error: (error) => {
+        console.error('Error saving attendance:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to save attendance. Please try again.',
+          icon: 'error',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      },
+    });
+  }
+
+  isDateWithinAllowedRange(): boolean {
+    const today = new Date();
+    const lowerBound = new Date(today);
+    const upperBound = new Date(today);
+  
+    lowerBound.setDate(today.getDate() - 2);
+    upperBound.setDate(today.getDate() + 1);
+  
+    const selected = new Date(this.attendanceDate);
+    selected.setHours(0, 0, 0, 0); 
+  
+    return selected >= lowerBound && selected <= upperBound;
+  }
+  
+  getRelativeDate(offset: number): string {
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    return date.toISOString().split('T')[0];
+  }
+  
+  isSunday(date: Date | null): boolean {
+    return date ? new Date(date).getDay() === 0 : false;
   }
 }

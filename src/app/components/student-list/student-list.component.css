@@ -1,52 +1,174 @@
+/* student-list.component.css */
+
 .student-list-container {
-    padding: 40px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #e9f8e3, #e5f5e7); /* Light purple/peach gradient */
-    border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    animation: fadeIn 0.8s ease-in-out;
-  }
-  
-  .student-list-container h2 {
-    color: #2e7d32; 
-    margin-bottom: 30px;
-    text-align: center;
-    border-bottom: 3px solid #66bb6a;
-    padding-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  
-  .student-list {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .student-item {
-    padding: 20px;
-    margin-bottom: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    cursor: pointer;
-    background-color: rgba(255, 255, 255, 0.85);
-    border-left: 8px solid #66bb6a; /* Pink accent for the list items */
-  }
-  
-  .student-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    background-color: rgba(255, 255, 255, 0.95);
-  }
-  
-  .student-item .student-info {
-    font-weight: 600;
-    color: #66bb6a; 
-    font-size: 1.1em;
-  }
-  
-  /* Animations */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  display: flex;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f0f8ff, #e0ffff); /* Light blue gradient */
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.8s ease-in-out;
+  padding: 30px;
+}
+
+.student-list-container h2 {
+  color: #2f4f4f; /* Dark slate gray */
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 2px solid #8fbc8f; /* Dark sea green */
+  padding-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  width: 100%;
+}
+
+/* Left Navigation Bar (Chevrons pointing right) */
+.left-navigation {
+  width: 180px; /* Adjust width */
+  margin-right: 30px;
+  padding: 20px 10px; /* Adjust vertical padding */
+  background-color: #f5f5f5; /* Light gray */
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.left-navigation h2 {
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  color: #555;
+  font-size: 1.2em;
+}
+
+.class-list-vertical {
+  list-style: none;
+  padding: 0;
+}
+
+.class-item-vertical {
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.chevron {
+  position: relative;
+  background-color: #a5db67; /* Light green for chevrons */
+  color: black;
+  padding: 10px 15px;
+  border-radius: 15px 0 0 15px; /* Rounded left side */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.08);
+  transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+  display: flex; /* Align text within chevron */
+  align-items: center;
+}
+
+.class-item-vertical.selected .chevron {
+  background-color: #418f45; /* Darker green for selected */
+  color: #fff;
+}
+
+.chevron::before {
+  content: '';
+  position: absolute;
+  right: -20px;
+  top: 0;
+  border-top: 20px solid transparent;
+  border-left: 20px solid #aed581; /* Match background */
+  border-bottom: 20px solid transparent;
+}
+
+.class-item-vertical.selected .chevron::before {
+  border-left-color: #388e3c; /* Match selected background */
+}
+
+.chevron span {
+  display: block;
+  flex-grow: 1; /* Allow text to take space */
+  text-align: left; /* Align text inside the chevron */
+}
+
+.class-item-vertical:hover .chevron {
+  background-color: #8cbe60; /* Medium green on hover */
+  transform: translateX(-5px); /* Move to the left on hover */
+}
+
+/* Student List Area */
+.student-list-area {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+}
+
+.student-list-area h2 {
+  text-align: left;
+  border-bottom: 2px solid #8fbc8f;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  color: #2f4f4f;
+  font-size: 1.4em;
+}
+
+.student-list {
+  list-style: none;
+  padding: 0;
+}
+
+.student-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease;
+  background-color: #f9fbe7; /* Light yellow background */
+  border-left: 8px solid #aae765; /* Thicker light green accent */
+}
+
+.student-item:hover {
+  background-color: #f0f4c3; /* Light olive hover */
+}
+
+.student-info {
+  flex-grow: 1;
+}
+
+.student-name {
+  font-weight: bold;
+  color: #333;
+  margin-right: 5px;
+}
+
+.student-id {
+  color: #777;
+  font-size: 0.9em;
+}
+
+.view-details-button {
+  background-color: #4caf50; /* Green button */
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.view-details-button:hover {
+  background-color: #388e3c; /* Darker green hover */
+}
+
+.no-students {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: #777;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

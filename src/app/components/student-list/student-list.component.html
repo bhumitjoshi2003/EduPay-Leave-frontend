@@ -1,8 +1,36 @@
 <div class="student-list-container">
-    <h2>Students of Class {{ selectedClass }}</h2>
-    <ul class="student-list">
-      <li *ngFor="let student of students" class="student-item" (click)="viewStudentDetails(student.studentId)">
-        {{ student.name }} ({{ student.studentId }})
+  <div *ngIf="loggedInUserRole === 'ADMIN'" class="left-navigation">
+    <h2>Classes</h2>
+    <ul class="class-list-vertical">
+      <li
+        *ngFor="let className of classList"
+        (click)="onClassSelect(className)"
+        [class.selected]="className === selectedClass"
+        class="class-item-vertical"
+      >
+        <div class="chevron">
+          <span>{{ className }}</span>
+        </div>
       </li>
     </ul>
   </div>
+
+  <div class="student-list-area">
+    <h2 *ngIf="loggedInUserRole === 'TEACHER'">Students of Class {{ selectedClass }}</h2>
+    <h2 *ngIf="loggedInUserRole === 'ADMIN' && selectedClass">Students of Class {{ selectedClass }}</h2>
+    <div *ngIf="students.length > 0; else noStudentsContainer">
+      <ul class="student-list">
+        <li *ngFor="let student of students" class="student-item" (click)="viewStudentDetails(student.studentId)">
+          <div class="student-info">
+            <span class="student-name">{{ student.name }}</span>
+            <span class="student-id">({{ student.studentId }})</span>
+          </div>
+          <button class="view-details-button" (click)="viewStudentDetails(student.studentId)">View</button>
+        </li>
+      </ul>
+    </div>
+    <ng-template #noStudentsContainer>
+      <p class="no-students">No students found for the selected class.</p>
+    </ng-template>
+  </div>
+</div>

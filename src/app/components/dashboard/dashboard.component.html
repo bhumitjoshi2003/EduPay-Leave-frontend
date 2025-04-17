@@ -6,12 +6,13 @@
 
     <nav mat-tab-nav-bar class="custom-tab-nav" #tabNav [tabPanel]="tabPanel">
       <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/fees" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">Fees</a>
-      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/fee-structure" routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">Fee Structure</a>
+      <a *ngIf="isStudent() || isAdmin()" mat-tab-link routerLink="/dashboard/fee-structure" routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">Fee Structure</a>
       <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/payment-history" routerLinkActive #rla5="routerLinkActive" [active]="rla5.isActive">Payment History</a>
       <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/apply-leave" routerLinkActive #rla6="routerLinkActive" [active]="rla6.isActive">Apply Leave</a>
       <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/student-attendance" routerLinkActive #rla8="routerLinkActive" [active]="rla8.isActive">Student Attendance</a>
-      <a *ngIf="isTeacherOrAdmin()" mat-tab-link routerLink="/dashboard/teacher-attendance" routerLinkActive #rla7="routerLinkActive" [active]="rla7.isActive">Teacher Attendance</a>
-      <a *ngIf="isTeacherOrAdmin()" mat-tab-link routerLink="/dashboard/student-list" routerLinkActive #rla9="routerLinkActive" [active]="rla9.isActive">My Students</a>
+      <a *ngIf="isTeacher()" mat-tab-link routerLink="/dashboard/teacher-attendance" routerLinkActive #rla7="routerLinkActive" [active]="rla7.isActive">Teacher Attendance</a>
+      <a *ngIf="isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/student-list" routerLinkActive #rla9="routerLinkActive" [active]="rla9.isActive">List of Students</a>
+      <a *ngIf="isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/view-leaves" routerLinkActive #rla10="routerLinkActive" [active]="rla10.isActive">View Leaves</a>
     </nav>
 
     <div class="profile-area">
@@ -28,17 +29,13 @@
             <span class="label">Role:</span>
             <span class="value">{{ Role }}</span>
           </div>
-          <div class="profile-row" *ngIf="isStudent()">
+          <div class="profile-row">
             <span class="label">Name:</span>
             <span class="value">{{ Name }}</span>
           </div>
           <div class="profile-row" *ngIf="isStudent()">
             <span class="label">Class:</span>
             <span class="value">{{ Class }}</span>
-          </div>
-          <div class="profile-row" *ngIf="Role === 'TEACHER'">
-            <span class="label">Name:</span>
-            <span class="value">{{ Name }}</span>
           </div>
           <div class="profile-row" *ngIf="Role === 'TEACHER'">
             <span *ngIf="ClassTeacher" class="label">Class Teacher:</span>

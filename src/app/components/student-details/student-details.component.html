@@ -1,20 +1,49 @@
 <div class="student-details-container" *ngIf="studentDetails">
-    <h2>Student Details</h2>
-    <p><strong>Name:</strong> {{ studentDetails.name }}</p>
-    <p><strong>Student ID:</strong> {{ studentDetails.studentId }}</p>
-    <p><strong>Class:</strong> {{ studentDetails.className }}</p>
-    <p><strong>Phone Number:</strong> {{ studentDetails.phoneNumber }}</p>
-    <p><strong>Email:</strong> {{ studentDetails.email }}</p>
-    <p><strong>Date of Birth:</strong> {{ studentDetails.dob }}</p>
-    <p><strong>Father's Name:</strong> {{ studentDetails.fatherName }}</p>
-    <p><strong>Mother's Name:</strong> {{ studentDetails.motherName }}</p>
+  <div class="header">
+    <h2>Student Profile</h2>
+  </div>
 
-    <div class="actions">
-      <button (click)="viewAttendance()">View Attendance</button>
+  <div class="details-grid">
+    <div class="detail-item">
+      <span class="label">Name:</span>
+      <span class="value">{{ studentDetails.name }}</span>
     </div>
-    <button (click)="router.navigate(['dashboard/student-list'])">Back to Student List</button>
+    <div class="detail-item">
+      <span class="label">Student ID:</span>
+      <span class="value">{{ studentDetails.studentId }}</span>
+    </div>
+    <div class="detail-item">
+      <span class="label">Class:</span>
+      <span class="value">{{ studentDetails.className }}</span>
+    </div>
+    <div class="detail-item">
+      <span class="label">Phone:</span>
+      <span class="value">{{ studentDetails.phoneNumber }}</span>
+    </div>
+    <div class="detail-item">
+      <span class="label">Email:</span>
+      <span class="value">{{ studentDetails.email }}</span>
+    </div>
+    <div class="detail-item">
+      <span class="label">Date of Birth:</span>
+      <span class="value">{{ studentDetails.dob }}</span>
+    </div>
+    <div class="detail-item parent-info">
+      <span class="label">Father:</span>
+      <span class="value">{{ studentDetails.fatherName }}</span>
+    </div>
+    <div class="detail-item parent-info">
+      <span class="label">Mother:</span>
+      <span class="value">{{ studentDetails.motherName }}</span>
+    </div>
   </div>
-  
-  <div *ngIf="!studentDetails">
-    <p>Loading student details...</p>
+
+  <div class="actions">
+    <button (click)="viewAttendance()">View Attendance</button>
   </div>
+  <button class="back-button" (click)="router.navigate(['dashboard/student-list'])">Back to Student List</button>
+</div>
+
+<div *ngIf="!studentDetails">
+  <p class="loading-message">Loading student details...</p>
+</div>

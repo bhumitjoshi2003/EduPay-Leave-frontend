@@ -1,0 +1,65 @@
+<div class="student-list-container">
+  <div *ngIf="loggedInUserRole === 'ADMIN'" class="left-navigation">
+    <h2>Classes</h2>
+    <ul class="class-list-vertical">
+      <li
+        *ngFor="let className of classList"
+        (click)="onClassSelect(className)"
+        [class.selected]="className === selectedClass"
+        class="class-item-vertical"
+      >
+        <div class="chevron">
+          <span>{{ className }}</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="student-list-area">
+    <h2 *ngIf="loggedInUserRole === 'TEACHER'">Leave Applications for Class {{ selectedClass }}</h2>
+    <h2 *ngIf="loggedInUserRole === 'ADMIN' && selectedClass">Leave Applications for Class {{ selectedClass }}</h2>
+
+    <div class="filter-options" *ngIf="loggedInUserRole === 'ADMIN' || loggedInUserRole === 'TEACHER'">
+      <div class="form-group">
+        <label for="date" class="form-label">Filter by Date:</label>
+        <mat-form-field appearance="outline">
+          <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" (ngModelChange)="onDateSelect()" id="date">
+          <mat-datepicker-toggle matSuffix [for]="picker">
+            <mat-icon>calendar_today</mat-icon>
+          </mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <button class="clear-filter-button" (click)="clearFilter()">Clear Filter</button>
+      <button *ngIf="loggedInUserRole === 'ADMIN'" class="delete-all-button" (click)="deleteAllFilteredLeaves()">Delete All</button>
+    </div>
+
+    <div *ngIf="filteredLeaves.length > 0; else noLeavesContainer">
+      <table class="leave-table">
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Student Name</th>
+            <th>Leave Date</th>
+            <th>Reason</th>
+            <th *ngIf="loggedInUserRole === 'ADMIN'">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let leave of filteredLeaves" class="leave-row">
+            <td>{{ leave.studentId }}</td>
+            <td>{{ leave.name }}</td>
+            <td>{{ leave.leaveDate }}</td>
+            <td>{{ leave.reason }}</td>
+            <td *ngIf="loggedInUserRole === 'ADMIN'">
+              <button class="delete-button" (click)="deleteLeave(leave.id)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noLeavesContainer>
+      <p class="no-students">No leave applications found for the selected class and date.</p>
+    </ng-template>
+  </div>
+</div>

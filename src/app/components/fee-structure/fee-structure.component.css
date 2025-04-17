@@ -2,7 +2,7 @@
 
 .fee-structure-container {
     width: 94%;
-    margin: 40px auto;
+    margin: 0px auto;
     background: linear-gradient(145deg, #f0faff, #e0f7fa);
     border-radius: 16px;
     box-shadow: 9px 9px 18px #d1e9f1, -9px -9px 18px #efffff;
@@ -199,7 +199,7 @@ app-bus-fees {
 }
 
 .edit-actions button {
-    padding: 10px 16px;
+    padding: 12px 25px;
     font-size: 14px;
     box-shadow: 1px 1px 2px #d1e9f1, -1px -1px 2px #efffff;
 }
@@ -211,9 +211,7 @@ app-bus-fees {
 
 
 .actions .edit-actions button {
-    padding: 12px 30px; 
-    font-size: 14px;
-    border-radius: 20px;
+    border-radius: 10px;
     background-color: #34b4e3;
     color: white;
     border: none;

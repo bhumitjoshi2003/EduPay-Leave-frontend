@@ -1,4 +1,3 @@
-// student-attendance.component.ts
 import { Component, OnInit, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID, ViewChild } from '@angular/core';
 import Chart from 'chart.js/auto';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -22,7 +21,7 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
   role: string = '';
 
   @ViewChildren('monthlyChart') monthlyCanvas!: QueryList<ElementRef>;
-  @ViewChild('overallPieChart') overallPieCanvas!: ElementRef; // Changed ViewChild selector
+  @ViewChild('overallChart') overallCanvas!: ElementRef;
 
   constructor(
     private attendanceService: AttendanceService,
@@ -111,11 +110,52 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
 
       if (this.monthlyCanvas) {
         this.monthlyCanvas.forEach((canvas, index) => {
-          // ... (rest of your monthly chart creation code - no changes needed here) ...
+          const data = this.attendanceData[index];
+          const totalDays = data.presentDays + data.absentDays;
+
+          let labels, datasetData, backgroundColors;
+
+          if (totalDays === 0) {
+            labels = ['No Attendance Recorded'];
+            datasetData = [100];
+            backgroundColors = ['#A9A9A9'];
+          } else {
+            const presentPercentage = ((data.presentDays / totalDays) * 100).toFixed(1);
+            const absentPercentage = ((data.absentDays / totalDays) * 100).toFixed(1);
+
+            labels = [`Absent (${absentPercentage}%)`, `Present (${presentPercentage}%)`];
+            datasetData = [data.absentDays, data.presentDays];
+            backgroundColors = ['#F08080', '#90EE90'];
+          }
+
+          const fullMonthName = new Date(new Date().getFullYear(), new Date(data.month + '1').getMonth()).toLocaleString('default', { month: 'long' });
+
+          this.monthlyCharts[index] = new Chart(canvas.nativeElement, {
+            type: 'pie',
+            data: {
+              labels: labels,
+              datasets: [{
+                data: datasetData,
+                backgroundColor: backgroundColors,
+              }],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: fullMonthName,
+                  font: { size: 14 },
+                },
+                legend: { display: true },
+              },
+            },
+          });
         });
       }
 
-      if (this.overallPieCanvas) { // Use the new ViewChild reference
+      if (this.overallCanvas) {
         if (this.overallChart) this.overallChart.destroy();
 
         const totalDays = this.overallData.presentDays + this.overallData.absentDays;
@@ -124,7 +164,7 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
 
         const overallColors = totalDays === 0 ? ['#A9A9A9', '#A9A9A9'] : ['#F08080', '#90EE90'];
 
-        this.overallChart = new Chart(this.overallPieCanvas.nativeElement, { // Use the new ViewChild reference
+        this.overallChart = new Chart(this.overallCanvas.nativeElement, {
           type: 'pie',
           data: {
             labels: totalDays === 0 ? ['No Attendance Recorded'] : [`Absent (${absentPercentage}%)`, `Present (${presentPercentage}%)`],
@@ -136,39 +176,14 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            interaction: {
-              mode: 'nearest',
-              intersect: false,
-            },
-            elements: {
-              arc: {
-                hoverOffset: 10
-              }
-            },
             plugins: {
               title: {
                 display: true,
                 text: 'Overall Attendance',
                 font: { size: 16 },
               },
-              legend: {
-                display: true,
-                position: 'bottom',
-                labels: {
-                  font: { size: 12 }
-                }
-              },
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    const label = context.label || '';
-                    const value = context.parsed;
-                    return `${label}: ${value} days`;
-                  }
-                }
-              }
-            }
-          }
+            },
+          },
         });
       }
     }

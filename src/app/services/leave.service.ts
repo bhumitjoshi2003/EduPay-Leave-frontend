@@ -3,6 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { LeaveRequest } from '../interfaces/leave-request';
 
+interface LeaveApplication {
+  studentId: string;
+  name: string; 
+  leaveDate: string;
+  reason: string;
+  className: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -28,6 +36,19 @@ export class LeaveService {
 
   getStudentLeaves(studentId:string):Observable<LeaveRequest[]>{
     return this.http.get<LeaveRequest[]>(`${this.apiUrl}/${studentId}`);
+  }
+
+  getAllLeaves(): Observable<LeaveApplication[]> {
+    return this.http.get<LeaveApplication[]>(`${this.apiUrl}/all`);
+  }
+
+  getLeavesByClass(className: string): Observable<LeaveApplication[]> {
+    console.log(`${this.apiUrl}/class/${className}`);
+    return this.http.get<LeaveApplication[]>(`${this.apiUrl}/class/${className}`); 
+  }
+
+  deleteLeaveById(leaveId: string): Observable<string> {
+    return this.http.delete(`${this.apiUrl}/${leaveId}`, { responseType: 'text' });
   }
 }
 

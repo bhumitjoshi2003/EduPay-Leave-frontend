@@ -8,12 +8,20 @@
   <form [formGroup]="leaveForm" (ngSubmit)="applyLeave()" class="leave-form">
     <div class="form-group">
       <label for="leaveDate" class="form-label">Leave Date:</label>
-      <input type="date" id="leaveDate" formControlName="leaveDate" class="form-input">
+      <input type="date" id="leaveDate" formControlName="leaveDate" class="form-input styled-input">
     </div>
 
     <div class="form-group">
       <label for="reason" class="form-label">Reason for Leave:</label>
-      <textarea id="reason" formControlName="reason" class="form-textarea"></textarea>
+      <select id="reason" formControlName="reason" class="form-input styled-input default-select" (change)="onReasonChange()">
+        <option value="" disabled>Select Reason</option>
+        <option *ngFor="let reason of reasonOptions" [value]="reason">{{ reason }}</option>
+      </select>
+    </div>
+
+    <div class="form-group" *ngIf="showOtherReasonInput">
+      <label for="otherReason" class="form-label">Specify Reason (Max 20 words):</label>
+      <textarea id="otherReason" formControlName="otherReason" class="form-textarea styled-input"></textarea>
     </div>
 
     <button type="submit" class="submit-button">Apply Leave</button>

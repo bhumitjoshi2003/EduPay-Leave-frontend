@@ -1,0 +1,392 @@
+/* view-leaves.component.css */
+
+.student-list-container {
+  display: flex;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f0f8ff, #e6f9ff); /* Softer blue gradient */
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
+  animation: fadeIn 0.8s ease-in-out;
+  padding: 30px;
+}
+
+.student-list-container h2 {
+  color: #37474f; /* Darker blue-gray */
+  margin-bottom: 25px;
+  text-align: center;
+  border-bottom: 3px solid #03a9f4; /* Vibrant blue accent */
+  padding-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+  font-size: 1.4em; /* Changed to match student-list */
+}
+
+/* Left Navigation Bar (Chevrons pointing right - Blue Theme) */
+.left-navigation {
+  width: 180px; /* Adjust width */
+  margin-right: 30px;
+  padding: 20px 10px; /* Adjust vertical padding */
+  background-color: #f5f5f5; /* Light gray */
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.left-navigation h2 {
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  color: #555;
+  font-size: 1.2em;
+}
+
+.class-list-vertical {
+  list-style: none;
+  padding: 0;
+}
+
+.class-item-vertical {
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.chevron {
+  position: relative;
+  background-color: #90caf9; /* Light blue for chevrons */
+  color: black;
+  padding: 10px 15px;
+  border-radius: 15px 0 0 15px; /* Rounded left side */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.08);
+  transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+  display: flex; /* Align text within chevron */
+  align-items: center;
+}
+
+.class-item-vertical.selected .chevron {
+  background-color: #1e88e5; /* Darker blue for selected */
+  color: #fff;
+}
+
+.chevron::before {
+  content: '';
+  position: absolute;
+  right: -20px;
+  top: 0;
+  border-top: 20px solid transparent;
+  border-left: 20px solid #b3e5fc; /* Match background */
+  border-bottom: 20px solid transparent;
+}
+
+.class-item-vertical.selected .chevron::before {
+  border-left-color: #1976d2; /* Match selected background */
+}
+
+.chevron span {
+  display: block;
+  flex-grow: 1; /* Allow text to take space */
+  text-align: left; /* Align text inside the chevron */
+}
+
+.class-item-vertical:hover .chevron {
+  background-color: #64b5f6; /* Medium blue on hover */
+  transform: translateX(-5px); /* Move to the left on hover */
+}
+
+/* Leave Table Area */
+.student-list-area {
+  flex-grow: 1;
+  padding: 25px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.08);
+}
+
+.student-list-area h2 {
+  text-align: left;
+  border-bottom: 3px solid #03a9f4;
+  padding-bottom: 12px;
+  margin-bottom: 25px;
+  color: #37474f;
+  font-size: 1.4em; /* Changed to match student-list */
+}
+
+/* Leave Table Styles */
+.leave-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden; /* For rounded corners on table */
+}
+
+.leave-table th,
+.leave-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.leave-table th {
+  background-color: #1e88e5; /* Vibrant blue header */
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.leave-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.leave-table tbody tr:hover {
+  background-color: #e3f2fd; /* Light blue on row hover */
+  transition: background-color 0.3s ease;
+}
+
+.leave-table td:first-child {
+  font-weight: 500; /* Emphasize Student ID */
+}
+
+/* Actions Column and Delete Button */
+.leave-table th:last-child,
+.leave-table td:last-child {
+  text-align: center; /* Center the delete button */
+}
+
+.delete-button {
+  background-color: #f44336; /* Red color for delete */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 0.9em;
+}
+
+.delete-button:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+}
+
+
+.filter-options {
+  display: flex;
+  gap: 15px; /* Reduced gap */
+  margin-bottom: 25px;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  justify-content: flex-start; /* Align items to the start */
+}
+
+.filter-options .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-right: auto; /* Push other buttons to the right */
+}
+
+.filter-options .form-label {
+  margin-bottom: 5px; /* Reduced margin */
+  font-weight: bold;
+  color: #444;
+  font-size: 0.9em; /* Slightly smaller font */
+}
+
+.filter-options .mat-form-field-wrapper {
+  padding-bottom: 0.5em; /* Adjust spacing */
+}
+
+.filter-options .mat-input-element {
+  padding: 8px; /* Reduced padding */
+  border: 1px solid #ccc;
+  border-radius: 4px; /* Smaller radius */
+  font-size: 0.9em; /* Slightly smaller font */
+}
+
+.filter-options .mat-datepicker-toggle button {
+  color: #1e88e5; /* Color of the calendar icon */
+}
+
+.mat-calendar {
+  width: 300px; /* Adjust as needed */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.mat-calendar-header {
+  background-color: #1e88e5; /* Vibrant blue header */
+  color: white;
+  padding: 12px; /* Reduced padding */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.mat-calendar-period-button {
+  color: white;
+  font-size: 1em; /* Reduced font size */
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mat-calendar-previous-button,
+.mat-calendar-next-button {
+  color: white;
+}
+
+.mat-icon {
+  font-size: 18px; /* Reduced icon size */
+  width: 18px;
+  height: 18px;
+}
+
+.mat-calendar-content {
+  padding: 12px; /* Reduced padding */
+}
+
+.mat-calendar-table thead tr th {
+  color: #555;
+  font-size: 0.8em; /* Reduced font size */
+  font-weight: 400;
+  padding: 6px; /* Reduced padding */
+  text-align: center;
+}
+
+.mat-calendar-table tbody tr td {
+  padding: 4px; /* Reduced padding */
+  text-align: center;
+}
+
+.mat-calendar-table .mat-calendar-body-cell {
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  font-size: 0.9em; /* Slightly smaller font */
+}
+
+.mat-calendar-table .mat-calendar-body-cell:hover:not(.mat-calendar-body-disabled):not(.mat-calendar-body-active) {
+  background-color: #e3f2fd; /* Light blue hover */
+}
+
+.mat-calendar-table .mat-calendar-body-active {
+  background-color: #1e88e5; /* Deeper blue for selected */
+  color: white;
+  font-weight: 500;
+}
+
+.mat-calendar-table .mat-calendar-body-disabled {
+  color: #ccc;
+  cursor: default;
+}
+
+.mat-calendar-previous-button .mat-icon,
+.mat-calendar-next-button .mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* No Leaves Message */
+.no-students {
+  text-align: center;
+  padding: 20px; /* Reduced padding */
+  font-style: italic;
+  color: #777;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  font-size: 0.9em; /* Slightly smaller font */
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+.filter-options {
+  display: flex;
+  gap: 10px; /* Further reduced gap */
+  margin-bottom: 20px; /* Reduced margin */
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 10px; /* Reduced padding */
+  border-radius: 6px; /* Smaller radius */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  justify-content: flex-start; /* Align items to the start */
+}
+
+.filter-options .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-right: auto; /* Push other buttons to the right */
+}
+
+.filter-options .form-label {
+  margin-bottom: 3px; /* Further reduced margin */
+  font-weight: bold;
+  color: #444;
+  font-size: 0.8em; /* Even smaller font */
+}
+
+.filter-options .mat-form-field-wrapper {
+  padding-bottom: 0.3em; /* Adjust spacing */
+}
+
+.filter-options .mat-input-element {
+  padding: 6px; /* Further reduced padding */
+  border: 1px solid #ccc;
+  border-radius: 3px; /* Even smaller radius */
+  font-size: 0.8em; /* Even smaller font */
+}
+
+.filter-options .mat-datepicker-toggle button {
+  color: #1e88e5; /* Color of the calendar icon */
+  margin-left: 5px; /* Add some space for the icon */
+}
+
+/* Clear Filter Button */
+.clear-filter-button {
+  padding: 8px 12px; /* Reduced padding */
+  border: none;
+  border-radius: 4px; /* Smaller radius */
+  background-color: #f44336; /* Red color for emphasis */
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 10px;
+  font-size: 1em; /* Even smaller font */
+  height: auto; /* Adjust height automatically */
+}
+
+.clear-filter-button:hover {
+  background-color: #db3939;
+}
+
+/* Delete All Button */
+.delete-all-button {
+  padding: 8px 12px; /* Reduced padding */
+  border: none;
+  border-radius: 4px; /* Smaller radius */
+  background-color: #f44336; /* Grey color */
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 5px; /* Reduced margin */
+  font-size: 1em; /* Even smaller font */
+  height: auto; /* Adjust height automatically */
+}
+
+.delete-all-button:hover {
+  background-color: #db3939;
+}

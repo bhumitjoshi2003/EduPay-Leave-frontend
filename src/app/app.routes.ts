@@ -13,6 +13,7 @@ import { StudentAttendanceComponent } from './components/student-attendance/stud
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { StudentListComponent } from './components/student-list/student-list.component';
 import { StudentDetailsComponent } from './components/student-details/student-details.component';
+import { ViewLeavesComponent } from './components/view-leaves/view-leaves.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -34,6 +35,7 @@ export const routes: Routes = [
             { path: 'student-attendance/:studentId', component: StudentAttendanceComponent },
             { path: 'student-list', component: StudentListComponent },
             { path: 'student-details/:studentId', component: StudentDetailsComponent },
+            { path: 'view-leaves', component: ViewLeavesComponent },
         ],
     },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },

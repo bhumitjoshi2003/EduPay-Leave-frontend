@@ -1,11 +1,13 @@
+/* fee-structure.component.css */
+
 .fee-structure-container {
-    width: 90%;
-    margin: 30px auto;
-    background-color: #f0f8ff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    padding: 30px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 94%;
+    margin: 40px auto;
+    background: linear-gradient(145deg, #f0faff, #e0f7fa);
+    border-radius: 16px;
+    box-shadow: 9px 9px 18px #d1e9f1, -9px -9px 18px #efffff;
+    padding: 40px;
+    font-family: 'Poppins', sans-serif;
 }
 
 input[type="number"]::-webkit-outer-spin-button,
@@ -16,101 +18,174 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 40px;
+    padding-bottom: 25px;
+    border-bottom: 2px solid #81d4fa;
 }
 
 .header h2 {
-    color: #2e8b57;
-    font-size: 28px;
-    margin: 0;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.actions button {
-    padding: 12px 25px;
-    margin-left: 15px;
-    background-color: #4682b4;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 500;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.actions select {
-    padding: 10px 15px;
-    border: 1px solid #a9a9a9;
-    border-radius: 6px;
-    font-size: 16px;
-    color: #444;
-    background-color: white;
-    cursor: pointer;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    min-width: 120px; /* Adjust this value as needed */
-    white-space: nowrap;
+    color: #1e88e5;
+    font-size: 30px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    text-align: left;
 }
 
 .actions {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.actions .session-select-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: auto;
+}
+
+.actions button,
+.actions select {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    border: black;
+}
+
+.actions button {
+    background-color: #34b4e3;
+    color: white;
 }
 
 .actions button:hover {
-    background-color: #206498;
+    background-color: #159aca;
     transform: translateY(-2px);
+}
+
+.actions button:active {
+    transform: translateY(1px);
+}
+
+.actions select {
+    color: #444;
+    background-color: #fff;
+    border: 1px solid #81d4fa;
+    min-width: 160px;
+    padding: 12px 18px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.actions select:focus {
+    border-color: #1e88e5;
+    box-shadow: 0 0 6px rgba(30, 136, 229, 0.3);
+}
+
+.actions .session-select-wrapper label {
+    font-size: 17px;
+    color: #333;
+    font-weight: 400;
+    margin-right: 8px;
+}
+
+/* Styling for Edit Mode Buttons */
+.actions > div[ngif="isEditing"] { /* Target the div containing edit buttons */
+    display: flex;
+    gap: 10px; /* Increased gap to create space between buttons */
+}
+
+.actions > div[ngif="isEditing"] button {
+    padding: 10px 16px; /* Smaller padding for edit buttons */
+    font-size: 14px; /* Smaller font for edit buttons */
+    box-shadow: 1px 1px 2px #d1e9f1, -1px -1px 2px #efffff; /* Even less shadow */
+}
+
+.actions > div[ngif="isEditing"] button:hover {
+    box-shadow: 2px 2px 4px #d1e9f1, -2px -2px 4px #efffff;
+}
+
+.tables-container {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+
+.fee-table-section {
+    width: 100%;
 }
 
 .fee-table {
     width: 100%;
     border-collapse: collapse;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     overflow: hidden;
+    box-shadow: 4px 4px 8px #d1e9f1, -4px -4px 8px #efffff;
 }
 
 .fee-table th,
 .fee-table td {
-    padding: 18px;
+    padding: 16px;
     text-align: left;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #b2ebf2;
 }
 
 .fee-table th {
-    background-color: #b0c4de;
-    color: #333;
+    background-color: #1e88e5;
+    color: white;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .fee-table tr:nth-child(even) {
-    background-color: #f5f5e6;
+    background-color: #f8f8f8; /* Light gray for even rows */
 }
 
 .fee-table tr:hover {
-    background-color: #e4f9e6;
-    transition: background-color 0.3s ease;
+    background-color: #e0f7fa;
+    transition: background-color 0.3s ease-in-out;
+    transform: scale(1.005);
+    box-shadow: 6px 6px 12px #d1e9f1, -6px -6px 12px #efffff;
 }
 
+.fee-table input[type="text"],
 .fee-table input[type="number"] {
     width: 100px;
     padding: 10px;
-    border: 1px solid #a9a9a9;
+    border: 1px solid #81d4fa;
     border-radius: 6px;
-    font-size: 16px;
-    transition: border-color 0.3s ease;
-    color: #444;
+    font-size: 15px;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    color: #333;
+    background-color: #fff;
+    outline: none;
+    box-shadow: inset 1px 1px 3px #d1e9f1, inset -1px -1px 3px #efffff;
 }
 
+.fee-table input[type="text"]:focus,
 .fee-table input[type="number"]:focus {
-    border-color: #008080;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 128, 128, 0.5);
+    border-color: #26a69a;
+    box-shadow: 0 0 6px rgba(38, 166, 154, 0.5);
+}
+
+.fee-table span {
+    display: block;
+    padding: 10px 0;
+    color: #555;
+    font-size: 15px;
 }
 
 app-bus-fees {
@@ -118,32 +193,36 @@ app-bus-fees {
     display: block;
 }
 
-/* Styles for the select element */
-.actions select {
-    padding: 10px 15px;
-    border: 1px solid #a9a9a9;
-    border-radius: 6px;
-    font-size: 16px;
-    color: #444;
-    background-color: white;
-    cursor: pointer;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.actions select:focus {
-    border-color: #008080;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 128, 128, 0.5);
-}
-
-.actions label {
-    font-size: 16px;
-    margin-right: 8px;
-}
-
-.session-select-wrapper {
+.edit-actions {
     display: flex;
-    align-items: center;
-    margin-right: 15px;
-    min-width: 150px; /* Adjust this value as needed */
+    gap: 15px; /* increased space between buttons */
+}
+
+.edit-actions button {
+    padding: 10px 16px;
+    font-size: 14px;
+    box-shadow: 1px 1px 2px #d1e9f1, -1px -1px 2px #efffff;
+}
+
+.edit-actions button:hover {
+    box-shadow: 2px 2px 4px #d1e9f1, -2px -2px 4px #efffff;
+}
+
+
+
+.actions .edit-actions button {
+    padding: 12px 30px; 
+    font-size: 14px;
+    border-radius: 20px;
+    background-color: #34b4e3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 1px 1px 2px #d1e9f1, -1px -1px 2px #efffff;
+}
+
+.actions .edit-actions button:hover {
+    background-color: #159aca;
+    transform: translateY(-2px);
 }

@@ -10,6 +10,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
  import { CommonModule } from '@angular/common';
  import { StudentService } from '../../services/student.service';
  import { TeacherService } from '../../services/teacher.service'; // Import TeacherService
+import { AdminService } from '../../services/admin.service';
 
  @Component({
    selector: 'app-dashboard',
@@ -30,7 +31,8 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
      private authService: AuthService,
      private snackBar: MatSnackBar,
      private studentService: StudentService,
-     private teacherService: TeacherService // Inject TeacherService
+     private teacherService: TeacherService,
+     private adminService: AdminService
    ) { }
 
    ngOnInit() {
@@ -60,7 +62,6 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
          }
        });
      } else if (this.Role === 'TEACHER' && this.Id) {
-      console.log("Fetching teacher with ID:", this.Id);
        this.teacherService.getTeacher(this.Id).subscribe({
          next: (teacher) => {
            this.Name = teacher.name;
@@ -70,6 +71,14 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
            console.error('Error fetching teacher details:', error);
          }
        });
+     }
+     else if(this.Role === 'ADMIN' && this.Id){
+        this.adminService.getAdmin(this.Id).subscribe({
+          next: (admin) => {
+            this.Name = admin.name;
+          }
+        });
+        
      }
      // Add similar logic for 'ADMIN' and 'SUB-ADMIN' if needed
    }
@@ -90,8 +99,12 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
      return this.Role === 'STUDENT';
    }
 
-   isTeacherOrAdmin(): boolean {
-     return this.Role === 'TEACHER' || this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN';
+   isTeacher(): boolean {
+     return this.Role === 'TEACHER';
+   }
+
+   isAdmin(): boolean{
+    return this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN';
    }
 
    logout() {

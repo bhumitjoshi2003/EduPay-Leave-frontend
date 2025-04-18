@@ -1,13 +1,13 @@
 <div class="attendance-container">
-    <h2>Student Attendance Overview</h2>
+  <h2 class="page-title">📊 Student Attendance Overview</h2>
 
-    <div class="charts-container">
-        <div *ngFor="let data of attendanceData; let i = index" class="chart-item">
-            <canvas #monthlyChart></canvas>
-        </div>
-    </div>
+  <div class="charts-container">
+      <div *ngFor="let data of attendanceData; let i = index" class="chart-item">
+          <canvas #monthlyChart></canvas>
+      </div>
+  </div>
 
-    <div class="overall-chart-container">
-        <canvas #overallChart></canvas>
-    </div>
+  <div class="overall-chart-container">
+      <canvas #overallChart></canvas>
+  </div>
 </div>

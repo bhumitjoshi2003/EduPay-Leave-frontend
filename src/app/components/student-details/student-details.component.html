@@ -40,6 +40,9 @@
 
   <div class="actions">
     <button (click)="viewAttendance()">View Attendance</button>
+    <button *ngIf="getUserRole() === 'ADMIN'"  class="payment-history-button" (click)="viewPaymentHistory()">View Payment History</button>
+    <button (click)="viewLeaves()" class="view-leaves-button">View Applied Leaves</button>
+    <button *ngIf="getUserRole() === 'ADMIN'"  class="fees" (click)="viewFeeDetails()">View Fee Details</button>
   </div>
   <button class="back-button" (click)="router.navigate(['dashboard/student-list'])">Back to Student List</button>
 </div>

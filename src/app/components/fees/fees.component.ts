@@ -10,6 +10,8 @@ import { BusFeesService } from '../../services/bus-fees.service';
 import Swal from 'sweetalert2';
 import { PaymentData } from '../../interfaces/payment-data';
 import { jwtDecode } from 'jwt-decode';
+import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-payment-tracker',
@@ -20,12 +22,14 @@ import { jwtDecode } from 'jwt-decode';
 })
 export class PaymentTrackerComponent implements OnInit {
   constructor(
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private feesService: FeesService,
     private feeStructureService: FeeStructureService,
     private studentService: StudentService,
-    private busFeesService: BusFeesService
+    private busFeesService: BusFeesService,
+    private authService: AuthService
   ) {}
 
   selectedYear: number = new Date().getFullYear();
@@ -40,6 +44,8 @@ export class PaymentTrackerComponent implements OnInit {
   selectedMonthDetails: any = null;
   lastSelectedMonth: any = null;
   studentName: string = '';
+  role: string = '';
+  manualPaymentAmount: number | null = null;
 
   paymentData: PaymentData = {
     totalAmount: 0,
@@ -57,7 +63,14 @@ export class PaymentTrackerComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.getStudentId();
+    this.role = this.authService.getUserRole();
+    this.route.params.subscribe(params => {
+      const studentIdFromParams = params['studentId'];
+      if (studentIdFromParams) {
+        this.studentId = studentIdFromParams;
+      }
+    });
+    if(this.role === 'STUDENT') this.getStudentId();
     this.fetchSessions();
   }
 

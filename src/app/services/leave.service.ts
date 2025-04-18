@@ -26,7 +26,6 @@ export class LeaveService {
   }
 
   getLeavesByDateAndClass(date: string, selectedClass: string): Observable<string[]> {
-    console.log(`${this.apiUrl}/date/${date}/class/${selectedClass}`);
     return this.http.get<string[]>(`${this.apiUrl}/date/${date}/class/${selectedClass}`);
   }
 
@@ -34,8 +33,8 @@ export class LeaveService {
     return this.http.delete(`${this.apiUrl}/delete/${studentId}/${leaveDate}`, { responseType: 'text' });
   }
 
-  getStudentLeaves(studentId:string):Observable<LeaveRequest[]>{
-    return this.http.get<LeaveRequest[]>(`${this.apiUrl}/${studentId}`);
+  getStudentLeaves(studentId:string):Observable<LeaveApplication[]>{
+    return this.http.get<LeaveApplication[]>(`${this.apiUrl}/${studentId}`);
   }
 
   getAllLeaves(): Observable<LeaveApplication[]> {

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PaymentHistory } from '../../interfaces/payment-history';
 import { PaymentHistoryService } from '../../services/payment-history.service';
@@ -13,29 +13,39 @@ import { jwtDecode } from 'jwt-decode';
   styleUrls: ['./payment-history.component.css']
 })
 export class PaymentHistoryComponent implements OnInit {
-  studentId: string = '';
   paymentHistory: PaymentHistory[] = [];
   loading: boolean = true;
   error: string = '';
+  role: string = '';
+  studentId: string = '';
+  
+  constructor(private http: HttpClient, private route: ActivatedRoute, private router: Router, private paymentHistoryService: PaymentHistoryService) {}
 
-  constructor(private http: HttpClient, private router: Router, private paymentHistoryService: PaymentHistoryService) {}
 
   ngOnInit(): void {
-    this.getStudentId();
-    this.fetchPaymentHistory();
-  }
-
-  getStudentId(): void {
+    console.log("am i even working");
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken: any = jwtDecode(token);
-      this.studentId = decodedToken.userId; 
+      this.role = decodedToken.role;
+
+      if (this.role === 'STUDENT') {
+        this.studentId = decodedToken.userId;
+      } else {
+        this.route.params.subscribe(params => {
+          const routeStudentId = params['studentId'];
+          if (routeStudentId) { this.studentId = routeStudentId; }
+        });
+      }
+      this.fetchPaymentHistory();
     }
   }
 
   fetchPaymentHistory(): void {
     this.loading = true;
     this.error = '';
+
+    const idToFetch = this.studentId ? this.studentId : (this.role === 'admin' ? null : this.studentId);
 
     this.paymentHistoryService.getPaymentHistory(this.studentId).subscribe({
       next: (data) => {

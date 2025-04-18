@@ -6,7 +6,7 @@
       <div class="login-form">
         <mat-card>
           <mat-card-title>Login</mat-card-title>
-          <mat-card-content>
+          <mat-card-content (keydown.enter)="submitLogin()">
             <mat-form-field appearance="outline">
               <mat-label>User ID</mat-label>
               <input matInput [(ngModel)]="studentId" placeholder="Enter your User ID">

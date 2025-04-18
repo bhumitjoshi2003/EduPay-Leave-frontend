@@ -30,6 +30,12 @@
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
       </div>
+      <div class="form-group">
+        <label for="studentIdFilter" class="form-label">Filter by Student ID:</label>
+        <mat-form-field appearance="outline">
+          <input matInput [(ngModel)]="studentIdFilter" (input)="onStudentIdInput()" id="studentIdFilter">
+        </mat-form-field>
+      </div>
       <button class="clear-filter-button" (click)="clearFilter()">Clear Filter</button>
       <button *ngIf="loggedInUserRole === 'ADMIN'" class="delete-all-button" (click)="deleteAllFilteredLeaves()">Delete All</button>
     </div>

@@ -32,6 +32,8 @@ export class PaymentComponent{
     studentName: "",
     className: "",
     session: "",
+    paidManually: false,
+    amountPaid: 0
   };
 
   @Output() paymentSuccess = new EventEmitter<any>(); // Emit payment details
@@ -47,7 +49,6 @@ export class PaymentComponent{
       });
       return;
     }
-  
     this.loadStudentDetails(this.paymentData.studentId);
   }
   
@@ -68,14 +69,13 @@ export class PaymentComponent{
   
         this.paymentData.totalAmount *= 100;
         this.razorpayService.createOrder(this.paymentData).subscribe((response: any) => {
-          console.log(response);
-  
+ 
           const options = {
             key: 'rzp_test_uzFJONVXH4vqou',
             amount: response.amount,
             currency: 'INR',
-            name: 'Indra Academy School',
-            description: 'School Fee Payment',
+            name: 'Indra Academy Sr. Sec. School',
+            description: 'IAS Fee Payment',
             order_id: response.orderId,
             prefill: {
               name: this.studentDetails.name || '',

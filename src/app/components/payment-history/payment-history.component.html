@@ -8,7 +8,7 @@
       <table>
           <thead>
               <tr>
-                  <th>Payment ID</th> <th>Order ID</th>
+                  <th>Payment ID</th> 
                   <th>Amount</th>
                   <th>Payment Date</th>
                   <th>Status</th>
@@ -17,8 +17,7 @@
           <tbody>
               <tr *ngFor="let payment of paymentHistory" (click)="viewPaymentDetails(payment.paymentId)" class="payment-row">
                   <td>{{ payment.paymentId }}</td>                  
-                  <td>{{ payment.orderId }}</td>
-                  <td>{{ payment.amount | currency: 'INR' }}</td>
+                  <td>{{ payment.amountPaid | currency: 'INR' }}</td>
                   <td>{{ payment.paymentDate | date: 'MMM d, y, h:mm a' }}</td>
                   <td [ngClass]="{'status-success': payment.status === 'success'}">{{ payment.status | uppercase }}</td>
               </tr>

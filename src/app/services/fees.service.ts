@@ -30,4 +30,8 @@ export class FeesService {
   getDistinctYearsByStudentId(studentId: string): Observable<string[]> {
     return this.http.get<string[]>(`${this.baseUrl}/sessions/${studentId}`);
   }
+
+  recordManualPayment(manualPaymentDetails: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/manual-payment`, manualPaymentDetails);
+  }
 }

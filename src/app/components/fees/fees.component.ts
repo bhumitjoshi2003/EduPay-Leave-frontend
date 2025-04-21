@@ -12,11 +12,13 @@ import { PaymentData } from '../../interfaces/payment-data';
 import { jwtDecode } from 'jwt-decode';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-payment-tracker',
   standalone: true,
-  imports: [FormsModule, CommonModule, PaymentComponent],
+  imports: [FormsModule, CommonModule, PaymentComponent, MatFormFieldModule, MatInputModule],
   templateUrl: './fees.component.html',
   styleUrls: ['./fees.component.css']
 })
@@ -45,7 +47,9 @@ export class PaymentTrackerComponent implements OnInit {
   lastSelectedMonth: any = null;
   studentName: string = '';
   role: string = '';
-  manualPaymentAmount: number | null = null;
+  manualPaymentAmount: number = 0;
+  paidManually: boolean = false;
+  amountPaid: number = 0;
 
   paymentData: PaymentData = {
     totalAmount: 0,
@@ -60,6 +64,8 @@ export class PaymentTrackerComponent implements OnInit {
     studentName: "",
     className: "",
     session: "",
+    paidManually: false,
+    amountPaid: 0
   };
 
   ngOnInit() {
@@ -243,7 +249,8 @@ export class PaymentTrackerComponent implements OnInit {
     this.paymentData.studentName = this.studentName;
     this.paymentData.className = this.className;
     this.paymentData.session = this.session;
-
+    this.paymentData.paidManually = this.paidManually;
+    this.paymentData.amountPaid =  this.paidManually ? this.amountPaid:  this.totalAmountToPay;
     console.log(this.paymentData);
   }
 
@@ -293,6 +300,8 @@ export class PaymentTrackerComponent implements OnInit {
           promises.push(new Promise<void>((resolve) => {
             this.feesService.getStudentFee(this.studentId, formattedYear, monthNumber).subscribe(fee => {
               fee.paid = true;
+              fee.manualyPaid = false;
+              fee.manualPaymentReceived = 0;
               this.feesService.updateStudentFees(fee).subscribe(() => {
                 resolve();
               });
@@ -333,5 +342,81 @@ export class PaymentTrackerComponent implements OnInit {
     this.paymentData.studentName= "",
     this.paymentData.className= "",
     this.paymentData.session= "";
+    this.paymentData.paidManually= false,
+    this.paymentData.amountPaid= 0
+  }
+
+  markAsManuallyPaid() {
+    if (this.role === 'ADMIN' && this.manualPaymentAmount !== null && this.selectedMonthsByYear[this.selectedYear]?.length > 0) {
+      Swal.fire({
+        title: 'Confirm Manual Payment',
+        text: `Mark selected months as manually paid with a total amount of ₹${this.manualPaymentAmount}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, mark as paid!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const promises: Promise<any>[] = [];
+
+          Promise.all(promises).then(() => {
+            this.paymentData.paidManually = true;
+            this.paymentData.amountPaid = this.manualPaymentAmount;
+            console.log("amount paid: " + this.manualPaymentAmount);
+
+            this.feesService.recordManualPayment(this.paymentData).subscribe({
+              next: (response) => {
+                Object.keys(this.selectedMonthsByYear).forEach(yearKey => {
+                  const year = parseInt(yearKey, 10);
+                  const formattedYear = `${year}-${year + 1}`;
+                  this.selectedMonthsByYear[year].forEach(monthNumber => {
+                    promises.push(new Promise<void>((resolve) => {
+                      this.feesService.getStudentFee(this.studentId, formattedYear, monthNumber).subscribe(fee => {
+                        fee.paid = true;
+                        fee.manualyPaid = true;
+                        fee.manualPaymentReceived = this.paymentData.amountPaid;
+                        this.feesService.updateStudentFees(fee).subscribe(() => {
+                          resolve();
+                        });
+                      });
+                    }));
+                  });
+                });
+          
+                this.initPaymentData();
+
+                Promise.all(promises).then(() => {
+                  this.fetchFees();
+                  this.selectedMonthsByYear = {};
+                  this.totalAmountToPay = 0;
+                  this.manualPaymentAmount = 0;
+                  this.cdr.detectChanges();
+                  Swal.fire(
+                    'Marked as Paid!',
+                    `The selected months have been marked as manually paid.`,
+                    'success'
+                  );
+                });
+              },
+              error: (error) => {
+                console.error('Error recording manual payment:', error);
+                Swal.fire(
+                  'Error!',
+                  'Failed to record manual payment.',
+                  'error'
+                );
+              }
+            });
+          });
+        }
+      });
+    } else if (this.role === 'ADMIN' && (this.selectedMonthsByYear[this.selectedYear]?.length === 0 || this.manualPaymentAmount === null)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Warning',
+        text: 'Please select months and enter the amount received.',
+      });
+    }
   }
 }

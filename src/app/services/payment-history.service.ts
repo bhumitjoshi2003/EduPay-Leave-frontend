@@ -20,5 +20,14 @@ export class PaymentHistoryService {
   getPaymentHistoryDetails(paymentId: string) : Observable<PaymentHistoryDetails>{
     return this.http.get<PaymentHistoryDetails>(`${this.baseUrl}/details/${paymentId}`);
   }
+
+  getAllPaymentHistory(): Observable<PaymentHistory[]> {
+    console.log(`${this.baseUrl}/all`);
+    return this.http.get<PaymentHistory[]>(`${this.baseUrl}/all`); 
+  }
+
+  getPaymentHistoryByClass(className: string): Observable<PaymentHistory[]> {
+    return this.http.get<PaymentHistory[]>(`${this.baseUrl}/class/${className}`);
+  }
 }
 

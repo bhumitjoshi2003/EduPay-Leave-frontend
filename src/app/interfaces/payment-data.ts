@@ -11,4 +11,6 @@ export interface PaymentData {
     studentName: string;
     className: string;
     session: string;
+    paidManually: boolean;
+    amountPaid: number;
   }

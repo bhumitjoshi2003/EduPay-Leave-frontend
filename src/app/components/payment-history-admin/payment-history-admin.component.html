@@ -1,0 +1,76 @@
+<div class="payment-history-container">
+  <div class="left-navigation">
+    <h2>CLASSES</h2>
+    <ul class="class-list-vertical">
+      <li
+        (click)="loadAllPaymentHistory()"
+        [class.selected]="selectedClass === 'all'"
+        class="class-item-vertical"
+      >
+        <div class="chevron">
+          <span>All Payments</span>
+        </div>
+      </li>
+      <li
+        *ngFor="let className of classList"
+        (click)="onClassSelect(className)"
+        [class.selected]="className !== 'all' && className === selectedClass"
+        class="class-item-vertical"
+      >
+        <div class="chevron">
+          <span>{{ className }}</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="payment-history-area">
+    <h2>Payment History {{ selectedClass !== 'all' ? 'for Class ' + selectedClass : ' - All Payments' }}</h2>
+
+    <div class="filter-options" *ngIf="paymentHistory.length > 0">
+      <div class="form-group">
+        <label for="date" class="form-label">Filter by Date:</label>
+        <mat-form-field appearance="outline">
+          <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" (ngModelChange)="onDateSelect()" id="date">
+          <mat-datepicker-toggle matSuffix [for]="picker">
+            <mat-icon>calendar_today</mat-icon>
+          </mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <div class="form-group">
+        <label for="studentIdFilter" class="form-label">Filter by Student ID:</label>
+        <mat-form-field appearance="outline">
+          <input matInput [(ngModel)]="studentIdFilter" (input)="onStudentIdInput()" id="studentIdFilter">
+        </mat-form-field>
+      </div>
+      <button class="clear-filter-button" (click)="clearFilter()">Clear Filter</button>
+    </div>
+
+    <div *ngIf="filteredPayments.length > 0; else noPaymentsContainer">
+      <table class="payment-history-table">
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Student Name</th>
+            <th>Amount Paid</th>
+            <th>Payment Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let payment of filteredPayments" class="payment-row clickable-row" (click)="viewPaymentDetails(payment.paymentId)">
+            <td>{{ payment.studentId }}</td>
+            <td>{{ payment.studentName }}</td>
+            <td>{{ payment.amountPaid }}</td>
+            <td>{{ payment.paymentDate | date:'yyyy-MM-dd' }}</td>
+            <td [ngClass]="{'status-success': payment.status.toLowerCase() === 'success'}">{{ payment.status | uppercase}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noPaymentsContainer>
+      <p class="no-payments">No payment history found{{ selectedClass !== 'all' ? ' for the selected class and filters.' : ' for the applied filters.' }}</p>
+    </ng-template>
+  </div>
+</div>

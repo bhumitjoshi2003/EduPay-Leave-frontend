@@ -11,6 +11,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 
+import Swal from 'sweetalert2'; // Import SweetAlert
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -24,7 +26,7 @@ export class HomeComponent implements OnInit {
   studentId = '';
   password = '';
   loginState = 'initial';
-  hidePassword = true; 
+  hidePassword = true;
 
   constructor(private authService: AuthService, private snackBar: MatSnackBar, private router: Router) { }
 
@@ -46,6 +48,16 @@ export class HomeComponent implements OnInit {
   }
 
   submitLogin() {
+    if (!this.studentId.trim() || !this.password.trim()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Information',
+        text: 'Please enter your User ID and Password.',
+        confirmButtonColor: '#3085d6',
+      });
+      return; // Stop the login attempt
+    }
+
     this.authService.login(this.studentId, this.password).subscribe({
       next: (token) => {
         if (typeof localStorage !== 'undefined') {
@@ -54,24 +66,24 @@ export class HomeComponent implements OnInit {
         this.authenticated = true;
         this.showLoginForm = false;
         this.loginState = 'initial'; // Reset state
-  
+
 
         const redirectUrl = localStorage.getItem('redirectUrl') || '/dashboard';
-        localStorage.removeItem('redirectUrl'); // Clear stored URL after redirecting
+        localStorage.removeItem('redirectUrl');
         this.router.navigateByUrl(redirectUrl);
       },
       error: (error) => {
-        this.snackBar.open('Incorrect Credentials', 'Okay', {
-          duration: 5000,
-          panelClass: ['error-snackbar'], 
-          horizontalPosition: 'center',
-          verticalPosition: 'top'
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: 'Incorrect Credentials',
+          confirmButtonColor: '#d33',
         });
         console.error('Login error:', error);
       }
     });
   }
-  
+
 
   logout() {
     if (typeof localStorage !== 'undefined') {

@@ -16,4 +16,5 @@ export interface PaymentHistoryDetails {
     labCharges: number;
     ecaProject: number;
     examinationFee: number;
+    amountPaid: number;
   }

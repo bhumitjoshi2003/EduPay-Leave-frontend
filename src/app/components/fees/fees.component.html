@@ -5,19 +5,20 @@
         <option *ngFor="let year of years" [value]="year">{{ year }}</option>
       </select>
     </div>
-    <div class="total-amount">
+    <div class="total-amount" *ngIf="role !== 'ADMIN'">
       Total Amount to Pay: ₹{{ totalAmountToPay }}
     </div>
   </div>
 
   <div class="month-grid">
     <div *ngFor="let month of months" class="month"
-         [ngClass]="{ 'paid': month.paid, 'unpaid': !month.paid, 'selected': month.selected }"
-         (click)="toggleMonthSelection(month)">
+         [ngClass]="{ 'paid': month.paid, 'manually-paid': month.manuallyPaid, 'unpaid': !month.paid && !month.manuallyPaid, 'selected': month.selected }"
+         (click)="role !== 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : (role === 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : null)">
       <div class="month-name">{{ month.name }}</div>
       <div class="month-status">
-        <span *ngIf="month.paid">Paid ₹{{ month.fee + (month.busFee || 0) }}</span>
-        <span *ngIf="!month.paid">₹{{ month.fee + (month.busFee || 0) }}</span>
+        <span *ngIf="month.paid && !month.manuallyPaid">Paid ₹{{ month.fee + (month.busFee || 0) }}</span>
+        <span *ngIf="month.manuallyPaid">Manually Paid ₹{{ month.manualPaymentReceived }}</span>
+        <span *ngIf="!month.paid && !month.manuallyPaid">₹{{ month.fee + (month.busFee || 0) }}</span>
       </div>
     </div>
   </div>
@@ -74,7 +75,7 @@
     </div>
   </div>
 
-  <div class="sticky-footer">
+  <div *ngIf="role !== 'ADMIN'; else adminPayment" class="sticky-footer">
     <div class="total-amount-bottom">
       Total Amount to Pay: ₹{{ totalAmountToPay }}
     </div>
@@ -83,4 +84,19 @@
       (paymentSuccess)="handleSuccessfulPayment()"
     ></app-payment>
   </div>
+
+  <ng-template #adminPayment>
+    <div class="sticky-footer">
+      <div class="total-amount-bottom">
+        Total Amount to Pay: ₹{{ totalAmountToPay }}
+      </div>
+      <div class="admin-payment-controls">
+        <mat-form-field appearance="outline" style="width: 200px;">
+          <mat-label>Amount Received</mat-label>
+          <input matInput type="number" [(ngModel)]="manualPaymentAmount">
+        </mat-form-field>
+        <button mat-raised-button color="accent" (click)="markAsManuallyPaid()">Mark as Paid</button>
+      </div>
+    </div>
+  </ng-template>
 </div>

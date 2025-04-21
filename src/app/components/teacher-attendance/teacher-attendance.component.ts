@@ -146,42 +146,54 @@ export class TeacherAttendanceComponent implements OnInit {
   }
 
   saveAttendance(): void {
-    const attendanceData: AttendanceData[] = this.students
-      .filter((student) => student.absent)
-      .map((student) => ({
-        studentId: student.studentId,
-        chargePaid: student.chargePaid,
-        absentDate: this.attendanceDate.toISOString().split('T')[0],
-        className: this.selectedClass,
-      }));
+    Swal.fire({
+      title: 'Confirm Save',
+      text: 'Sure you want to save the attendance?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, save it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const attendanceData: AttendanceData[] = this.students
+          .filter((student) => student.absent)
+          .map((student) => ({
+            studentId: student.studentId,
+            chargePaid: student.chargePaid,
+            absentDate: this.attendanceDate.toISOString().split('T')[0],
+            className: this.selectedClass,
+          }));
 
-    attendanceData.push({
-      studentId: 'X',
-      chargePaid: true, 
-      absentDate: this.attendanceDate.toISOString().split('T')[0],
-      className: this.selectedClass,
-    });
+        attendanceData.push({
+          studentId: 'X',
+          chargePaid: true,
+          absentDate: this.attendanceDate.toISOString().split('T')[0],
+          className: this.selectedClass,
+        });
 
-    this.attendanceService.saveAttendance(attendanceData).subscribe({
-      next: () => {
-        Swal.fire({
-          title: 'Attendance Saved!',
-          text: 'Attendance data saved successfully.',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false,
+        this.attendanceService.saveAttendance(attendanceData).subscribe({
+          next: () => {
+            Swal.fire({
+              title: 'Attendance Saved!',
+              text: 'Attendance data saved successfully.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          },
+          error: (error) => {
+            console.error('Error saving attendance:', error);
+            Swal.fire({
+              title: 'Error!',
+              text: 'Failed to save attendance. Please try again.',
+              icon: 'error',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          },
         });
-      },
-      error: (error) => {
-        console.error('Error saving attendance:', error);
-        Swal.fire({
-          title: 'Error!',
-          text: 'Failed to save attendance. Please try again.',
-          icon: 'error',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      },
+      }
     });
   }
 

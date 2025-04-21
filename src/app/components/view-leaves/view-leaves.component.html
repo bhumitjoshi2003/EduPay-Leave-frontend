@@ -19,7 +19,7 @@
     <h2 *ngIf="loggedInUserRole === 'TEACHER'">Leave Applications for Class {{ selectedClass }}</h2>
     <h2 *ngIf="loggedInUserRole === 'ADMIN' && selectedClass">Leave Applications for Class {{ selectedClass }}</h2>
 
-    <div class="filter-options" *ngIf="loggedInUserRole === 'ADMIN' || loggedInUserRole === 'TEACHER'">
+    <div class="filter-options" *ngIf="filteredLeaves.length > 0">
       <div class="form-group">
         <label for="date" class="form-label">Filter by Date:</label>
         <mat-form-field appearance="outline">

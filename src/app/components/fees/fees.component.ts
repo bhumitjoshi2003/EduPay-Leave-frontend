@@ -300,6 +300,8 @@ export class PaymentTrackerComponent implements OnInit {
           promises.push(new Promise<void>((resolve) => {
             this.feesService.getStudentFee(this.studentId, formattedYear, monthNumber).subscribe(fee => {
               fee.paid = true;
+              fee.manualyPaid = false;
+              fee.manualPaymentReceived = 0;
               this.feesService.updateStudentFees(fee).subscribe(() => {
                 resolve();
               });
@@ -346,13 +348,6 @@ export class PaymentTrackerComponent implements OnInit {
 
   markAsManuallyPaid() {
     if (this.role === 'ADMIN' && this.manualPaymentAmount !== null && this.selectedMonthsByYear[this.selectedYear]?.length > 0) {
-      const numberOfSelectedMonths = this.selectedMonthsByYear[this.selectedYear].length;
-      const amountPerMonth = Math.floor(this.manualPaymentAmount / numberOfSelectedMonths);
-      let remainingAmount = this.manualPaymentAmount - (amountPerMonth * numberOfSelectedMonths);
-      const year = this.selectedYear;
-      const formattedYear = `${year}-${year + 1}`;
-      const selectedMonthNumbers = this.selectedMonthsByYear[year];
-
       Swal.fire({
         title: 'Confirm Manual Payment',
         text: `Mark selected months as manually paid with a total amount of ₹${this.manualPaymentAmount}?`,
@@ -365,69 +360,54 @@ export class PaymentTrackerComponent implements OnInit {
         if (result.isConfirmed) {
           const promises: Promise<any>[] = [];
 
-          selectedMonthNumbers.forEach((monthNumber, index) => {
-            let individualMonthAmount = amountPerMonth;
-            if (remainingAmount > 0) {
-              individualMonthAmount++;
-              remainingAmount--;
-            }
-
-            promises.push(new Promise<void>((resolve) => {
-              this.feesService.getStudentFee(this.studentId, formattedYear, monthNumber).subscribe(fee => {
-
-                const manualPaymentData: PaymentData = {
-                  totalAmount: individualMonthAmount,
-                  monthSelectionString: '000000000000',
-                  totalTuitionFee: fee.tuitionFee,
-                  totalAnnualCharges: fee.annualCharges,
-                  totalLabCharges: fee.labCharges,
-                  totalEcaProject: fee.ecaProject,
-                  totalBusFee: fee.busFee || 0,
-                  totalExaminationFee: fee.examinationFee,
-                  studentId: this.studentId,
-                  studentName: this.studentName, 
-                  className: fee.className,
-                  session: formattedYear,
-                  paidManually: true,
-                  amountPaid: this.manualPaymentAmount, 
-                };
-                console.log(manualPaymentData);
-
-                this.feesService.recordManualPayment(manualPaymentData).subscribe({
-                  next: (response) => {
-                    console.log(`Manual payment recorded for month ${monthNumber}:`, response);
-                    fee.paid = true;
-                    fee.manuallyPaid = true;
-                    fee.manualPaymentReceived = individualMonthAmount;
-                    this.feesService.updateStudentFees(fee).subscribe(() => {
-                      resolve();
-                    });
-                  },
-                  error: (error) => {
-                    console.error(`Error recording manual payment for month ${monthNumber}:`, error);
-                    Swal.fire(
-                      'Error!',
-                      `Failed to record manual payment for month ${this.getMonthName(monthNumber)}.`,
-                      'error'
-                    );
-                    resolve(); // Still resolve to continue processing other months
-                  }
-                });
-              });
-            }));
-          });
-
           Promise.all(promises).then(() => {
-            this.fetchFees();
-            this.selectedMonthsByYear[year] = [];
-            this.totalAmountToPay = 0;
-            this.manualPaymentAmount = 0;
-            this.cdr.detectChanges();
-            Swal.fire(
-              'Marked as Paid!',
-              `The selected ${numberOfSelectedMonths} months have been marked as manually paid.`,
-              'success'
-            );
+            this.paymentData.paidManually = true;
+            this.paymentData.amountPaid = this.manualPaymentAmount;
+            console.log("amount paid: " + this.manualPaymentAmount);
+
+            this.feesService.recordManualPayment(this.paymentData).subscribe({
+              next: (response) => {
+                Object.keys(this.selectedMonthsByYear).forEach(yearKey => {
+                  const year = parseInt(yearKey, 10);
+                  const formattedYear = `${year}-${year + 1}`;
+                  this.selectedMonthsByYear[year].forEach(monthNumber => {
+                    promises.push(new Promise<void>((resolve) => {
+                      this.feesService.getStudentFee(this.studentId, formattedYear, monthNumber).subscribe(fee => {
+                        fee.paid = true;
+                        fee.manualyPaid = true;
+                        fee.manualPaymentReceived = this.paymentData.amountPaid;
+                        this.feesService.updateStudentFees(fee).subscribe(() => {
+                          resolve();
+                        });
+                      });
+                    }));
+                  });
+                });
+          
+                this.initPaymentData();
+
+                Promise.all(promises).then(() => {
+                  this.fetchFees();
+                  this.selectedMonthsByYear = {};
+                  this.totalAmountToPay = 0;
+                  this.manualPaymentAmount = 0;
+                  this.cdr.detectChanges();
+                  Swal.fire(
+                    'Marked as Paid!',
+                    `The selected months have been marked as manually paid.`,
+                    'success'
+                  );
+                });
+              },
+              error: (error) => {
+                console.error('Error recording manual payment:', error);
+                Swal.fire(
+                  'Error!',
+                  'Failed to record manual payment.',
+                  'error'
+                );
+              }
+            });
           });
         }
       });

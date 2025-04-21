@@ -98,32 +98,44 @@ import { Component, OnInit } from '@angular/core';
 
    deleteLeave(leaveDate: string): void {
      if (leaveDate) {
-       const formattedLeaveDate = new Date(leaveDate).toISOString().split('T')[0];
+       Swal.fire({
+         title: 'Are you sure?',
+         text: 'You will not be able to recover this leave!',
+         icon: 'warning',
+         showCancelButton: true,
+         confirmButtonColor: '#d33',
+         cancelButtonColor: '#3085d6',
+         confirmButtonText: 'Yes, delete it!',
+       }).then((result) => {
+         if (result.isConfirmed) {
+           const formattedLeaveDate = new Date(leaveDate).toISOString().split('T')[0];
 
-       this.leaveService.deleteLeave(this.studentId, formattedLeaveDate).subscribe({
-         next: () => {
-           this.leaveForm.reset();
-           this.reasonControl?.setValue(''); // Reset dropdown to default
-           this.showOtherReasonInput = false;
-           Swal.fire({
-             title: 'Leave Deleted!',
-             text: 'Your leave has been deleted.',
-             icon: 'success',
-             timer: 2000,
-             showConfirmButton: false,
+           this.leaveService.deleteLeave(this.studentId, formattedLeaveDate).subscribe({
+             next: () => {
+               this.leaveForm.reset();
+               this.reasonControl?.setValue(''); 
+               this.showOtherReasonInput = false;
+               Swal.fire({
+                 title: 'Deleted!',
+                 text: 'Your leave has been deleted.',
+                 icon: 'success',
+                 timer: 2000,
+                 showConfirmButton: false,
+               });
+               this.ngOnInit();
+             },
+             error: (error) => {
+               console.error('Error deleting leave:', error);
+               Swal.fire({
+                 title: 'Error!',
+                 text: 'Failed to delete leave. Please try again.',
+                 icon: 'error',
+                 timer: 2000,
+                 showConfirmButton: false,
+               });
+             },
            });
-           this.ngOnInit();
-         },
-         error: (error) => {
-           console.error('Error deleting leave:', error);
-           Swal.fire({
-             title: 'Error!',
-             text: 'Failed to delete leave. Please try again.',
-             icon: 'error',
-             timer: 2000,
-             showConfirmButton: false,
-           });
-         },
+         }
        });
      }
    }
@@ -143,87 +155,87 @@ import { Component, OnInit } from '@angular/core';
    }
 
    applyLeave(): void {
-    if (this.leaveForm.invalid) {
-      this.check();
-      return;
-    }
+     if (this.leaveForm.invalid) {
+       this.check();
+       return;
+     }
 
-    if (this.leaveForm.valid) {
-      const now = new Date();
-      const leaveDate = new Date(this.leaveForm.get('leaveDate')?.value);
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const sixAMToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 6, 0, 0);
+     if (this.leaveForm.valid) {
+       const now = new Date();
+       const leaveDate = new Date(this.leaveForm.get('leaveDate')?.value);
+       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+       const sixAMToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 6, 0, 0);
 
-      this.errorMessage = '';
+       this.errorMessage = '';
 
-      if (leaveDate < today) {
-        this.errorMessage = 'Leave cannot be applied for past dates!';
-        return;
-      }
+       if (leaveDate < today) {
+         this.errorMessage = 'Leave cannot be applied for past dates!';
+         return;
+       }
 
-      if (leaveDate.toDateString() === today.toDateString() && now >= sixAMToday) {
-        this.errorMessage = 'Leave for today must be applied before 6:00 AM!';
-        return;
-      }
+       if (leaveDate.toDateString() === today.toDateString() && now >= sixAMToday) {
+         this.errorMessage = 'Leave for today must be applied before 6:00 AM!';
+         return;
+       }
 
-      if (leaveDate.getDay() === 0) {
-        this.errorMessage = 'Even the server takes Sundays off. Please choose another day!';
-        return;
-      }
+       if (leaveDate.getDay() === 0) {
+         this.errorMessage = 'Even the server takes Sundays off. Please choose another day!';
+         return;
+       }
 
-      const formattedLeaveDate = leaveDate.toISOString().split('T')[0];
-      const selectedReason = this.reasonControl?.value;
-      let finalReason = selectedReason;
+       const formattedLeaveDate = leaveDate.toISOString().split('T')[0];
+       const selectedReason = this.reasonControl?.value;
+       let finalReason = selectedReason;
 
-      if (selectedReason === 'Others') {
-        finalReason = this.otherReasonControl?.value;
-      }
+       if (selectedReason === 'Others') {
+         finalReason = this.otherReasonControl?.value;
+       }
 
-      // Corrected leaveExists check: Compare the originalLeaveDate (yyyy-MM-dd)
-      const leaveExists = this.leaves.some(
-        (leave) => leave.originalLeaveDate === formattedLeaveDate
-      );
+       // Corrected leaveExists check: Compare the originalLeaveDate (yyyy-MM-dd)
+       const leaveExists = this.leaves.some(
+         (leave) => leave.originalLeaveDate === formattedLeaveDate
+       );
 
-      if (leaveExists) {
-        this.errorMessage = 'Leave already applied for this date!';
-        return;
-      }
+       if (leaveExists) {
+         this.errorMessage = 'Leave already applied for this date!';
+         return;
+       }
 
 
-      const leaveRequest: LeaveRequest = {
-        studentId: this.studentId,
-        leaveDate: formattedLeaveDate,
-        reason: finalReason,
-        className: this.className,
-      };
+       const leaveRequest: LeaveRequest = {
+         studentId: this.studentId,
+         leaveDate: formattedLeaveDate,
+         reason: finalReason,
+         className: this.className,
+       };
 
-      this.leaveService.applyLeave(leaveRequest).subscribe({
-        next: (response) => {
-          this.leaveForm.reset();
-          this.reasonControl?.setValue(''); // Reset reason dropdown
-          this.leaveForm.get('leaveDate')?.setValue(''); // Reset date input
-          this.showOtherReasonInput = false;
-          Swal.fire({
-            title: 'Leave Applied!',
-            text: response,
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false,
-          });
-          this.ngOnInit();
-        },
-        error: (error) => {
-          console.error('Error applying leave:', error);
-          this.errorMessage = 'Failed to apply leave. Please try again.';
-          Swal.fire({
-            title: 'Error!',
-            text: this.errorMessage,
-            icon: 'error',
-            timer: 2000,
-            showConfirmButton: false,
-          });
-        },
-      });
-    }
-  }
+       this.leaveService.applyLeave(leaveRequest).subscribe({
+         next: (response) => {
+           this.leaveForm.reset();
+           this.reasonControl?.setValue(''); 
+           this.leaveForm.get('leaveDate')?.setValue(''); 
+           this.showOtherReasonInput = false;
+           Swal.fire({
+             title: 'Leave Applied!',
+             text: response,
+             icon: 'success',
+             timer: 2000,
+             showConfirmButton: false,
+           });
+           this.ngOnInit();
+         },
+         error: (error) => {
+           console.error('Error applying leave:', error);
+           this.errorMessage = 'Failed to apply leave. Please try again.';
+           Swal.fire({
+             title: 'Error!',
+             text: this.errorMessage,
+             icon: 'error',
+             timer: 2000,
+             showConfirmButton: false,
+           });
+         },
+       });
+     }
+   }
  }

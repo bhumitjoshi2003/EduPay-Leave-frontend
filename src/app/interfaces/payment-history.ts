@@ -1,7 +1,8 @@
 export interface PaymentHistory {
+    studentId: string;
     paymentId: string;
     orderId: string;
-    amount: number;
+    amountPaid: number;
     paymentDate: string;
     status: string;
 }

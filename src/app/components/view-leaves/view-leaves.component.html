@@ -54,7 +54,7 @@
         <tbody>
           <tr *ngFor="let leave of filteredLeaves" class="leave-row">
             <td>{{ leave.studentId }}</td>
-            <td>{{ leave.name }}</td>
+            <td>{{ leave.studentName }}</td>
             <td>{{ leave.leaveDate }}</td>
             <td>{{ leave.reason }}</td>
             <td *ngIf="loggedInUserRole === 'ADMIN'">

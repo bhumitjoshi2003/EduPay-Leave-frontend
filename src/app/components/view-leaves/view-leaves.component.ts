@@ -1,39 +1,23 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { LeaveService } from '../../services/leave.service';
-import { AuthService } from '../../auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil, switchMap, map, concatMap } from 'rxjs'; // Import concatMap and from
+import { Subject, takeUntil, switchMap } from 'rxjs';
 import { TeacherService } from '../../services/teacher.service';
 import { jwtDecode } from 'jwt-decode';
-import { StudentService } from '../../services/student.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import Swal from 'sweetalert2'; // Import SweetAlert
-import { from } from 'rxjs'; // Import 'from'
+import Swal from 'sweetalert2';
+import { from, concatMap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-
-interface LeaveApplication {
-  id: string;
-  studentId: string;
-  name: string;
-  leaveDate: string;
-  reason: string;
-  className: string;
-}
-
-interface Student {
-  studentId: string;
-  name: string;
-}
+import { LeaveApplication, LeaveService } from '../../services/leave.service';
 
 @Component({
   selector: 'app-view-leaves',
   templateUrl: './view-leaves.component.html',
-  styleUrls: ['./view-leaves.component.css'], // Using similar CSS
+  styleUrls: ['./view-leaves.component.css'],
   imports: [CommonModule,
     FormsModule,
     MatFormFieldModule,
@@ -43,7 +27,6 @@ interface Student {
     MatIconModule],
 })
 export class ViewLeavesComponent implements OnInit, OnDestroy {
-  studentNameMap: Map<string, string> = new Map();
   loggedInUserRole: string = '';
   loggedInUserId: string = '';
   loggedInUserClass: string = '';
@@ -54,23 +37,27 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
     'Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
   ];
   selectedClass: string = '';
-  selectedDate: any = ''; 
-  studentIdFilter: string = ''; 
+  selectedDate: any = '';
+  studentIdFilter: string = '';
   private ngUnsubscribe = new Subject<void>();
 
-  constructor(private route: ActivatedRoute, private leaveService: LeaveService, private studentService: StudentService, private authService: AuthService, private teacherService: TeacherService) { }
+  constructor(
+    private route: ActivatedRoute,
+    private leaveService: LeaveService,
+    private teacherService: TeacherService
+  ) { }
 
   ngOnInit(): void {
-      this.route.params.subscribe(params => {
-        const studentIdFromParams = params['studentId'];
-        if (studentIdFromParams) {
-          this.studentIdFilter = studentIdFromParams;
-        }
-      });
-      this.loadInitialData();
+    this.route.params.subscribe(params => {
+      const studentIdFromParams = params['studentId'];
+      if (studentIdFromParams) {
+        this.studentIdFilter = studentIdFromParams;
+      }
+    });
+    this.loadInitialData();
   }
 
-  loadInitialData(){
+  loadInitialData() {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken: any = jwtDecode(token);
@@ -79,9 +66,9 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
 
       if (this.loggedInUserRole === 'ADMIN') {
         this.selectedClass = localStorage.getItem('lastSelectedClass') ? localStorage.getItem('lastSelectedClass')! : this.classList[0];
-        this.loadLeavesAndStudentsForClass(this.selectedClass);
+        this.loadLeavesForClass(this.selectedClass);
       } else if (this.loggedInUserRole === 'TEACHER') {
-        this.getTeacherClassAndLoadLeavesAndStudents();
+        this.getTeacherClassAndLoadLeaves();
       }
     }
   }
@@ -91,61 +78,37 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
 
-  getTeacherClassAndLoadLeavesAndStudents(): void {
+  getTeacherClassAndLoadLeaves(): void {
     this.teacherService.getTeacher(this.loggedInUserId).pipe(
       takeUntil(this.ngUnsubscribe),
       switchMap((teacher: any) => {
         this.selectedClass = teacher.classTeacher;
-        return this.studentService.getStudentsByClass(this.selectedClass);
-      }),
-      switchMap((students) => {
-        this.createStudentNameMap(students);
         return this.leaveService.getLeavesByClass(this.selectedClass);
-      }),
-      map((leaves) => this.assignStudentNamesToLeaves(leaves))
+      })
     ).subscribe({
-      next: (leavesWithNames) => {
-        this.allLeaves = leavesWithNames;
+      next: (leaves) => {
+        this.allLeaves = leaves;
         this.sortAndFilterLeaves();
       },
       error: (error: any) => {
-        console.error('Error fetching teacher details or student/leaves:', error);
+        console.error('Error fetching teacher details or leaves:', error);
       }
     });
   }
 
-  loadLeavesAndStudentsForClass(className: string): void {
-    this.studentService.getStudentsByClass(className).pipe(
-      takeUntil(this.ngUnsubscribe),
-      switchMap((students) => {
-        this.createStudentNameMap(students);
-        return this.leaveService.getLeavesByClass(className);
-      }),
-      map((leaves) => this.assignStudentNamesToLeaves(leaves))
+  loadLeavesForClass(className: string): void {
+    this.leaveService.getLeavesByClass(className).pipe(
+      takeUntil(this.ngUnsubscribe)
     ).subscribe({
-      next: (leavesWithNames) => {
-        this.allLeaves = leavesWithNames;
+      next: (leaves) => {
+        this.allLeaves = leaves;
         this.sortAndFilterLeaves();
         localStorage.setItem('lastSelectedClass', className);
       },
       error: (error) => {
-        console.error(`Error loading leaves and students for class ${className}:`, error);
+        console.error(`Error loading leaves for class ${className}:`, error);
       }
     });
-  }
-
-  createStudentNameMap(students: Student[]): void {
-    this.studentNameMap.clear();
-    students.forEach(student => {
-      this.studentNameMap.set(student.studentId, student.name);
-    });
-  }
-
-  assignStudentNamesToLeaves(leaves: any[]): LeaveApplication[] {
-    return leaves.map(leave => ({
-      ...leave,
-      name: this.studentNameMap.get(leave.studentId) || 'Unknown Student'
-    }));
   }
 
   sortAndFilterLeaves(): void {
@@ -171,7 +134,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
 
   onClassSelect(selectedClass: string): void {
     this.selectedClass = selectedClass;
-    this.loadLeavesAndStudentsForClass(selectedClass);
+    this.loadLeavesForClass(selectedClass);
   }
 
   onDateSelect(): void {
@@ -183,10 +146,10 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   }
 
   clearFilter(): void {
-    this.selectedDate = ''; // Reset the selected date
-    this.studentIdFilter = ''; // Reset the student ID filter
-    this.selectedClass = localStorage.getItem('lastSelectedClass') ? localStorage.getItem('lastSelectedClass')! : this.classList[0]; // Reset to the last selected or default class
-    this.loadLeavesAndStudentsForClass(this.selectedClass); // Reload data for the default/last selected class
+    this.selectedDate = '';
+    this.studentIdFilter = '';
+    this.selectedClass = localStorage.getItem('lastSelectedClass') ? localStorage.getItem('lastSelectedClass')! : this.classList[0];
+    this.loadLeavesForClass(this.selectedClass);
   }
 
   deleteAllFilteredLeaves(): void {
@@ -210,7 +173,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
           takeUntil(this.ngUnsubscribe)
         ).subscribe({
           next: (response) => {
-            console.log('Leave deleted:', response); // Optional: Log success
+            console.log('Leave deleted:', response);
           },
           complete: () => {
             Swal.fire(
@@ -218,7 +181,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
               'All filtered leave applications deleted successfully.',
               'success'
             );
-            this.loadLeavesAndStudentsForClass(this.selectedClass); // Reload leaves after deletion
+            this.loadLeavesForClass(this.selectedClass);
           },
           error: (error) => {
             console.error('Error deleting leaves:', error);
@@ -227,7 +190,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
               'Failed to delete one or more leave applications.',
               'error'
             );
-            this.loadLeavesAndStudentsForClass(this.selectedClass); // Still reload to reflect any successful deletions
+            this.loadLeavesForClass(this.selectedClass);
           }
         });
       }
@@ -252,7 +215,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
               response,
               'success'
             );
-            this.loadLeavesAndStudentsForClass(this.selectedClass);
+            this.loadLeavesForClass(this.selectedClass);
           },
           error: (error) => {
             console.error('Error deleting leave:', error);

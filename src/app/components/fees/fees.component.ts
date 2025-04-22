@@ -341,16 +341,42 @@ export class PaymentTrackerComponent implements OnInit {
     this.paymentData.totalExaminationFee= 0,
     this.paymentData.studentName= "",
     this.paymentData.className= "",
-    this.paymentData.session= "";
+    this.paymentData.session= "",
     this.paymentData.paidManually= false,
     this.paymentData.amountPaid= 0
   }
 
   markAsManuallyPaid() {
     if (this.role === 'ADMIN' && this.manualPaymentAmount !== null && this.selectedMonthsByYear[this.selectedYear]?.length > 0) {
+      const selectedMonthsCount = Object.values(this.selectedMonthsByYear)
+        .flat()
+        .length;
+
+      if (selectedMonthsCount === 0) {
+        Swal.fire('Warning', 'Please select months to mark as paid.', 'warning');
+        return;
+      }
+
+      const baseAmountPerMonth = Math.floor(this.manualPaymentAmount / selectedMonthsCount);
+      let remainder = this.manualPaymentAmount % selectedMonthsCount;
+      const amountsToApply: { [year: number]: { [month: number]: number } } = {};
+
+      Object.keys(this.selectedMonthsByYear).forEach(yearKey => {
+        const year = parseInt(yearKey, 10);
+        amountsToApply[year] = {};
+        this.selectedMonthsByYear[year].forEach(monthNumber => {
+          let currentMonthAmount = baseAmountPerMonth;
+          if (remainder > 0) {
+            currentMonthAmount += 1;
+            remainder--;
+          }
+          amountsToApply[year][monthNumber] = currentMonthAmount;
+        });
+      });
+
       Swal.fire({
         title: 'Confirm Manual Payment',
-        text: `Mark selected months as manually paid with a total amount of ₹${this.manualPaymentAmount}?`,
+        text: `Mark ${selectedMonthsCount} selected months as manually paid with a total amount of ₹${this.manualPaymentAmount}? The amount will be distributed as whole rupees among the months.`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -360,47 +386,47 @@ export class PaymentTrackerComponent implements OnInit {
         if (result.isConfirmed) {
           const promises: Promise<any>[] = [];
 
-          Promise.all(promises).then(() => {
-            this.paymentData.paidManually = true;
-            this.paymentData.amountPaid = this.manualPaymentAmount;
-            console.log("amount paid: " + this.manualPaymentAmount);
+          this.paymentData.paidManually = true;
+          this.paymentData.amountPaid = this.manualPaymentAmount;
+          console.log("Total amount paid:", this.manualPaymentAmount);
 
-            this.feesService.recordManualPayment(this.paymentData).subscribe({
-              next: (response) => {
-                Object.keys(this.selectedMonthsByYear).forEach(yearKey => {
-                  const year = parseInt(yearKey, 10);
-                  const formattedYear = `${year}-${year + 1}`;
-                  this.selectedMonthsByYear[year].forEach(monthNumber => {
-                    promises.push(new Promise<void>((resolve) => {
-                      this.feesService.getStudentFee(this.studentId, formattedYear, monthNumber).subscribe(fee => {
-                        fee.paid = true;
-                        fee.manualyPaid = true;
-                        fee.manualPaymentReceived = this.paymentData.amountPaid;
-                        this.feesService.updateStudentFees(fee).subscribe(() => {
-                          resolve();
-                        });
-                      });
-                    }));
+          Object.keys(this.selectedMonthsByYear).forEach(yearKey => {
+            const year = parseInt(yearKey, 10);
+            const formattedYear = `${year}-${year + 1}`;
+            this.selectedMonthsByYear[year].forEach(monthNumber => {
+              promises.push(new Promise<void>((resolve) => {
+                this.feesService.getStudentFee(this.studentId, formattedYear, monthNumber).subscribe(fee => {
+                  fee.paid = true;
+                  fee.manuallyPaid = true;
+                  fee.manualPaymentReceived = amountsToApply[year][monthNumber]; // Apply distributed amount
+                  console.log(`Sending update for month: ${monthNumber}/${year}, with amount:`, fee.manualPaymentReceived);
+                  this.feesService.updateStudentFees(fee).subscribe(() => {
+                    resolve();
                   });
                 });
-          
-                this.initPaymentData();
+              }));
+            });
+          });
 
-                Promise.all(promises).then(() => {
-                  this.fetchFees();
-                  this.selectedMonthsByYear = {};
-                  this.totalAmountToPay = 0;
-                  this.manualPaymentAmount = 0;
-                  this.cdr.detectChanges();
-                  Swal.fire(
-                    'Marked as Paid!',
-                    `The selected months have been marked as manually paid.`,
-                    'success'
-                  );
-                });
+          Promise.all(promises).then(() => {
+            // Execute recordManualPayment after all individual updates
+            this.feesService.recordManualPayment(this.paymentData).subscribe({
+              next: (recordResponse) => {
+                console.log('Manual payment recorded:', recordResponse);
+                this.initPaymentData();
+                this.fetchFees();
+                this.selectedMonthsByYear = {};
+                this.totalAmountToPay = 0;
+                this.manualPaymentAmount = 0;
+                this.cdr.detectChanges();
+                Swal.fire(
+                  'Marked as Paid!',
+                  `The selected months have been marked as manually paid.`,
+                  'success'
+                );
               },
-              error: (error) => {
-                console.error('Error recording manual payment:', error);
+              error: (recordError) => {
+                console.error('Error recording manual payment:', recordError);
                 Swal.fire(
                   'Error!',
                   'Failed to record manual payment.',

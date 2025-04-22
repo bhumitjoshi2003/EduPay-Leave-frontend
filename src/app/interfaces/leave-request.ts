@@ -1,6 +1,7 @@
 export interface LeaveRequest {
-    studentId: string;
-    className: string;
-    leaveDate: string;
-    reason: string;
-  }
+  studentId: string;
+  studentName: string;
+  className: string;
+  leaveDate: string;
+  reason: string;
+}

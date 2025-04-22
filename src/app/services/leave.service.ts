@@ -3,9 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { LeaveRequest } from '../interfaces/leave-request';
 
-interface LeaveApplication {
+export interface LeaveApplication {
+  id: string;
   studentId: string;
-  name: string; 
+  studentName: string; 
   leaveDate: string;
   reason: string;
   className: string;

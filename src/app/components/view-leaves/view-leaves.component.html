@@ -19,7 +19,7 @@
     <h2 *ngIf="loggedInUserRole === 'TEACHER'">Leave Applications for Class {{ selectedClass }}</h2>
     <h2 *ngIf="loggedInUserRole === 'ADMIN' && selectedClass">Leave Applications for Class {{ selectedClass }}</h2>
 
-    <div class="filter-options" *ngIf="filteredLeaves.length > 0">
+    <div class="filter-options" *ngIf="allLeaves.length > 0">
       <div class="form-group">
         <label for="date" class="form-label">Filter by Date:</label>
         <mat-form-field appearance="outline">
@@ -54,7 +54,7 @@
         <tbody>
           <tr *ngFor="let leave of filteredLeaves" class="leave-row">
             <td>{{ leave.studentId }}</td>
-            <td>{{ leave.name }}</td>
+            <td>{{ leave.studentName }}</td>
             <td>{{ leave.leaveDate }}</td>
             <td>{{ leave.reason }}</td>
             <td *ngIf="loggedInUserRole === 'ADMIN'">

@@ -3,9 +3,18 @@
     <h2>Classes</h2>
     <ul class="class-list-vertical">
       <li
+        (click)="loadLeaves('all')"
+        [class.selected]="selectedClass === 'all'"
+        class="class-item-vertical"
+      >
+        <div class="chevron">
+          <span>All Leaves</span>
+        </div>
+      </li>
+      <li
         *ngFor="let className of classList"
         (click)="onClassSelect(className)"
-        [class.selected]="className === selectedClass"
+        [class.selected]="selectedClass !== 'all' && className === selectedClass"
         class="class-item-vertical"
       >
         <div class="chevron">
@@ -17,7 +26,9 @@
 
   <div class="student-list-area">
     <h2 *ngIf="loggedInUserRole === 'TEACHER'">Leave Applications for Class {{ selectedClass }}</h2>
-    <h2 *ngIf="loggedInUserRole === 'ADMIN' && selectedClass">Leave Applications for Class {{ selectedClass }}</h2>
+    <h2 *ngIf="loggedInUserRole === 'ADMIN'">
+      Leave Applications {{ selectedClass !== 'all' ? 'for Class ' + selectedClass : '- All Leaves' }}
+    </h2>
 
     <div class="filter-options" *ngIf="allLeaves.length > 0">
       <div class="form-group">
@@ -65,7 +76,7 @@
       </table>
     </div>
     <ng-template #noLeavesContainer>
-      <p class="no-students">No leave applications found for the selected class and date.</p>
+      <p class="no-students">No leave applications found{{ selectedClass !== 'all' ? ' for the selected class and date.' : ' for the applied filters.' }}</p>
     </ng-template>
   </div>
 </div>

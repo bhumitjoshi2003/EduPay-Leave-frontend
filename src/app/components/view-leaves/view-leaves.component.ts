@@ -36,7 +36,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   classList: string[] = [
     'Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
   ];
-  selectedClass: string = '';
+  selectedClass: string = 'all'; // Initialize to 'all'
   selectedDate: any = '';
   studentIdFilter: string = '';
   private ngUnsubscribe = new Subject<void>();
@@ -65,8 +65,8 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
       this.loggedInUserId = decodedToken.userId;
 
       if (this.loggedInUserRole === 'ADMIN') {
-        this.selectedClass = localStorage.getItem('lastSelectedClass') ? localStorage.getItem('lastSelectedClass')! : this.classList[0];
-        this.loadLeavesForClass(this.selectedClass);
+        this.selectedClass = localStorage.getItem('lastSelectedClass') ? localStorage.getItem('lastSelectedClass')! : 'all';
+        this.loadLeaves(this.selectedClass);
       } else if (this.loggedInUserRole === 'TEACHER') {
         this.getTeacherClassAndLoadLeaves();
       }
@@ -96,19 +96,37 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadLeavesForClass(className: string): void {
-    this.leaveService.getLeavesByClass(className).pipe(
-      takeUntil(this.ngUnsubscribe)
-    ).subscribe({
-      next: (leaves) => {
-        this.allLeaves = leaves;
-        this.sortAndFilterLeaves();
-        localStorage.setItem('lastSelectedClass', className);
-      },
-      error: (error) => {
-        console.error(`Error loading leaves for class ${className}:`, error);
-      }
-    });
+  loadLeaves(className: string): void {
+    this.selectedClass = className;
+    if (className === 'all') {
+      this.leaveService.getAllLeaves().pipe(
+        takeUntil(this.ngUnsubscribe)
+      ).subscribe({
+        next: (leaves) => {
+          this.allLeaves = leaves;
+          this.sortAndFilterLeaves();
+          localStorage.removeItem('lastSelectedClass'); // Optionally remove last selected class
+        },
+        error: (error) => {
+          console.error('Error loading all leaves:', error);
+          Swal.fire('Error!', 'Failed to load all leave applications.', 'error');
+        }
+      });
+    } else {
+      this.leaveService.getLeavesByClass(className).pipe(
+        takeUntil(this.ngUnsubscribe)
+      ).subscribe({
+        next: (leaves) => {
+          this.allLeaves = leaves;
+          this.sortAndFilterLeaves();
+          localStorage.setItem('lastSelectedClass', className);
+        },
+        error: (error) => {
+          console.error(`Error loading leaves for class ${className}:`, error);
+          Swal.fire('Error!', `Failed to load leave applications for class ${className}.`, 'error');
+        }
+      });
+    }
   }
 
   sortAndFilterLeaves(): void {
@@ -117,7 +135,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
       const dateB = new Date(b.leaveDate);
       return dateB.getTime() - dateA.getTime();
     }).filter((leave) => {
-      const classFilter = !this.selectedClass || leave.className === this.selectedClass;
+      const classFilter = this.selectedClass === 'all' || leave.className === this.selectedClass;
       let dateFilter = true;
       if (this.selectedDate) {
         const selectedDateObject = new Date(this.selectedDate);
@@ -133,8 +151,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   }
 
   onClassSelect(selectedClass: string): void {
-    this.selectedClass = selectedClass;
-    this.loadLeavesForClass(selectedClass);
+    this.loadLeaves(selectedClass);
   }
 
   onDateSelect(): void {
@@ -148,8 +165,8 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   clearFilter(): void {
     this.selectedDate = '';
     this.studentIdFilter = '';
-    this.selectedClass = localStorage.getItem('lastSelectedClass') ? localStorage.getItem('lastSelectedClass')! : this.classList[0];
-    this.loadLeavesForClass(this.selectedClass);
+    this.selectedClass = localStorage.getItem('lastSelectedClass') ? localStorage.getItem('lastSelectedClass')! : 'all';
+    this.loadLeaves(this.selectedClass);
   }
 
   deleteAllFilteredLeaves(): void {
@@ -181,7 +198,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
               'All filtered leave applications deleted successfully.',
               'success'
             );
-            this.loadLeavesForClass(this.selectedClass);
+            this.loadLeaves(this.selectedClass);
           },
           error: (error) => {
             console.error('Error deleting leaves:', error);
@@ -190,7 +207,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
               'Failed to delete one or more leave applications.',
               'error'
             );
-            this.loadLeavesForClass(this.selectedClass);
+            this.loadLeaves(this.selectedClass);
           }
         });
       }
@@ -215,7 +232,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
               response,
               'success'
             );
-            this.loadLeavesForClass(this.selectedClass);
+            this.loadLeaves(this.selectedClass);
           },
           error: (error) => {
             console.error('Error deleting leave:', error);

@@ -376,7 +376,7 @@ export class PaymentTrackerComponent implements OnInit {
 
       Swal.fire({
         title: 'Confirm Manual Payment',
-        text: `Mark ${selectedMonthsCount} selected months as manually paid with a total amount of ₹${this.manualPaymentAmount}? The amount will be distributed as whole rupees among the months.`,
+        text: `Mark selected months as manually paid with a total amount of ₹${this.manualPaymentAmount}?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -399,7 +399,6 @@ export class PaymentTrackerComponent implements OnInit {
                   fee.paid = true;
                   fee.manuallyPaid = true;
                   fee.manualPaymentReceived = amountsToApply[year][monthNumber]; // Apply distributed amount
-                  console.log(`Sending update for month: ${monthNumber}/${year}, with amount:`, fee.manualPaymentReceived);
                   this.feesService.updateStudentFees(fee).subscribe(() => {
                     resolve();
                   });
@@ -421,7 +420,7 @@ export class PaymentTrackerComponent implements OnInit {
                 this.cdr.detectChanges();
                 Swal.fire(
                   'Marked as Paid!',
-                  `The selected months have been marked as manually paid.`,
+                  `The selected months have been marked as paid.`,
                   'success'
                 );
               },

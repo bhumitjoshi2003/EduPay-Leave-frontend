@@ -11,9 +11,10 @@
       <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/apply-leave" routerLinkActive #rla6="routerLinkActive" [active]="rla6.isActive">Apply Leave</a>
       <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/student-attendance" routerLinkActive #rla8="routerLinkActive" [active]="rla8.isActive">Student Attendance</a>
       <a *ngIf="isTeacher()" mat-tab-link routerLink="/dashboard/teacher-attendance" routerLinkActive #rla7="routerLinkActive" [active]="rla7.isActive">Teacher Attendance</a>
-      <a *ngIf="isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/student-list" routerLinkActive #rla9="routerLinkActive" [active]="rla9.isActive">List of Students</a>
+      <a *ngIf="isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/student-list" routerLinkActive #rla9="routerLinkActive" [active]="rla9.isActive">Students</a>
       <a *ngIf="isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/view-leaves" routerLinkActive #rla10="routerLinkActive" [active]="rla10.isActive">Leaves</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/payment-history-admin" routerLinkActive #rla10="routerLinkActive" [active]="rla10.isActive">Payment History</a>
+      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/payment-history-admin" routerLinkActive #rla11="routerLinkActive" [active]="rla11.isActive">Payment History</a>
+      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/teacher-list" routerLinkActive #rla12="routerLinkActive" [active]="rla12.isActive">Teachers</a>
     </nav>
 
     <div class="profile-area">
@@ -30,20 +31,15 @@
             <span class="label">Role:</span>
             <span class="value">{{ Role }}</span>
           </div>
-          <div class="profile-row">
-            <span class="label">Name:</span>
-            <span class="value">{{ Name }}</span>
-          </div>
-          <div class="profile-row" *ngIf="isStudent()">
-            <span class="label">Class:</span>
-            <span class="value">{{ Class }}</span>
-          </div>
-          <div class="profile-row" *ngIf="Role === 'TEACHER'">
-            <span *ngIf="ClassTeacher" class="label">Class Teacher:</span>
+          <div class="profile-row" *ngIf="isTeacher() && ClassTeacher">
+            <span class="label">Class Teacher:</span>
             <span class="value">{{ ClassTeacher }}</span>
           </div>
           <hr />
-          <button mat-menu-item class="logout-button" (click)="logout()">Logout</button>
+          <div class="profile-details">
+            <button *ngIf="isStudent() || isTeacher()" mat-menu-item (click)="navigateToMyProfile()" class="profile-btn">My Profile</button>
+            <button mat-menu-item class="logout-button" (click)="logout()" class="logout-btn">Logout</button>
+          </div>
         </div>
       </mat-menu>
     </div>

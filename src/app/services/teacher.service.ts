@@ -15,4 +15,11 @@ export class TeacherService {
      return this.http.get<any>(`${this.baseUrl}/${teacherId}`);
    }
 
+   getAllTeachers(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}`);
+  }
+
+  updateTeacher(teacherId: string, updatedTeacher: any): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/${teacherId}`, updatedTeacher);
+  }
 }

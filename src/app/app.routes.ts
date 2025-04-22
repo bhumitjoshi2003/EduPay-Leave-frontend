@@ -15,6 +15,8 @@ import { StudentListComponent } from './components/student-list/student-list.com
 import { StudentDetailsComponent } from './components/student-details/student-details.component';
 import { ViewLeavesComponent } from './components/view-leaves/view-leaves.component';
 import { PaymentHistoryAdminComponent } from './components/payment-history-admin/payment-history-admin.component';
+import { TeacherListComponent } from './components/teacher-list/teacher-list.component';
+import { TeacherDetailsComponent } from './components/teacher-details/teacher-details.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -41,6 +43,8 @@ export const routes: Routes = [
             { path: 'view-leaves/:studentId', component: ViewLeavesComponent },
             { path: 'fees/:studentId', component: PaymentTrackerComponent },
             { path: 'payment-history-admin', component: PaymentHistoryAdminComponent },
+            { path: 'teacher-list', component: TeacherListComponent },
+            { path: 'teacher-details/:teacherId', component: TeacherDetailsComponent},
         ],
     },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },

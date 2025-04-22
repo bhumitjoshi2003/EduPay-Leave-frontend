@@ -1,12 +1,18 @@
-<div class="student-details-container" *ngIf="studentDetails">
+<div class="student-details-container" *ngIf="studentDetails && updatedDetails">
   <div class="header">
     <h2>Student Profile</h2>
+    <button *ngIf="getUserRole() === 'ADMIN' && !isEditing" (click)="enableEditMode()">Edit Details</button>
+    <div *ngIf="getUserRole() === 'ADMIN' && isEditing">
+      <button (click)="saveStudentDetails()">Save</button>
+      <button (click)="cancelEditMode()">Cancel</button>
+    </div>
   </div>
 
   <div class="details-grid">
     <div class="detail-item">
       <span class="label">Name:</span>
-      <span class="value">{{ studentDetails.name }}</span>
+      <span class="value" *ngIf="!isEditing">{{ studentDetails.name }}</span>
+      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.name" (input)="updateFieldValue('name', $event)">
     </div>
     <div class="detail-item">
       <span class="label">Student ID:</span>
@@ -18,33 +24,38 @@
     </div>
     <div class="detail-item">
       <span class="label">Phone:</span>
-      <span class="value">{{ studentDetails.phoneNumber }}</span>
+      <span class="value" *ngIf="!isEditing">{{ studentDetails.phoneNumber }}</span>
+      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.phoneNumber" (input)="updateFieldValue('phoneNumber', $event)">
     </div>
     <div class="detail-item">
       <span class="label">Email:</span>
-      <span class="value">{{ studentDetails.email }}</span>
+      <span class="value" *ngIf="!isEditing">{{ studentDetails.email }}</span>
+      <input type="email" *ngIf="isEditing" [(ngModel)]="updatedDetails.email" (input)="updateFieldValue('email', $event)">
     </div>
     <div class="detail-item">
       <span class="label">Date of Birth:</span>
-      <span class="value">{{ studentDetails.dob }}</span>
+      <span class="value" *ngIf="!isEditing">{{ studentDetails.dob }}</span>
+      <input type="date" *ngIf="isEditing" [(ngModel)]="updatedDetails.dob" (input)="updateFieldValue('dob', $event)">
     </div>
     <div class="detail-item parent-info">
       <span class="label">Father:</span>
-      <span class="value">{{ studentDetails.fatherName }}</span>
+      <span class="value" *ngIf="!isEditing">{{ studentDetails.fatherName }}</span>
+      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.fatherName" (input)="updateFieldValue('fatherName', $event)">
     </div>
     <div class="detail-item parent-info">
       <span class="label">Mother:</span>
-      <span class="value">{{ studentDetails.motherName }}</span>
+      <span class="value" *ngIf="!isEditing">{{ studentDetails.motherName }}</span>
+      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.motherName" (input)="updateFieldValue('motherName', $event)">
     </div>
   </div>
 
-  <div class="actions">
+  <div *ngIf="getUserRole() !== 'STUDENT'" class="actions">
     <button (click)="viewAttendance()">View Attendance</button>
     <button *ngIf="getUserRole() === 'ADMIN'"  class="payment-history-button" (click)="viewPaymentHistory()">View Payment History</button>
     <button (click)="viewLeaves()" class="view-leaves-button">View Applied Leaves</button>
     <button *ngIf="getUserRole() === 'ADMIN'"  class="fees" (click)="viewFeeDetails()">View Fee Details</button>
   </div>
-  <button class="back-button" (click)="router.navigate(['dashboard/student-list'])">Back to Student List</button>
+  <button *ngIf="getUserRole() !== 'STUDENT'" class="back-button" (click)="router.navigate(['dashboard/student-list'])">Back to Student List</button>
 </div>
 
 <div *ngIf="!studentDetails">

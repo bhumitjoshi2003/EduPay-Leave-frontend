@@ -22,4 +22,8 @@ export class TeacherService {
   updateTeacher(teacherId: string, updatedTeacher: any): Observable<any> {
     return this.http.put<any>(`${this.baseUrl}/${teacherId}`, updatedTeacher);
   }
+
+  addTeacher(teacherData: any): Observable<any> {
+    return this.http.post(this.baseUrl, teacherData);
+  }
 }

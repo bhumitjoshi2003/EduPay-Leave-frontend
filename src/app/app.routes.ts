@@ -17,6 +17,9 @@ import { ViewLeavesComponent } from './components/view-leaves/view-leaves.compon
 import { PaymentHistoryAdminComponent } from './components/payment-history-admin/payment-history-admin.component';
 import { TeacherListComponent } from './components/teacher-list/teacher-list.component';
 import { TeacherDetailsComponent } from './components/teacher-details/teacher-details.component';
+import { RegisterStudentComponent } from './components/register-student/register-student.component';
+import { RegisterTeacherComponent } from './components/register-teacher/register-teacher.component';
+import { RegisterComponent } from './components/register/register.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -45,6 +48,9 @@ export const routes: Routes = [
             { path: 'payment-history-admin', component: PaymentHistoryAdminComponent },
             { path: 'teacher-list', component: TeacherListComponent },
             { path: 'teacher-details/:teacherId', component: TeacherDetailsComponent},
+            // { path: 'register-student', component: RegisterStudentComponent },
+            // { path: 'register-teacher', component: RegisterTeacherComponent },
+            { path: 'register', component: RegisterComponent }, // Add the new combined route
         ],
     },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },

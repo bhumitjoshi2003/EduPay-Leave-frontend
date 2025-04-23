@@ -15,6 +15,7 @@
       <a *ngIf="isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/view-leaves" routerLinkActive #rla10="routerLinkActive" [active]="rla10.isActive">Leaves</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/payment-history-admin" routerLinkActive #rla11="routerLinkActive" [active]="rla11.isActive">Payment History</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/teacher-list" routerLinkActive #rla12="routerLinkActive" [active]="rla12.isActive">Teachers</a>
+      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/register" routerLinkActive #rla13="routerLinkActive" [active]="rla13.isActive">Register</a>
     </nav>
 
     <div class="profile-area">

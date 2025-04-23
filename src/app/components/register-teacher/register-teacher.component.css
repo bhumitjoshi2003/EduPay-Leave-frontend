@@ -1,0 +1,148 @@
+/* Page background - shared style */
+body {
+    background: linear-gradient(135deg, #f3e5f5, #ffffff);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+
+.register-teacher-container {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.8);
+    max-width: 650px;
+    margin: 60px auto;
+    padding: 40px 50px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin-top: 30px;
+    animation: fadeIn 1s ease-out;
+}
+
+/* Animated Heading */
+h2 {
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: #00796b;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    width: 90px;
+    height: 3px;
+    background-color: #00796b;
+    transform: translateX(-50%);
+    border-radius: 2px;
+    animation: slideIn 1s ease-out forwards;
+}
+
+/* Form Group */
+.form-group {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+/* Labels outside inputs */
+label {
+    display: block;
+    color: #616161;
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+}
+
+/* Inputs */
+input.form-control,
+select.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #bbb;
+    border-radius: 10px;
+    font-size: 1rem;
+    background-color: #ffffff;
+    color: #333;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+input.form-control:focus,
+select.form-control:focus {
+    border-color: #00796b;
+    box-shadow: 0 0 5px rgba(24, 161, 155, 0.3);
+    outline: none;
+}
+
+/* Error */
+.error-message {
+    color: #c62828;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+/* Buttons */
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.save-button,
+.cancel-button {
+    padding: 10px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    color: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.save-button {
+    background-color: #08897a;
+    box-shadow: 0 4px 12px rgba(36, 170, 143, 0.4);
+}
+
+.cancel-button {
+    background-color: #757575;
+    box-shadow: 0 4px 12px rgba(117, 117, 117, 0.6);
+}
+
+.save-button:hover {
+    background-color: #00796b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(36, 170, 143, 0.4);
+}
+
+.cancel-button:hover {
+    background-color: #616161;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(117, 117, 117, 0.6);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        width: 0;
+    }
+    to {
+        width: 90px;
+    }
+}

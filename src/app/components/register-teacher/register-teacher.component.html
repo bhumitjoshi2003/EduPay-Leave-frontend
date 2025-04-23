@@ -1,0 +1,69 @@
+<div class="register-teacher-container">
+    <h2>Register New Teacher</h2>
+    <form [formGroup]="teacherForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="teacherId">Teacher ID:</label>
+        <input type="text" id="teacherId" formControlName="teacherId" class="form-control" />
+        <div *ngIf="teacherForm.controls['teacherId'].invalid && (teacherForm.controls['teacherId'].dirty || teacherForm.controls['teacherId'].touched)" class="error-message">
+          Teacher ID is required.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" formControlName="name" class="form-control" />
+        <div *ngIf="teacherForm.controls['name'].invalid && (teacherForm.controls['name'].dirty || teacherForm.controls['name'].touched)" class="error-message">
+          Name is required.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" formControlName="email" class="form-control" />
+        <div *ngIf="teacherForm.controls['email'].invalid && (teacherForm.controls['email'].dirty || teacherForm.controls['email'].touched)" class="error-message">
+          <div *ngIf="teacherForm.controls['email'].errors?.['required']">Email is required.</div>
+          <div *ngIf="teacherForm.controls['email'].errors?.['email']">Invalid email format.</div>
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="text" id="phoneNumber" formControlName="phoneNumber" class="form-control" />
+        <div *ngIf="teacherForm.controls['phoneNumber'].invalid && (teacherForm.controls['phoneNumber'].dirty || teacherForm.controls['phoneNumber'].touched)" class="error-message">
+          Invalid phone number.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" formControlName="dob" class="form-control" />
+        <div *ngIf="teacherForm.controls['dob'].invalid && (teacherForm.controls['dob'].dirty || teacherForm.controls['dob'].touched)" class="error-message">
+          Date of Birth is required.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label for="gender">Gender:</label>
+        <select id="gender" formControlName="gender" class="form-control">
+          <option value="" disabled>Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+        <div *ngIf="teacherForm.controls['gender'].invalid && (teacherForm.controls['gender'].dirty || teacherForm.controls['gender'].touched)" class="error-message">
+          Gender is required.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label for="classTeacher">Class Teacher Of:</label>
+        <input type="text" id="classTeacher" formControlName="classTeacher" class="form-control" />
+      </div>
+  
+      <div class="button-group">
+        <button type="submit" class="save-button">Save Teacher</button>
+        <button type="button" class="cancel-button" (click)="goBack()">Cancel</button>
+      </div>
+    </form>
+  </div>
+  

@@ -25,10 +25,6 @@ export class AuthService {
     return this.http.post(this.apiUrl + '/login', { userId, password }, { responseType: 'text' });
   }
 
-  changePassword(request: ChangePasswordRequest): Observable<any> {
-    return this.http.post(this.apiUrl + '/change-password', request, { responseType: 'text' });
-  }
-
   logout() {
     localStorage.removeItem('token');
   }

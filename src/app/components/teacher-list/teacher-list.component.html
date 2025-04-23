@@ -1,0 +1,19 @@
+<div class="teacher-list-container">
+    <div class="teacher-list-area">
+      <h2>List of Teachers</h2>
+      <div *ngIf="teachers.length > 0; else noTeachersContainer">
+        <ul class="teacher-list">
+          <li *ngFor="let teacher of teachers" class="teacher-item" (click)="viewTeacherDetails(teacher.teacherId)">
+            <div class="teacher-info">
+              <span class="teacher-name">{{ teacher.name }}</span>
+              <span class="teacher-id">({{ teacher.teacherId }})</span>
+              </div>
+            <button class="view-details-button" (click)="viewTeacherDetails(teacher.teacherId)">View Details</button>
+          </li>
+        </ul>
+      </div>
+      <ng-template #noTeachersContainer>
+        <p class="no-teachers">No teachers found.</p>
+      </ng-template>
+    </div>
+  </div>

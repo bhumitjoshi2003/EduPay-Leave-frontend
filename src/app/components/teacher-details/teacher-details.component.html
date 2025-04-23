@@ -1,0 +1,51 @@
+<div class="teacher-details-container" *ngIf="teacherDetails && updatedDetails">
+  <div class="header">
+    <h2>Teacher Profile</h2>
+    <button *ngIf="getUserRole() === 'ADMIN' && !isEditing" (click)="enableEditMode()">Edit Details</button>
+    <div *ngIf="getUserRole() === 'ADMIN' && isEditing">
+      <button (click)="saveTeacherDetails()">Save</button>
+      <button (click)="cancelEditMode()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="details-grid">
+    <div class="detail-item">
+      <span class="label">Name:</span>
+      <span class="value" *ngIf="!isEditing">{{ teacherDetails.name }}</span>
+      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.name" (input)="updateFieldValue('name', $event)">
+    </div>
+    <div class="detail-item">
+      <span class="label">Teacher ID:</span>
+      <span class="value">{{ teacherDetails.teacherId }}</span>
+    </div>
+    <div class="detail-item">
+      <span class="label">Email:</span>
+      <span class="value" *ngIf="!isEditing">{{ teacherDetails.email }}</span>
+      <input type="email" *ngIf="isEditing" [(ngModel)]="updatedDetails.email" (input)="updateFieldValue('email', $event)">
+    </div>
+    <div class="detail-item">
+      <span class="label">Phone:</span>
+      <span class="value" *ngIf="!isEditing">{{ teacherDetails.phoneNumber }}</span>
+      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.phoneNumber" (input)="updateFieldValue('phoneNumber', $event)">
+    </div>
+    <div class="detail-item">
+      <span class="label">Date of Birth:</span>
+      <span class="value" *ngIf="!isEditing">{{ teacherDetails.dob }}</span>
+      <input type="date" *ngIf="isEditing" [(ngModel)]="updatedDetails.dob" (input)="updateFieldValue('dob', $event)">
+    </div>
+    <div class="detail-item">
+      <span class="label">Class Teacher:</span>
+      <span class="value" *ngIf="!isEditing">{{ teacherDetails.classTeacher ? teacherDetails.classTeacher : 'Not Assigned' }}</span>
+      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.classTeacher" (input)="updateFieldValue('classTeacher', $event)" placeholder="Not Assigned">
+    </div>
+  </div>
+
+  <div class="actions">
+  </div>
+
+  <button class="back-button" (click)="goBackToTeacherList()">Back to Teacher List</button>
+</div>
+
+<div *ngIf="!teacherDetails">
+  <p class="loading-message">Loading teacher details...</p>
+</div>

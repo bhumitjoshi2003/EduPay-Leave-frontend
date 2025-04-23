@@ -98,7 +98,7 @@
 }
 
 .profile-area button {
-    background: linear-gradient(135deg, #6ab545, #b5d54b); 
+    background: linear-gradient(135deg, #6ab545, #b5d54b);
     color: white;
     border: none;
     border-radius: 50%;
@@ -118,7 +118,7 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Updated Profile Dropdown Styling */
+/* Profile Dropdown Styling */
 .profile-details {
     padding: 12px 16px;
     background: #ffffff;
@@ -152,27 +152,52 @@
     color: #37474f;
 }
 
-/* Logout Button Styling */
+/* Remove separator line */
 .profile-details hr {
     display: none;
 }
 
+/* Profile Buttons Styling */
 .profile-details button {
     margin-top: 10px;
-    background-color: transparent;
-    color: #e53935;
-    border: 1px solid #e53935;
     border-radius: 6px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.7s ease, color 0.7s ease;
+    transition: background-color 0.4s ease, color 0.4s ease, transform 0.3s ease;
+    padding: 8px 12px;
+    border: 1px solid;
 }
 
-.profile-details button:hover {
+/* My Profile Button (Green) */
+.profile-details button.profile-btn {
+    background-color: transparent;
+    color: #42a247;
+    font-weight: bold;
+    border-color: #4a9a4e;
+}
+
+.profile-details button.profile-btn:hover {
+    background-color: #45bc4b;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    transform: translateY(-1px);
+}
+
+/* Logout Button (Red) */
+.profile-details button.logout-btn {
+    margin-top: 10px;
+    background-color: transparent;
+    font-weight: bold;
+    color: #e53935;
+    border: 1px solid #e53935;
+}
+
+.profile-details button.logout-btn:hover {
     background-color: #e53935;
     color: white;
     border-color: #c62828;
+    
     transform: translateY(-1px);
 }
 

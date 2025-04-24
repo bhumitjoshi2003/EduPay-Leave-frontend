@@ -20,10 +20,12 @@ import { TeacherDetailsComponent } from './components/teacher-details/teacher-de
 import { RegisterStudentComponent } from './components/register-student/register-student.component';
 import { RegisterTeacherComponent } from './components/register-teacher/register-teacher.component';
 import { RegisterComponent } from './components/register/register.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: HomeComponent },
+    { path: 'reset-password', component: ResetPasswordComponent },
     {
         path: 'dashboard',
         component: DashboardComponent,
@@ -48,9 +50,7 @@ export const routes: Routes = [
             { path: 'payment-history-admin', component: PaymentHistoryAdminComponent },
             { path: 'teacher-list', component: TeacherListComponent },
             { path: 'teacher-details/:teacherId', component: TeacherDetailsComponent},
-            // { path: 'register-student', component: RegisterStudentComponent },
-            // { path: 'register-teacher', component: RegisterTeacherComponent },
-            { path: 'register', component: RegisterComponent }, // Add the new combined route
+            { path: 'register', component: RegisterComponent },
         ],
     },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },

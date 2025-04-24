@@ -1,10 +1,13 @@
 <div class="teacher-details-container" *ngIf="teacherDetails && updatedDetails">
   <div class="header">
     <h2>Teacher Profile</h2>
-    <button *ngIf="getUserRole() === 'ADMIN' && !isEditing" (click)="enableEditMode()">Edit Details</button>
-    <div *ngIf="getUserRole() === 'ADMIN' && isEditing">
-      <button (click)="saveTeacherDetails()">Save</button>
-      <button (click)="cancelEditMode()">Cancel</button>
+    <div class="header-buttons">
+      <button *ngIf="getUserRole() === 'ADMIN' && !isEditing" (click)="enableEditMode()">Edit Details</button>
+      <div *ngIf="getUserRole() === 'ADMIN' && isEditing">
+        <button (click)="saveTeacherDetails()">Save</button>
+        <button (click)="cancelEditMode()">Cancel</button>
+      </div>
+      <button (click)="changePassword()">Change Password</button> 
     </div>
   </div>
 

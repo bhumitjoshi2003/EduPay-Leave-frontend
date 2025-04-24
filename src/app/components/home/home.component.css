@@ -1,4 +1,3 @@
-/* Home container with a sleek background overlay */
 .home-container {
   position: relative;
   width: 100%;
@@ -21,11 +20,10 @@
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px); /* Subtle blur effect */
+  backdrop-filter: blur(5px);
   z-index: 1;
 }
 
-/* Animated Logo */
 .logo {
   width: 150px;
   height: auto;
@@ -33,14 +31,14 @@
 }
 
 .logo:hover {
-  transform: scale(1.1); /* Slight zoom on hover */
+  transform: scale(1.1);
 }
 
 .content {
   font-family: 'Poppins', sans-serif;
   z-index: 2;
   transition: all 0.3s ease;
-  position: relative; /* Add relative positioning */
+  position: relative;
 }
 
 h1 {
@@ -58,111 +56,126 @@ h2, h3 {
   color: #f8f8f8;
 }
 
-/* Beautiful custom divider */
 .custom-hr {
   display: block;
-  width: 25%; /* Reduced width for a sharper look */
+  width: 25%;
   border-bottom: 4px solid white;
   margin: 20px auto;
   opacity: 0.8;
 }
 
-/* Elegant Glassmorphism Login Form */
 .login-form {
   position: absolute;
   top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 4;
-
-  width: 450px; 
+  width: 450px;
   padding: 20px;
-
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)); /* More pronounced gradient */
-  backdrop-filter: blur(15px); /* Increased blur */
-  border-radius: 25px; /* More rounded corners */
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); /* Stronger shadow */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(15px);
+  border-radius: 25px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
   color: white;
-  animation: fadeIn 0.8s ease-out; /* Slightly longer animation */
-  border: 2px solid rgba(255, 255, 255, 0.3); /* More visible border */
+  animation: fadeIn 0.8s ease-out;
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Fade-in animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translate(-50%, -70%); } /* Increased initial translateY */
+  from { opacity: 0; transform: translate(-50%, -70%); }
   to { opacity: 1; transform: translate(-50%, -50%); }
 }
 
-/* Enhanced Login Title */
 .login-form mat-card-title {
   text-align: center;
   margin-bottom: 25px;
-  margin-top: 25px; 
-  font-size: 32px; /* Larger title */
-  font-weight: 700; /* Bolder title */
-  color: #595b5b; /* Light blue title */
-  text-shadow: 2px 2px 6px rgba(186, 185, 185, 0.5); /* Stronger text shadow */
+  margin-top: 25px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #595b5b;
+  text-shadow: 2px 2px 6px rgba(186, 185, 185, 0.5);
 }
 
-/* Styled Input Fields */
 .login-form input {
   width: 100%;
   font-size: 20px;
   line-height: 1.5;
-  border: 2px solid rgba(255, 255, 255, 0.4); 
-  border-radius: 12px; /* More rounded inputs */
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.2);
   color: black;
-  transition: 0.4s; /* Slightly longer transition */
+  transition: 0.4s;
 }
 
 .login-form mat-form-field {
-  display: block; 
+  display: block;
   width: 100%;
-
 }
 
 .login-form input::placeholder {
   color: rgba(30, 21, 21, 0.7);
 }
 
-/* Modern Buttons */
-.login-form button {
+.login-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.login-actions button[mat-raised-button] {
   width: 100%;
-  padding: 18px; /* Increased padding */
+  padding: 18px;
   border: none;
-  border-radius: 12px; /* More rounded buttons */
-  font-weight: 700; /* Bolder button text */
+  border-radius: 12px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.4s ease-in-out; /* Slightly longer transition */
-}
-
-/* Primary Button */
-.login-form button[mat-raised-button] {
-  background: linear-gradient(135deg, #61b3de, #299cda); /* Vibrant gradient */
+  transition: all 0.4s ease-in-out;
+  background: linear-gradient(135deg, #61b3de, #299cda);
   color: white;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Stronger shadow */
-}
-
-.login-form button[mat-raised-button]:hover {
-  background: linear-gradient(135deg, #46a9de, #1695d9); /* Slightly darker hover gradient */
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4); /* Stronger hover shadow */
-}
-
-/* Transparent Cancel Button */
-.login-form button[mat-button] {
-  color: rgb(255, 255, 255);
-  background: linear-gradient(135deg, #46a9de, #1695d9);
-  margin-top: 25px; /* Increased margin */
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
-.login-form button[mat-button]:hover {
+.login-actions button[mat-raised-button]:hover {
   background: linear-gradient(135deg, #46a9de, #1695d9);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4); /* Stronger hover shadow */
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
 }
 
-/* Stylish Login Button */
+.secondary-actions {
+  display: flex;
+  width: 100%;
+}
+
+.secondary-actions button[mat-button] {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  color: rgb(255, 255, 255);
+  background: linear-gradient(135deg, #46a9de, #1695d9);
+  margin-top: 10px;
+}
+
+.secondary-actions button[mat-button]:first-child {
+  margin-right: 5px;
+}
+
+.secondary-actions button[mat-button]:last-child {
+  margin-left: 5px;
+  color: rgb(255, 255, 255);
+  background: linear-gradient(135deg, #46a9de, #1695d9);
+  box-shadow: none;
+}
+
+.secondary-actions button[mat-button]:last-child:hover {
+  color: rgb(255, 255, 255);
+  background: linear-gradient(135deg, #3da5dc, #0f8fd4);
+  box-shadow: none;
+}
+
 .login-button {
   position: absolute;
   top: 20px;
@@ -176,16 +189,14 @@ h2, h3 {
   cursor: pointer;
   z-index: 3;
   transition: all 0.3s ease;
-  border: 1px solid #484848; /* Added a 1px solid border */
+  border: 1px solid #484848;
 }
 
 .login-button:hover {
   background: #5a5a5a;
-  border: 1px solid #bbb; /* Slightly lighter border on hover */
+  border: 1px solid #bbb;
 }
 
-
-/* Logout Button */
 .logout-button {
   position: absolute;
   top: 20px;
@@ -255,17 +266,47 @@ h2, h3 {
     top: 65px;
 }
 
-/* Added CSS for horizontal line */
 .login-active-hr {
-  display: none; /* Initially hide the line */
+  display: none;
 }
 
 .login-active .login-active-hr {
-  display: block; /* Show the line when login is active */
+  display: block;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  width: 50%; /* Adjust the width as needed */
-  border: 1px solid #f8f8f8; /* Adjust the color and thickness as needed */
-  top: 50px; /* Adjusted the top property */
+  width: 50%;
+  border: 1px solid #f8f8f8;
+  top: 50px;
+}
+
+.swal2-container.swal-loading-container {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.swal-primary-button {
+  background-color: #3f51b5 !important;
+  color: white !important;
+}
+
+.swal-primary-button:hover {
+  background-color: #303f9f !important;
+}
+
+.swal-cancel-button {
+  background-color: #9e9e9e !important;
+  color: white !important;
+}
+
+.swal-cancel-button:hover {
+  background-color: #757575 !important;
+}
+
+.swal-error-button {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+.swal-error-button:hover {
+  background-color: #d32f2f !important;
 }

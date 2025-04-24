@@ -38,4 +38,8 @@ export class StudentService {
   updateStudent(studentId: string, updatedDetails: StudentDetails): Observable<any> {
     return this.http.put<any>(`${this.baseUrl}/${studentId}`, updatedDetails);
   }
+
+  addStudent(studentData: any): Observable<any> {
+    return this.http.post(this.baseUrl, studentData);
+  }
 }

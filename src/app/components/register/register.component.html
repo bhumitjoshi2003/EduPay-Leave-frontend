@@ -1,0 +1,21 @@
+<div class="register-container">
+    <div class="form-toggle-nav">
+      <button
+        [ngClass]="{'active': showStudentForm}"
+        (click)="toggleForm('student')"
+      >
+        Register Student
+      </button>
+      <button
+        [ngClass]="{'active': !showStudentForm}"
+        (click)="toggleForm('teacher')"
+      >
+        Register Teacher
+      </button>
+    </div>
+  
+    <div class="form-wrapper">
+      <app-register-student *ngIf="showStudentForm"></app-register-student>
+      <app-register-teacher *ngIf="!showStudentForm"></app-register-teacher>
+    </div>
+  </div>

@@ -3,7 +3,7 @@
 .teacher-list-container {
   display: flex;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #eaf6f6, #f0f8ff); /* Soft teal to pale blue */
+  background: linear-gradient(135deg, #eaf6f6, #f0f8ff);
   border-radius: 15px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
   animation: fadeIn 0.8s ease-in-out;

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { StudentDetailsComponent } from '../components/student-details/student-details.component';
 
 interface StudentLeaveDTO {
   studentId: string;
@@ -17,6 +18,8 @@ interface StudentDetails {
   dob?: string;
   fatherName?: string;
   motherName?: string;
+  takesBus?: boolean;
+  distance?: number | null;
 }
 
 @Injectable({
@@ -36,6 +39,8 @@ export class StudentService {
   }
 
   updateStudent(studentId: string, updatedDetails: StudentDetails): Observable<any> {
+    console.log(updatedDetails.takesBus);
+    console.log(updatedDetails.distance);
     return this.http.put<any>(`${this.baseUrl}/${studentId}`, updatedDetails);
   }
 

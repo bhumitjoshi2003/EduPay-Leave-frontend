@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StudentService } from '../../services/student.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { AuthService } from '../../auth/auth.service';
 import { FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -18,11 +18,13 @@ interface StudentDetails {
   dob?: string;
   fatherName?: string;
   motherName?: string;
+  takesBus?: boolean;
+  distance?: number | null;
 }
 
 @Component({
   selector: 'app-student-details',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgIf],
   templateUrl: './student-details.component.html',
   styleUrl: './student-details.component.css'
 })
@@ -78,6 +80,9 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
       next: (details) => {
         this.studentDetails = details;
         this.updatedDetails = { ...details };
+        if (this.updatedDetails && this.updatedDetails.takesBus === false) {
+          this.updatedDetails.distance = null;
+        }
       },
       error: (error) => {
         console.error('Error fetching details:', error);
@@ -134,17 +139,19 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     }).then((result) => {
       if (result.isConfirmed) {
         if (this.updatedDetails) {
+          console.log("Before service call - updatedDetails:", this.updatedDetails);
           this.studentService.updateStudent(this.studentId, this.updatedDetails).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
             next: (response) => {
               console.log('Details updated successfully:', response);
-              this.studentDetails = { ...this.updatedDetails };
-              this.isEditing = false;
               Swal.fire({
                 icon: 'success',
                 title: 'Success!',
                 text: 'Details have been updated.',
                 timer: 1500,
                 showConfirmButton: false,
+              }).then(() => {
+                this.loadStudentDetails(this.studentId);
+                this.isEditing = false;
               });
             },
             error: (error) => {
@@ -163,7 +170,11 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
 
   updateFieldValue(field: keyof StudentDetails, event: any): void {
     if (this.updatedDetails) {
-      this.updatedDetails[field] = event.target.value;
+      if (field === 'takesBus') {
+        this.updatedDetails[field] = event.target.checked;
+      } else {
+        this.updatedDetails[field] = event.target.value;
+      }
     }
   }
 
@@ -277,7 +288,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
           newPassword: newPassword
         };
 
-        this.authService.changePassword(payload).subscribe({
+        this.authService.changePassword(payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
           next: (response) => {
             Swal.fire('Success', 'Password changed successfully!', 'success');
           },
@@ -305,4 +316,3 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     return type === 'eye' ? this.eyeIcon : this.eyeOffIcon;
   }
 }
-

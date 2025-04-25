@@ -50,17 +50,17 @@ h2::after {
 
 /* Labels outside inputs */
 label {
-    display: block; /* Make labels take up their own line */
+    display: block;
     color: #757575;
     font-size: 0.95rem;
-    margin-bottom: 5px; /* Add some space below the label */
+    margin-bottom: 5px;
 }
 
 /* Inputs */
 input.form-control,
 select.form-control {
     width: 100%;
-    padding: 12px; /* Adjust padding now that labels are outside */
+    padding: 12px;
     border: 1px solid #ccc;
     border-radius: 10px;
     font-size: 1rem;
@@ -144,4 +144,121 @@ select.form-control:focus {
     to {
         width: 80px;
     }
+}
+
+/* Custom Switch Styles */
+.switch-container {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #f44336;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #4caf50;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #4caf50;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(30px);
+    -ms-transform: translateX(30px);
+    transform: translateX(30px);
+}
+
+/* Rounded Slider */
+.slider.round {
+    border-radius: 30px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.switch-label {
+    margin-bottom: 8px;
+    color: #757575;
+    font-size: 0.95rem;
+    display: block;
+    text-align: left;
+}
+
+.switch-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 2px;
+    font-size: 0.8rem;
+    color: #fff;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    height: 100%;
+    pointer-events: none;
+    user-select: none;
+}
+
+.switch-labels span {
+    padding: 0 8px;
+    line-height: 30px;
+    white-space: nowrap;
+}
+
+.switch-labels .no {
+    order: 1;
+    background-color: #f44336;
+    border-radius: 4px 0 0 4px;
+}
+
+.switch-labels .yes {
+    order: 2;
+    background-color: #4caf50;
+    border-radius: 0 4px 4px 0;
+    text-align: right;
 }

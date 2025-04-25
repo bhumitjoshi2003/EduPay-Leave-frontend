@@ -6,6 +6,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
 import Swal from 'sweetalert2';
+import { DomSanitizer } from '@angular/platform-browser';
 
 interface TeacherDetails {
   teacherId?: string;
@@ -29,14 +30,21 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
   isEditing: boolean = false;
   updatedDetails: TeacherDetails | null = null;
   changePasswordForm: FormGroup;
-  private ngUnsubscribe = new Subject<void>(); // Added ngUnsubscribe
+  private ngUnsubscribe = new Subject<void>();
+  showOldPassword = false;
+  showNewPassword = false;
+  showConfirmNewPassword = false;
+  private readonly eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  private readonly eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off"><path d="M17.94 17.94A10.01 10.01 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M15 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/><path d="M3 3l18 18"/></svg>`;
+
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private teacherService: TeacherService,
     private authService: AuthService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private sanitizer: DomSanitizer
   ) {
     this.changePasswordForm = this.fb.group({
       oldPassword: [''],
@@ -161,16 +169,22 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
   }
 
   changePassword(): void {
-    const userRole = this.getUserRole();
-    const showOldPassword = (userRole !== 'ADMIN');
+    const showOldPassword = (this.role !== 'ADMIN');
+
+    this.showOldPassword = false;
+    this.showNewPassword = false;
+    this.showConfirmNewPassword = false;
 
     Swal.fire({
       title: 'Change Password',
       html:
         `<div class="change-password-form">
-          ${showOldPassword ? `<input id="oldPassword" type="password" class="swal2-input" placeholder="Current Password">` : ''}
+          ${showOldPassword ? `<input id="oldPassword" type="password" class="swal2-input" placeholder="Current Password">
+          <span id="showOldPassword" class="password-toggle">${this.showOldPassword ? this.getEyeIcon('eye') : this.getEyeIcon('eye-off')}</span><br>` : ''}
           <input id="newPassword" type="password" class="swal2-input" placeholder="New Password">
+          <span id="showNewPassword" class="password-toggle">${this.showNewPassword ? this.getEyeIcon('eye') : this.getEyeIcon('eye-off')}</span><br>
           <input id="confirmNewPassword" type="password" class="swal2-input" placeholder="Confirm New Password">
+          <span id="showConfirmNewPassword" class="password-toggle">${this.showConfirmNewPassword ? this.getEyeIcon('eye') : this.getEyeIcon('eye-off')}</span>
         </div>`,
       focusConfirm: false,
       preConfirm: () => {
@@ -185,6 +199,39 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
       customClass: {
         input: 'change-password-input',
       },
+      didRender: () => {
+        if (showOldPassword) {
+          const showOldPasswordSpan = document.getElementById('showOldPassword');
+          if (showOldPasswordSpan) {
+            showOldPasswordSpan.addEventListener('click', () => {
+              this.showOldPassword = !this.showOldPassword;
+              const oldPasswordField = document.getElementById('oldPassword') as HTMLInputElement;
+              oldPasswordField.type = this.showOldPassword ? 'text' : 'password';
+              showOldPasswordSpan.innerHTML = this.showOldPassword ? this.getEyeIcon('eye') : this.getEyeIcon('eye-off');
+            });
+          }
+        }
+
+        const showNewPasswordSpan = document.getElementById('showNewPassword');
+        if (showNewPasswordSpan) {
+          showNewPasswordSpan.addEventListener('click', () => {
+            this.showNewPassword = !this.showNewPassword;
+            const newPasswordField = document.getElementById('newPassword') as HTMLInputElement;
+            newPasswordField.type = this.showNewPassword ? 'text' : 'password';
+            showNewPasswordSpan.innerHTML = this.showNewPassword ? this.getEyeIcon('eye') : this.getEyeIcon('eye-off');
+          });
+        }
+
+        const showConfirmNewPasswordSpan = document.getElementById('showConfirmNewPassword');
+        if (showConfirmNewPasswordSpan) {
+          showConfirmNewPasswordSpan.addEventListener('click', () => {
+            this.showConfirmNewPassword = !this.showConfirmNewPassword;
+            const confirmNewPasswordField = document.getElementById('confirmNewPassword') as HTMLInputElement;
+            confirmNewPasswordField.type = this.showConfirmNewPassword ? 'text' : 'password';
+            showConfirmNewPasswordSpan.innerHTML = this.showConfirmNewPassword ? this.getEyeIcon('eye') : this.getEyeIcon('eye-off');
+          });
+        }
+      }
     }).then((result) => {
       if (result.isConfirmed) {
         const { oldPassword, newPassword, confirmNewPassword } = result.value as any;
@@ -204,13 +251,18 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
           return;
         }
 
+        if (newPassword.length <= 6) {
+          Swal.fire('Error', 'New password must be more than 6 characters', 'error');
+          return;
+        }
+
         const payload = {
           userId: this.teacherId,
           oldPassword: oldPassword,
           newPassword: newPassword
         };
 
-        this.authService.changePassword(payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({ // Added takeUntil
+        this.authService.changePassword(payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
           next: (response) => {
             Swal.fire('Success', 'Password changed successfully!', 'success');
           },
@@ -232,6 +284,10 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     } else {
       return { passwordMismatch: true };
     }
+  }
+
+    getEyeIcon(type: 'eye' | 'eye-off'): string {
+    return type === 'eye' ? this.eyeIcon : this.eyeOffIcon;
   }
 }
 

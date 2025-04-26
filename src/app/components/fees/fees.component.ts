@@ -200,24 +200,29 @@ export class PaymentTrackerComponent implements OnInit {
       if (index === -1) {
         this.totalAmountToPay += month.fee + month.busFee;
         this.selectedMonthsByYear[year].push(month.month);
-        this.lastSelectedMonth = month; 
-        this.populateMonthDetails(month);
+        this.lastSelectedMonth = month;
 
-        this.updatePaymentData(month, true);
+        this.populateMonthDetails(month)
+          .then(() => {
+            this.updatePaymentData(month, true);
+          })
+          .catch((error) => {
+            console.error('Error during populateMonthDetails:', error);
+          });
 
       } else {
         this.totalAmountToPay -= month.fee + month.busFee;
         this.selectedMonthsByYear[year].splice(index, 1);
-
         this.updatePaymentData(month, false);
 
-        if(this.lastSelectedMonth === month){
-          if(this.selectedMonthsByYear[year].length > 0){
-            let lastSelectedIndex = this.selectedMonthsByYear[year][this.selectedMonthsByYear[year].length -1];
+        if (this.lastSelectedMonth === month) {
+          if (this.selectedMonthsByYear[year].length > 0) {
+            let lastSelectedIndex = this.selectedMonthsByYear[year][this.selectedMonthsByYear[year].length - 1];
             let lastSelectedMonth = this.months.find(m => m.month === lastSelectedIndex);
-            if(lastSelectedMonth){
-              this.populateMonthDetails(lastSelectedMonth);
-              this.lastSelectedMonth = lastSelectedMonth;
+            if (lastSelectedMonth) {
+              this.populateMonthDetails(lastSelectedMonth).then(() => {
+                this.lastSelectedMonth = lastSelectedMonth;
+              });
             } else {
               this.selectedMonthDetails = null;
               this.lastSelectedMonth = null;
@@ -230,6 +235,49 @@ export class PaymentTrackerComponent implements OnInit {
       }
       month.selected = !month.selected;
     }
+  }
+
+  populateMonthDetails(month: any): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.studentService.getStudent(this.studentId).subscribe({
+        next: (student) => {
+          this.studentName = student.name;
+          this.feeStructureService.getFeeStructure(this.session, this.className).subscribe({
+            next: (feeStructure) => {
+              if (feeStructure) {
+                this.selectedMonthDetails = {
+                  studentId: this.studentId,
+                  studentClass: student.className,
+                  studentName: this.studentName,
+                  tuitionFee: feeStructure.tuitionFee,
+                  annualCharges: (month.month === 1) ? feeStructure.annualCharges : 0,
+                  labCharges: (month.month === 1) ? feeStructure.labCharges : 0,
+                  ecaProject: (month.month === 1) ? feeStructure.ecaProject : 0,
+                  examinationFee: (month.month === 1) ? feeStructure.examinationFee : 0,
+                  busFee: month.busFee,
+                  monthName: month.name
+                };
+                resolve(); 
+              } else {
+                console.error('Fee structure not found.');
+                this.selectedMonthDetails = null;
+                resolve(); 
+              }
+            },
+            error: (error) => {
+              console.error('Error fetching fee structure:', error);
+              this.selectedMonthDetails = null;
+              resolve(); 
+            }
+          });
+        },
+        error: (error) => {
+          console.error('Error fetching student:', error);
+          this.selectedMonthDetails = null;
+          resolve();
+        }
+      });
+    });
   }
 
   updatePaymentData(month: any, add: boolean) {
@@ -255,39 +303,6 @@ export class PaymentTrackerComponent implements OnInit {
   }
 
 
-  populateMonthDetails(month: any) {
-    this.studentService.getStudent(this.studentId).subscribe({
-      next: (student) => {
-        this.feeStructureService.getFeeStructure(this.session, this.className).subscribe({
-          next: (feeStructure) => {
-            if (feeStructure) {
-              this.studentName = student.name;
-              this.selectedMonthDetails = {
-                studentId: this.studentId,
-                studentClass: student.className,
-                studentName: this.studentName,
-                tuitionFee: feeStructure.tuitionFee,
-                annualCharges: (month.month==1) ? feeStructure.annualCharges : 0,
-                labCharges: (month.month==1) ? feeStructure.labCharges : 0,
-                ecaProject: (month.month==1) ? feeStructure.ecaProject : 0,
-                examinationFee: (month.month==1) ? feeStructure.examinationFee : 0,
-                busFee: month.busFee,
-                monthName: month.name
-              };
-            }
-          },
-          error: (error) => {
-            console.error('Error fetching fee structure:', error);
-            this.selectedMonthDetails = null;
-          }
-        });
-      },
-      error: (error) => {
-        console.error('Error fetching student:', error);
-        this.selectedMonthDetails = null;
-      }
-    });
-  }
 
   handleSuccessfulPayment() {
     this.ngZone.run(() => {

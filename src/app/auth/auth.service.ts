@@ -15,6 +15,7 @@ interface ChangePasswordRequest {
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8081/api/auth';
+  private baseUrl = 'http://localhost:8081/students';
 
   constructor(private http: HttpClient) { }
 
@@ -27,8 +28,7 @@ export class AuthService {
   }
 
   changePassword(request: ChangePasswordRequest): Observable<any> {
-    console.log(this.apiUrl + '/change-password');
-    return this.http.post(this.apiUrl + '/change-password', request, { responseType: 'text' });
+    return this.http.post(this.baseUrl + '/change-password', request, { responseType: 'text' });
   }
 
   requestPasswordReset(userId: string, email: string): Observable<any> {

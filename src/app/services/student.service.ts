@@ -1,22 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { StudentDetailsComponent } from '../components/student-details/student-details.component';
 
 interface StudentLeaveDTO {
   studentId: string;
   name: string;
-}
-
-interface StudentDetails {
-  studentId?: string;
-  name?: string;
-  className?: string;
-  phoneNumber?: string;
-  email?: string;
-  gender?: string;
-  dob?: string;
-  fatherName?: string;
-  motherName?: string;
 }
 
 @Injectable({
@@ -35,7 +24,7 @@ export class StudentService {
     return this.http.get<StudentLeaveDTO[]>(`${this.baseUrl}/class/${selectedClass}`);
   }
 
-  updateStudent(studentId: string, updatedDetails: StudentDetails): Observable<any> {
+  updateStudent(studentId: string, updatedDetails: any): Observable<any> {
     return this.http.put<any>(`${this.baseUrl}/${studentId}`, updatedDetails);
   }
 

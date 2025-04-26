@@ -7,7 +7,8 @@
         <button (click)="saveStudentDetails()">Save</button>
         <button (click)="cancelEditMode()">Cancel</button>
       </div>
-      <button *ngIf="getUserRole() !== 'TEACHER'" (click)="changePassword()">Change Password</button> </div>
+      <button *ngIf="getUserRole() !== 'TEACHER'" (click)="changePassword()">Change Password</button>
+    </div>
   </div>
 
   <div class="details-grid">
@@ -22,7 +23,9 @@
     </div>
     <div class="detail-item">
       <span class="label">Class:</span>
-      <span class="value">{{ studentDetails.className }}</span>
+      <span class="value" *ngIf="!isEditing">{{ studentDetails.className }}</span>
+      <input type="text" *ngIf="isEditing && getUserRole() === 'ADMIN'" [(ngModel)]="updatedDetails.className" (input)="updateFieldValue('className', $event)">
+      <span class="value" *ngIf="isEditing && getUserRole() !== 'ADMIN'">{{ studentDetails.className }}</span>
     </div>
     <div class="detail-item">
       <span class="label">Phone:</span>
@@ -36,7 +39,7 @@
     </div>
     <div class="detail-item">
       <span class="label">Date of Birth:</span>
-      <span class="value" *ngIf="!isEditing">{{ studentDetails.dob }}</span>
+      <span class="value" *ngIf="!isEditing">{{ studentDetails.dob | date }}</span>
       <input type="date" *ngIf="isEditing" [(ngModel)]="updatedDetails.dob" (input)="updateFieldValue('dob', $event)">
     </div>
     <div class="detail-item parent-info">
@@ -48,6 +51,19 @@
       <span class="label">Mother:</span>
       <span class="value" *ngIf="!isEditing">{{ studentDetails.motherName }}</span>
       <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.motherName" (input)="updateFieldValue('motherName', $event)">
+    </div>
+
+  <div  *ngIf="getUserRole() === 'ADMIN'" class="detail-item">
+      <span class="label">Uses Bus Facility:</span>
+      <span class="value" *ngIf="!isEditing">{{ studentDetails.takesBus ? 'Yes' : 'No' }}</span>
+      <div *ngIf="isEditing">
+        <input type="checkbox" id="takesBus" [(ngModel)]="updatedDetails.takesBus" (change)="updateFieldValue('takesBus', $event)">
+      </div>
+    </div>
+    <div class="detail-item" *ngIf="getUserRole() === 'ADMIN' && (studentDetails.takesBus || (isEditing && updatedDetails.takesBus))">
+      <span class="label">Distance (km):</span>
+      <span class="value" *ngIf="!isEditing">{{ studentDetails.distance }}</span>
+      <input type="number" *ngIf="isEditing" [(ngModel)]="updatedDetails.distance" (input)="updateFieldValue('distance', $event)">
     </div>
   </div>
 

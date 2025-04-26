@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { StudentService } from '../../services/student.service'; // Assuming you have a StudentService
+import { StudentService } from '../../services/student.service';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2'; // For success/error messages
+import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth.service';
 
@@ -14,6 +14,7 @@ import { AuthService } from '../../auth/auth.service';
 })
 export class RegisterStudentComponent implements OnInit {
   studentForm: FormGroup;
+  isBusUser = false; // Track the state of the bus user toggle
 
   constructor(
     private fb: FormBuilder,
@@ -25,16 +26,27 @@ export class RegisterStudentComponent implements OnInit {
       studentId: ['', Validators.required],
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', Validators.pattern('^[0-9]{10}$')], 
+      phoneNumber: ['', Validators.pattern('^[0-9]{10}$')],
       dob: ['', Validators.required],
       className: ['', Validators.required],
       gender: ['', Validators.required],
       fatherName: [''],
-      motherName: ['']
+      motherName: [''],
+      takesBus: [false],
+      distance: [''] 
     });
   }
 
   ngOnInit(): void {
+    this.studentForm.get('takesBus')?.valueChanges.subscribe(value => {
+      this.isBusUser = value;
+      if (this.isBusUser) {
+        this.studentForm.get('distance')?.setValidators([Validators.required]);
+      } else {
+        this.studentForm.get('distance')?.clearValidators();
+      }
+      this.studentForm.get('distance')?.updateValueAndValidity();
+    });
   }
 
   onSubmit() {
@@ -63,6 +75,7 @@ export class RegisterStudentComponent implements OnInit {
               }
             });
             this.studentForm.reset();
+            this.isBusUser = false; 
           });
         },
         error: (error) => {
@@ -96,6 +109,8 @@ export class RegisterStudentComponent implements OnInit {
   }
 
   goBack() {
-    this.studentForm.reset(); 
+    this.studentForm.reset();
+    this.isBusUser = false;
   }
 }
+

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StudentService } from '../../services/student.service';
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth.service';
 import { FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -24,7 +24,7 @@ interface StudentDetails {
 
 @Component({
   selector: 'app-student-details',
-  imports: [CommonModule, FormsModule, NgIf],
+  imports: [CommonModule, FormsModule],
   templateUrl: './student-details.component.html',
   styleUrl: './student-details.component.css'
 })
@@ -39,6 +39,14 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
   showOldPassword = false;
   showNewPassword = false;
   showConfirmNewPassword = false;
+  effectiveFromMonth: number | null = null; // To store the selected month
+  academicMonths = [
+    { value: 0, label: 'New Academic Year' }, 
+    { value: 4, label: 'April' }, { value: 5, label: 'May' }, { value: 6, label: 'June' },
+    { value: 7, label: 'July' }, { value: 8, label: 'August' }, { value: 9, label: 'September' },
+    { value: 10, label: 'October' }, { value: 11, label: 'November' }, { value: 12, label: 'December' },
+    { value: 1, label: 'January' }, { value: 2, label: 'February' }, { value: 3, label: 'March' }
+  ];
   private readonly eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
   private readonly eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off"><path d="M17.94 17.94A10.01 10.01 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M15 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/><path d="M3 3l18 18"/></svg>`;
 
@@ -80,9 +88,6 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
       next: (details) => {
         this.studentDetails = details;
         this.updatedDetails = { ...details };
-        if (this.updatedDetails && this.updatedDetails.takesBus === false) {
-          this.updatedDetails.distance = null;
-        }
       },
       error: (error) => {
         console.error('Error fetching details:', error);
@@ -118,6 +123,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
   cancelEditMode(): void {
     this.isEditing = false;
     this.updatedDetails = { ...this.studentDetails! };
+    this.effectiveFromMonth = null; 
     Swal.fire({
       icon: 'info',
       title: 'Cancelled',
@@ -127,7 +133,45 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  saveStudentDetails(): void {
+  async saveStudentDetails(): Promise<void> {
+    let needsEffectiveMonth = false;
+
+    if (this.updatedDetails && this.studentDetails) {
+      if (this.updatedDetails.takesBus !== this.studentDetails.takesBus) {
+        needsEffectiveMonth = true;
+      } else if (this.updatedDetails.takesBus && this.studentDetails.takesBus && this.updatedDetails.distance !== this.studentDetails.distance) {
+        needsEffectiveMonth = true;
+      }
+    }
+
+
+    if (needsEffectiveMonth) {
+      const { value: month } = await Swal.fire({
+        title: 'Select Effective Month',
+        input: 'select',
+        inputOptions: this.academicMonths.reduce((obj: { [key: number]: string }, item) => {
+          obj[item.value] = item.label;
+          return obj;
+        }, {}),
+        inputPlaceholder: 'Select Month',
+        showCancelButton: true,
+        confirmButtonText: 'Save with Selected Month',
+        cancelButtonText: 'Cancel',
+        inputValidator: (value) => {
+          return !value && 'You need to select a month!';
+        },
+      });
+
+      if (month) {
+        this.effectiveFromMonth = parseInt(month, 10);
+        this.executeUpdate();
+      }
+    } else {
+      this.executeUpdate();
+    }
+  }
+
+  executeUpdate(): void {
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to save the changes to the details?',
@@ -139,19 +183,22 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     }).then((result) => {
       if (result.isConfirmed) {
         if (this.updatedDetails) {
-          console.log("Before service call - updatedDetails:", this.updatedDetails);
-          this.studentService.updateStudent(this.studentId, this.updatedDetails).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+          const payload = {
+            studentDetails: this.updatedDetails,
+            effectiveFromMonth: this.effectiveFromMonth
+          };
+          this.studentService.updateStudent(this.studentId, payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
             next: (response) => {
               console.log('Details updated successfully:', response);
+              this.studentDetails = { ...this.updatedDetails };
+              this.isEditing = false;
+              this.effectiveFromMonth = null;
               Swal.fire({
                 icon: 'success',
                 title: 'Success!',
                 text: 'Details have been updated.',
                 timer: 1500,
                 showConfirmButton: false,
-              }).then(() => {
-                this.loadStudentDetails(this.studentId);
-                this.isEditing = false;
               });
             },
             error: (error) => {
@@ -170,11 +217,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
 
   updateFieldValue(field: keyof StudentDetails, event: any): void {
     if (this.updatedDetails) {
-      if (field === 'takesBus') {
-        this.updatedDetails[field] = event.target.checked;
-      } else {
-        this.updatedDetails[field] = event.target.value;
-      }
+      this.updatedDetails[field] = (field === 'takesBus') ? event.target.checked : event.target.value;
     }
   }
 
@@ -288,7 +331,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
           newPassword: newPassword
         };
 
-        this.authService.changePassword(payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+        this.authService.changePassword(payload).subscribe({
           next: (response) => {
             Swal.fire('Success', 'Password changed successfully!', 'success');
           },

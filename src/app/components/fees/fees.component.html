@@ -74,7 +74,11 @@
           </div>
           <div class="detail-item" *ngIf="selectedMonthDetails.busFee">
             <strong>Bus Fees:</strong>
-            <span>₹{{ selectedMonthDetails.busFee }}</span>
+            <span>₹{{ selectedMonthDetails.busFee}}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedMonthDetails.additionalCharges && this.selectedMonthsByYear[this.selectedYear]?.length === 1">
+            <strong>Unapplied Leave Charge:</strong>
+            <span style="color: rgb(239, 64, 64)">₹{{ selectedMonthDetails.additionalCharges}}</span>
           </div>
         </div>
       </div>

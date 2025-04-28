@@ -14,6 +14,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { AttendanceService } from '../../services/attendance.service';
 
 @Component({
   selector: 'app-payment-tracker',
@@ -31,7 +32,8 @@ export class PaymentTrackerComponent implements OnInit {
     private feeStructureService: FeeStructureService,
     private studentService: StudentService,
     private busFeesService: BusFeesService,
-    private authService: AuthService
+    private authService: AuthService,
+    private attendanceService: AttendanceService
   ) {}
 
   selectedYear: number = new Date().getFullYear();
@@ -50,6 +52,8 @@ export class PaymentTrackerComponent implements OnInit {
   manualPaymentAmount: number = 0;
   paidManually: boolean = false;
   amountPaid: number = 0;
+  totalUnappliedLeaves: number = 0;
+  totalUnappliedLeaveCharge: number = 0;
 
   currentMonth = new Date().getMonth() + 6;
   academicCurrentMonth = this.getAcademicMonth(this.currentMonth);
@@ -139,45 +143,69 @@ export class PaymentTrackerComponent implements OnInit {
     this.feesService.getStudentFees(this.studentId, this.session).subscribe({
       next: (fees) => {
         this.className = fees[0].className;
-        this.feeStructureService.getFeeStructure(this.session, this.className).subscribe({
-          next: (feeStructure) => {
-            if (feeStructure) {
-              this.months = fees.map(fee => ({
-                ...fee,
-                name: this.getMonthName(fee.month),
-                monthNumber: fee.month,
-                selected: this.isMonthSelected(fee.month, this.selectedYear),
-                fee: feeStructure.tuitionFee + ((fee.month!==1) ? 0 : feeStructure.annualCharges + feeStructure.ecaProject + feeStructure.examinationFee + feeStructure.labCharges),
-                tuitionFee: feeStructure.tuitionFee,
-                annualCharges: (fee.month !== 1) ? 0 : feeStructure.annualCharges,
-                ecaProject: (fee.month !== 1) ? 0 : feeStructure.ecaProject,
-                examinationFee: (fee.month !== 1) ? 0 : feeStructure.examinationFee,  
-                labCharges: (fee.month !== 1) ? 0 : feeStructure.labCharges, 
-                busFee: 0
-              }));
-              this.fetchBusFees();
-            } else {
-              console.error('Fee structure not found.');
-              this.months = fees.map(fee => ({
-                ...fee,
-                name: this.getMonthName(fee.month),
-                selected: this.isMonthSelected(fee.month, this.selectedYear),
-                fee: 0,
-                busFee: 0
-              }));
-              this.totalAmountToPay = 0;
-            }
+        this.attendanceService.getTotalUnappliedLeaveCount(this.studentId, this.session).subscribe({
+          next: (totalUnappliedLeaves) => {
+            console.log("LEAVES WITHOUT APPLY ===> " + totalUnappliedLeaves);
+            this.totalUnappliedLeaves = totalUnappliedLeaves;
+            this.totalUnappliedLeaveCharge = this.totalUnappliedLeaves * 25; 
+  
+            this.feeStructureService.getFeeStructure(this.session, this.className).subscribe({
+              next: (feeStructure) => {
+                if (feeStructure) {
+                  this.months = fees.map(fee => ({
+                    ...fee,
+                    name: this.getMonthName(fee.month),
+                    monthNumber: fee.month,
+                    selected: this.isMonthSelected(fee.month, this.selectedYear),
+                    fee: feeStructure.tuitionFee + ((fee.month !== 1) ? 0 : feeStructure.annualCharges + feeStructure.ecaProject + feeStructure.examinationFee + feeStructure.labCharges),
+                    tuitionFee: feeStructure.tuitionFee,
+                    annualCharges: (fee.month !== 1) ? 0 : feeStructure.annualCharges,
+                    ecaProject: (fee.month !== 1) ? 0 : feeStructure.ecaProject,
+                    examinationFee: (fee.month !== 1) ? 0 : feeStructure.examinationFee,
+                    labCharges: (fee.month !== 1) ? 0 : feeStructure.labCharges,
+                    busFee: 0,
+                    unappliedLeaveCharge: 0 
+                  }));
+                  this.fetchBusFees();
+                } else {
+                  console.error('Fee structure not found.');
+                  this.months = fees.map(fee => ({
+                    ...fee,
+                    name: this.getMonthName(fee.month),
+                    selected: this.isMonthSelected(fee.month, this.selectedYear),
+                    fee: 0,
+                    busFee: 0,
+                    unappliedLeaveCharge: 0
+                  }));
+                  this.totalAmountToPay = 0;
+                }
+              },
+              error: (error) => {
+                console.error('Error fetching fee structure:', error);
+                this.months = fees.map(fee => ({
+                  ...fee,
+                  name: this.getMonthName(fee.month),
+                  selected: this.isMonthSelected(fee.month, this.selectedYear),
+                  fee: 0,
+                  busFee: 0,
+                  unappliedLeaveCharge: 0
+                }));
+                this.totalAmountToPay = 0;
+              }
+            });
           },
           error: (error) => {
-            console.error('Error fetching fee structure:', error);
-            this.months = fees.map(fee => ({
-              ...fee,
-              name: this.getMonthName(fee.month),
-              selected: this.isMonthSelected(fee.month, this.selectedYear),
-              fee: 0,
-              busFee: 0
-            }));
-            this.totalAmountToPay = 0;
+            console.error('Error fetching total unapplied leave count:', error);
+            this.feeStructureService.getFeeStructure(this.session, this.className).subscribe({
+              next: (feeStructure) => {
+                this.months = fees.map(fee => ({ ...fee, name: this.getMonthName(fee.month), selected: this.isMonthSelected(fee.month, this.selectedYear), fee: 0, busFee: 0, unappliedLeaveCharge: 0 }));
+                this.totalAmountToPay = 0;
+              },
+              error: () => {
+                this.months = fees.map(fee => ({ ...fee, name: this.getMonthName(fee.month), selected: this.isMonthSelected(fee.month, this.selectedYear), fee: 0, busFee: 0, unappliedLeaveCharge: 0 }));
+                this.totalAmountToPay = 0;
+              }
+            });
           }
         });
       },
@@ -207,7 +235,10 @@ export class PaymentTrackerComponent implements OnInit {
 
       const index = this.selectedMonthsByYear[year].indexOf(month.month);
       if (index === -1) {
-        this.totalAmountToPay += month.fee + month.busFee;
+        this.totalAmountToPay += month.fee + (month.busFee || 0);
+        if (this.selectedMonthsByYear[year].length === 0 && this.totalUnappliedLeaveCharge > 0) {
+          this.totalAmountToPay += this.totalUnappliedLeaveCharge;
+        }
         this.selectedMonthsByYear[year].push(month.month);
         this.lastSelectedMonth = month;
 
@@ -220,7 +251,7 @@ export class PaymentTrackerComponent implements OnInit {
           });
 
       } else {
-        this.totalAmountToPay -= month.fee + month.busFee;
+        this.totalAmountToPay -= month.fee + (month.busFee || 0);
         this.selectedMonthsByYear[year].splice(index, 1);
         this.updatePaymentData(month, false);
 
@@ -239,6 +270,9 @@ export class PaymentTrackerComponent implements OnInit {
           } else {
             this.selectedMonthDetails = null;
             this.lastSelectedMonth = null;
+            if (this.totalUnappliedLeaveCharge > 0) {
+              this.totalAmountToPay -= this.totalUnappliedLeaveCharge;
+            }
           }
         }
       }
@@ -264,7 +298,8 @@ export class PaymentTrackerComponent implements OnInit {
                   ecaProject: (month.month === 1) ? feeStructure.ecaProject : 0,
                   examinationFee: (month.month === 1) ? feeStructure.examinationFee : 0,
                   busFee: month.busFee,
-                  monthName: month.name
+                  monthName: month.name,
+                  additionalCharges:this.totalUnappliedLeaveCharge
                 };
                 resolve(); 
               } else {

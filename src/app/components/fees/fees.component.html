@@ -12,11 +12,17 @@
 
   <div class="month-grid">
     <div *ngFor="let month of months" class="month"
-         [ngClass]="{ 'paid': month.paid, 'manually-paid': month.manuallyPaid, 'unpaid': !month.paid && !month.manuallyPaid, 'selected': month.selected }"
-         (click)="role !== 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : (role === 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : null)">
+    [ngClass]="{
+     'paid': month.paid,
+     'manually-paid': month.manuallyPaid,
+     'unpaid': !month.paid && !month.manuallyPaid,
+     'selected': month.selected,
+     'late': !month.paid && !month.manuallyPaid && month.month <= academicCurrentMonth
+   }"
+    (click)="role !== 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : (role === 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : null)">
       <div class="month-name">{{ month.name }}</div>
       <div class="month-status">
-        <span *ngIf="month.paid && !month.manuallyPaid">Paid ₹{{ month.fee + (month.busFee || 0) }}</span>
+        <span *ngIf="month.paid && !month.manuallyPaid">Paid ₹{{ month.amountPaid }}</span>
         <span *ngIf="month.manuallyPaid">Manually Paid ₹{{ month.manualPaymentReceived }}</span>
         <span *ngIf="!month.paid && !month.manuallyPaid">₹{{ month.fee + (month.busFee || 0) }}</span>
       </div>

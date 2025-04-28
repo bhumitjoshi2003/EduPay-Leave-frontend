@@ -51,6 +51,9 @@ export class PaymentTrackerComponent implements OnInit {
   paidManually: boolean = false;
   amountPaid: number = 0;
 
+  currentMonth = new Date().getMonth() + 6;
+  academicCurrentMonth = this.getAcademicMonth(this.currentMonth);
+
   paymentData: PaymentData = {
     totalAmount: 0,
     monthSelectionString: "000000000000",
@@ -77,6 +80,8 @@ export class PaymentTrackerComponent implements OnInit {
       }
     });
     if(this.role === 'STUDENT') this.getStudentId();
+    console.log('Current Month (1-12):', this.currentMonth);
+    console.log('Academic Current Month (Apr=1, Mar=12):', this.academicCurrentMonth);
     this.fetchSessions();
   }
 
@@ -102,6 +107,10 @@ export class PaymentTrackerComponent implements OnInit {
         console.error('Error fetching sessions:', error);
       }
     });
+  }
+
+  getAcademicMonth(month: number): number {
+    return (month >= 4) ? (month - 3) : (month + 9);
   }
 
   onYearChange(event: any) {
@@ -314,9 +323,11 @@ export class PaymentTrackerComponent implements OnInit {
         this.selectedMonthsByYear[year].forEach(monthNumber => {
           promises.push(new Promise<void>((resolve) => {
             this.feesService.getStudentFee(this.studentId, formattedYear, monthNumber).subscribe(fee => {
+              const monthDetails = this.months.find(m => m.monthNumber === monthNumber && m.year === formattedYear);
               fee.paid = true;
               fee.manualyPaid = false;
               fee.manualPaymentReceived = 0;
+              fee.amountPaid = monthDetails.fee + monthDetails.busFee;
               this.feesService.updateStudentFees(fee).subscribe(() => {
                 resolve();
               });

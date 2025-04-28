@@ -108,9 +108,9 @@ export class TeacherAttendanceComponent implements OnInit {
           this.students.forEach((student) => {
             if (this.absentStudents.includes(student.studentId)) {
               student.absent = true;
+              student.chargePaid = true;
             } else {
               student.absent = false;
-              student.chargePaid = true;
             }
           });
         });
@@ -122,8 +122,7 @@ export class TeacherAttendanceComponent implements OnInit {
     const student = this.students.find((s) => s.studentId === studentId);
     if (student) {
       student.absent = true;
-      if (this.absentStudents.includes(student.studentId)) student.chargePaid = true;
-      else student.chargePaid = false;
+      student.chargePaid = this.absentStudents.includes(student.studentId);
     }
   }
 

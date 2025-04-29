@@ -12,13 +12,19 @@
 
   <div class="month-grid">
     <div *ngFor="let month of months" class="month"
-         [ngClass]="{ 'paid': month.paid, 'manually-paid': month.manuallyPaid, 'unpaid': !month.paid && !month.manuallyPaid, 'selected': month.selected }"
-         (click)="role !== 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : (role === 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : null)">
+    [ngClass]="{
+     'paid': month.paid,
+     'manually-paid': month.manuallyPaid,
+     'unpaid': !month.paid && !month.manuallyPaid,
+     'selected': month.selected,
+     'late': !month.paid && !month.manuallyPaid && month.month <= academicCurrentMonth
+   }"
+    (click)="role !== 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : (role === 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : null)">
       <div class="month-name">{{ month.name }}</div>
       <div class="month-status">
-        <span *ngIf="month.paid && !month.manuallyPaid">Paid ₹{{ month.fee + (month.busFee || 0) }}</span>
+        <span *ngIf="month.paid && !month.manuallyPaid">Paid ₹{{ month.amountPaid }}</span>
         <span *ngIf="month.manuallyPaid">Manually Paid ₹{{ month.manualPaymentReceived }}</span>
-        <span *ngIf="!month.paid && !month.manuallyPaid">₹{{ month.fee + (month.busFee || 0) }}</span>
+        <span *ngIf="!month.paid && !month.manuallyPaid">₹{{ month.fee + (month.busFee || 0) + month.lateFee }}</span>
       </div>
     </div>
   </div>
@@ -68,7 +74,15 @@
           </div>
           <div class="detail-item" *ngIf="selectedMonthDetails.busFee">
             <strong>Bus Fees:</strong>
-            <span>₹{{ selectedMonthDetails.busFee }}</span>
+            <span>₹{{ selectedMonthDetails.busFee}}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedMonthDetails.lateFee">
+            <strong>Late Fees:</strong>
+            <span style="color: rgb(239, 64, 64)">₹{{ selectedMonthDetails.lateFee}}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedMonthDetails.additionalCharges && this.selectedMonthsByYear[this.selectedYear]?.length === 1">
+            <strong>Unapplied Leave Charge:</strong>
+            <span style="color: rgb(239, 64, 64)">₹{{ selectedMonthDetails.additionalCharges}}</span>
           </div>
         </div>
       </div>

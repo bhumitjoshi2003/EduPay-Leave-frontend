@@ -17,4 +17,6 @@ export interface PaymentHistoryDetails {
     ecaProject: number;
     examinationFee: number;
     amountPaid: number;
+    additionalCharges: number;
+    lateFees: number;
   }

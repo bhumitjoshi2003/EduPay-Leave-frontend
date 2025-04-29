@@ -247,3 +247,13 @@
 .admin-payment-controls .mat-form-field-wrapper {
   padding-bottom: 0 !important;
 }
+
+.month.late {
+  background-color: #d83e3e;
+  color: white;
+}
+
+.late.selected {
+  background-color: #f7d156; 
+  color: #100d05;
+}

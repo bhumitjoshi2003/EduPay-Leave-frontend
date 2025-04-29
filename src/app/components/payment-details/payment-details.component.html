@@ -71,6 +71,14 @@
         <td class="label">Examination Fee:</td>
         <td>{{ paymentDetails.examinationFee | currency: 'INR' }}</td>
       </tr>
+      <tr *ngIf="paymentDetails.additionalCharges">
+        <td class="label">Unapplied Leave Charges:</td>
+        <td>{{ paymentDetails.additionalCharges | currency: 'INR' }}</td>
+      </tr>
+      <tr *ngIf="paymentDetails.lateFees">
+        <td class="label">Late Fees:</td>
+        <td>{{ paymentDetails.lateFees | currency: 'INR' }}</td>
+      </tr>
       <tr>
         <td class="label">Total Amount:</td>
         <td>{{ paymentDetails.amount | currency: 'INR' }}</td>

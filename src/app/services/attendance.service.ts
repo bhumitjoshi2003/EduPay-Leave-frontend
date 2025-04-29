@@ -23,4 +23,12 @@ export class AttendanceService {
   getAttendanceCounts(studentId: string, year: number, month: number): Observable<{ studentAbsent: number; totalAbsent: number }> {
     return this.http.get<{ studentAbsent: number; totalAbsent: number }>(`${this.apiUrl}/counts/${studentId}/${year}/${month}`);
   }
+
+  getTotalUnappliedLeaveCount(studentId: string, session: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/unapplied-leave-count/${studentId}/session/${session}`);
+  }
+
+  updateChargePaidAfterPayment(studentId: string, session: string): Observable<string> {
+    return this.http.put<string>(`${this.apiUrl}/charge-paid/${studentId}/session/${session}`, null, { responseType: 'text' as 'json' });
+  }
 }

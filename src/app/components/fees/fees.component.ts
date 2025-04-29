@@ -37,6 +37,8 @@ export class PaymentTrackerComponent implements OnInit {
     private attendanceService: AttendanceService
   ) {}
 
+  unpaidCurrentMonthMessage: any = '';
+  pastUnpaidMonthsWithLateFees: string = '';
   selectedYear: number = new Date().getFullYear();
   months: any[] = [];
   totalAmountToPay: number = 0;
@@ -58,7 +60,7 @@ export class PaymentTrackerComponent implements OnInit {
   lateFees: number = 0; 
   lateFeePerDay: number[] = [12,15,18,21];
 
-  currentMonth = new Date().getMonth() + 11;
+  currentMonth = new Date().getMonth() + 1;
   academicCurrentMonth = this.getAcademicMonth(this.currentMonth);
 
   paymentData: PaymentData = {
@@ -170,6 +172,7 @@ export class PaymentTrackerComponent implements OnInit {
                     lateFee: this.lateFees = this.calculateLateFees(fee.month)
                   }));
                   this.fetchBusFees();
+                  this.checkAndDisplayFeeWarnings();
                 } else {
                   console.error('Fee structure not found.');
                   this.months = fees.map(fee => ({
@@ -182,6 +185,7 @@ export class PaymentTrackerComponent implements OnInit {
                     lateFee: 0
                   }));
                   this.totalAmountToPay = 0;
+                  this.checkAndDisplayFeeWarnings();
                 }
               },
               error: (error) => {
@@ -196,6 +200,7 @@ export class PaymentTrackerComponent implements OnInit {
                   lateFee: 0
                 }));
                 this.totalAmountToPay = 0;
+                this.checkAndDisplayFeeWarnings();
               }
             });
           },
@@ -205,10 +210,12 @@ export class PaymentTrackerComponent implements OnInit {
               next: (feeStructure) => {
                 this.months = fees.map(fee => ({ ...fee, name: this.getMonthName(fee.month), selected: this.isMonthSelected(fee.month, this.selectedYear), fee: 0, busFee: 0, unappliedLeaveCharge: 0 ,  lateFee: 0 }));
                 this.totalAmountToPay = 0;
+                this.checkAndDisplayFeeWarnings();
               },
               error: () => {
                 this.months = fees.map(fee => ({ ...fee, name: this.getMonthName(fee.month), selected: this.isMonthSelected(fee.month, this.selectedYear), fee: 0, busFee: 0, unappliedLeaveCharge: 0,  lateFee: 0 }));
                 this.totalAmountToPay = 0;
+                this.checkAndDisplayFeeWarnings();
               }
             });
           }
@@ -220,9 +227,41 @@ export class PaymentTrackerComponent implements OnInit {
     });
   }
 
+  checkAndDisplayFeeWarnings() {
+    if (this.role === 'STUDENT') {
+      const today = new Date();
+      const currentCalendarMonth = today.getMonth() + 1;
+      const currentAcademicMonth = this.getAcademicMonth(currentCalendarMonth);
+  
+      const currentMonthFee = this.months.find(
+        month => month.monthNumber === currentAcademicMonth
+      );
+  
+      if (currentMonthFee && !currentMonthFee.paid) {
+        this.unpaidCurrentMonthMessage = `Reminder: Kindly ensure that the fee for <span class="unpaid-month">${this.getMonthName(currentMonthFee.monthNumber)}</span> is paid before the end of this month to avoid late charges.`;
+      } else {
+        this.unpaidCurrentMonthMessage = '';
+      }
+  
+      const pastUnpaid = this.months.filter(month => {
+        return !month.paid && month.monthNumber < currentAcademicMonth && month.lateFee > 0;
+      });
+  
+      if (pastUnpaid.length > 0) {
+        const pastUnpaidMonthDetails = pastUnpaid.map(
+          m => `<span class="past-unpaid-month">${this.getMonthName(m.monthNumber)}</span>`
+        );
+        this.pastUnpaidMonthsWithLateFees = `Late fees have been applied for the following overdue ${pastUnpaidMonthDetails.length > 1 ? 'months' : 'month'}: ${pastUnpaidMonthDetails.join(', ')}.`;
+      } else {
+        this.pastUnpaidMonthsWithLateFees = '';
+      }
+    }
+  }
+  
+
   calculateLateFees(academicFeeMonth: number): number {
     const today = new Date();
-    const currentMonth = today.getMonth() + 11;
+    const currentMonth = today.getMonth() + 1;
     const academicCurrentMonth = this.getAcademicMonth(currentMonth);
 
     let monthDifference = academicCurrentMonth - academicFeeMonth;
@@ -375,8 +414,6 @@ export class PaymentTrackerComponent implements OnInit {
     console.log(this.paymentData);
   }
 
-
-
   handleSuccessfulPayment() {
     this.ngZone.run(() => {
       const promises: Promise<any>[] = [];
@@ -392,7 +429,6 @@ export class PaymentTrackerComponent implements OnInit {
               fee.manualyPaid = false;
               fee.manualPaymentReceived = 0;
               fee.amountPaid = monthDetails.fee + monthDetails.busFee + monthDetails.lateFee;
-              console.log(this.totalUnappliedLeaveCharge);
               this.feesService.updateStudentFees(fee).subscribe(() => {
                 resolve();
               });

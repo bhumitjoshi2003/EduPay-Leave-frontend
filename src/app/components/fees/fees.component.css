@@ -5,7 +5,7 @@
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   max-width: 1200px;
-  margin: 20px auto;
+  margin: 10px auto;
   width: 95%;
 }
 
@@ -256,4 +256,36 @@
 .late.selected {
   background-color: #f7d156; 
   color: #100d05;
+}
+
+
+
+
+.unpaid-month-warning {
+  background-color: #ffebee; 
+  color: #d32f2f; 
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: 1px solid #ef9a9a;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: pulse 1.5s infinite alternate; 
+}
+
+.unpaid-month-warning .unpaid-month {
+  color: #f77269; 
+  font-weight: bolder;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
 }

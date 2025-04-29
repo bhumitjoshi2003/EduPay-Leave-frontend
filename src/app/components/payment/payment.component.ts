@@ -33,10 +33,12 @@ export class PaymentComponent{
     className: "",
     session: "",
     paidManually: false,
-    amountPaid: 0
+    amountPaid: 0,
+    additionalCharges: 0,
+    lateFees: 0
   };
 
-  @Output() paymentSuccess = new EventEmitter<any>(); // Emit payment details
+  @Output() paymentSuccess = new EventEmitter<any>(); 
 
   studentDetails: any;
 

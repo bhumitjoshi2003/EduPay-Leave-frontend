@@ -13,4 +13,6 @@ export interface PaymentData {
     session: string;
     paidManually: boolean;
     amountPaid: number;
+    additionalCharges: number;
+    lateFees: number;
   }

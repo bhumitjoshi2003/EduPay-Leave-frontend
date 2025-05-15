@@ -1,0 +1,78 @@
+<div class="container mt-5">
+    <div *ngIf="isAdmin; else notAdmin">
+      <h2>Notice to Students</h2>
+      <form [formGroup]="emailForm" (ngSubmit)="sendEmail()" class="card p-4">
+        
+        <div class="form-group">
+          <label for="targetClass">Select Class:</label>
+          <select
+            id="targetClass"
+            formControlName="targetClass"
+            class="form-control"
+            [ngClass]="{ 'is-invalid': f['targetClass'].invalid && (f['targetClass'].dirty || f['targetClass'].touched) }"
+          >
+            <option value="" disabled selected>Select a class</option>
+            <option *ngFor="let className of classList" [value]="className">{{ className }}</option>
+          </select>
+          <div *ngIf="f['targetClass'].invalid && (f['targetClass'].dirty || f['targetClass'].touched)" class="invalid-feedback">
+            Please select a class.
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="title">Title:</label>
+          <input
+            type="text"
+            id="title"
+            formControlName="title"
+            class="form-control"
+            [ngClass]="{ 'is-invalid': f['title'].invalid && (f['title'].dirty || f['title'].touched) }"
+          />
+          <div *ngIf="f['title'].invalid && (f['title'].dirty || f['title'].touched)" class="invalid-feedback">
+            Title is required.
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="subject">Subject:</label>
+          <input
+            type="text"
+            id="subject"
+            formControlName="subject"
+            class="form-control"
+            [ngClass]="{ 'is-invalid': f['subject'].invalid && (f['subject'].dirty || f['subject'].touched) }"
+          />
+          <div *ngIf="f['subject'].invalid && (f['subject'].dirty || f['subject'].touched)" class="invalid-feedback">
+            Subject is required.
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="body">Body:</label>
+          <textarea
+            id="body"
+            formControlName="body"
+            class="form-control"
+            rows="5"
+            [ngClass]="{ 'is-invalid': f['body'].invalid && (f['body'].dirty || f['body'].touched) }"
+          ></textarea>
+          <div *ngIf="f['body'].invalid && (f['body'].dirty || f['body'].touched)" class="invalid-feedback">
+            Body is required.
+          </div>
+        </div>
+  
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+          Send Email
+        </button>
+  
+      </form>
+    </div>
+  
+    <ng-template #notAdmin>
+      <div class="alert alert-danger" role="alert">
+        You do not have permission to access this page.
+      </div>
+    </ng-template>
+  </div>
+  

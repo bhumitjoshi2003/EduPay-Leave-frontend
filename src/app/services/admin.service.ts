@@ -7,7 +7,8 @@ import { Observable } from 'rxjs';
 })
 export class AdminService {
 
-  private baseUrl = 'http://localhost:8081/admins';
+  private baseUrl = 'http://localhost:8081/api/admins';
+  private noticeUrl = 'http://localhost:8081/api/admin';
 
   constructor(private http: HttpClient) {}
 
@@ -29,5 +30,9 @@ export class AdminService {
 
   deleteAdmin(adminId: string): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/${adminId}`); 
+  }
+
+  sendNoticeToStudents(data: { title: string; subject: string; body: string }): Observable<any> {
+    return this.http.post<any>(this.noticeUrl + '/notice', data);
   }
 }

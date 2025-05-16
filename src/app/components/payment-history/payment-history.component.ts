@@ -5,12 +5,13 @@ import { CommonModule } from '@angular/common';
 import { PaymentHistory } from '../../interfaces/payment-history';
 import { PaymentHistoryService } from '../../services/payment-history.service';
 import { jwtDecode } from 'jwt-decode';
+import { saveAs } from 'file-saver'; 
 
 @Component({
   selector: 'app-payment-history',
   templateUrl: './payment-history.component.html',
   imports: [CommonModule],
-  styleUrls: ['./payment-history.component.css']
+  styleUrls: ['./payment-history.component.css'],
 })
 export class PaymentHistoryComponent implements OnInit {
   paymentHistory: PaymentHistory[] = [];
@@ -18,9 +19,13 @@ export class PaymentHistoryComponent implements OnInit {
   error: string = '';
   role: string = '';
   studentId: string = '';
-  
-  constructor(private http: HttpClient, private route: ActivatedRoute, private router: Router, private paymentHistoryService: PaymentHistoryService) {}
 
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router,
+    private paymentHistoryService: PaymentHistoryService
+  ) {}
 
   ngOnInit(): void {
     const token = localStorage.getItem('token');
@@ -31,9 +36,11 @@ export class PaymentHistoryComponent implements OnInit {
       if (this.role === 'STUDENT') {
         this.studentId = decodedToken.userId;
       } else {
-        this.route.params.subscribe(params => {
+        this.route.params.subscribe((params) => {
           const routeStudentId = params['studentId'];
-          if (routeStudentId) { this.studentId = routeStudentId; }
+          if (routeStudentId) {
+            this.studentId = routeStudentId;
+          }
         });
       }
       this.fetchPaymentHistory();
@@ -44,8 +51,6 @@ export class PaymentHistoryComponent implements OnInit {
     this.loading = true;
     this.error = '';
 
-    const idToFetch = this.studentId ? this.studentId : (this.role === 'admin' ? null : this.studentId);
-
     this.paymentHistoryService.getPaymentHistory(this.studentId).subscribe({
       next: (data) => {
         this.paymentHistory = data;
@@ -55,11 +60,28 @@ export class PaymentHistoryComponent implements OnInit {
         this.error = 'Failed to fetch payment history.';
         console.error('Error fetching payment history:', err);
         this.loading = false;
-      }
+      },
     });
   }
 
   viewPaymentDetails(paymentId: string): void {
     this.router.navigate(['dashboard/payment-history-details', paymentId]);
+  }
+
+  downloadPaymentReceipt(paymentId: string): void {
+    this.loading = true;
+    this.error = '';
+    this.paymentHistoryService.downloadPaymentReceipt(paymentId).subscribe({
+      next: (data: Blob) => {
+        let filename = `receipt_${paymentId}.pdf`;
+        saveAs(data, filename);
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to download payment receipt.';
+        console.error('Error downloading payment receipt:', err);
+        this.loading = false;
+      },
+    });
   }
 }

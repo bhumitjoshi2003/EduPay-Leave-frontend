@@ -1,4 +1,10 @@
 <div class="payment-tracker">
+  <div *ngIf="pastUnpaidMonthsWithLateFees" class="unpaid-month-warning">
+    <p [innerHTML]="pastUnpaidMonthsWithLateFees"></p>
+  </div>
+  <div *ngIf="unpaidCurrentMonthMessage" class="unpaid-month-warning">
+    <p [innerHTML]="unpaidCurrentMonthMessage"></p>
+  </div>
   <div class="header">
     <div class="year-select-wrapper">
       <select [disabled]="lastSelectedMonth" [(ngModel)]="session" (change)="onYearChange($event)">

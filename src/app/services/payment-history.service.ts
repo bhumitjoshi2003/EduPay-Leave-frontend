@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PaymentHistory } from '../interfaces/payment-history';
@@ -28,6 +28,12 @@ export class PaymentHistoryService {
 
   getPaymentHistoryByClass(className: string): Observable<PaymentHistory[]> {
     return this.http.get<PaymentHistory[]>(`${this.baseUrl}/class/${className}`);
+  }
+
+  downloadPaymentReceipt(paymentId: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/receipt/${paymentId}`, {
+      responseType: 'blob',
+    });
   }
 }
 

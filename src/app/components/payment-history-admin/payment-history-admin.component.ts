@@ -12,6 +12,7 @@ import Swal from 'sweetalert2';
 import { PaymentHistory } from '../../interfaces/payment-history';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { saveAs } from 'file-saver'; 
 
 @Component({
   selector: 'app-payment-history-admin',
@@ -29,20 +30,24 @@ import { Router } from '@angular/router';
   providers: [DatePipe]
 })
 export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
+
   paymentHistory: PaymentHistory[] = [];
   filteredPayments: PaymentHistory[] = [];
   classList: string[] = [
     'Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
   ];
-  selectedClass: string = 'all'; // Initialize to 'all' or an empty string based on your preference
+  selectedClass: string = 'all';
   selectedDate: any = '';
+  loading: boolean = true;
+  error: string = '';
+
   studentIdFilter: string = '';
   private ngUnsubscribe = new Subject<void>();
 
   constructor(private router: Router, private paymentHistoryService: PaymentHistoryService, private datePipe: DatePipe) { }
 
   ngOnInit(): void {
-    this.loadAllPaymentHistory(); // Load all transactions initially or based on a default selection
+    this.loadAllPaymentHistory(); 
   }
 
   ngOnDestroy(): void {
@@ -124,5 +129,22 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
 
   viewPaymentDetails(paymentId: string): void {
     this.router.navigate(['dashboard/payment-history-details', paymentId]);
+  }
+
+  downloadPaymentReceipt(paymentId: string): void {
+    this.loading = true;
+    this.error = '';
+    this.paymentHistoryService.downloadPaymentReceipt(paymentId).subscribe({
+      next: (data: Blob) => {
+        let filename = `receipt_${paymentId}.pdf`;
+        saveAs(data, filename);
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to download payment receipt.';
+        console.error('Error downloading payment receipt:', err);
+        this.loading = false;
+      },
+    });
   }
 }

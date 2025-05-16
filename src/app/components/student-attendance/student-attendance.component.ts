@@ -57,19 +57,29 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
+    const today = new Date();
+    let academicYearStart: number;
+    let academicYearEnd: number;
+
     const startMonth = 4;
     const endMonth = 3;
+
+    if (today.getMonth() < 3) { 
+      academicYearStart = today.getFullYear() - 1;
+      academicYearEnd = today.getFullYear();
+    } else {
+      academicYearStart = today.getFullYear();
+      academicYearEnd = today.getFullYear() + 1;
+    }
 
     const observables = [];
 
     for (let month = startMonth; month <= 12; month++) {
-      observables.push(this.attendanceService.getAttendanceCounts(this.studentId, currentYear, month));
+      observables.push(this.attendanceService.getAttendanceCounts(this.studentId, academicYearStart, month));
     }
 
     for (let month = 1; month <= endMonth; month++) {
-      observables.push(this.attendanceService.getAttendanceCounts(this.studentId, currentYear + 1, month));
+      observables.push(this.attendanceService.getAttendanceCounts(this.studentId, academicYearEnd, month));
     }
 
     forkJoin(observables).subscribe((results) => {
@@ -78,7 +88,7 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
         const absentDays = counts.studentAbsent;
         const presentDays = workingDays - absentDays;
 
-        const year = index < 9 ? currentYear : currentYear + 1;
+        const year = index < 9 ? academicYearStart : academicYearEnd;
         const month = index < 9 ? startMonth + index : 1 + index - 9;
 
         if (workingDays === 0) {

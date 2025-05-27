@@ -17,15 +17,14 @@
   </div>
 
   <div class="month-grid">
-    <div *ngFor="let month of months" class="month"
-    [ngClass]="{
+    <div *ngFor="let month of months" class="month" [ngClass]="{
      'paid': month.paid,
      'manually-paid': month.manuallyPaid,
      'unpaid': !month.paid && !month.manuallyPaid,
      'selected': month.selected,
      'late': !month.paid && !month.manuallyPaid && month.month <= academicCurrentMonth
    }"
-    (click)="role !== 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : (role === 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : null)">
+      (click)="role !== 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : (role === 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : null)">
       <div class="month-name">{{ month.name }}</div>
       <div class="month-status">
         <span *ngIf="month.paid && !month.manuallyPaid">Paid ₹{{ month.amountPaid }}</span>
@@ -86,7 +85,8 @@
             <strong>Late Fees:</strong>
             <span style="color: rgb(239, 64, 64)">₹{{ selectedMonthDetails.lateFee}}</span>
           </div>
-          <div class="detail-item" *ngIf="selectedMonthDetails.additionalCharges && this.selectedMonthsByYear[this.selectedYear]?.length === 1">
+          <div class="detail-item"
+            *ngIf="selectedMonthDetails.additionalCharges && this.selectedMonthsByYear[this.selectedYear]?.length === 1">
             <strong>Unapplied Leave Charge:</strong>
             <span style="color: rgb(239, 64, 64)">₹{{ selectedMonthDetails.additionalCharges}}</span>
           </div>
@@ -99,10 +99,9 @@
     <div class="total-amount-bottom">
       Total Amount to Pay: ₹{{ totalAmountToPay }}
     </div>
-    <app-payment
-      [paymentData]="paymentData"
-      (paymentSuccess)="handleSuccessfulPayment()"
-    ></app-payment>
+    <app-payment [paymentData]="paymentData" (paymentSuccess)="handleSuccessfulPayment()"
+      (paymentProcessingStarted)="onPaymentProcessingStarted()" [disabled]="isLoadingPayment">>
+    </app-payment>
   </div>
 
   <ng-template #adminPayment>

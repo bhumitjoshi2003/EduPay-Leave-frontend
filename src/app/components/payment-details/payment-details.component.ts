@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { PaymentHistoryService } from '../../services/payment-history.service';
 import { PaymentHistoryDetails } from '../../interfaces/payment-response'; 
 import { CommonModule } from '@angular/common';
+import saveAs from 'file-saver';
 
 @Component({
   selector: 'app-payment-details',
@@ -59,5 +60,22 @@ export class PaymentDetailsComponent implements OnInit {
     } else {
       this.months = [];
     }
+  }
+
+  downloadReceipt(paymentId: string): void {
+    this.loading = true;
+    this.error = '';
+    this.paymentHistoryService.downloadPaymentReceipt(paymentId).subscribe({
+      next: (data: Blob) => {
+        const filename = `receipt_${paymentId}.pdf`;
+        saveAs(data, filename);
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to download receipt.';
+        console.error('Download error:', err);
+        this.loading = false;
+      },
+    });
   }
 }

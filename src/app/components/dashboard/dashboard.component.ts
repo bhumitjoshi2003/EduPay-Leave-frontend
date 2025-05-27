@@ -39,7 +39,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ClassTeacher: string = '';
   hasShownWelcomeMessage: boolean = false;
   private ngUnsubscribe = new Subject<void>();
-  private welcomeMessageKey = 'hasShownWelcome'; 
+  private welcomeMessageKey = 'hasShownWelcome';
 
   constructor(
     private router: Router,
@@ -48,10 +48,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private teacherService: TeacherService,
     private adminService: AdminService,
     private dialog: MatDialog
-  ) {}
+  ) { }
 
   ngOnInit() {
-    this.loadWelcomeMessageState(); 
+    this.loadWelcomeMessageState();
     this.getDetails();
     this.handleInitialNavigation();
   }
@@ -124,7 +124,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!this.hasShownWelcomeMessage) {
       this.openWelcomeMessage();
       this.hasShownWelcomeMessage = true;
-      this.saveWelcomeMessageState(); 
+      this.saveWelcomeMessageState();
     }
   }
 
@@ -144,14 +144,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   handleInitialNavigation(): void {
-    if (this.Role === 'STUDENT') {
-      this.router.navigate(['/dashboard/fees']);
-    } else if (this.Role === 'TEACHER') {
-      this.router.navigate(['/dashboard/teacher-attendance']);
-    } else if (this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN') {
-      this.router.navigate(['/dashboard/fee-structure']);
-    } else {
-      this.router.navigate(['/dashboard']);
+    const currentUrl = this.router.url;
+    if (!currentUrl.startsWith('/dashboard/payment-history-details/')) {
+      if (this.Role === 'STUDENT') {
+        this.router.navigate(['/dashboard/fees']);
+      } else if (this.Role === 'TEACHER') {
+        this.router.navigate(['/dashboard/teacher-attendance']);
+      } else if (this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN') {
+        this.router.navigate(['/dashboard/fee-structure']);
+      } else {
+        this.router.navigate(['/dashboard']);
+      }
     }
   }
 
@@ -168,7 +171,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    localStorage.removeItem(this.welcomeMessageKey); 
+    localStorage.removeItem(this.welcomeMessageKey);
     this.authService.logout();
     this.router.navigate(['/home']);
   }
@@ -177,7 +180,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.isStudent() && this.Id) {
       this.router.navigate(['/dashboard/student-details', this.Id]);
     }
-    if(this.isTeacher() && this.Id) {
+    if (this.isTeacher() && this.Id) {
       this.router.navigate(['/dashboard/teacher-details', this.Id]);
     }
   }

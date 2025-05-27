@@ -12,12 +12,12 @@ declare var Razorpay: any;
   templateUrl: './payment.component.html',
   styleUrl: './payment.component.css'
 })
-export class PaymentComponent{
+export class PaymentComponent {
 
   constructor(
     private razorpayService: RazorpayService,
     private studentService: StudentService // Inject StudentService
-  ) {}
+  ) { }
 
   @Input() paymentData: PaymentData = {
     totalAmount: 0,
@@ -38,40 +38,48 @@ export class PaymentComponent{
     lateFees: 0
   };
 
-  @Output() paymentSuccess = new EventEmitter<any>(); 
+  @Input() disabled: boolean = false;
+  @Output() paymentSuccess = new EventEmitter<any>();
+  @Output() paymentProcessingStarted = new EventEmitter<void>();
+  @Output() paymentProcessCompleted = new EventEmitter<void>();
 
   studentDetails: any;
 
   initiatePayment() {
+    this.paymentProcessingStarted.emit();
     if (!this.paymentData || !this.paymentData.studentId) {
       Swal.fire({
         icon: 'warning',
         title: 'Payment Error',
         text: 'Payment data or student ID is missing.',
+      }).then(() => {
+        this.paymentProcessCompleted.emit();
       });
       return;
     }
     this.loadStudentDetails(this.paymentData.studentId);
   }
-  
+
   loadStudentDetails(studentId: string): void {
     this.studentService.getStudent(studentId).subscribe({
       next: (student) => {
         this.studentDetails = student;
         console.log(this.studentDetails.phoneNumber);
-  
+
         if (!this.paymentData || !this.studentDetails) {
           Swal.fire({
             icon: 'warning',
             title: 'Payment Error',
             text: 'Payment data or student details are missing.',
+          }).then(() => {
+            this.paymentProcessCompleted.emit();
           });
           return;
         }
-  
+
         this.paymentData.totalAmount *= 100;
         this.razorpayService.createOrder(this.paymentData).subscribe((response: any) => {
- 
+
           const options = {
             key: 'rzp_test_uzFJONVXH4vqou',
             amount: response.amount,
@@ -98,7 +106,7 @@ export class PaymentComponent{
               this.verifyPayment(paymentResponse, response);
             },
             modal: {
-              ondismiss: function () {
+              ondismiss: () => {
                 Swal.fire({
                   icon: 'warning',
                   title: 'Payment Cancelled!',
@@ -109,11 +117,12 @@ export class PaymentComponent{
                   color: '#b91c1c',
                   timer: 4000,
                   timerProgressBar: true
+                }).then(() => {
+                  this.paymentProcessCompleted.emit();
                 });
               }
             }
           };
-  
           const rzp = new Razorpay(options);
           rzp.open();
         });
@@ -124,17 +133,37 @@ export class PaymentComponent{
           icon: 'error',
           title: 'Error',
           text: 'Failed to load student details for payment.',
+        }).then(() => {
+          this.paymentProcessCompleted.emit();
         });
       }
     });
   }
 
-  verifyPayment(paymentResponse: any, orderDetails : any) {
-    this.razorpayService.verifyPayment(paymentResponse, orderDetails).subscribe((result: any) => {
-      if (result.success) {
-        this.paymentSuccess.emit(paymentResponse); 
-      } else {
-        alert('Payment Verification Failed!');
+  verifyPayment(paymentResponse: any, orderDetails: any) {
+    this.razorpayService.verifyPayment(paymentResponse, orderDetails).subscribe({
+      next: (result: any) => {
+        if (result.success) {
+          this.paymentSuccess.emit(paymentResponse);
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Verification Failed!',
+            text: 'Payment could not be verified. Please contact support.',
+          }).then(() => {
+            this.paymentProcessCompleted.emit();
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error during payment verification:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Verification Error!',
+          text: 'An error occurred during payment verification. Please try again or contact support.',
+        }).then(() => {
+          this.paymentProcessCompleted.emit();
+        });
       }
     });
   }

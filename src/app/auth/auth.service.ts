@@ -37,7 +37,7 @@ export class AuthService {
 
   resetPassword(token: string, newPassword: string): Observable<any> {
     console.log(this.apiUrl + '/reset-password?token=' + token);
-   return this.http.post(this.apiUrl + '/reset-password?token=' + token, { newPassword }, { responseType: 'text' });
+    return this.http.post(this.apiUrl + '/reset-password?token=' + token, { newPassword }, { responseType: 'text' });
   }
 
   logout() {
@@ -52,5 +52,4 @@ export class AuthService {
     }
     return '';
   }
-  
 }

@@ -53,7 +53,8 @@
 
 .month-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr); /* 6 columns */
+  grid-template-columns: repeat(6, 1fr);
+  /* 6 columns */
   gap: 15px;
   margin-top: 20px;
 }
@@ -84,12 +85,12 @@
 }
 
 .month.selected {
-  background-color: #e0f2fe; 
-  color: #1e88e5; 
+  background-color: #e0f2fe;
+  color: #1e88e5;
 }
 
 .unpaid.selected {
-  background-color: #f7d156; 
+  background-color: #f7d156;
   color: #100d05;
 }
 
@@ -160,7 +161,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  width: 100%; 
+  width: 100%;
 }
 
 .student-details,
@@ -236,12 +237,12 @@
   font-weight: 600;
   text-transform: none;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .admin-payment-controls button:hover {
   background-color: #aae17e;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .admin-payment-controls .mat-form-field-wrapper {
@@ -254,7 +255,7 @@
 }
 
 .late.selected {
-  background-color: #f7d156; 
+  background-color: #f7d156;
   color: #100d05;
 }
 
@@ -262,8 +263,8 @@
 
 
 .unpaid-month-warning {
-  background-color: #ffebee; 
-  color: #d32f2f; 
+  background-color: #ffebee;
+  color: #d32f2f;
   margin-bottom: 20px;
   border-radius: 5px;
   border: 1px solid #ef9a9a;
@@ -271,11 +272,11 @@
   font-size: 1rem;
   font-weight: bold;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  animation: pulse 1.5s infinite alternate; 
+  animation: pulse 1.5s infinite alternate;
 }
 
 .unpaid-month-warning .unpaid-month {
-  color: #f77269; 
+  color: #f77269;
   font-weight: bolder;
 }
 
@@ -284,8 +285,75 @@
     opacity: 0.8;
     transform: scale(1);
   }
+
   100% {
     opacity: 1;
     transform: scale(1.02);
   }
+}
+
+
+.payment-container.disabled-ui {
+  pointer-events: none;
+  /* Disables all click events */
+  opacity: 0.7;
+  /* Visually indicates disabled state */
+  position: relative;
+  /* Needed for overlay positioning */
+  filter: blur(2px);
+  /* Optional: adds a slight blur */
+  transition: all 0.2s ease-in-out;
+  /* Smooth transition */
+}
+
+/* Loading overlay styles */
+.loading-overlay {
+  position: absolute;
+  /* Position over the parent .payment-container */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  /* Semi-transparent white background */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  /* Ensure it's above other content */
+  color: #333;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+/* Spinner animation */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #3399cc;
+  /* Primary color of your theme */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Styles for individual month cards when disabled (e.g., already paid or loading) */
+.month.disabled {
+  pointer-events: none;
+  /* Disable clicks on individual months */
+  opacity: 0.6;
+  /* Make them slightly faded */
+  cursor: not-allowed;
 }

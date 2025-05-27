@@ -6,7 +6,7 @@ import { AuthService } from '../../auth/auth.service';
 import { FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Subject, takeUntil } from 'rxjs';
-import { DomSanitizer } from '@angular/platform-browser';
+import { Location } from '@angular/common';
 
 interface StudentDetails {
   studentId?: string;
@@ -41,7 +41,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
   showConfirmNewPassword = false;
   effectiveFromMonth: number | null = null; // To store the selected month
   academicMonths = [
-    { value: 0, label: 'New Academic Year' }, 
+    { value: 0, label: 'New Academic Year' },
     { value: 1, label: 'April' }, { value: 2, label: 'May' }, { value: 3, label: 'June' },
     { value: 4, label: 'July' }, { value: 5, label: 'August' }, { value: 6, label: 'September' },
     { value: 7, label: 'October' }, { value: 8, label: 'November' }, { value: 9, label: 'December' },
@@ -57,7 +57,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private authService: AuthService,
     private fb: FormBuilder,
-    private sanitizer: DomSanitizer
+    private location: Location
   ) {
     this.changePasswordForm = this.fb.group({
       oldPassword: [''],
@@ -123,7 +123,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
   cancelEditMode(): void {
     this.isEditing = false;
     this.updatedDetails = { ...this.studentDetails! };
-    this.effectiveFromMonth = null; 
+    this.effectiveFromMonth = null;
     Swal.fire({
       icon: 'info',
       title: 'Cancelled',
@@ -357,5 +357,9 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
 
   getEyeIcon(type: 'eye' | 'eye-off'): string {
     return type === 'eye' ? this.eyeIcon : this.eyeOffIcon;
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }

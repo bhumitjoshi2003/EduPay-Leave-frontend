@@ -99,7 +99,9 @@
     <div class="total-amount-bottom">
       Total Amount to Pay: ₹{{ totalAmountToPay }}
     </div>
-    <app-payment [paymentData]="paymentData" (paymentSuccess)="handleSuccessfulPayment()"></app-payment>
+    <app-payment [paymentData]="paymentData" (paymentSuccess)="handleSuccessfulPayment()"
+      (paymentProcessingStarted)="onPaymentProcessingStarted()" [disabled]="isLoadingPayment">>
+    </app-payment>
   </div>
 
   <ng-template #adminPayment>

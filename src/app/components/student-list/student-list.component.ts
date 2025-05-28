@@ -19,6 +19,7 @@ interface Student {
 
 export class StudentListComponent implements OnInit {
   students: Student[] = [];
+  newStudents: Student[] = [];
   teacherId: string = '';
   loggedInUserRole: string = '';
   selectedClass: string = '';
@@ -30,7 +31,7 @@ export class StudentListComponent implements OnInit {
     private studentService: StudentService,
     private teacherService: TeacherService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.getUserRoleAndLoadData();
@@ -51,7 +52,7 @@ export class StudentListComponent implements OnInit {
       }
     } else {
       console.error('No token found');
-      this.router.navigate(['/login']); 
+      this.router.navigate(['/login']);
     }
   }
 
@@ -71,6 +72,12 @@ export class StudentListComponent implements OnInit {
     this.studentService.getStudentsByClass(this.selectedClass).subscribe((students) => {
       this.students = students;
     });
+    if (this.loggedInUserRole === 'ADMIN') {
+      console.log("admin");
+      this.studentService.getNewStudentsByClass(this.selectedClass).subscribe((students) => {
+        this.newStudents = students;
+      });
+    }
     localStorage.setItem('lastSelectedClass', this.selectedClass);
   }
 
@@ -79,7 +86,7 @@ export class StudentListComponent implements OnInit {
   }
 
   onClassSelect(selectedClass: string): void {
-      this.selectedClass = selectedClass;
-      this.loadStudents();
+    this.selectedClass = selectedClass;
+    this.loadStudents();
   }
 }

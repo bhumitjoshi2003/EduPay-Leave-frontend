@@ -33,7 +33,8 @@ export class RegisterStudentComponent implements OnInit {
       fatherName: [''],
       motherName: [''],
       takesBus: [false],
-      distance: [''] 
+      distance: [''],
+      joiningDate: ['', Validators.required]
     });
   }
 
@@ -75,7 +76,7 @@ export class RegisterStudentComponent implements OnInit {
               }
             });
             this.studentForm.reset();
-            this.isBusUser = false; 
+            this.isBusUser = false;
           });
         },
         error: (error) => {

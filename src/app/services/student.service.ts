@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { StudentDetailsComponent } from '../components/student-details/student-details.component';
 
-interface StudentLeaveDTO {
+interface StudentDTO {
   studentId: string;
   name: string;
 }
@@ -14,14 +14,14 @@ interface StudentLeaveDTO {
 export class StudentService {
   private baseUrl = 'http://localhost:8081/students';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getStudent(studentId: string): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/${studentId}`);
   }
 
-  getStudentsByClass(selectedClass: string): Observable<StudentLeaveDTO[]> {
-    return this.http.get<StudentLeaveDTO[]>(`${this.baseUrl}/class/${selectedClass}`);
+  getStudentsByClass(selectedClass: string): Observable<StudentDTO[]> {
+    return this.http.get<StudentDTO[]>(`${this.baseUrl}/class/${selectedClass}`);
   }
 
   updateStudent(studentId: string, updatedDetails: any): Observable<any> {
@@ -30,5 +30,9 @@ export class StudentService {
 
   addStudent(studentData: any): Observable<any> {
     return this.http.post(this.baseUrl, studentData);
+  }
+
+  getNewStudentsByClass(selectedClass: string): Observable<StudentDTO[]> {
+    return this.http.get<StudentDTO[]>(`${this.baseUrl}/new/class/${selectedClass}`);
   }
 }

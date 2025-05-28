@@ -5,18 +5,30 @@
     </div>
 
     <nav mat-tab-nav-bar class="custom-tab-nav" #tabNav [tabPanel]="tabPanel">
-      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/fees" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">Fees</a>
-      <a *ngIf="isStudent() || isAdmin()" mat-tab-link routerLink="/dashboard/fee-structure" routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">Fee Structure</a>
-      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/payment-history" routerLinkActive #rla5="routerLinkActive" [active]="rla5.isActive">Payment History</a>
-      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/apply-leave" routerLinkActive #rla6="routerLinkActive" [active]="rla6.isActive">Apply Leave</a>
-      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/student-attendance" routerLinkActive #rla8="routerLinkActive" [active]="rla8.isActive">Student Attendance</a>
-      <a *ngIf="isTeacher()" mat-tab-link routerLink="/dashboard/teacher-attendance" routerLinkActive #rla7="routerLinkActive" [active]="rla7.isActive">Teacher Attendance</a>
-      <a *ngIf="isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/student-list" routerLinkActive #rla9="routerLinkActive" [active]="rla9.isActive">Students</a>
-      <a *ngIf="isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/view-leaves" routerLinkActive #rla10="routerLinkActive" [active]="rla10.isActive">Leaves</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/payment-history-admin" routerLinkActive #rla11="routerLinkActive" [active]="rla11.isActive">Payment History</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/teacher-list" routerLinkActive #rla12="routerLinkActive" [active]="rla12.isActive">Teachers</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/notice" routerLinkActive #rla13="routerLinkActive" [active]="rla13.isActive">Notice</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/register" routerLinkActive #rla13="routerLinkActive" [active]="rla13.isActive">Register</a>
+      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/fees" routerLinkActive #rla2="routerLinkActive"
+        [active]="rla2.isActive">Fees</a>
+      <a *ngIf="isStudent() || isAdmin()" mat-tab-link routerLink="/dashboard/fee-structure" routerLinkActive
+        #rla1="routerLinkActive" [active]="rla1.isActive">Fee Structure</a>
+      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/payment-history" routerLinkActive
+        #rla5="routerLinkActive" [active]="rla5.isActive">Payment History</a>
+      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/apply-leave" routerLinkActive #rla6="routerLinkActive"
+        [active]="rla6.isActive">Apply Leave</a>
+      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/student-attendance" routerLinkActive
+        #rla8="routerLinkActive" [active]="rla8.isActive">Student Attendance</a>
+      <a *ngIf="isTeacher()" mat-tab-link routerLink="/dashboard/teacher-attendance" routerLinkActive
+        #rla7="routerLinkActive" [active]="rla7.isActive">Teacher Attendance</a>
+      <a *ngIf="isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/student-list" routerLinkActive
+        #rla9="routerLinkActive" [active]="rla9.isActive">Students</a>
+      <a *ngIf="isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/view-leaves" routerLinkActive
+        #rla10="routerLinkActive" [active]="rla10.isActive">Leaves</a>
+      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/payment-history-admin" routerLinkActive
+        #rla11="routerLinkActive" [active]="rla11.isActive">Payment History</a>
+      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/teacher-list" routerLinkActive #rla12="routerLinkActive"
+        [active]="rla12.isActive">Teachers</a>
+      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/notice" routerLinkActive #rla13="routerLinkActive"
+        [active]="rla13.isActive">Notice</a>
+      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/register" routerLinkActive #rla13="routerLinkActive"
+        [active]="rla13.isActive">Register</a>
     </nav>
 
     <div class="profile-area">
@@ -39,7 +51,8 @@
           </div>
           <hr />
           <div class="profile-details">
-            <button *ngIf="isStudent() || isTeacher()" mat-menu-item (click)="navigateToMyProfile()" class="profile-btn">My Profile</button>
+            <button *ngIf="isStudent() || isTeacher()" mat-menu-item (click)="navigateToMyProfile()"
+              class="profile-btn">My Profile</button>
             <button mat-menu-item class="logout-button" (click)="logout()" class="logout-btn">Logout</button>
           </div>
         </div>

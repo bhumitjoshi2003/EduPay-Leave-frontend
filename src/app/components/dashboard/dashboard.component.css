@@ -10,9 +10,11 @@
 .header-area {
     background-color: #ffffff;
     padding: 2px 150px;
+    /* ORIGINAL DESKTOP: Reverted to 2px vertical padding */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     animation: fadeSlideDown 1s ease-in-out;
     position: relative;
+    /* desktop flex properties (implicit) */
 }
 
 /* Logo Section */
@@ -21,11 +23,15 @@
     justify-content: center;
     align-items: center;
     margin-bottom: 15px;
+    /* desktop width (implicit) */
 }
 
 .logo {
     width: 60%;
+    /* ORIGINAL DESKTOP: Reverted to 60% */
     transition: transform 0.3s ease;
+    height: auto;
+    /* Ensure aspect ratio */
 }
 
 /* Navigation Tabs */
@@ -35,17 +41,20 @@
     flex-wrap: wrap;
     gap: 10px;
     animation: fadeSlideUp 1s ease-in-out;
+    /* desktop width (implicit) */
 }
 
 .custom-tab-nav a {
     font-size: 16px;
     font-family: 'Serif', serif;
     margin: 1px;
+    /* ORIGINAL DESKTOP: Reverted to 1px margin */
     border-radius: 6px;
     background-color: #f3ec0c;
     color: #161616;
     text-decoration: none;
     transition: all 0.3s ease;
+    /* desktop padding (implicit, due to margin) */
 }
 
 .custom-tab-nav a.active {
@@ -62,6 +71,7 @@
 .content-area {
     flex-grow: 1;
     padding: 30px;
+    /* ORIGINAL DESKTOP: Reverted to 30px padding */
 }
 
 /* Animations */
@@ -70,6 +80,7 @@
         opacity: 0;
         transform: translateY(-30px);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0);
@@ -81,6 +92,7 @@
         opacity: 0;
         transform: translateY(30px);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0);
@@ -91,7 +103,9 @@
 .profile-area {
     position: absolute;
     top: 10px;
+    /* ORIGINAL DESKTOP: Reverted to 10px */
     right: 10px;
+    /* ORIGINAL DESKTOP: Reverted to 10px */
     display: flex;
     align-items: center;
     z-index: 10;
@@ -104,7 +118,9 @@
     border-radius: 50%;
     padding: 8px;
     width: 40px;
+    /* ORIGINAL DESKTOP: Reverted to 40px */
     height: 40px;
+    /* ORIGINAL DESKTOP: Reverted to 40px */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -125,6 +141,7 @@
     border-radius: 8px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     width: 160px;
+    /* ORIGINAL DESKTOP: Reverted to 160px */
     font-family: 'Segoe UI', sans-serif;
     color: #2c3e50;
     display: flex;
@@ -197,7 +214,6 @@
     background-color: #e53935;
     color: white;
     border-color: #c62828;
-    
     transform: translateY(-1px);
 }
 
@@ -207,13 +223,14 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-
+/* Global Material Overrides (from original file) */
 ::ng-deep .welcome-snackbar {
     background-color: #2196f3;
     color: #fff;
@@ -222,13 +239,168 @@
     text-align: center;
     border-radius: 8px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
-  }
-  
-  ::ng-deep .custom-dialog-container .mat-dialog-container {
+}
+
+::ng-deep .custom-dialog-container .mat-dialog-container {
     padding: 0;
     border-radius: 20px;
     overflow: hidden;
-  }
-  
+}
 
-  
+/* --- Responsive Adjustments (Tablet and Mobile Views Only) --- */
+
+/* Tablet and Mobile (max-width: 1023px) */
+@media (max-width: 1023px) {
+    .header-area {
+        padding: 10px 15px;
+        /* Consistent horizontal padding */
+        flex-direction: column;
+        /* Stack logo and nav vertically */
+        align-items: center;
+        /* Center content */
+    }
+
+    .logo-container {
+        margin-bottom: 10px;
+        width: 100%;
+        order: 1;
+        /* Ensure logo is at the top */
+    }
+
+    .logo {
+        width: 90%;
+        /* Logo takes 90% width of its container */
+        max-width: 380px;
+        /* Increased max-width for tablets */
+        height: auto;
+    }
+
+    .custom-tab-nav {
+        order: 3;
+        /* Position tabs below logo and potentially profile */
+        justify-content: flex-start;
+        gap: 8px;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 5px;
+        margin-top: 10px;
+        /* Space between logo/profile and tabs */
+    }
+
+    .custom-tab-nav::-webkit-scrollbar {
+        height: 5px;
+    }
+
+    .custom-tab-nav::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+
+    .custom-tab-nav::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
+    .custom-tab-nav a {
+        font-size: 14px;
+        padding: 4px 10px;
+        /* SIGNIFICANTLY DECREASED VERTICAL PADDING */
+        min-width: unset;
+    }
+
+    .profile-area {
+        position: absolute;
+        /* Keep absolute position */
+        top: 10px;
+        /* Adjust top for mobile/tablet to be higher */
+        right: 10px;
+        /* Keep it on the right */
+        order: 2;
+        /* Ensure it's between logo and nav, if not absolutely positioned */
+    }
+
+    .profile-area button {
+        width: 32px;
+        /* SMALLER PROFILE ICON: Reduced width */
+        height: 32px;
+        /* SMALLER PROFILE ICON: Reduced height */
+        padding: 6px;
+        /* Adjust padding for smaller size */
+        font-size: 18px;
+        /* Adjust icon size within button */
+    }
+
+    .profile-area button mat-icon {
+        font-size: 18px;
+        /* Ensure Material icon scales correctly */
+        width: 18px;
+        height: 18px;
+    }
+
+    .content-area {
+        padding: 20px;
+    }
+
+    .profile-details {
+        width: 180px;
+    }
+}
+
+/* Mobile Devices (max-width: 767px) - further refinements for small screens */
+@media (max-width: 767px) {
+    .header-area {
+        padding: 10px;
+    }
+
+    .logo {
+        width: 95%;
+        /* Logo takes more space on very small screens */
+        max-width: 300px;
+        /* Cap its size */
+    }
+
+    .custom-tab-nav {
+        gap: 5px;
+        justify-content: flex-start;
+    }
+
+    .custom-tab-nav a {
+        font-size: 12px;
+        padding: 3px 8px;
+        /* FURTHER DECREASED VERTICAL PADDING for smallest screens */
+    }
+
+    .profile-area {
+        top: 5px;
+        /* Adjust top for very small screens */
+        right: 5px;
+    }
+
+    .profile-area button {
+        width: 28px;
+        /* EVEN SMALLER PROFILE ICON for very small screens */
+        height: 28px;
+        padding: 5px;
+        font-size: 16px;
+    }
+
+    .profile-area button mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+
+    .content-area {
+        padding: 10px;
+    }
+
+    .profile-details {
+        width: 150px;
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+
+    .profile-row {
+        font-size: 12px;
+    }
+}

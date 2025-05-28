@@ -1,3 +1,5 @@
+/* payment-tracker.component.css */
+
 .payment-tracker {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 30px;
@@ -139,9 +141,6 @@
 }
 
 
-
-
-
 .month-details-container {
   margin-top: 40px;
   background-color: #ebe9e9;
@@ -207,6 +206,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #f8f9fa;
+  /* Ensure footer has a background */
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  /* Optional: add shadow to footer */
 }
 
 .total-amount-bottom {
@@ -260,8 +263,6 @@
 }
 
 
-
-
 .unpaid-month-warning {
   background-color: #ffebee;
   color: #d32f2f;
@@ -273,6 +274,8 @@
   font-weight: bold;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   animation: pulse 1.5s infinite alternate;
+  padding: 15px;
+  /* Added default padding */
 }
 
 .unpaid-month-warning .unpaid-month {
@@ -356,4 +359,228 @@
   opacity: 0.6;
   /* Make them slightly faded */
   cursor: not-allowed;
+}
+
+
+/* --- Responsive Adjustments --- */
+
+/* Tablet Devices (max-width: 1023px) */
+@media (max-width: 1023px) {
+  .payment-tracker {
+    padding: 20px;
+    /* Reduced padding */
+    width: 98%;
+    /* Slightly wider */
+  }
+
+  .header {
+    flex-direction: column;
+    /* Stack year select and total amount */
+    align-items: flex-start;
+    gap: 15px;
+    /* Space between stacked items */
+    margin-bottom: 25px;
+  }
+
+  .year-select-wrapper select {
+    width: 160px;
+    /* Slightly smaller width */
+    font-size: 15px;
+    padding: 10px 35px 10px 12px;
+  }
+
+  .month-grid {
+    grid-template-columns: repeat(4, 1fr);
+    /* 4 columns for tablets */
+    gap: 12px;
+  }
+
+  .month {
+    padding: 15px;
+    /* Reduced month card padding */
+  }
+
+  .month-name {
+    font-size: 0.95em;
+  }
+
+  .month-status {
+    font-size: 0.8em;
+  }
+
+  .total-amount {
+    font-size: 17px;
+  }
+
+  .month-details-container {
+    margin-top: 30px;
+    padding: 20px;
+  }
+
+  .month-details h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+  }
+
+  .details-grid {
+    gap: 15px;
+  }
+
+  .student-details h3,
+  .fee-details h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .detail-item strong,
+  .detail-item span {
+    font-size: 0.95em;
+  }
+
+  .sticky-footer {
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-top: 15px;
+    flex-direction: column;
+    /* Stack total and controls */
+    align-items: center;
+    gap: 10px;
+  }
+
+  .total-amount-bottom {
+    font-size: 17px;
+    padding-top: 12px;
+  }
+
+  .admin-payment-controls {
+    flex-direction: column;
+    /* Stack input and button */
+    gap: 15px;
+    width: 100%;
+    /* Take full width to allow stacking */
+  }
+
+  .admin-payment-controls mat-form-field {
+    width: 100% !important;
+    /* Full width for input field */
+    margin-top: 15px;
+    /* Adjust margin as needed */
+  }
+
+  .admin-payment-controls button {
+    width: 100%;
+    /* Full width for button */
+    padding: 10px 15px;
+    font-size: 15px;
+  }
+
+  .unpaid-month-warning {
+    font-size: 0.9em;
+    padding: 10px 15px;
+  }
+}
+
+/* Mobile Devices (max-width: 767px) */
+@media (max-width: 767px) {
+  .payment-tracker {
+    padding: 6px;
+  }
+
+  .header {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .year-select-wrapper select {
+    width: 100%;
+    /* Full width for mobile */
+    font-size: 14px;
+    padding: 10px 30px 10px 10px;
+  }
+
+  .month-grid {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 columns for mobile */
+    gap: 10px;
+  }
+
+  .month {
+    padding: 12px;
+    /* Further reduced month card padding */
+  }
+
+  .month-name {
+    font-size: 0.9em;
+  }
+
+  .month-status {
+    font-size: 0.75em;
+  }
+
+  .total-amount {
+    font-size: 16px;
+  }
+
+  .month-details-container {
+    margin-top: 20px;
+    padding: 15px;
+  }
+
+  .month-details h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    /* Stack student and fee details */
+    gap: 15px;
+  }
+
+  .student-details h3,
+  .fee-details h3 {
+    font-size: 17px;
+    margin-bottom: 15px;
+  }
+
+  .detail-item strong,
+  .detail-item span {
+    font-size: 0.85em;
+  }
+
+  .sticky-footer {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: 10px;
+    gap: 4px;
+  }
+
+  .total-amount-bottom {
+    font-size: 16px;
+    padding-top: 12px;
+  }
+
+  .admin-payment-controls {
+    gap: 10px;
+  }
+
+  .admin-payment-controls mat-form-field {
+    margin-top: 10px;
+  }
+
+  .admin-payment-controls button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .unpaid-month-warning {
+    font-size: 0.85em;
+    padding: 8px 12px;
+  }
+
+  /* Adjust the spinner for smaller screens if needed */
+  .spinner {
+    width: 40px;
+    height: 40px;
+  }
 }

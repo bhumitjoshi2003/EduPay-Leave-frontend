@@ -10,13 +10,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
 
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatSnackBarModule, FormsModule, MatIconModule],
+  imports: [MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatSnackBarModule, FormsModule, MatIconModule, CommonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -95,27 +96,27 @@ export class HomeComponent implements OnInit {
   }
 
   forgotPassword() {
-  Swal.fire({
-    title: 'Forgot Password',
-    html: `
+    Swal.fire({
+      title: 'Forgot Password',
+      html: `
       <input id="swal-input1" class="swal2-input" style="width: 90%; max-width: 350px; padding: 0.5rem; margin-bottom: 0.75rem; box-sizing: border-box;" placeholder="Enter your User ID">
       <input id="swal-input2" class="swal2-input" style="width: 90%; max-width: 350px; padding: 0.5rem; margin-bottom: 0.75rem; box-sizing: border-box;" placeholder="Enter your registered Email Address">
     `,
-    showCancelButton: true,
-    confirmButtonText: 'Reset Password',
-    cancelButtonText: 'Cancel',
-    preConfirm: () => {
-      const userId = (document.getElementById('swal-input1') as HTMLInputElement).value;
-      const email = (document.getElementById('swal-input2') as HTMLInputElement).value;
-      if (!userId || !email) {
-        Swal.showValidationMessage('Please enter both your User ID and Email Address');
+      showCancelButton: true,
+      confirmButtonText: 'Reset Password',
+      cancelButtonText: 'Cancel',
+      preConfirm: () => {
+        const userId = (document.getElementById('swal-input1') as HTMLInputElement).value;
+        const email = (document.getElementById('swal-input2') as HTMLInputElement).value;
+        if (!userId || !email) {
+          Swal.showValidationMessage('Please enter both your User ID and Email Address');
+        }
+        return { userId: userId, email: email };
+      },
+      customClass: {
+        confirmButton: 'swal-primary-button',
+        cancelButton: 'swal-cancel-button'
       }
-      return { userId: userId, email: email };
-    },
-    customClass: {
-      confirmButton: 'swal-primary-button',
-      cancelButton: 'swal-cancel-button'
-    }
     }).then((result) => {
       if (result.isConfirmed) {
         const { userId, email } = result.value;

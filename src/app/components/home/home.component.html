@@ -1,43 +1,45 @@
 <div class="home-container" [class.login-active]="loginState === 'loginActive'">
   @if (!authenticated) {
-    @if (!showLoginForm) {
-      <button mat-button style="color: rgb(211, 207, 207);" class="login-button" (click)="login()">Login</button>
-    } @else {
-      <div class="login-form">
-        <mat-card>
-          <mat-card-title>Login</mat-card-title>
-          <mat-card-content (keydown.enter)="submitLogin()">
-            <mat-form-field appearance="outline">
-              <mat-label>User ID</mat-label>
-              <input matInput [(ngModel)]="studentId" placeholder="Enter your User ID">
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Password</mat-label>
-              <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="password" placeholder="Enter your password">
-              <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" [attr.aria-label]="hidePassword ? 'Hide password' : 'Show password'" [attr.aria-pressed]="!hidePassword">
-                <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-              </button>
-            </mat-form-field>
-            <div class="login-actions">
-              <button mat-raised-button color="primary" (click)="submitLogin()">Login</button>
-              <div class="secondary-actions">
-                <button mat-button (click)="cancelLogin()">Cancel</button>
-                <button mat-button class="forgot-password-button" (click)="forgotPassword()">Forgot Password?</button>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    }
+  @if (!showLoginForm) {
+  <button mat-button style="color: rgb(211, 207, 207);" class="login-button" (click)="login()">Login</button>
   } @else {
-    <button mat-button style="color: rgb(211, 207, 207);" class="login-button" (click)="logout()">Logout</button>
+  <div class="login-form">
+    <mat-card>
+      <mat-card-title>Login</mat-card-title>
+      <mat-card-content (keydown.enter)="submitLogin()">
+        <mat-form-field appearance="outline">
+          <mat-label>User ID</mat-label>
+          <input matInput [(ngModel)]="studentId" placeholder="Enter your User ID">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="password"
+            placeholder="Enter your password">
+          <button mat-icon-button matSuffix (click)="togglePasswordVisibility()"
+            [attr.aria-label]="hidePassword ? 'Hide password' : 'Show password'" [attr.aria-pressed]="!hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </mat-form-field>
+        <div class="login-actions">
+          <button mat-raised-button color="primary" (click)="submitLogin()">Login</button>
+          <div class="secondary-actions">
+            <button mat-button (click)="cancelLogin()">Cancel</button>
+            <button mat-button class="forgot-password-button" (click)="forgotPassword()">Forgot Password?</button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  }
+  } @else {
+  <button mat-button style="color: rgb(211, 207, 207);" class="login-button" (click)="logout()">Logout</button>
   }
   <div class="content">
     <img src="/MONO_png.png" alt="School Logo" class="logo">
     <h1 style="font-family: Verdana, Geneva, Tahoma, sans-serif">Indra Academy Sr. Sec. School</h1>
     <h2 style="font-family: Verdana, Geneva, Tahoma, sans-serif">Haldwani, Nainital</h2>
     <span class="custom-hr"></span>
-    <hr class="login-active-hr">
+    <hr *ngIf="showLoginForm" class="login-active-hr">
     <h3 style="font-family: Verdana, Geneva, Tahoma, sans-serif">Affiliated to CBSE, New Delhi</h3>
   </div>
 </div>

@@ -2,12 +2,8 @@
   <div *ngIf="loggedInUserRole === 'ADMIN'" class="left-navigation">
     <h2>Classes</h2>
     <ul class="class-list-vertical">
-      <li
-        *ngFor="let className of classList"
-        (click)="onClassSelect(className)"
-        [class.selected]="className === selectedClass"
-        class="class-item-vertical"
-      >
+      <li *ngFor="let className of classList" (click)="onClassSelect(className)"
+        [class.selected]="className === selectedClass" class="class-item-vertical">
         <div class="chevron">
           <span>{{ className }}</span>
         </div>
@@ -21,6 +17,17 @@
     <div *ngIf="students.length > 0; else noStudentsContainer">
       <ul class="student-list">
         <li *ngFor="let student of students" class="student-item" (click)="viewStudentDetails(student.studentId)">
+          <div class="student-info">
+            <span class="student-name">{{ student.name }}</span>
+            <span class="student-id">({{ student.studentId }})</span>
+          </div>
+          <button class="view-details-button" (click)="viewStudentDetails(student.studentId)">View Details</button>
+        </li>
+      </ul>
+
+      <ul class="student-list">
+        <li *ngFor="let student of newStudents" class="new-student-item"
+          (click)="viewStudentDetails(student.studentId)">
           <div class="student-info">
             <span class="student-name">{{ student.name }}</span>
             <span class="student-id">({{ student.studentId }})</span>

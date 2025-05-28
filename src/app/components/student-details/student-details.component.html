@@ -73,6 +73,12 @@
       <input type="number" *ngIf="isEditing" [(ngModel)]="updatedDetails.distance"
         (input)="updateFieldValue('distance', $event)">
     </div>
+    <div *ngIf="getUserRole() === 'ADMIN'" class="detail-item">
+      <span class="label">Joining Date:</span>
+      <span class="value" *ngIf="!isEditing">{{ studentDetails.joiningDate | date }}</span>
+      <input type="date" *ngIf="isEditing" [(ngModel)]="updatedDetails.joiningDate"
+        (input)="updateFieldValue('joiningDate', $event)">
+    </div>
   </div>
 
   <div *ngIf="getUserRole() !== 'STUDENT'" class="actions">

@@ -20,6 +20,7 @@ interface StudentDetails {
   motherName?: string;
   takesBus?: boolean;
   distance?: number | null;
+  joiningDate?: string;
 }
 
 @Component({

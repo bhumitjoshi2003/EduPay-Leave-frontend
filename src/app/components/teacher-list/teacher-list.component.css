@@ -1,5 +1,3 @@
-/* teacher-list.component.css */
-
 .teacher-list-container {
   display: flex;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -8,20 +6,22 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
   animation: fadeIn 0.8s ease-in-out;
   padding: 30px;
+  max-width: 900px;
+  margin: 20px auto;
+  width: 95%;
 }
 
 .teacher-list-container h2 {
-  color: #1f6f8b; /* Deep teal */
+  color: #1f6f8b;
   margin-bottom: 20px;
   text-align: center;
-  border-bottom: 2px solid #4fbdbd; /* Soft aqua */
+  border-bottom: 2px solid #4fbdbd;
   padding-bottom: 10px;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   width: 100%;
 }
 
-/* Teacher List Area */
 .teacher-list-area {
   flex-grow: 1;
   padding: 20px;
@@ -52,28 +52,45 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: background-color 0.3s ease;
-  background-color: #f0f9f9; /* Light teal background */
-  border-left: 8px solid #4fbdbd; /* Aqua accent */
+  background-color: #f0f9f9;
+  border-left: 8px solid #4fbdbd;
 }
 
 .teacher-item:hover {
-  background-color: #ccf7f7; /* Softer hover */
+  background-color: #ccf7f7;
 }
 
 .teacher-info {
   flex-grow: 1;
+  display: flex;
+  /* Use flex for name and ID */
+  align-items: center;
+  min-width: 0;
+  /* Allow content to shrink */
 }
 
 .teacher-name {
   font-weight: bold;
   color: #333;
-  margin-right: 10px;
+  margin-right: 5px;
+  /* Reduced margin */
+  white-space: nowrap;
+  /* Prevent wrapping */
+  overflow: hidden;
+  /* Hide overflow */
+  text-overflow: ellipsis;
+  /* Add ellipsis */
 }
 
 .teacher-id {
   color: #666;
   font-size: 0.9em;
-  margin-right: 10px;
+  white-space: nowrap;
+  /* Prevent wrapping */
+  overflow: hidden;
+  /* Hide overflow */
+  text-overflow: ellipsis;
+  /* Add ellipsis */
 }
 
 .teacher-email,
@@ -81,20 +98,27 @@
   color: #444;
   font-size: 0.9em;
   margin-right: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .view-details-button {
-  background-color: #1f6f8b; /* Deep teal button */
+  background-color: #1f6f8b;
   color: white;
   border: none;
   padding: 8px 15px;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  flex-shrink: 0;
+  /* Prevent button from shrinking */
+  white-space: nowrap;
+  /* Prevent button text from wrapping */
 }
 
 .view-details-button:hover {
-  background-color: #14505d; /* Darker teal hover */
+  background-color: #14505d;
 }
 
 .no-teachers {
@@ -104,8 +128,102 @@
   color: #666;
 }
 
-/* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Responsive Adjustments --- */
+
+/* Tablet Devices (max-width: 1023px) */
+@media (max-width: 1023px) {
+  .teacher-list-container {
+    padding: 25px;
+    width: 98%;
+  }
+
+  .teacher-list-container h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .teacher-list-area {
+    padding: 15px;
+  }
+
+  .teacher-list-area h2 {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+  }
+
+  .teacher-item {
+    padding: 12px;
+  }
+
+  .teacher-name {
+    font-size: 0.95em;
+  }
+
+  .teacher-id {
+    font-size: 0.85em;
+  }
+
+  .view-details-button {
+    padding: 6px 12px;
+    font-size: 0.85em;
+  }
+}
+
+/* Mobile Devices (max-width: 767px) */
+@media (max-width: 767px) {
+  .teacher-list-container {
+    padding: 15px;
+    width: 100%;
+  }
+
+  .teacher-list-container h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+  }
+
+  .teacher-list-area {
+    padding: 10px;
+  }
+
+  .teacher-list-area h2 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+
+  .teacher-item {
+    padding: 8px 10px;
+    justify-content: flex-start;
+  }
+
+  .teacher-info {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .teacher-name {
+    font-size: 0.9em;
+    margin-right: 5px;
+  }
+
+  .teacher-id {
+    font-size: 0.8em;
+  }
+
+  .view-details-button {
+    display: none;
+  }
 }

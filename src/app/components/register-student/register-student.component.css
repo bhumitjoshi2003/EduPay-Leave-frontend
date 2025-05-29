@@ -1,25 +1,9 @@
-/* Page background */
-body {
-    background: linear-gradient(135deg, #e0f7fa, #ffffff);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 20px;
-}
-
-/* Glass card container */
 .register-student-container {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.8);
-    max-width: 650px;
-    margin: 60px auto;
     padding: 40px 50px;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    margin-top: 30px;
     animation: fadeIn 1s ease-out;
+    /* ENSURED THIS IS HERE */
 }
 
-/* Animated Heading */
 h2 {
     text-align: center;
     font-size: 2rem;
@@ -42,13 +26,11 @@ h2::after {
     animation: slideIn 1s ease-out forwards;
 }
 
-/* Form Group */
 .form-group {
     position: relative;
     margin-bottom: 30px;
 }
 
-/* Labels outside inputs */
 label {
     display: block;
     color: #757575;
@@ -56,7 +38,6 @@ label {
     margin-bottom: 5px;
 }
 
-/* Inputs */
 input.form-control,
 select.form-control {
     width: 100%;
@@ -67,6 +48,9 @@ select.form-control {
     background-color: #ffffff;
     color: #333;
     transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 input.form-control:focus,
@@ -76,19 +60,26 @@ select.form-control:focus {
     outline: none;
 }
 
-/* Error */
+select.form-control {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%22292%22%20height%3D%22292%22%20viewBox%3D%220%200%20292%20292%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20fill%3D%22%23757575%22%20d%3D%22M287%2069.4l-14.2-14.3L146%20182.8%2019.2%2055.1%205%2069.4%20146%20210.6z%22/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 35px;
+}
+
 .error-message {
     color: #d32f2f;
     font-size: 0.8rem;
     margin-top: 5px;
 }
 
-/* Buttons */
 .button-group {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 15px;
     margin-top: 30px;
+    flex-wrap: wrap;
 }
 
 .save-button,
@@ -101,6 +92,8 @@ select.form-control:focus {
     border: none;
     color: white;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-width: 120px;
+    text-align: center;
 }
 
 .save-button {
@@ -125,12 +118,13 @@ select.form-control:focus {
     box-shadow: 0 6px 15px rgba(117, 117, 117, 0.6);
 }
 
-/* Animations */
+/* Ensure fadeIn is defined here too if this component can be loaded independently */
 @keyframes fadeIn {
     from {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -141,18 +135,20 @@ select.form-control:focus {
     from {
         width: 0;
     }
+
     to {
         width: 80px;
     }
 }
 
-/* Custom Switch Styles */
 .switch-container {
-    display: inline-flex;
+    display: flex;
+    flex-direction: row;
     align-items: center;
     cursor: pointer;
-    flex-direction: column;
-    align-items: flex-start;
+    margin-top: 10px;
+    width: 100%;
+    justify-content: flex-start;
 }
 
 .switch {
@@ -160,6 +156,8 @@ select.form-control:focus {
     display: inline-block;
     width: 60px;
     height: 30px;
+    margin-left: 10px;
+    flex-shrink: 0;
 }
 
 .switch input {
@@ -197,21 +195,20 @@ select.form-control:focus {
     border-radius: 50%;
 }
 
-input:checked + .slider {
+input:checked+.slider {
     background-color: #4caf50;
 }
 
-input:focus + .slider {
+input:focus+.slider {
     box-shadow: 0 0 1px #4caf50;
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
     -webkit-transform: translateX(30px);
     -ms-transform: translateX(30px);
     transform: translateX(30px);
 }
 
-/* Rounded Slider */
 .slider.round {
     border-radius: 30px;
 }
@@ -221,44 +218,138 @@ input:checked + .slider:before {
 }
 
 .switch-label {
-    margin-bottom: 8px;
+    margin-bottom: 0;
     color: #757575;
     font-size: 0.95rem;
-    display: block;
+    display: inline-block;
     text-align: left;
 }
 
-.switch-labels {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-bottom: 2px;
-    font-size: 0.8rem;
-    color: #fff;
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    height: 100%;
-    pointer-events: none;
-    user-select: none;
+@media (max-width: 768px) {
+    .register-student-container {
+        padding: 30px 35px;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+    }
+
+    h2::after {
+        width: 60px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    label {
+        font-size: 0.9rem;
+    }
+
+    input.form-control,
+    select.form-control {
+        padding: 10px;
+        font-size: 0.95rem;
+        border-radius: 8px;
+    }
+
+    select.form-control {
+        background-position: right 10px center;
+        background-size: 14px;
+        padding-right: 30px;
+    }
+
+    .save-button,
+    .cancel-button {
+        padding: 9px 20px;
+        font-size: 0.95rem;
+        border-radius: 6px;
+    }
+
+    .switch-container {
+        margin-top: 5px;
+    }
+
+    .switch {
+        width: 50px;
+        height: 25px;
+        margin-left: 8px;
+    }
+
+    .slider:before {
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+    }
+
+    input:checked+.slider:before {
+        transform: translateX(25px);
+    }
 }
 
-.switch-labels span {
-    padding: 0 8px;
-    line-height: 30px;
-    white-space: nowrap;
-}
+@media (max-width: 480px) {
+    .register-student-container {
+        padding: 20px 25px;
+    }
 
-.switch-labels .no {
-    order: 1;
-    background-color: #f44336;
-    border-radius: 4px 0 0 4px;
-}
+    h2 {
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+    }
 
-.switch-labels .yes {
-    order: 2;
-    background-color: #4caf50;
-    border-radius: 0 4px 4px 0;
-    text-align: right;
+    h2::after {
+        width: 50px;
+        bottom: -8px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-size: 0.85rem;
+    }
+
+    input.form-control,
+    select.form-control {
+        padding: 8px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+    }
+
+    select.form-control {
+        background-position: right 8px center;
+        background-size: 12px;
+        padding-right: 25px;
+    }
+
+    .button-group {
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 25px;
+    }
+
+    .save-button,
+    .cancel-button {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+        min-width: 100px;
+        max-width: 150px;
+    }
+
+    .error-message {
+        font-size: 0.75rem;
+    }
+
+    .switch-container {
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .switch-label {
+        text-align: left;
+    }
 }

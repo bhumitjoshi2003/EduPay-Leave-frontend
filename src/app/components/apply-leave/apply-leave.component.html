@@ -13,7 +13,8 @@
 
     <div class="form-group">
       <label for="reason" class="form-label">Reason for Leave:</label>
-      <select id="reason" formControlName="reason" class="form-input styled-input default-select" (change)="onReasonChange()">
+      <select id="reason" formControlName="reason" class="form-input styled-input default-select"
+        (change)="onReasonChange()">
         <option value="" disabled>Select Reason</option>
         <option *ngFor="let reason of reasonOptions" [value]="reason">{{ reason }}</option>
       </select>
@@ -30,6 +31,7 @@
 
 <div *ngIf="leaves.length" class="leave-list-container">
   <h2 class="section-title">Applied Leaves</h2>
+
   <div class="leave-table-container">
     <table class="leave-table">
       <thead>
@@ -44,12 +46,32 @@
           <td>{{ leave.leaveDate }}</td>
           <td>{{ leave.reason }}</td>
           <td>
-            <button [disabled]="leave.originalLeaveDate <= today" (click)="deleteLeave(leave.originalLeaveDate)" class="delete-button" [title]="leave.originalLeaveDate <= today ? 'Cannot delete past leaves' : ''">
+            <button [disabled]="leave.originalLeaveDate <= today" (click)="deleteLeave(leave.originalLeaveDate)"
+              class="delete-button" [title]="leave.originalLeaveDate <= today ? 'Cannot delete past leaves' : ''">
               Delete
             </button>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="leave-cards-container">
+    <div *ngFor="let leave of leaves" class="leave-card">
+      <div class="card-item">
+        <span class="card-label">Leave Date:</span>
+        <span class="card-value">{{ leave.leaveDate }}</span>
+      </div>
+      <div class="card-item">
+        <span class="card-label">Reason:</span>
+        <span class="card-value">{{ leave.reason }}</span>
+      </div>
+      <div class="card-actions">
+        <button [disabled]="leave.originalLeaveDate <= today" (click)="deleteLeave(leave.originalLeaveDate)"
+          class="card-delete-button" [title]="leave.originalLeaveDate <= today ? 'Cannot delete past leaves' : ''">
+          Delete
+        </button>
+      </div>
+    </div>
   </div>
 </div>

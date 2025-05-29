@@ -1,3 +1,5 @@
+/* teacher-attendance.component.css */
+
 .teacher-attendance-container {
   padding: 40px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -5,6 +7,9 @@
   border-radius: 15px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   animation: fadeIn 0.8s ease-in-out;
+  max-width: 1200px;
+  margin: 20px auto;
+  width: 95%;
 }
 
 .teacher-attendance-container h2 {
@@ -15,6 +20,7 @@
   padding-bottom: 15px;
   text-transform: uppercase;
   letter-spacing: 1px;
+  font-size: 28px;
 }
 
 .teacher-attendance-container p {
@@ -24,6 +30,59 @@
   font-size: 1.1em;
 }
 
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  /* Keeps datepicker left, save button right */
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  /* Allows wrapping on smaller screens if content is too wide */
+  gap: 20px;
+  /* Space between items in top section */
+}
+
+.custom-datepicker {
+  max-width: 300px;
+  /* Limit datepicker width */
+  width: 100%;
+  /* Allow it to shrink */
+  flex-grow: 1;
+  /* Allow datepicker to grow if space available */
+}
+
+.attendance-button.save {
+  background: rgb(49, 148, 219);
+  padding: 11px 35px;
+  font-size: 1.1em;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-transform: uppercase;
+  white-space: nowrap;
+  /* Prevent button text from wrapping */
+  width: auto;
+  /* Ensure it does not cover entire line */
+}
+
+.attendance-button.save:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.attendance-restriction-message {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 12px 16px;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  margin: 16px 0;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
 .student-list {
   list-style: none;
   padding: 0;
@@ -31,14 +90,21 @@
 
 .student-item {
   display: flex;
+  /* Always flex-direction: row for single line */
   justify-content: space-between;
+  /* Student info left, buttons right */
   align-items: center;
+  /* Vertically center items */
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   border-left: 8px solid transparent;
+  flex-wrap: wrap;
+  /* Allow wrapping if content is too wide on very small screens */
+  gap: 15px;
+  /* Default gap between student info and buttons */
 }
 
 .student-item:hover {
@@ -49,29 +115,36 @@
 .student-item.absent {
   border-left-color: #e57373;
   box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
-  background-color: #ffebee; /* Light red background */
+  background-color: #ffebee;
 }
 
 .student-item:not(.absent) {
   border-left-color: #81c784;
   box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
-  background-color: #d5f4d8; /* Light green background */
+  background-color: #d5f4d8;
 }
 
 .student-info {
   flex-grow: 1;
+  /* Allows student info to take up available space */
   font-weight: 600;
   color: #333;
   font-size: 1.1em;
+  min-width: 100px;
+  /* Ensures name doesn't shrink too much */
 }
 
 .attendance-buttons {
   display: flex;
   gap: 15px;
+  /* Default gap between mark buttons */
+  flex-shrink: 0;
+  /* Prevents buttons from shrinking excessively */
 }
 
 .attendance-button {
   width: auto;
+  /* Default auto width based on content/padding */
   padding: 10px 15px;
   border-radius: 8px;
   border: none;
@@ -84,6 +157,8 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  /* Prevent button text from wrapping */
 }
 
 .attendance-button:hover {
@@ -107,72 +182,206 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-
-
-
-
-.teacher-attendance-container {
-  padding: 40px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #e7f6f8, #f4f7f4);
-  border-radius: 15px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  animation: fadeIn 0.8s ease-in-out;
-}
-
-.top-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.attendance-button.save {
-  background: rgb(49, 148, 219);
-  padding: 11px 35px;
-  font-size: 1.1em;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  text-transform: uppercase;
-}
-
-.attendance-button.save:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-
-.attendance-restriction-message {
-  background-color: #fff3cd;
-  color: #856404;
-  padding: 12px 16px;
-  border: 1px solid #ffeeba;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  margin: 16px 0;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+/* --- Responsive Adjustments --- */
+
+/* Tablet Devices (max-width: 1023px) */
+@media (max-width: 1023px) {
+  .teacher-attendance-container {
+    padding: 35px;
+    /* Adjusted padding as discussed previously */
+    width: 98%;
+  }
+
+  .teacher-attendance-container h2 {
+    font-size: 24px;
+    margin-bottom: 25px;
+    padding-bottom: 12px;
+  }
+
+  .teacher-attendance-container p {
+    font-size: 1em;
+    margin-bottom: 25px;
+  }
+
+  /* Top Section - Datepicker and Save button */
+  .top-section {
+    flex-direction: row;
+    /* Keep in a row */
+    justify-content: space-between;
+    /* Datepicker left, Save button right */
+    align-items: center;
+    gap: 15px;
+  }
+
+  .custom-datepicker {
+    flex-grow: 1;
+    /* Allow datepicker to grow */
+    max-width: 60%;
+    /* Limit its width on tablets */
+  }
+
+  .attendance-button.save {
+    width: auto;
+    /* Don't make save button full width */
+    padding: 10px 25px;
+    /* Adjust padding for tablet size */
+    font-size: 1em;
+  }
+
+  .attendance-restriction-message {
+    font-size: 14px;
+    padding: 10px 12px;
+    margin: 12px 0;
+  }
+
+  /* Student Item Layout (Name and Button on same line) */
+  .student-item {
+    flex-direction: row;
+    /* Already row, ensuring consistency */
+    align-items: center;
+    padding: 15px;
+    gap: 10px;
+    /* Slightly less gap for tablet */
+  }
+
+  .student-info {
+    font-size: 1em;
+    flex-grow: 1;
+    min-width: 80px;
+    /* Ensure name doesn't shrink too much */
+  }
+
+  .attendance-buttons {
+    gap: 8px;
+    /* Gap between mark buttons */
+  }
+
+  .attendance-button {
+    padding: 8px 15px;
+    /* Adjusted button padding for tablet */
+    font-size: 0.9em;
+    width: auto;
+    /* Auto width based on content */
+  }
+}
+
+/* Mobile Devices (max-width: 767px) - further refinements for small screens */
+@media (max-width: 767px) {
+
+  .student-id-display {
+    display: none;
+  }
+
+  .teacher-attendance-container {
+    padding: 20px;
+    /* Adjusted padding as discussed previously */
+    width: 100%;
+    margin: 10px auto;
+  }
+
+  .teacher-attendance-container h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+  }
+
+  .teacher-attendance-container p {
+    font-size: 0.9em;
+    margin-bottom: 20px;
+  }
+
+  /* Top Section - Datepicker and Save button */
+  .top-section {
+    flex-direction: row;
+    /* Keep in a row */
+    justify-content: space-between;
+    /* Datepicker left, Save button right */
+    align-items: center;
+    gap: 10px;
+  }
+
+  .custom-datepicker {
+    flex-grow: 1;
+    /* Allow datepicker to grow */
+    max-width: 60%;
+    /* Limit its width on mobile */
+  }
+
+  .attendance-button.save {
+    width: auto;
+    /* Don't make save button full width */
+    padding: 9px 20px;
+    /* Adjust padding for mobile size */
+    font-size: 0.9em;
+  }
+
+  .attendance-restriction-message {
+    font-size: 13px;
+    padding: 8px 10px;
+    margin: 10px 0;
+  }
+
+  /* Student Item Layout (Name and Button on same line) */
+  .student-item {
+    flex-direction: row;
+    /* Ensure items stay in a row for mobile */
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    gap: 10px;
+    /* Space between student info and buttons */
+  }
+
+  .student-info {
+    font-size: 0.95em;
+    flex-grow: 1;
+    text-align: left;
+    /* Ensure text is left-aligned */
+    margin-bottom: 0;
+    /* No bottom margin when in a row */
+    min-width: 60px;
+    /* Ensure name doesn't shrink too much */
+  }
+
+  .attendance-buttons {
+    gap: 6px;
+    /* Slightly smaller gap between mark buttons */
+  }
+
+  .attendance-button {
+    width: auto;
+    /* Revert from fixed width to auto */
+    padding: 6px 12px;
+    /* Adjusted padding for mobile mark buttons */
+    font-size: 0.8em;
+    /* Adjusted font size for mobile mark buttons */
+    flex-shrink: 0;
+    /* Prevent from shrinking too much */
   }
 }

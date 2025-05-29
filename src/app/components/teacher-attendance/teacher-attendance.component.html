@@ -3,22 +3,14 @@
 
   <div class="top-section">
     <mat-form-field class="custom-datepicker">
-      <input
-        matInput
-        [matDatepicker]="picker"
-        placeholder="Choose a date"
-        [(ngModel)]="attendanceDate"
-        (dateChange)="onDateChange($event)"
-      />
+      <input matInput [matDatepicker]="picker" placeholder="Choose a date" [(ngModel)]="attendanceDate"
+        (dateChange)="onDateChange($event)" />
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
 
-    <button
-      class="attendance-button save"
-      [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
-      (click)="saveAttendance()"
-    >
+    <button class="attendance-button save" [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
+      (click)="saveAttendance()">
       Save
     </button>
   </div>
@@ -27,34 +19,24 @@
     Attendance can only be modified for dates between {{ getRelativeDate(-2) }} and {{ getRelativeDate(1) }}.
   </div>
 
-  <div *ngIf="isSunday(attendanceDate) && isDateWithinAllowedRange()" class="attendance-restriction-message sunday-message">
+  <div *ngIf="isSunday(attendanceDate) && isDateWithinAllowedRange()"
+    class="attendance-restriction-message sunday-message">
     Even the attendance system takes the day off on Sundays.
   </div>
 
   <ul class="student-list">
-    <li
-      *ngFor="let student of students"
-      class="student-item"
-      [class.absent]="student.absent"
-    >
+    <li *ngFor="let student of students" class="student-item" [class.absent]="student.absent">
       <div class="student-info">
-        {{ student.name }} ({{ student.studentId }})
+        {{ student.name }}
+        <span class="student-id-display">({{ student.studentId }})</span>
       </div>
       <div class="attendance-buttons">
-        <button
-          *ngIf="!student.absent"
-          (click)="markAbsent(student.studentId)"
-          class="attendance-button absent"
-          [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
-        >
+        <button *ngIf="!student.absent" (click)="markAbsent(student.studentId)" class="attendance-button absent"
+          [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)">
           Mark Absent
         </button>
-        <button
-          *ngIf="student.absent"
-          (click)="markPresent(student.studentId)"
-          class="attendance-button present"
-          [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
-        >
+        <button *ngIf="student.absent" (click)="markPresent(student.studentId)" class="attendance-button present"
+          [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)">
           Mark Present
         </button>
       </div>

@@ -1,42 +1,134 @@
+body {
+  background: linear-gradient(135deg, #e0f7fa, #ffffff);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 .register-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
-    margin-top: -10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 0 15px;
+  box-sizing: border-box;
+
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: fadeIn 1s ease-out;
+  /* Keeping the fadeIn animation here */
+}
+
+.form-toggle-nav {
+  display: flex;
+  margin-bottom: 20px;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 5px;
+  margin-top: 20px;
+}
+
+.form-toggle-nav button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  transition: color 0.3s ease, font-weight 0.3s ease, border-bottom 0.3s ease;
+  color: #555;
+  flex-grow: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.form-toggle-nav button:hover {
+  color: #00796b;
+}
+
+.form-toggle-nav button.active {
+  color: #00796b;
+  font-weight: bold;
+  border-bottom: 2px solid #00796b;
+}
+
+.form-wrapper {
+  width: 100%;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+app-register-student,
+app-register-teacher {
+  display: block;
+  width: 100%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments for the main layout */
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+
+  .register-container {
+    margin: 15px auto;
+    padding: 0 10px;
+  }
+
   .form-toggle-nav {
-    display: flex;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    max-width: 350px;
+    margin-top: 15px;
   }
-  
+
   .form-toggle-nav button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-    transition: color 0.3s ease;
-    color: #555;
-    font-size: large;
+    padding: 8px 15px;
+    font-size: 0.95rem;
   }
-  
-  .form-toggle-nav button:hover {
-    color: #00796b; 
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
   }
-  
-  .form-toggle-nav button.active {
-    color: #00796b;
-    font-weight: bold;
-    border-bottom: 2px solid #00796b; /* Highlight active button */
+
+  .register-container {
+    margin: 10px auto;
+    padding: 0 5px;
   }
-  
-  .form-wrapper {
-    width: 100%; 
+
+  .form-toggle-nav {
+    margin-bottom: 10px;
+    max-width: 280px;
+    margin-top: 10px;
   }
-  
-  /* You might want to adjust the margins or other styles of the embedded forms */
-  app-register-student,
-  app-register-teacher {
-    width: 100%;
+
+  .form-toggle-nav button {
+    padding: 8px 10px;
+    font-size: 0.85rem;
   }
+}

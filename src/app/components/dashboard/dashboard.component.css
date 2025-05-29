@@ -71,7 +71,6 @@
 .content-area {
     flex-grow: 1;
     padding: 30px;
-    /* ORIGINAL DESKTOP: Reverted to 30px padding */
 }
 
 /* Animations */

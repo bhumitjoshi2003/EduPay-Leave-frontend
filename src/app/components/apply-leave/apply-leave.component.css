@@ -1,7 +1,7 @@
 .apply-leave-container,
 .leave-list-container {
   max-width: 600px;
-  margin: 2.5rem auto;
+  margin: 1rem auto;
   padding: 2rem;
   background: #f8f9fa;
   border: 1px solid #ddd;
@@ -100,7 +100,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
   display: block;
-  margin: 0 auto;
+  margin: 2rem auto 1rem;
 }
 
 .submit-button:hover {

@@ -6,55 +6,58 @@
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Header Section */
+/* REMOVED: Old .user-main-info .user-id, .user-role, .user-class-teacher bold rule */
+
 .header-area {
     background-color: #ffffff;
-    padding: 2px 150px;
-    /* ORIGINAL DESKTOP: Reverted to 2px vertical padding */
+    padding: 2px 50px;
+    /* Decreased horizontal padding to give more space for tabs */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     animation: fadeSlideDown 1s ease-in-out;
     position: relative;
-    /* desktop flex properties (implicit) */
 }
 
-/* Logo Section */
 .logo-container {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 15px;
-    /* desktop width (implicit) */
 }
 
 .logo {
     width: 60%;
-    /* ORIGINAL DESKTOP: Reverted to 60% */
     transition: transform 0.3s ease;
     height: auto;
-    /* Ensure aspect ratio */
 }
 
-/* Navigation Tabs */
 .custom-tab-nav {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+    justify-content: flex-start;
+    /* Changed to flex-start for scroll behavior */
+    /* Removed flex-wrap: wrap to prevent tabs from breaking into new lines */
     gap: 10px;
     animation: fadeSlideUp 1s ease-in-out;
-    /* desktop width (implicit) */
+    overflow-x: auto;
+    /* THIS enables horizontal scrolling */
+    white-space: nowrap;
+    /* THIS keeps all links on a single line */
+    -webkit-overflow-scrolling: touch;
+    /* THIS provides native-like touch scrolling */
+    padding-bottom: 5px;
+    margin-top: 10px;
 }
 
 .custom-tab-nav a {
     font-size: 16px;
     font-family: 'Serif', serif;
     margin: 1px;
-    /* ORIGINAL DESKTOP: Reverted to 1px margin */
     border-radius: 6px;
     background-color: #f3ec0c;
     color: #161616;
     text-decoration: none;
     transition: all 0.3s ease;
-    /* desktop padding (implicit, due to margin) */
+    padding: 4px 15px;
+    /* Decreased vertical padding for desktop */
 }
 
 .custom-tab-nav a.active {
@@ -67,13 +70,11 @@
     transform: translateY(-2px);
 }
 
-/* Main Content Area */
 .content-area {
     flex-grow: 1;
     padding: 30px;
 }
 
-/* Animations */
 @keyframes fadeSlideDown {
     0% {
         opacity: 0;
@@ -98,13 +99,11 @@
     }
 }
 
-/* Enhanced Profile Area */
 .profile-area {
     position: absolute;
     top: 10px;
-    /* ORIGINAL DESKTOP: Reverted to 10px */
-    right: 10px;
-    /* ORIGINAL DESKTOP: Reverted to 10px */
+    right: 20px;
+    /* Adjusted to be closer to the right corner */
     display: flex;
     align-items: center;
     z-index: 10;
@@ -115,11 +114,9 @@
     color: white;
     border: none;
     border-radius: 50%;
-    padding: 8px;
-    width: 40px;
-    /* ORIGINAL DESKTOP: Reverted to 40px */
-    height: 40px;
-    /* ORIGINAL DESKTOP: Reverted to 40px */
+    padding: 6px;
+    width: 35px;
+    height: 35px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -133,59 +130,143 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Profile Dropdown Styling */
+.profile-area button mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
 .profile-details {
     padding: 12px 16px;
     background: #ffffff;
     border-radius: 8px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-    width: 160px;
-    /* ORIGINAL DESKTOP: Reverted to 160px */
+    width: 200px;
+    /* Increased width for desktop */
     font-family: 'Segoe UI', sans-serif;
     color: #2c3e50;
+    /* Base text color for profile details */
     display: flex;
     flex-direction: column;
     animation: slideUp 0.3s ease-in-out;
+    border: none;
 }
 
-.profile-row {
+.profile-overview {
     display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    padding: 6px 0;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
 }
 
-.profile-row:not(:last-of-type) {
-    border-bottom: 1px solid #ccc;
+.user-initials {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: #e8f0fe;
+    color: #1a73e8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.profile-row .label {
-    font-weight: 600;
-    color: #1e88e5;
+.user-main-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    /* Ensure default text color for all child elements if not explicitly set */
+    color: #555;
+    font-size: 12px;
 }
 
-.profile-row .value {
-    color: #37474f;
+/* NEW: Styles for the new structure for ID, Role, Class Teacher */
+.profile-detail-row {
+    display: flex;
+    /* Aligns label, colon, and value horizontally */
+    align-items: baseline;
+    /* Aligns content based on text baseline for better vertical alignment */
+    margin-bottom: 2px;
+    /* Small space between rows */
+    white-space: nowrap;
+    /* Prevents text from wrapping if too long */
+    overflow: hidden;
+    /* Hides content that overflows */
+    text-overflow: ellipsis;
+    /* Adds "..." if content overflows */
 }
 
-/* Remove separator line */
-.profile-details hr {
-    display: none;
+.detail-label {
+    min-width: 60px;
+    /* Adjust this value as needed to align your text perfectly */
+    text-align: left;
+    /* Aligns label text to the left within its allocated width */
+    font-weight: bold;
+    /* Keeps the label text bold */
+    font-size: inherit;
+    /* Inherit from .user-main-info */
+    color: inherit;
+    /* Inherit from .user-main-info */
 }
 
-/* Profile Buttons Styling */
+.detail-colon {
+    margin-right: 5px;
+    /* Adds space after the colon */
+    font-weight: bold;
+    /* Keeps the colon bold */
+    font-size: inherit;
+    /* Inherit from .user-main-info */
+    color: inherit;
+    /* Inherit from .user-main-info */
+}
+
+.detail-value {
+    flex-grow: 1;
+    /* Allows the value to take up the remaining space */
+    font-weight: bold;
+    /* Keeps the value text bold */
+    text-transform: capitalize;
+    /* Converts "ADMIN" to "Admin", "TEACHER" to "Teacher", etc. */
+    font-size: inherit;
+    /* Inherit from .user-main-info */
+    color: inherit;
+    /* Inherit from .user-main-info */
+}
+
+/* REMOVED: Old .user-id-role-row, .user-main-info span, .user-id, .user-role, .user-class-teacher rules */
+
+.profile-separator {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 10px 0;
+}
+
 .profile-details button {
-    margin-top: 10px;
+    margin-top: 8px;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.4s ease, color 0.4s ease, transform 0.3s ease;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
 }
 
-/* My Profile Button (Green) */
+.profile-details button .button-icon {
+    margin-right: 8px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: inherit;
+}
+
 .profile-details button.profile-btn {
     background-color: transparent;
     color: #42a247;
@@ -200,9 +281,8 @@
     transform: translateY(-1px);
 }
 
-/* Logout Button (Red) */
 .profile-details button.logout-btn {
-    margin-top: 10px;
+    margin-top: 8px;
     background-color: transparent;
     font-weight: bold;
     color: #e53935;
@@ -216,7 +296,6 @@
     transform: translateY(-1px);
 }
 
-/* Dropdown Animation */
 @keyframes slideUp {
     0% {
         opacity: 0;
@@ -229,7 +308,6 @@
     }
 }
 
-/* Global Material Overrides (from original file) */
 ::ng-deep .welcome-snackbar {
     background-color: #2196f3;
     color: #fff;
@@ -246,37 +324,36 @@
     overflow: hidden;
 }
 
-/* --- Responsive Adjustments (Tablet and Mobile Views Only) --- */
+/* REMOVED ALL DEFAULT SHADOWS/BORDERS FROM MAT-MENU-PANEL */
+::ng-deep .mat-menu-panel {
+    box-shadow: none !important;
+    /* Removes the circular shadow */
+    border: none !important;
+    /* Removes any default border that might look like a shadow */
+}
 
-/* Tablet and Mobile (max-width: 1023px) */
+
 @media (max-width: 1023px) {
     .header-area {
         padding: 10px 15px;
-        /* Consistent horizontal padding */
         flex-direction: column;
-        /* Stack logo and nav vertically */
         align-items: center;
-        /* Center content */
     }
 
     .logo-container {
         margin-bottom: 10px;
         width: 100%;
         order: 1;
-        /* Ensure logo is at the top */
     }
 
     .logo {
         width: 90%;
-        /* Logo takes 90% width of its container */
         max-width: 380px;
-        /* Increased max-width for tablets */
         height: auto;
     }
 
     .custom-tab-nav {
         order: 3;
-        /* Position tabs below logo and potentially profile */
         justify-content: flex-start;
         gap: 8px;
         overflow-x: auto;
@@ -284,7 +361,6 @@
         -webkit-overflow-scrolling: touch;
         padding-bottom: 5px;
         margin-top: 10px;
-        /* Space between logo/profile and tabs */
     }
 
     .custom-tab-nav::-webkit-scrollbar {
@@ -292,7 +368,8 @@
     }
 
     .custom-tab-nav::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.2);
+        background-color: rgba(0, 0, 0, 0.4);
+        /* Made scrollbar thumb slightly more visible */
         border-radius: 10px;
     }
 
@@ -302,85 +379,22 @@
 
     .custom-tab-nav a {
         font-size: 14px;
-        padding: 4px 10px;
-        /* SIGNIFICANTLY DECREASED VERTICAL PADDING */
+        padding: 3px 10px;
+        /* Decreased vertical padding for tablet */
         min-width: unset;
     }
 
     .profile-area {
         position: absolute;
-        /* Keep absolute position */
         top: 10px;
-        /* Adjust top for mobile/tablet to be higher */
         right: 10px;
-        /* Keep it on the right */
         order: 2;
-        /* Ensure it's between logo and nav, if not absolutely positioned */
-    }
-
-    .profile-area button {
-        width: 32px;
-        /* SMALLER PROFILE ICON: Reduced width */
-        height: 32px;
-        /* SMALLER PROFILE ICON: Reduced height */
-        padding: 6px;
-        /* Adjust padding for smaller size */
-        font-size: 18px;
-        /* Adjust icon size within button */
-    }
-
-    .profile-area button mat-icon {
-        font-size: 18px;
-        /* Ensure Material icon scales correctly */
-        width: 18px;
-        height: 18px;
-    }
-
-    .content-area {
-        padding: 20px;
-    }
-
-    .profile-details {
-        width: 180px;
-    }
-}
-
-/* Mobile Devices (max-width: 767px) - further refinements for small screens */
-@media (max-width: 767px) {
-    .header-area {
-        padding: 10px;
-    }
-
-    .logo {
-        width: 95%;
-        /* Logo takes more space on very small screens */
-        max-width: 300px;
-        /* Cap its size */
-    }
-
-    .custom-tab-nav {
-        gap: 5px;
-        justify-content: flex-start;
-    }
-
-    .custom-tab-nav a {
-        font-size: 12px;
-        padding: 3px 8px;
-        /* FURTHER DECREASED VERTICAL PADDING for smallest screens */
-    }
-
-    .profile-area {
-        top: 5px;
-        /* Adjust top for very small screens */
-        right: 5px;
     }
 
     .profile-area button {
         width: 28px;
-        /* EVEN SMALLER PROFILE ICON for very small screens */
         height: 28px;
         padding: 5px;
-        font-size: 16px;
     }
 
     .profile-area button mat-icon {
@@ -390,16 +404,142 @@
     }
 
     .content-area {
+        padding: 20px;
+    }
+
+    .profile-details {
+        width: 180px;
+        /* Increased width for tablet */
+    }
+
+    /* NEW: Adjust font sizes for new classes in media queries */
+    .profile-detail-row {
+        margin-bottom: 1px;
+    }
+
+    .detail-label,
+    .detail-colon,
+    .detail-value {
+        font-size: 12px;
+        /* Adjust font size for tablet */
+    }
+
+    .detail-label {
+        min-width: 55px;
+        /* Adjust min-width for tablet */
+    }
+
+    .detail-colon {
+        margin-right: 3px;
+    }
+
+}
+
+@media (max-width: 767px) {
+    .header-area {
+        padding: 10px;
+    }
+
+    .logo {
+        width: 95%;
+        max-width: 300px;
+    }
+
+    .custom-tab-nav {
+        gap: 5px;
+        justify-content: flex-start;
+    }
+
+    .custom-tab-nav a {
+        font-size: 12px;
+        padding: 2px 8px;
+        /* Decreased vertical padding for mobile */
+    }
+
+    .profile-area {
+        top: 5px;
+        right: 5px;
+    }
+
+    .profile-area button {
+        margin: 2px -2px;
+        width: 24px;
+        height: 24px;
+        padding: 4px;
+    }
+
+    .profile-area button mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+    }
+
+    .content-area {
         padding: 10px;
     }
 
     .profile-details {
-        width: 150px;
+        width: 140px;
+        /* Increased width for mobile */
         font-size: 13px;
+        /* Base font size for profile details */
         padding: 10px 12px;
     }
 
-    .profile-row {
-        font-size: 12px;
+    /* NEW: Adjust font sizes for new classes in mobile media query */
+    .profile-detail-row {
+        margin-bottom: 0px;
+        /* Less space between rows on mobile */
+    }
+
+    .detail-label,
+    .detail-colon,
+    .detail-value {
+        font-size: 11px;
+        /* Adjust font size for mobile */
+    }
+
+    .detail-label {
+        min-width: 35px;
+        /* Adjust min-width for mobile */
+    }
+
+    .detail-colon {
+        margin-right: 5px;
+    }
+
+    /* REMOVED: Old .profile-row */
+
+    .profile-details button {
+        margin-top: 3px;
+        font-size: 11px;
+        padding: 4px 8px;
+        border: 1px solid;
+        width: 90%;
+    }
+
+    .profile-details button .button-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+        margin-right: 6px;
+    }
+
+    .profile-overview {
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+    }
+
+    .user-initials {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+        margin-right: 10px;
+    }
+
+    /* REMOVED: Old .user-id, .user-role, .user-class-teacher specific mobile rules */
+
+    .profile-separator {
+        margin: 8px 0;
     }
 }

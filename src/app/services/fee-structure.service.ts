@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface FeeStructure {
   id?: number;
@@ -18,9 +19,9 @@ export interface FeeStructure {
   providedIn: 'root'
 })
 export class FeeStructureService {
-  private baseUrl = 'http://localhost:8081/fee-structure'; 
+  private baseUrl = `${environment.apiUrl}/fee-structure`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAcademicYears(): Observable<string[]> {
     return this.http.get<FeeStructure[]>(this.baseUrl).pipe(

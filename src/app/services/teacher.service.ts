@@ -1,21 +1,22 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TeacherService {
 
-  private baseUrl = 'http://localhost:8081/teachers'; 
+  private baseUrl = `${environment.apiUrl}/teachers`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-   getTeacher(teacherId: string): Observable<any> {
-     return this.http.get<any>(`${this.baseUrl}/${teacherId}`);
-   }
+  getTeacher(teacherId: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${teacherId}`);
+  }
 
-   getAllTeachers(): Observable<any> {
+  getAllTeachers(): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}`);
   }
 

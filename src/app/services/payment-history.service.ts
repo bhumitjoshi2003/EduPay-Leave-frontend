@@ -3,27 +3,28 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PaymentHistory } from '../interfaces/payment-history';
 import { PaymentHistoryDetails } from '../interfaces/payment-response';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PaymentHistoryService {
 
-  private baseUrl = 'http://localhost:8081/api/payments/history';
+  private baseUrl = `${environment.apiUrl}/api/payments/history`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getPaymentHistory(studentId: string): Observable<PaymentHistory[]> {
     return this.http.get<PaymentHistory[]>(`${this.baseUrl}/${studentId}`);
   }
 
-  getPaymentHistoryDetails(paymentId: string) : Observable<PaymentHistoryDetails>{
+  getPaymentHistoryDetails(paymentId: string): Observable<PaymentHistoryDetails> {
     return this.http.get<PaymentHistoryDetails>(`${this.baseUrl}/details/${paymentId}`);
   }
 
   getAllPaymentHistory(): Observable<PaymentHistory[]> {
     console.log(`${this.baseUrl}/all`);
-    return this.http.get<PaymentHistory[]>(`${this.baseUrl}/all`); 
+    return this.http.get<PaymentHistory[]>(`${this.baseUrl}/all`);
   }
 
   getPaymentHistoryByClass(className: string): Observable<PaymentHistory[]> {

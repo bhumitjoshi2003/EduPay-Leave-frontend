@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { StudentDetailsComponent } from '../components/student-details/student-details.component';
+import { environment } from '../../environments/environment';
 
 interface StudentDTO {
   studentId: string;
@@ -12,7 +12,7 @@ interface StudentDTO {
   providedIn: 'root'
 })
 export class StudentService {
-  private baseUrl = 'http://localhost:8081/students';
+  private baseUrl = `${environment.apiUrl}/students`;
 
   constructor(private http: HttpClient) { }
 

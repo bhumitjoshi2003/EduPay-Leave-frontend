@@ -2,21 +2,13 @@
   <div *ngIf="loggedInUserRole === 'ADMIN'" class="left-navigation">
     <h2>Classes</h2>
     <ul class="class-list-vertical">
-      <li
-        (click)="loadLeaves('all')"
-        [class.selected]="selectedClass === 'all'"
-        class="class-item-vertical"
-      >
+      <li (click)="loadLeaves('all')" [class.selected]="selectedClass === 'all'" class="class-item-vertical">
         <div class="chevron">
           <span>All Leaves</span>
         </div>
       </li>
-      <li
-        *ngFor="let className of classList"
-        (click)="onClassSelect(className)"
-        [class.selected]="selectedClass !== 'all' && className === selectedClass"
-        class="class-item-vertical"
-      >
+      <li *ngFor="let className of classList" (click)="onClassSelect(className)"
+        [class.selected]="selectedClass !== 'all' && className === selectedClass" class="class-item-vertical">
         <div class="chevron">
           <span>{{ className }}</span>
         </div>
@@ -34,7 +26,8 @@
       <div class="form-group">
         <label for="date" class="form-label">Filter by Date:</label>
         <mat-form-field appearance="outline">
-          <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" (ngModelChange)="onDateSelect()" id="date">
+          <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" (ngModelChange)="onDateSelect()"
+            id="date">
           <mat-datepicker-toggle matSuffix [for]="picker">
             <mat-icon>calendar_today</mat-icon>
           </mat-datepicker-toggle>
@@ -48,7 +41,8 @@
         </mat-form-field>
       </div>
       <button class="clear-filter-button" (click)="clearFilter()">Clear Filter</button>
-      <button *ngIf="loggedInUserRole === 'ADMIN'" class="delete-all-button" (click)="deleteAllFilteredLeaves()">Delete All</button>
+      <button *ngIf="loggedInUserRole === 'ADMIN'" class="delete-all-button" (click)="deleteAllFilteredLeaves()">Delete
+        All</button>
     </div>
 
     <div *ngIf="filteredLeaves.length > 0; else noLeavesContainer">
@@ -76,7 +70,8 @@
       </table>
     </div>
     <ng-template #noLeavesContainer>
-      <p class="no-students">No leave applications found{{ selectedClass !== 'all' ? ' for the selected class and date.' : ' for the applied filters.' }}</p>
+      <p class="no-students">No leave applications found{{ selectedClass !== 'all' ? ' for the selected class and date.'
+        : ' for the applied filters.' }}</p>
     </ng-template>
   </div>
 </div>

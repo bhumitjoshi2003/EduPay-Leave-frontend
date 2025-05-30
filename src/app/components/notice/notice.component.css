@@ -1,267 +1,352 @@
 .container {
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 40px 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #ffffff;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    border-radius: 15px;
-    animation: fadeIn 0.4s ease-in, slideIn 0.3s ease-out; /* Added slide-in animation */
-    transition: transform 0.2s ease; /* Added transform transition */
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #ffffff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  animation: fadeIn 0.4s ease-in, slideIn 0.3s ease-out;
+  transition: transform 0.2s ease;
+}
+
+.container:hover {
+  transform: translateY(-4px);
+  /* Slight lift on hover */
+}
+
+
+/* Keyframes for animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-  .container:hover {
-    transform: translateY(-4px); /* Slight lift on hover */
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  
-  /* Keyframes for animations */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-50px);
+    opacity: 0;
   }
-  
-  @keyframes slideIn {
-    from {
-      transform: translateX(-50px);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
-  
-  
+}
+
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 28px;
+  color: #2c3e50;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+  /* Subtle text shadow */
+  letter-spacing: -0.02em;
+}
+
+
+form.card {
+  background-color: #f9f9f9;
+  padding: 30px;
+  border-radius: 15px;
+  border: 1px solid #ddd;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  backdrop-filter: blur(5px);
+  /* Note: backdrop-filter has limited browser support */
+  background-color: rgba(249, 249, 249, 0.8);
+}
+
+form.card:hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+
+label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 18px;
+  color: #34495e;
+  font-weight: 500;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+label:hover {
+  transform: translateX(4px);
+  color: #2c3e50;
+}
+
+
+input.form-control,
+textarea.form-control,
+select.form-control {
+  /* Combined for consistency */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  transition: border 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  width: calc(100% - 24px);
+  /* Account for padding */
+  appearance: none;
+  /* For select, removes default arrow on some browsers */
+  background-color: #fff;
+}
+
+input.form-control:focus,
+textarea.form-control:focus,
+select.form-control:focus {
+  /* Combined for consistency */
+  border-color: #4a90e2;
+  box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+  outline: none;
+  background-color: #f5f5f5;
+}
+
+/* Placeholder styling */
+input.form-control::placeholder,
+textarea.form-control::placeholder {
+  color: #aaa;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+
+textarea.form-control {
+  min-height: 150px;
+  resize: vertical;
+}
+
+
+.is-invalid {
+  border-color: #e74c3c !important;
+  background-color: #fff6f6;
+  animation: shake 0.3s ease-in-out;
+}
+
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+
+.invalid-feedback {
+  color: #e74c3c;
+  font-size: 13px;
+  margin-top: 5px;
+  animation: fadeIn 0.3s ease;
+}
+
+button.btn-primary {
+  background: linear-gradient(to right, #4a90e2, #007bff);
+  border: none;
+  padding: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+}
+
+button.btn-primary:hover {
+  background: linear-gradient(to right, #3c7ddf, #006fe6);
+  transform: scale(1.03);
+  box-shadow: 0 7px 20px rgba(0, 123, 255, 0.5);
+}
+
+button.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+
+.spinner-border {
+  vertical-align: middle;
+  margin-right: 8px;
+  /* Adjusted margin for better alignment within button */
+  display: inline-block;
+  /* Ensure it stays in line */
+  width: 1em;
+  /* Make spinner size relative to font size */
+  height: 1em;
+  border: 0.1em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  /* Faster spin */
+}
+
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.alert {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  animation: fadeIn 0.3s ease, alertSlide 0.3s ease-out;
+  border: 1px solid transparent;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes alertSlide {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
+.alert-danger {
+  background-color: #fce4e4;
+  color: #c0392b;
+  border-color: #fcc2c3;
+}
+
+/* Specific styling for select dropdown arrow */
+select.form-control {
+  /* Custom arrow for select (SVG based) */
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%22292%22%20height%3D%22292%22%20viewBox%3D%220%200%20292%20292%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4l-14.2-14.3L146%20182.8%2019.2%2055.1%205%2069.4%20146%20210.6z%22/%3E%3C/svg%3E"),
+    linear-gradient(to bottom, #ffffff 0%, #f9f9f9 100%);
+  background-repeat: no-repeat, repeat;
+  background-position: right 0.7em top 50%, 0 0;
+  background-size: 1.2em auto, 100%;
+  padding-right: 2.5em;
+  /* Make space for the custom arrow */
+}
+
+select.form-control:hover {
+  border-color: #007bff;
+}
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 15px;
+    /* Slightly more padding on smaller screens */
+  }
+
   h2 {
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 28px;
-    color: #2c3e50;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05); /* Subtle text shadow */
-    letter-spacing: -0.02em;
-  }
-  
-  
-  form.card {
-    background-color: #f9f9f9;
-    padding: 30px;
-    border-radius: 15px;
-    border: 1px solid #ddd;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    transition: box-shadow 0.3s ease, transform 0.2s ease; /* Added transform */
-    backdrop-filter: blur(5px);
-    background-color: rgba(249, 249, 249, 0.8);
-  }
-  
-  form.card:hover {
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-    transform: translateY(-4px);
-  }
-  
-  
-  .form-group {
+    font-size: 24px;
     margin-bottom: 25px;
   }
-  
-  
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
   label {
-    display: block;
-    margin-bottom: 12px;
-    font-size: 18px;
-    color: #34495e;
-    font-weight: 500;
-    transition: color 0.3s ease, transform 0.2s ease; /* Added transform transition */
+    font-size: 17px;
+    margin-bottom: 10px;
   }
-  
-  label:hover {
-    transform: translateX(4px);
-    color: #2c3e50;
-  }
-  
-  
+
   input.form-control,
-  textarea.form-control {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 12px;
+  textarea.form-control,
+  select.form-control {
+    padding: 10px;
+    font-size: 15px;
+    width: calc(100% - 20px);
+    /* Adjust for new padding */
+  }
+
+  select.form-control {
+    padding-right: 2em;
+    /* Adjust arrow space */
+    background-position: right 0.5em top 50%, 0 0;
+    background-size: 1em auto, 100%;
+  }
+
+  button.btn-primary {
     font-size: 16px;
-    transition: border 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; /* Added background-color */
-    width: calc(100% - 24px);
-    appearance: none;
-    background-color: #fff;
+    padding: 12px;
   }
-  
-  input.form-control:focus,
-  textarea.form-control:focus {
-    border-color: #4a90e2;
-    box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
-    outline: none;
-    background-color: #f5f5f5;
-  }
-  
-  /* Placeholder styling */
-  input.form-control::placeholder,
-  textarea.form-control::placeholder {
-    color: #aaa;
-    font-style: italic;
-    font-size: 0.95rem;
-  }
-  
-  
-  textarea.form-control {
-    min-height: 150px;
-    resize: vertical;
-  }
-  
-  
-  .is-invalid {
-    border-color: #e74c3c !important;
-    background-color: #fff6f6;
-    animation: shake 0.3s ease-in-out;
-  }
-  
-  
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-  }
-  
-  
-  .invalid-feedback {
-    color: #e74c3c;
-    font-size: 13px;
-    margin-top: 5px;
-    animation: fadeIn 0.3s ease;
-  }
-  
-    button.btn-primary {
-        background: linear-gradient(to right, #4a90e2, #007bff);
-        border: none;
-        padding: 14px;
-        font-size: 17px;
-        font-weight: 600;
-        color: white;
-        border-radius: 10px;
-        cursor: pointer;
-        width: 100%;
-        transition: all 0.3s ease;
-        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
-    }
+}
 
-    button.btn-primary:hover {
-        background: linear-gradient(to right, #3c7ddf, #006fe6);
-        transform: scale(1.03);
-        box-shadow: 0 7px 20px rgba(0, 123, 255, 0.5);
-    }
+@media (max-width: 480px) {
+  .container {
+    padding: 15px 10px;
+    /* Further reduced padding for very small screens */
+    border-radius: 10px;
+    /* Slightly smaller border-radius */
+  }
 
-    .spinner-border {
-        vertical-align: middle;
-        margin-right: 8px;
-    }
-  
-  .spinner-border {
-    vertical-align: middle;
-    margin-right: 12px;
-    animation: spin 1s linear infinite;
+  h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
   }
-  
-  
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+
+  form.card {
+    padding: 20px;
+    border-radius: 10px;
   }
-  
-  
+
+  label {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  input.form-control,
+  textarea.form-control,
+  select.form-control {
+    padding: 8px;
+    font-size: 14px;
+    width: calc(100% - 16px);
+    /* Adjust for new padding */
+  }
+
+  button.btn-primary {
+    padding: 10px;
+    font-size: 15px;
+  }
+
   .alert {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 16px;
-    animation: fadeIn 0.3s ease, alertSlide 0.3s ease-out;
-    border: 1px solid transparent;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  @keyframes alertSlide {
-    from {
-      transform: translateY(-10px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-  
-  
-  .alert-danger {
-    background-color: #fce4e4;
-    color: #c0392b;
-    border-color: #fcc2c3;
-  }
-
-  @media (max-width: 768px) {
-    .container {
-      padding: 20px 10px;
-    }
-  
-    h2 {
-      font-size: 24px;
-    }
-  
-    button.btn-primary {
-      font-size: 16px;
-    }
-  }
-
-select.form-control {
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    font-size: 14px;
     padding: 12px;
-    font-size: 16px;
-    transition: border 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-    width: calc(100% - 24px);
-    appearance: none;
-    background-color: #fff;
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%22292%22%20height%3D%22292%22%20viewBox%3D%220%200%20292%20292%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4l-14.2-14.3L146%20182.8%2019.2%2055.1%205%2069.4%20146%20210.6z%22/%3E%3C/svg%3E"),
-      linear-gradient(to bottom, #ffffff 0%,#f9f9f9 100%);
-    background-repeat: no-repeat, repeat;
-    background-position: right 0.7em top 50%, 0 0;
-    background-size: 1.2em auto, 100%;
   }
-  
-  select.form-control:focus {
-    border-color: #4a90e2;
-    box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
-    outline: none;
-    background-color: #f5f5f5;
-  }
-  
-  select.form-control:hover {
-    border-color: #007bff;
-  }
-  
-  select.form-control.is-invalid {
-    border-color: #e74c3c !important;
-    background-color: #fff6f6;
-    animation: shake 0.3s ease-in-out;
-  }
-  
-  .form-group select {
-    margin-top: 5px;
-  }
-  
-  @media (max-width: 768px) {
-    select.form-control {
-      font-size: 15px;
-      padding: 10px;
-    }
-  }
+}

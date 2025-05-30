@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface BusFee {
   id?: number;
@@ -15,9 +16,9 @@ export interface BusFee {
 })
 
 export class BusFeesService {
-  private apiUrl = 'http://localhost:8081/bus-fees';
+  private apiUrl = `${environment.apiUrl}/bus-fees`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAcademicYears(): Observable<string[]> {
     return this.http.get<BusFee[]>(this.apiUrl).pipe(
@@ -26,7 +27,7 @@ export class BusFeesService {
         return Array.from(years).sort();
       })
     );
-  } 
+  }
 
   getBusFees(year: string): Observable<BusFee[]> {
     return this.http.get<BusFee[]>(`${this.apiUrl}/${year}`);

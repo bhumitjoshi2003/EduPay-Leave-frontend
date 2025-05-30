@@ -5,33 +5,39 @@
   <div *ngIf="error" class="error-message">{{ error }}</div>
 
   <div class="table-container" *ngIf="paymentHistory.length > 0">
-      <table>
-          <thead>
-              <tr>
-                  <th>Payment ID</th> 
-                  <th>Amount</th>
-                  <th>Payment Date</th>
-                  <th>Status</th>
-                  <th></th>
-              </tr>
-          </thead>
-          <tbody>
-              <tr *ngFor="let payment of paymentHistory" (click)="viewPaymentDetails(payment.paymentId)" class="payment-row">
-                  <td>{{ payment.paymentId }}</td>                  
-                  <td>{{ payment.amountPaid | currency: 'INR' }}</td>
-                  <td>{{ payment.paymentDate | date: 'MMM d, y, h:mm a' }}</td>
-                  <td [ngClass]="{'status-success': payment.status === 'success'}">{{ payment.status | uppercase }}</td>
-                  <td>
-                    <button (click)="downloadPaymentReceipt(payment.paymentId)" class="download-button">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-                      </svg>
-                    </button>
-                  </td>
-              </tr>
-          </tbody>
-      </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Payment ID</th>
+          <th>Amount</th>
+          <th>Payment Date</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let payment of paymentHistory" (click)="viewPaymentDetails(payment.paymentId)" class="payment-row">
+          <td data-label="Payment ID:"><span class="payment-value">{{ payment.paymentId }}</span></td>
+          <td data-label="Amount:"><span class="payment-value">{{ payment.amountPaid | currency: 'INR' }}</span></td>
+          <td data-label="Payment Date:"><span class="payment-value">{{ payment.paymentDate | date: 'MMM d, y, h:mm a'
+              }}</span></td>
+          <td data-label="Status:"><span class="payment-value"
+              [ngClass]="{'status-success': payment.status === 'success'}">{{ payment.status | uppercase }}</span></td>
+          <td data-label="Receipt:">
+            <span class="payment-value download-value">
+              <button (click)="downloadPaymentReceipt(payment.paymentId); $event.stopPropagation();"
+                class="download-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                </svg>
+              </button>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-  <div *ngIf="paymentHistory.length === 0 && !loading && !error" class="no-history-message">No payment history found.</div>
+  <div *ngIf="paymentHistory.length === 0 && !loading && !error" class="no-history-message">No payment history found.
+  </div>
 </div>

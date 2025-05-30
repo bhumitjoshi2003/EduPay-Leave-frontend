@@ -10,7 +10,8 @@
         </select>
       </div>
 
-      <button *ngIf="!(isNewSessionStarted || isEditing) && canEdit()" (click)="startNewAcademicYear()">Start New Academic Year</button>
+      <button *ngIf="!(isNewSessionStarted || isEditing) && canEdit()" (click)="startNewAcademicYear()">Start New
+        Academic Year</button>
       <button *ngIf="!isEditing && canEdit()" (click)="edit()">Edit</button>
 
       <div *ngIf="isEditing" class="edit-actions">
@@ -24,51 +25,53 @@
 
   <div class="tables-container">
     <div class="fee-table-section">
-      <table class="fee-table">
-        <thead>
-          <tr>
-            <th>Class</th>
-            <th>Tuition Fee</th>
-            <th>Admission Fee</th>
-            <th>Annual Charges</th>
-            <th>E.C.A (Project)</th>
-            <th>Examination Fee</th>
-            <th>Lab Charges</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let fee of feeStructures">
-            <td>
-              <input *ngIf="isEditing" type="text" [(ngModel)]="fee.className" />
-              <span *ngIf="!isEditing">{{ fee.className }}</span>
-            </td>
-            <td>
-              <input *ngIf="isEditing" type="number" [(ngModel)]="fee.tuitionFee" />
-              <span *ngIf="!isEditing">{{ fee.tuitionFee }}</span>
-            </td>
-            <td>
-              <input *ngIf="isEditing" type="number" [(ngModel)]="fee.admissionFee" />
-              <span *ngIf="!isEditing">{{ fee.admissionFee }}</span>
-            </td>
-            <td>
-              <input *ngIf="isEditing" type="number" [(ngModel)]="fee.annualCharges" />
-              <span *ngIf="!isEditing">{{ fee.annualCharges }}</span>
-            </td>
-            <td>
-              <input *ngIf="isEditing" type="number" [(ngModel)]="fee.ecaProject" />
-              <span *ngIf="!isEditing">{{ fee.ecaProject }}</span>
-            </td>
-            <td>
-              <input *ngIf="isEditing" type="number" [(ngModel)]="fee.examinationFee" />
-              <span *ngIf="!isEditing">{{ fee.examinationFee }}</span>
-            </td>
-            <td>
-              <input *ngIf="isEditing" type="number" [(ngModel)]="fee.labCharges" />
-              <span *ngIf="!isEditing">{{ fee.labCharges }}</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive-wrapper">
+        <table class="fee-table">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Tuition Fee</th>
+              <th>Admission Fee</th>
+              <th>Annual Charges</th>
+              <th>E.C.A (Project)</th>
+              <th>Examination Fee</th>
+              <th>Lab Charges</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let fee of feeStructures">
+              <td>
+                <input *ngIf="isEditing" type="text" [(ngModel)]="fee.className" />
+                <span *ngIf="!isEditing">{{ fee.className }}</span>
+              </td>
+              <td>
+                <input *ngIf="isEditing" type="number" [(ngModel)]="fee.tuitionFee" />
+                <span *ngIf="!isEditing">{{ fee.tuitionFee }}</span>
+              </td>
+              <td>
+                <input *ngIf="isEditing" type="number" [(ngModel)]="fee.admissionFee" />
+                <span *ngIf="!isEditing">{{ fee.admissionFee }}</span>
+              </td>
+              <td>
+                <input *ngIf="isEditing" type="number" [(ngModel)]="fee.annualCharges" />
+                <span *ngIf="!isEditing">{{ fee.annualCharges }}</span>
+              </td>
+              <td>
+                <input *ngIf="isEditing" type="number" [(ngModel)]="fee.ecaProject" />
+                <span *ngIf="!isEditing">{{ fee.ecaProject }}</span>
+              </td>
+              <td>
+                <input *ngIf="isEditing" type="number" [(ngModel)]="fee.examinationFee" />
+                <span *ngIf="!isEditing">{{ fee.examinationFee }}</span>
+              </td>
+              <td>
+                <input *ngIf="isEditing" type="number" [(ngModel)]="fee.labCharges" />
+                <span *ngIf="!isEditing">{{ fee.labCharges }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div class="bus-fees-table-section">

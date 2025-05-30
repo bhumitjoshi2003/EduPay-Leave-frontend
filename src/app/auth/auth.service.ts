@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
-import { Console } from 'console';
+import { environment } from '../../environments/environment';
 
 interface ChangePasswordRequest {
   userId: string;
@@ -14,8 +14,9 @@ interface ChangePasswordRequest {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8081/api/auth';
-  private baseUrl = 'http://localhost:8081/students';
+
+  private apiUrl = `${environment.apiUrl}/api/auth`;
+  private baseUrl = `${environment.apiUrl}/students`;
 
   constructor(private http: HttpClient) { }
 

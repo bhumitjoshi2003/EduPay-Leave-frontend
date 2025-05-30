@@ -2,21 +2,13 @@
   <div class="left-navigation">
     <h2>CLASSES</h2>
     <ul class="class-list-vertical">
-      <li
-        (click)="loadAllPaymentHistory()"
-        [class.selected]="selectedClass === 'all'"
-        class="class-item-vertical"
-      >
+      <li (click)="loadAllPaymentHistory()" [class.selected]="selectedClass === 'all'" class="class-item-vertical">
         <div class="chevron">
           <span>All Payments</span>
         </div>
       </li>
-      <li
-        *ngFor="let className of classList"
-        (click)="onClassSelect(className)"
-        [class.selected]="className !== 'all' && className === selectedClass"
-        class="class-item-vertical"
-      >
+      <li *ngFor="let className of classList" (click)="onClassSelect(className)"
+        [class.selected]="className !== 'all' && className === selectedClass" class="class-item-vertical">
         <div class="chevron">
           <span>{{ className }}</span>
         </div>
@@ -31,7 +23,8 @@
       <div class="form-group">
         <label for="date" class="form-label">Filter by Date:</label>
         <mat-form-field appearance="outline">
-          <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" (ngModelChange)="onDateSelect()" id="date">
+          <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" (ngModelChange)="onDateSelect()"
+            id="date">
           <mat-datepicker-toggle matSuffix [for]="picker">
             <mat-icon>calendar_today</mat-icon>
           </mat-datepicker-toggle>
@@ -48,37 +41,43 @@
     </div>
 
     <div *ngIf="filteredPayments.length > 0; else noPaymentsContainer">
-      <table class="payment-history-table">
-        <thead>
-          <tr>
-            <th>Student ID</th>
-            <th>Student Name</th>
-            <th>Amount Paid</th>
-            <th>Payment Date</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let payment of filteredPayments" class="payment-row clickable-row" (click)="viewPaymentDetails(payment.paymentId)">
-            <td>{{ payment.studentId }}</td>
-            <td>{{ payment.studentName }}</td>
-            <td>{{ payment.amountPaid }}</td>
-            <td>{{ payment.paymentDate | date:'yyyy-MM-dd' }}</td>
-            <td [ngClass]="{'status-success': payment.status.toLowerCase() === 'success'}">{{ payment.status | uppercase}}</td>
-            <td>
-              <button (click)="downloadPaymentReceipt(payment.paymentId)" class="download-button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-                </svg>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-wrapper">
+        <table class="payment-history-table">
+          <thead>
+            <tr>
+              <th>Student ID</th>
+              <th>Student Name</th>
+              <th>Amount Paid</th>
+              <th>Payment Date</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let payment of filteredPayments" class="payment-row clickable-row"
+              (click)="viewPaymentDetails(payment.paymentId)">
+              <td>{{ payment.studentId }}</td>
+              <td>{{ payment.studentName }}</td>
+              <td>{{ payment.amountPaid }}</td>
+              <td>{{ payment.paymentDate | date:'yyyy-MM-dd' }}</td>
+              <td [ngClass]="{'status-success': payment.status.toLowerCase() === 'success'}">{{ payment.status |
+                uppercase}}</td>
+              <td>
+                <button (click)="downloadPaymentReceipt(payment.paymentId)" class="download-button">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                    fill="currentColor">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     <ng-template #noPaymentsContainer>
-      <p class="no-payments">No payment history found{{ selectedClass !== 'all' ? ' for the selected class and filters.' : ' for the applied filters.' }}</p>
+      <p class="no-payments">No payment history found{{ selectedClass !== 'all' ? ' for the selected class and filters.'
+        : ' for the applied filters.' }}</p>
     </ng-template>
   </div>
 </div>

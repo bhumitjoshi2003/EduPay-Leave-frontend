@@ -10,6 +10,8 @@
   text-align: center;
   color: white;
   transition: all 0.3s ease-in-out;
+  background-size: cover;
+  background-position: center;
 }
 
 .home-container::before {
@@ -25,9 +27,10 @@
 }
 
 .logo {
-  width: 150px;
+  width: 100px;
   height: auto;
   transition: transform 0.3s ease;
+  margin-bottom: 10px;
 }
 
 .logo:hover {
@@ -39,18 +42,21 @@
   z-index: 2;
   transition: all 0.3s ease;
   position: relative;
+  width: 90%;
+  padding: 10px;
 }
 
 h1 {
   margin-top: 10px;
-  font-size: 32px;
+  font-size: clamp(24px, 6vw, 32px);
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
 }
 
-h2, h3 {
-  font-size: 23px;
+h2,
+h3 {
+  font-size: clamp(16px, 4vw, 23px);
   margin-top: 5px;
   font-style: italic;
   color: #f8f8f8;
@@ -58,9 +64,9 @@ h2, h3 {
 
 .custom-hr {
   display: block;
-  width: 25%;
+  width: 50%;
   border-bottom: 4px solid white;
-  margin: 20px auto;
+  margin: 15px auto;
   opacity: 0.8;
 }
 
@@ -70,8 +76,9 @@ h2, h3 {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 4;
-  width: 450px;
-  padding: 20px;
+  width: 90%;
+  max-width: 450px;
+  padding: 10px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
   backdrop-filter: blur(15px);
   border-radius: 25px;
@@ -79,18 +86,26 @@ h2, h3 {
   color: white;
   animation: fadeIn 0.8s ease-out;
   border: 2px solid rgba(255, 255, 255, 0.3);
+  box-sizing: border-box;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translate(-50%, -70%); }
-  to { opacity: 1; transform: translate(-50%, -50%); }
+  from {
+    opacity: 0;
+    transform: translate(-50%, -70%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .login-form mat-card-title {
   text-align: center;
-  margin-bottom: 25px;
-  margin-top: 25px;
-  font-size: 32px;
+  margin-bottom: 15px;
+  margin-top: 15px;
+  font-size: clamp(24px, 7vw, 32px);
   font-weight: 700;
   color: #595b5b;
   text-shadow: 2px 2px 6px rgba(186, 185, 185, 0.5);
@@ -98,18 +113,20 @@ h2, h3 {
 
 .login-form input {
   width: 100%;
-  font-size: 20px;
+  font-size: 16px;
   line-height: 1.5;
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.2);
   color: black;
   transition: 0.4s;
+  padding: 1px 1px;
 }
 
 .login-form mat-form-field {
   display: block;
   width: 100%;
+  margin-bottom: 15px;
 }
 
 .login-form input::placeholder {
@@ -120,12 +137,12 @@ h2, h3 {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
 .login-actions button[mat-raised-button] {
   width: 100%;
-  padding: 18px;
+  padding: 15px;
   border: none;
   border-radius: 12px;
   font-weight: 700;
@@ -143,7 +160,10 @@ h2, h3 {
 
 .secondary-actions {
   display: flex;
+  flex-direction: row;
   width: 100%;
+  gap: 10px;
+  margin-top: 5px;
 }
 
 .secondary-actions button[mat-button] {
@@ -156,35 +176,25 @@ h2, h3 {
   transition: all 0.3s ease-in-out;
   color: rgb(255, 255, 255);
   background: linear-gradient(135deg, #46a9de, #1695d9);
-  margin-top: 10px;
+  margin-right: 0;
+  margin-left: 0;
+  margin-top: 0;
 }
 
-.secondary-actions button[mat-button]:first-child {
-  margin-right: 5px;
-}
-
-.secondary-actions button[mat-button]:last-child {
-  margin-left: 5px;
-  color: rgb(255, 255, 255);
-  background: linear-gradient(135deg, #46a9de, #1695d9);
-  box-shadow: none;
-}
-
-.secondary-actions button[mat-button]:last-child:hover {
-  color: rgb(255, 255, 255);
+.secondary-actions button[mat-button]:hover {
   background: linear-gradient(135deg, #3da5dc, #0f8fd4);
   box-shadow: none;
 }
 
 .login-button {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 15px;
+  right: 15px;
   background: #686969;
   color: rgb(211, 207, 207);
-  padding: 8px 30px;
+  padding: 6px 20px;
   border-radius: 30px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   cursor: pointer;
   z-index: 3;
@@ -199,85 +209,248 @@ h2, h3 {
 
 .logout-button {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  background: #6a11cb;
-  color: white;
-  padding: 8px 26px;
+  top: 15px;
+  right: 15px;
+  background: #686969;
+  color: rgb(211, 207, 207);
+  padding: 6px 20px;
   border-radius: 30px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   cursor: pointer;
   z-index: 3;
   transition: all 0.3s ease;
+  border: 1px solid #484848;
 }
 
 .logout-button:hover {
-  background: #2575fc;
+  background: #5a5a5a;
+  border: 1px solid #bbb;
+}
+
+.home-container.login-active {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .login-active .content {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  padding: 10px 15px;
+  box-sizing: border-box;
+  background: transparent;
+  backdrop-filter: blur(5px);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
 }
 
 .login-active .logo {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 150px;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 70px;
+  height: auto;
+  margin-bottom: 0;
+  z-index: 5;
 }
 
 .login-active h1 {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 24px;
+  position: static;
+  font-size: clamp(19px, 4vw, 20px);
+  margin-top: 0;
+  margin-bottom: 0;
+  letter-spacing: 0.5px;
+  max-width: calc(100% - 130px);
+  text-align: center;
+}
+
+.login-active h2,
+.login-active h3 {
+  padding-top: 7px;
+  position: static;
+  font-size: clamp(13px, 3vw, 14px);
+  margin-top: 2px;
+  margin-bottom: 0;
+  text-align: center;
+  max-width: calc(100% - 130px);
 }
 
 .login-active .custom-hr {
   display: none;
 }
 
-.login-active h2 {
-  position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 20px;
-    margin-top: 75px;
-    font-style: italic;
-    color: #f8f8f8;
-}
-
-.login-active h3 {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 20px;
-    margin-top: 45px;
-    font-style: italic;
-    color: #f8f8f8;
-}
-
-.login-active h3 {
-    top: 65px;
-}
-
-.login-active-hr {
-  display: none;
-}
-
 .login-active .login-active-hr {
   display: block;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50%;
+  width: 20%;
   border: 1px solid #f8f8f8;
-  top: 50px;
+  margin: 5px auto 0;
+  position: static;
+  transform: none;
+}
+
+.home-container.login-active .login-form {
+  top: 55%;
+}
+
+/* --- Tablet and Desktop Styles (using Media Queries) --- */
+@media (min-width: 768px) {
+  .logo {
+    width: 120px;
+  }
+
+  h1 {
+    font-size: 30px;
+    letter-spacing: 2px;
+  }
+
+  h2,
+  h3 {
+    font-size: 20px;
+  }
+
+  .custom-hr {
+    width: 35%;
+    margin: 20px auto;
+  }
+
+  .login-form {
+    width: 80%;
+    max-width: 450px;
+    padding: 20px;
+  }
+
+  .login-form mat-card-title {
+    font-size: 30px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+
+  .login-form input {
+    font-size: 18px;
+    padding: 1px 1px;
+  }
+
+  .login-actions button[mat-raised-button] {
+    padding: 18px;
+  }
+
+  .secondary-actions {
+    flex-direction: row;
+  }
+
+  .secondary-actions button[mat-button] {
+    margin-right: 5px;
+    margin-left: 5px;
+  }
+
+  .secondary-actions button[mat-button]:first-child {
+    margin-right: 5px;
+  }
+
+  .secondary-actions button[mat-button]:last-child {
+    margin-left: 5px;
+  }
+
+  .login-button,
+  .logout-button {
+    top: 20px;
+    right: 20px;
+    padding: 8px 30px;
+    font-size: 16px;
+  }
+
+  .login-active .content {
+    padding: 15px 20px;
+  }
+
+  .login-active .logo {
+    width: 90px;
+    top: 15px;
+    left: 15px;
+  }
+
+  .login-active h1 {
+    font-size: 22px;
+    max-width: calc(100% - 150px);
+  }
+
+  .login-active h2,
+  h3 {
+    font-size: 14px;
+    max-width: calc(100% - 150px);
+  }
+
+  .login-active .login-active-hr {
+    width: 25%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .logo {
+    width: 150px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  h2,
+  h3 {
+    font-size: 23px;
+  }
+
+  .custom-hr {
+    width: 25%;
+  }
+
+  .login-form {
+    width: 450px;
+  }
+
+  .login-form mat-card-title {
+    font-size: 32px;
+    margin-bottom: 25px;
+    margin-top: 25px;
+  }
+
+  .login-form input {
+    font-size: 20px;
+    padding: 1px 1px;
+  }
+
+  .login-active .content {
+    padding: 20px 30px;
+  }
+
+  .login-active .logo {
+    width: 120px;
+    top: 20px;
+    left: 20px;
+  }
+
+  .login-active h1 {
+    font-size: 24px;
+    max-width: calc(100% - 180px);
+  }
+
+  .login-active h2,
+  h3 {
+    font-size: 16px;
+    text-align: center;
+    margin: 0 auto;
+    max-width: calc(100% - 180px);
+  }
+
+  .login-active .login-active-hr {
+    width: 25%;
+  }
 }
 
 .swal2-container.swal-loading-container {

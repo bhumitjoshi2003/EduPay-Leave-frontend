@@ -1,16 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
 
-  private baseUrl = 'http://localhost:8081/api/admins';
-  private noticeUrl = 'http://localhost:8081/api/admin';
+  private baseUrl = `${environment.apiUrl}/api/admins`;
+  private noticeUrl = `${environment.apiUrl}/api/admin`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAdmin(adminId: string): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/${adminId}`);
@@ -29,7 +30,7 @@ export class AdminService {
   }
 
   deleteAdmin(adminId: string): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}/${adminId}`); 
+    return this.http.delete<any>(`${this.baseUrl}/${adminId}`);
   }
 
   sendNoticeToStudents(data: { title: string; subject: string; body: string }): Observable<any> {

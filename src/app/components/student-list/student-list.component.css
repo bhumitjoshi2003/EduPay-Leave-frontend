@@ -3,13 +3,13 @@
 .student-list-container {
   display: flex;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #f0f8ff, #e0ffff);
+  background: linear-gradient(145deg, #f0faff, #e0f7fa);
   border-radius: 15px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   animation: fadeIn 0.8s ease-in-out;
   padding: 30px;
   max-width: 1200px;
-  margin: 20px auto;
+  margin: 0px auto;
   width: 95%;
 }
 
@@ -265,8 +265,8 @@
 /* Mobile Devices (max-width: 767px) */
 @media (max-width: 767px) {
   .student-list-container {
-    padding: 15px;
-    width: 100%;
+    padding: 10px;
+    width: 94%;
     flex-direction: column;
   }
 
@@ -278,9 +278,9 @@
 
   .left-navigation {
     padding: 10px;
+    margin: auto;
     margin-bottom: 15px;
-    width: 100%;
-    margin-right: 0;
+    width: 94%;
   }
 
   .left-navigation h2 {

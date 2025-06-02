@@ -41,7 +41,7 @@
     </div>
 
     <div *ngIf="filteredPayments.length > 0; else noPaymentsContainer">
-      <div class="table-wrapper">
+      <div class="table-wrapper d-none d-md-block">
         <table class="payment-history-table">
           <thead>
             <tr>
@@ -60,7 +60,8 @@
               <td>{{ payment.studentName }}</td>
               <td>{{ payment.amountPaid }}</td>
               <td>{{ payment.paymentDate | date:'yyyy-MM-dd' }}</td>
-              <td [ngClass]="{'status-success': payment.status.toLowerCase() === 'success'}">{{ payment.status |
+              <td [ngClass]="{'status-success': payment.status.toLowerCase() === 'success'}" styles="color: green">{{
+                payment.status |
                 uppercase}}</td>
               <td>
                 <button (click)="downloadPaymentReceipt(payment.paymentId)" class="download-button">
@@ -73,6 +74,42 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div class="cards-wrapper d-block d-md-none">
+        <div *ngFor="let payment of filteredPayments" class="payment-card clickable-card"
+          (click)="viewPaymentDetails(payment.paymentId)">
+          <div class="card-row">
+            <span class="card-label">Student ID:</span>
+            <span class="card-value">{{ payment.studentId }}</span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Student Name:</span>
+            <span class="card-value">{{ payment.studentName }}</span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Amount Paid:</span>
+            <span class="card-value">{{ payment.amountPaid }}</span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Payment Date:</span>
+            <span class="card-value">{{ payment.paymentDate | date:'yyyy-MM-dd' }}</span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Status:</span>
+            <span class="card-value" [ngClass]="{'status-success': payment.status.toLowerCase() === 'success'}">{{
+              payment.status | uppercase}}</span>
+          </div>
+          <div class="card-actions">
+            <button (click)="downloadPaymentReceipt(payment.paymentId); $event.stopPropagation()"
+              class="download-button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+              </svg>
+              Download Receipt
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <ng-template #noPaymentsContainer>

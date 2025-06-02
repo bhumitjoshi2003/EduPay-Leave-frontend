@@ -13,7 +13,7 @@
   border: 1px solid rgba(255, 255, 255, 0.25);
   max-width: 1200px;
   margin: 30px auto;
-  width: 95%;
+  width: 98%;
 }
 
 .header {
@@ -192,7 +192,7 @@
 /* Tablet Devices (max-width: 1023px) */
 @media (max-width: 1023px) {
   .teacher-details-container {
-    padding: 30px;
+    padding: 20px;
     gap: 20px;
   }
 
@@ -242,9 +242,10 @@
 /* Mobile Devices (max-width: 767px) */
 @media (max-width: 767px) {
   .teacher-details-container {
-    padding: 15px;
+    padding: 10px;
     gap: 15px;
     margin: 15px auto;
+    width: 94%;
   }
 
   .header {

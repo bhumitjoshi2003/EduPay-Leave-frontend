@@ -272,8 +272,8 @@ app-bus-fees {
 
 @media (max-width: 767px) {
     .fee-structure-container {
-        width: 98%;
-        padding: 15px;
+        width: 95%;
+        padding: 25px 10px;
         border-radius: 10px;
         box-shadow: 5px 5px 10px #d1e9f1, -5px -5px 10px #efffff;
     }

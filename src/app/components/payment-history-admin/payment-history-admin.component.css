@@ -7,7 +7,6 @@
   animation: fadeIn 0.8s ease-in-out;
   padding: 30px;
   width: 95%;
-  max-width: 1200px;
   margin: 20px auto;
   flex-shrink: 0;
 }
@@ -25,7 +24,7 @@
 }
 
 .left-navigation {
-  width: 180px;
+  width: 15%;
   margin-right: 30px;
   padding: 20px 10px;
   background-color: #e0f2f1;
@@ -310,7 +309,6 @@
 }
 
 .status-success {
-  color: #44aa44;
   font-weight: bold;
 }
 
@@ -332,7 +330,7 @@
   }
 
   .left-navigation {
-    width: 150px;
+    width: 15%;
     margin-right: 20px;
     padding: 15px 8px;
   }
@@ -419,7 +417,7 @@
   .payment-history-container {
     flex-direction: column;
     padding: 15px;
-    width: 100%;
+    width: 93%;
     margin: 10px auto;
   }
 
@@ -430,10 +428,10 @@
   }
 
   .left-navigation {
-    padding: 10px;
+    width: 97%;
+    margin: auto auto;
     margin-bottom: 15px;
-    width: 100%;
-    margin-right: 0;
+    padding: 8px;
   }
 
   .left-navigation h2 {
@@ -483,13 +481,14 @@
   }
 
   .payment-history-area {
-    padding: 10px;
-    width: 100%;
+    padding: 12px;
+    width: 95%;
   }
 
   .payment-history-area h2 {
     font-size: 1.2em;
     margin-bottom: 15px;
+    text-align: center;
   }
 
   .payment-history-table th,
@@ -548,7 +547,7 @@
   }
 
   .filter-options .form-label {
-    font-size: 1em;
+    font-size: 0.75em;
   }
 
   .filter-options .mat-input-element {
@@ -568,11 +567,9 @@
 
 @media (max-width: 480px) {
   .payment-history-container {
-    padding: 0.8rem;
-  }
-
-  .left-navigation {
-    padding: 8px;
+    padding: 0.5rem;
+    padding-right: 1rem;
+    width: 93%;
   }
 
   .class-list-vertical {
@@ -586,7 +583,9 @@
   }
 
   .payment-history-area {
-    padding: 8px;
+    width: 94%;
+    padding: 12px;
+    margin: auto;
   }
 
   .payment-history-table th,
@@ -629,16 +628,180 @@
   }
 
   .filter-options .form-group {
-    font-size: 0.7em;
+    width: 95%;
+    margin: auto auto;
+    flex-basis: auto;
   }
 
   .filter-options .mat-input-element {
-    font-size: 0.7em;
+    font-size: 0.75em;
     padding: 3px;
   }
 
   .clear-filter-button {
     font-size: 0.75em;
     padding: 6px 8px;
+  }
+}
+
+.cards-wrapper {
+  display: none;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.payment-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.clickable-card {
+  cursor: pointer;
+}
+
+.clickable-card:hover {
+  transform: translateY(-3px);
+}
+
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 8px;
+  margin-bottom: 2px;
+}
+
+.card-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.card-label {
+  font-weight: 600;
+  color: #004d40;
+  flex-shrink: 0;
+  margin-right: 10px;
+  font-size: 0.9em;
+}
+
+.card-value {
+  text-align: right;
+  flex-grow: 1;
+  font-size: 0.9em;
+  color: #333;
+  word-break: break-word;
+}
+
+.card-actions {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.payment-card .download-button {
+  width: auto;
+  padding: 8px 15px;
+  font-size: 0.9em;
+  margin: auto;
+}
+
+.payment-card .download-button svg {
+  margin-right: 8px;
+}
+
+/* --- Responsive Display Utilities --- */
+
+/* Hide on screens larger than mobile (default table view) */
+.d-none {
+  display: none !important;
+}
+
+/* Show on screens larger than mobile (default table view) */
+.d-block {
+  display: block !important;
+}
+
+/* Initially hide cards and show table */
+.cards-wrapper {
+  display: none;
+}
+
+.table-wrapper {
+  display: block;
+}
+
+
+/* Mobile Styles (up to 767px) */
+@media (max-width: 767px) {
+
+  /* Hide table, show cards */
+  .table-wrapper {
+    display: none !important;
+  }
+
+  .cards-wrapper {
+    display: flex !important;
+  }
+
+  .payment-history-table {
+    /* Ensure table styles are overridden for mobile */
+    display: none;
+    overflow-x: hidden;
+    white-space: normal;
+  }
+
+  .payment-history-table thead,
+  .payment-history-table tbody {
+    display: none;
+  }
+
+  .payment-history-container {
+    flex-direction: column;
+  }
+
+  .payment-history-area {
+    padding: 12px;
+    width: 95%;
+  }
+
+  .left-navigation {
+    width: 97%;
+    margin: auto auto 15px;
+  }
+
+  .class-list-vertical {
+    flex-wrap: nowrap;
+  }
+}
+
+/* Tablets and Desktops (768px and up) */
+@media (min-width: 768px) {
+
+  /* Show table, hide cards */
+  .table-wrapper {
+    display: block !important;
+  }
+
+  .cards-wrapper {
+    display: none !important;
+  }
+
+  .payment-history-table {
+    display: block;
+    /* Re-enable table's block display for scrolling */
+  }
+
+  .payment-history-table thead,
+  .payment-history-table tbody {
+    display: table;
+    /* Re-enable table display */
   }
 }

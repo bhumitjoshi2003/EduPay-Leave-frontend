@@ -46,28 +46,54 @@
     </div>
 
     <div *ngIf="filteredLeaves.length > 0; else noLeavesContainer">
-      <table class="leave-table">
-        <thead>
-          <tr>
-            <th>Student ID</th>
-            <th>Student Name</th>
-            <th>Leave Date</th>
-            <th>Reason</th>
-            <th *ngIf="loggedInUserRole === 'ADMIN'">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let leave of filteredLeaves" class="leave-row">
-            <td>{{ leave.studentId }}</td>
-            <td>{{ leave.studentName }}</td>
-            <td>{{ leave.leaveDate }}</td>
-            <td>{{ leave.reason }}</td>
-            <td *ngIf="loggedInUserRole === 'ADMIN'">
-              <button class="delete-button" (click)="deleteLeave(leave.id)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="leave-table-container">
+        <table class="leave-table">
+          <thead>
+            <tr>
+              <th>Student ID</th>
+              <th>Student Name</th>
+              <th>Leave Date</th>
+              <th>Reason</th>
+              <th *ngIf="loggedInUserRole === 'ADMIN'">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let leave of filteredLeaves" class="leave-row">
+              <td>{{ leave.studentId }}</td>
+              <td>{{ leave.studentName }}</td>
+              <td>{{ leave.leaveDate }}</td>
+              <td>{{ leave.reason }}</td>
+              <td *ngIf="loggedInUserRole === 'ADMIN'">
+                <button class="delete-button" (click)="deleteLeave(leave.id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="leave-cards-container">
+        <div class="leave-card" *ngFor="let leave of filteredLeaves">
+          <div class="card-item">
+            <span class="card-label">Student ID:</span>
+            <span class="card-value">{{ leave.studentId }}</span>
+          </div>
+          <div class="card-item">
+            <span class="card-label">Student Name:</span>
+            <span class="card-value">{{ leave.studentName }}</span>
+          </div>
+          <div class="card-item">
+            <span class="card-label">Leave Date:</span>
+            <span class="card-value">{{ leave.leaveDate }}</span>
+          </div>
+          <div class="card-item">
+            <span class="card-label">Reason:</span>
+            <span class="card-value">{{ leave.reason }}</span>
+          </div>
+          <div class="card-actions" *ngIf="loggedInUserRole === 'ADMIN'">
+            <button class="card-delete-button" (click)="deleteLeave(leave.id)">Delete</button>
+          </div>
+        </div>
+      </div>
     </div>
     <ng-template #noLeavesContainer>
       <p class="no-students">No leave applications found{{ selectedClass !== 'all' ? ' for the selected class and date.'

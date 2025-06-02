@@ -1,7 +1,5 @@
-/* teacher-attendance.component.css */
-
 .teacher-attendance-container {
-  padding: 40px;
+  padding: 30px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #e7f6f8, #f4f7f4);
   border-radius: 15px;
@@ -33,22 +31,16 @@
 .top-section {
   display: flex;
   justify-content: space-between;
-  /* Keeps datepicker left, save button right */
   align-items: center;
   margin-bottom: 20px;
   flex-wrap: wrap;
-  /* Allows wrapping on smaller screens if content is too wide */
   gap: 20px;
-  /* Space between items in top section */
 }
 
 .custom-datepicker {
   max-width: 300px;
-  /* Limit datepicker width */
   width: 100%;
-  /* Allow it to shrink */
   flex-grow: 1;
-  /* Allow datepicker to grow if space available */
 }
 
 .attendance-button.save {
@@ -59,9 +51,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   text-transform: uppercase;
   white-space: nowrap;
-  /* Prevent button text from wrapping */
   width: auto;
-  /* Ensure it does not cover entire line */
 }
 
 .attendance-button.save:hover {
@@ -90,11 +80,8 @@
 
 .student-item {
   display: flex;
-  /* Always flex-direction: row for single line */
   justify-content: space-between;
-  /* Student info left, buttons right */
   align-items: center;
-  /* Vertically center items */
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 12px;
@@ -102,9 +89,7 @@
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   border-left: 8px solid transparent;
   flex-wrap: wrap;
-  /* Allow wrapping if content is too wide on very small screens */
   gap: 15px;
-  /* Default gap between student info and buttons */
 }
 
 .student-item:hover {
@@ -126,25 +111,20 @@
 
 .student-info {
   flex-grow: 1;
-  /* Allows student info to take up available space */
   font-weight: 600;
   color: #333;
   font-size: 1.1em;
   min-width: 100px;
-  /* Ensures name doesn't shrink too much */
 }
 
 .attendance-buttons {
   display: flex;
   gap: 15px;
-  /* Default gap between mark buttons */
   flex-shrink: 0;
-  /* Prevents buttons from shrinking excessively */
 }
 
 .attendance-button {
   width: auto;
-  /* Default auto width based on content/padding */
   padding: 10px 15px;
   border-radius: 8px;
   border: none;
@@ -158,7 +138,6 @@
   justify-content: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
-  /* Prevent button text from wrapping */
 }
 
 .attendance-button:hover {
@@ -208,14 +187,12 @@
 }
 
 
-/* --- Responsive Adjustments --- */
 
 /* Tablet Devices (max-width: 1023px) */
 @media (max-width: 1023px) {
   .teacher-attendance-container {
-    padding: 35px;
-    /* Adjusted padding as discussed previously */
-    width: 98%;
+    padding: 30px;
+    width: 93%;
   }
 
   .teacher-attendance-container h2 {
@@ -229,28 +206,22 @@
     margin-bottom: 25px;
   }
 
-  /* Top Section - Datepicker and Save button */
+
   .top-section {
     flex-direction: row;
-    /* Keep in a row */
     justify-content: space-between;
-    /* Datepicker left, Save button right */
     align-items: center;
     gap: 15px;
   }
 
   .custom-datepicker {
     flex-grow: 1;
-    /* Allow datepicker to grow */
     max-width: 60%;
-    /* Limit its width on tablets */
   }
 
   .attendance-button.save {
     width: auto;
-    /* Don't make save button full width */
     padding: 10px 25px;
-    /* Adjust padding for tablet size */
     font-size: 1em;
   }
 
@@ -260,34 +231,27 @@
     margin: 12px 0;
   }
 
-  /* Student Item Layout (Name and Button on same line) */
   .student-item {
     flex-direction: row;
-    /* Already row, ensuring consistency */
     align-items: center;
     padding: 15px;
     gap: 10px;
-    /* Slightly less gap for tablet */
   }
 
   .student-info {
     font-size: 1em;
     flex-grow: 1;
     min-width: 80px;
-    /* Ensure name doesn't shrink too much */
   }
 
   .attendance-buttons {
     gap: 8px;
-    /* Gap between mark buttons */
   }
 
   .attendance-button {
     padding: 8px 15px;
-    /* Adjusted button padding for tablet */
     font-size: 0.9em;
     width: auto;
-    /* Auto width based on content */
   }
 }
 
@@ -299,9 +263,8 @@
   }
 
   .teacher-attendance-container {
-    padding: 20px;
-    /* Adjusted padding as discussed previously */
-    width: 100%;
+    padding: 15px 20px;
+    width: 88%;
     margin: 10px auto;
   }
 
@@ -316,28 +279,21 @@
     margin-bottom: 20px;
   }
 
-  /* Top Section - Datepicker and Save button */
   .top-section {
     flex-direction: row;
-    /* Keep in a row */
     justify-content: space-between;
-    /* Datepicker left, Save button right */
     align-items: center;
     gap: 10px;
   }
 
   .custom-datepicker {
     flex-grow: 1;
-    /* Allow datepicker to grow */
     max-width: 60%;
-    /* Limit its width on mobile */
   }
 
   .attendance-button.save {
     width: auto;
-    /* Don't make save button full width */
     padding: 9px 20px;
-    /* Adjust padding for mobile size */
     font-size: 0.9em;
   }
 
@@ -347,41 +303,30 @@
     margin: 10px 0;
   }
 
-  /* Student Item Layout (Name and Button on same line) */
   .student-item {
     flex-direction: row;
-    /* Ensure items stay in a row for mobile */
     align-items: center;
     justify-content: space-between;
     padding: 12px;
     gap: 10px;
-    /* Space between student info and buttons */
   }
 
   .student-info {
     font-size: 0.95em;
     flex-grow: 1;
     text-align: left;
-    /* Ensure text is left-aligned */
     margin-bottom: 0;
-    /* No bottom margin when in a row */
     min-width: 60px;
-    /* Ensure name doesn't shrink too much */
   }
 
   .attendance-buttons {
     gap: 6px;
-    /* Slightly smaller gap between mark buttons */
   }
 
   .attendance-button {
     width: auto;
-    /* Revert from fixed width to auto */
     padding: 6px 12px;
-    /* Adjusted padding for mobile mark buttons */
     font-size: 0.8em;
-    /* Adjusted font size for mobile mark buttons */
     flex-shrink: 0;
-    /* Prevent from shrinking too much */
   }
 }

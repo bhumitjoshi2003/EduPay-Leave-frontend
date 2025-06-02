@@ -5,12 +5,24 @@ import { CommonModule } from '@angular/common';
 import { PaymentHistory } from '../../interfaces/payment-history';
 import { PaymentHistoryService } from '../../services/payment-history.service';
 import { jwtDecode } from 'jwt-decode';
-import { saveAs } from 'file-saver'; 
+import { saveAs } from 'file-saver';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-payment-history',
   templateUrl: './payment-history.component.html',
-  imports: [CommonModule],
+  imports: [CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatIconModule],
   styleUrls: ['./payment-history.component.css'],
 })
 export class PaymentHistoryComponent implements OnInit {
@@ -25,7 +37,7 @@ export class PaymentHistoryComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private paymentHistoryService: PaymentHistoryService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const token = localStorage.getItem('token');

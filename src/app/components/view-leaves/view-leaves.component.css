@@ -1,25 +1,3 @@
-html {
-  box-sizing: border-box;
-  /* Ensures padding and borders are included in an element's total width */
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: inherit;
-  /* All elements inherit box-sizing from html */
-}
-
-body,
-html {
-  margin: 0;
-  /* Remove default browser margin on body and html */
-  padding: 0;
-  /* Remove default browser padding on body and html */
-  overflow-x: hidden;
-  /* Prevent horizontal scrollbars on the body if content tries to break out */
-}
-
 .student-list-container {
   display: flex;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -29,9 +7,8 @@ html {
   animation: fadeIn 0.8s ease-in-out;
   padding: 30px;
   max-width: 1200px;
-  margin: 20px auto;
+  margin: 0px auto;
   width: 95%;
-  /* Adjusted width for desktop/tablet to provide side margins */
 }
 
 .student-list-container h2 {
@@ -138,13 +115,22 @@ html {
   font-size: 1.4em;
 }
 
-.leave-table {
-  width: 100%;
-  border-collapse: collapse;
+/* TABLE VIEW for Desktop/Tablet */
+.leave-table-container {
+  display: block;
+  overflow-x: auto;
+  /* Ensures horizontal scrolling for the table */
   margin-top: 15px;
   box-shadow: 0 3px 7px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.leave-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+  /* Ensures the table is wide enough to trigger scroll if content doesn't fit */
 }
 
 .leave-table th,
@@ -152,6 +138,9 @@ html {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #eee;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .leave-table th {
@@ -159,7 +148,6 @@ html {
   color: white;
   font-weight: 600;
   text-transform: uppercase;
-  white-space: nowrap;
 }
 
 .leave-table tbody tr:nth-child(even) {
@@ -173,46 +161,20 @@ html {
 
 .leave-table td:first-child {
   font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   max-width: 120px;
 }
 
-.leave-table td {
-  white-space: nowrap;
-  /* Keeps text on one line */
-  overflow: hidden;
-  /* Hides overflowing content */
-  text-overflow: ellipsis;
-  /* Adds ellipsis for hidden text */
-  max-width: 180px;
-}
-
-.leave-table th:last-child,
 .leave-table td:last-child {
   text-align: center;
-  /* For the th, and as a fallback for td text */
   max-width: 130px;
-  /* Ensure enough space for the delete button */
   min-width: 100px;
-  /* Ensure minimum width for the button even on smaller screens */
   white-space: normal;
-  /* Allow cell to wrap content if needed, overriding general td */
   overflow: visible;
-  /* Ensure button is not clipped by cell boundaries, overriding general td */
   text-overflow: clip;
-  /* Not relevant for buttons */
-}
-
-.leave-table td:last-child {
   display: flex;
   justify-content: center;
-  /* Center content (the button) horizontally */
   align-items: center;
-  /* Center content (the button) vertically */
 }
-
 
 .delete-button {
   background-color: #f44336;
@@ -224,7 +186,6 @@ html {
   transition: background-color 0.3s ease;
   font-size: 0.9em;
   white-space: nowrap;
-  /* Keep button text on one line */
 }
 
 .delete-button:hover {
@@ -286,7 +247,6 @@ html {
   height: auto;
   white-space: nowrap;
   margin-left: auto;
-  /* Keeps it aligned to the right on larger screens */
 }
 
 .clear-filter-button:hover {
@@ -336,6 +296,99 @@ html {
     transform: translateY(0);
   }
 }
+
+/* --- Leave Cards Container (initially hidden) --- */
+.leave-cards-container {
+  display: none;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 25px;
+  padding: 0 5px;
+}
+
+.leave-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 0;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  overflow: hidden;
+}
+
+.leave-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9em;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.card-item:last-of-type {
+  border-bottom: none;
+}
+
+.card-label {
+  flex-basis: 40%;
+  font-weight: 600;
+  color: #333;
+  background-color: #f0f3f6;
+  /* Changed background-color as requested */
+  padding: 10px 15px;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.card-value {
+  flex-basis: 60%;
+  color: #555;
+  padding: 10px 15px;
+  word-break: break-word;
+  white-space: normal;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.card-actions {
+  background-color: #f8fbfc;
+  padding: 10px 15px;
+  text-align: center;
+  /* Changed to center for delete button */
+  border-top: 1px solid #f0f0f0;
+}
+
+.card-delete-button {
+  padding: 8px 15px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  display: inline-block;
+}
+
+.card-delete-button:hover {
+  background-color: #c82333;
+}
+
+.card-delete-button[disabled] {
+  background-color: #e74c3c;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 
 /* Responsive Adjustments */
 
@@ -408,8 +461,8 @@ html {
 @media (max-width: 767px) {
   .student-list-container {
     flex-direction: column;
-    padding: 15px;
-    width: 100%;
+    padding: 10px;
+    width: 95%;
     margin: 10px auto;
   }
 
@@ -422,7 +475,7 @@ html {
   .left-navigation {
     padding: 10px;
     margin-bottom: 15px;
-    width: 100%;
+    width: 94%;
     margin-right: 0;
     display: block;
   }
@@ -475,7 +528,6 @@ html {
 
   .student-list-area {
     padding: 10px;
-    width: 100%;
   }
 
   .student-list-area h2 {
@@ -494,13 +546,14 @@ html {
   }
 
   .filter-options .form-group {
-    width: 100%;
-    margin-right: 0;
+    width: 95%;
+    margin: auto auto;
     flex-basis: auto;
+    font-size: 0.75em;
   }
 
   .filter-options .form-label {
-    font-size: 0.75em;
+    font-size: 0.9em;
   }
 
   .filter-options .mat-input-element {
@@ -516,93 +569,34 @@ html {
     font-size: 0.8em;
     margin-left: 0;
     min-width: 48%;
-    /* Ensures buttons try to stay side-by-side */
   }
 
-  .leave-table {
-    display: block;
-    overflow-x: auto;
-    /* Allows horizontal scrolling */
-    white-space: nowrap;
-    /* Keeps content on one line to enable scrolling */
-    -webkit-overflow-scrolling: touch;
+  /* --- Mobile View Specifics --- */
+  .leave-table-container {
+    display: none;
+
   }
 
-  .leave-table thead,
-  .leave-table tbody {
-    display: table;
-    /* Maintains table-like behavior within the scrollable block */
-    width: 100%;
-    /* Ensures they fill the scrollable container */
-  }
-
-  .leave-table th,
-  .leave-table td {
-    padding: 8px 10px;
-    font-size: 0.85em;
-    min-width: 80px;
-    /* Ensures minimum width for readability */
-    max-width: unset;
-    white-space: nowrap;
-    /* Prevents text wrapping within cells */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* Adds ellipsis for hidden text */
-    text-align: left;
-    /* Explicitly set to left-align for all cells here in mobile view */
-  }
-
-  .leave-table td:first-child {
-    min-width: 90px;
-    max-width: 120px;
-  }
-
-  .leave-table td:nth-child(2) {
-    min-width: 120px;
-    max-width: 150px;
-  }
-
-  .leave-table td:nth-child(3) {
-    min-width: 100px;
-    max-width: 120px;
-  }
-
-  .leave-table td:nth-child(4) {
-    min-width: 150px;
-    max-width: 200px;
-  }
-
-  .leave-table th:last-child,
-  .leave-table td:last-child {
-    min-width: 100px;
-    /* Ensures minimum width for the delete button */
-    max-width: 130px;
-    /* Ensures maximum width for the delete button */
-    text-align: center;
-    /* Center the Actions header text */
-  }
-
-  /* Specific mobile adjustments for the Actions td */
-  .leave-table td:last-child {
+  .leave-cards-container {
     display: flex;
-    /* Ensures button is centered */
-    justify-content: center;
-    align-items: center;
-    white-space: normal;
-    /* Allow cell to wrap content if needed, overriding general td */
-    overflow: visible;
-    /* Ensure button is not clipped, overriding general td */
-    text-overflow: clip;
-    /* Not relevant for buttons */
+    /* Show the cards on mobile */
+    padding: 0;
   }
 
-  .delete-button {
-    padding: 6px 10px;
+  .card-item {
     font-size: 0.8em;
   }
 
-  .no-students {
-    font-size: 0.8em;
-    padding: 15px;
+  .card-label {
+    padding: 8px 10px;
+  }
+
+  .card-value {
+    padding: 8px 10px;
+  }
+
+  .card-delete-button {
+    padding: 7px 12px;
+    font-size: 0.75em;
   }
 }

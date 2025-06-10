@@ -1,161 +1,188 @@
 import { Component, OnInit } from '@angular/core';
- import { FormBuilder, FormGroup, Validators } from '@angular/forms';
- import { CommonModule, formatDate } from '@angular/common';
- import { ReactiveFormsModule } from '@angular/forms';
- import { LeaveService } from '../../services/leave.service';
- import { StudentService } from '../../services/student.service';
- import Swal from 'sweetalert2';
- import { LeaveRequest } from '../../interfaces/leave-request';
- import { jwtDecode } from 'jwt-decode';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule, formatDate } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { LeaveService } from '../../services/leave.service';
+import { StudentService } from '../../services/student.service';
+import Swal from 'sweetalert2';
+import { LeaveRequest } from '../../interfaces/leave-request';
+import { jwtDecode } from 'jwt-decode';
+import { PaginatedResponse } from '../../services/payment-history.service';
 
- @Component({
-   selector: 'app-apply-leave',
-   templateUrl: './apply-leave.component.html',
-   styleUrls: ['./apply-leave.component.css'],
-   imports: [ReactiveFormsModule, CommonModule],
- })
- export class ApplyLeaveComponent implements OnInit {
-   leaveForm: FormGroup;
-   errorMessage: string = '';
-   studentId: string = '';
-   studentName: string = '';
-   className = '';
-   leaves: { originalLeaveDate: string; leaveDate: string; reason: string }[] = [];
-   today: string = '';
-   reasonOptions: string[] = [
-     'Medical Leave',
-     'Family Event',
-     'Personal Work',
-     'Travel',
-     'Others',
-   ];
-   showOtherReasonInput: boolean = false;
+@Component({
+  selector: 'app-apply-leave',
+  templateUrl: './apply-leave.component.html',
+  styleUrls: ['./apply-leave.component.css'],
+  imports: [ReactiveFormsModule, CommonModule],
+})
+export class ApplyLeaveComponent implements OnInit {
+  leaveForm: FormGroup;
+  errorMessage: string = '';
+  studentId: string = '';
+  studentName: string = '';
+  className = '';
+  leaves: { originalLeaveDate: string; leaveDate: string; reason: string }[] = [];
 
-   constructor(
-     private fb: FormBuilder,
-     private leaveService: LeaveService,
-     private studentService: StudentService
-   ) {
-     this.leaveForm = this.fb.group({
-       leaveDate: ['', Validators.required],
-       reason: ['', Validators.required], // Default to Medical Leave
-       otherReason: ['', Validators.maxLength(20)], // For custom reason (20 words)
-     });
-   }
+  // Pagination
+  currentPage: number = 0;
+  pageSize: number = 5;
+  totalPages: number = 0;
+  totalElements: number = 0;
 
-   ngOnInit(): void {
-     const today = new Date();
-     this.today = formatDate(today, 'yyyy-MM-dd', 'en');
-     this.getStudentId();
-   }
+  today: string = '';
+  reasonOptions: string[] = [
+    'Medical Leave',
+    'Family Event',
+    'Personal Work',
+    'Travel',
+    'Others',
+  ];
+  showOtherReasonInput: boolean = false;
 
-   get reasonControl() {
-     return this.leaveForm.get('reason');
-   }
+  constructor(
+    private fb: FormBuilder,
+    private leaveService: LeaveService,
+    private studentService: StudentService
+  ) {
+    this.leaveForm = this.fb.group({
+      leaveDate: ['', Validators.required],
+      reason: ['', Validators.required],
+      otherReason: ['', Validators.maxLength(20)],
+    });
+  }
 
-   get otherReasonControl() {
-     return this.leaveForm.get('otherReason');
-   }
+  ngOnInit(): void {
+    const today = new Date();
+    this.today = formatDate(today, 'yyyy-MM-dd', 'en');
+    this.getStudentId();
+  }
 
-   onReasonChange(): void {
-     this.showOtherReasonInput = this.reasonControl?.value === 'Others';
-     if (this.showOtherReasonInput) {
-       this.otherReasonControl?.setValidators([Validators.required, Validators.maxLength(20)]);
-     } else {
-       this.otherReasonControl?.clearValidators();
-     }
-     this.otherReasonControl?.updateValueAndValidity();
-   }
+  get reasonControl() {
+    return this.leaveForm.get('reason');
+  }
 
-   getStudentId(): void {
-     const token = localStorage.getItem('token');
-     if (token) {
-       const decodedToken: any = jwtDecode(token);
-       this.studentId = decodedToken.userId;
-       this.studentService.getStudent(this.studentId).subscribe({
-         next: (student) => {
-           this.className = student.className;
-           this.loadStudentLeaves();
-         },
-         error: (error) => {
-           console.error('Error fetching student details:', error);
-         }
-       });
-     }
-   }
+  get otherReasonControl() {
+    return this.leaveForm.get('otherReason');
+  }
 
+  onReasonChange(): void {
+    this.showOtherReasonInput = this.reasonControl?.value === 'Others';
+    if (this.showOtherReasonInput) {
+      this.otherReasonControl?.setValidators([Validators.required, Validators.maxLength(20)]);
+    } else {
+      this.otherReasonControl?.clearValidators();
+    }
+    this.otherReasonControl?.updateValueAndValidity();
+  }
 
-   loadStudentLeaves(): void {
-     this.leaveService.getStudentLeaves(this.studentId).subscribe((data) => {
-       this.leaves = data
-         .sort((a, b) => new Date(b.leaveDate).getTime() - new Date(a.leaveDate).getTime())
-         .map((leave) => ({
-           originalLeaveDate: leave.leaveDate,
-           leaveDate: formatDate(leave.leaveDate, 'dd-MMM-yyyy', 'en'),
-           reason: leave.reason
-         }));
-     });
-   }
+  getStudentId(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      this.studentId = decodedToken.userId;
+      this.studentService.getStudent(this.studentId).subscribe({
+        next: (student) => {
+          this.className = student.className;
+          this.loadStudentLeaves();
+        },
+        error: (error) => {
+          console.error('Error fetching student details:', error);
+        }
+      });
+    }
+  }
 
-   deleteLeave(leaveDate: string): void {
-     if (leaveDate) {
-       Swal.fire({
-         title: 'Are you sure?',
-         text: 'You will not be able to recover this leave!',
-         icon: 'warning',
-         showCancelButton: true,
-         confirmButtonColor: '#d33',
-         cancelButtonColor: '#3085d6',
-         confirmButtonText: 'Yes, delete it!',
-       }).then((result) => {
-         if (result.isConfirmed) {
-           const formattedLeaveDate = new Date(leaveDate).toISOString().split('T')[0];
+  loadStudentLeaves(): void {
+    this.leaveService.getLeavesByStudentId(this.studentId, this.currentPage, this.pageSize)
+      .subscribe({
+        next: (response: PaginatedResponse<any>) => {
+          this.leaves = response.content.map((leave: any) => ({
+            originalLeaveDate: leave.leaveDate,
+            leaveDate: leave.leaveDate,
+            reason: leave.reason,
+          }));
+          this.totalPages = response.totalPages;
+          this.totalElements = response.totalElements;
+        },
+        error: (error) => {
+          console.error('Error fetching student leaves:', error);
+        }
+      });
+  }
 
-           this.leaveService.deleteLeave(this.studentId, formattedLeaveDate).subscribe({
-             next: () => {
-               this.leaveForm.reset();
-               this.reasonControl?.setValue(''); 
-               this.showOtherReasonInput = false;
-               Swal.fire({
-                 title: 'Deleted!',
-                 text: 'Your leave has been deleted.',
-                 icon: 'success',
-                 timer: 2000,
-                 showConfirmButton: false,
-               });
-               this.ngOnInit();
-             },
-             error: (error) => {
-               console.error('Error deleting leave:', error);
-               Swal.fire({
-                 title: 'Error!',
-                 text: 'Failed to delete leave. Please try again.',
-                 icon: 'error',
-                 timer: 2000,
-                 showConfirmButton: false,
-               });
-             },
-           });
-         }
-       });
-     }
-   }
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+      this.loadStudentLeaves();
+    }
+  }
 
-   check(): void {
-     if (this.leaveForm.get('leaveDate')?.hasError('required')) {
-       this.errorMessage = "Please choose a date.";
-     } else if (this.reasonControl?.hasError('required')) {
-       this.errorMessage = "Please select a reason.";
-     } else if (this.showOtherReasonInput && this.otherReasonControl?.hasError('required')) {
-       this.errorMessage = "Please provide a reason.";
-     } else if (this.otherReasonControl?.hasError('maxlength')) {
-       this.errorMessage = "Reason cannot be more than 20 words.";
-     } else {
-       this.errorMessage = "";
-     }
-   }
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.loadStudentLeaves();
+    }
+  }
 
-   applyLeave(): void {
+  deleteLeave(leaveDate: string): void {
+    if (leaveDate) {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'You will not be able to recover this leave!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const formattedLeaveDate = new Date(leaveDate).toISOString().split('T')[0];
+
+          this.leaveService.deleteLeave(this.studentId, formattedLeaveDate).subscribe({
+            next: () => {
+              this.leaveForm.reset();
+              this.reasonControl?.setValue('');
+              this.showOtherReasonInput = false;
+              Swal.fire({
+                title: 'Deleted!',
+                text: 'Your leave has been deleted.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false,
+              });
+              this.ngOnInit();
+            },
+            error: (error) => {
+              console.error('Error deleting leave:', error);
+              Swal.fire({
+                title: 'Error!',
+                text: 'Failed to delete leave. Please try again.',
+                icon: 'error',
+                timer: 2000,
+                showConfirmButton: false,
+              });
+            },
+          });
+        }
+      });
+    }
+  }
+
+  check(): void {
+    if (this.leaveForm.get('leaveDate')?.hasError('required')) {
+      this.errorMessage = "Please choose a date.";
+    } else if (this.reasonControl?.hasError('required')) {
+      this.errorMessage = "Please select a reason.";
+    } else if (this.showOtherReasonInput && this.otherReasonControl?.hasError('required')) {
+      this.errorMessage = "Please provide a reason.";
+    } else if (this.otherReasonControl?.hasError('maxlength')) {
+      this.errorMessage = "Reason cannot be more than 20 words.";
+    } else {
+      this.errorMessage = "";
+    }
+  }
+
+  applyLeave(): void {
     if (this.leaveForm.invalid) {
       this.check();
       return;

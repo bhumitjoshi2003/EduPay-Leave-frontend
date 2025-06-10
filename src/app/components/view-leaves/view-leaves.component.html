@@ -2,7 +2,7 @@
   <div *ngIf="loggedInUserRole === 'ADMIN'" class="left-navigation">
     <h2>Classes</h2>
     <ul class="class-list-vertical">
-      <li (click)="loadLeaves('all')" [class.selected]="selectedClass === 'all'" class="class-item-vertical">
+      <li (click)="onClassSelect('all')" [class.selected]="selectedClass === 'all'" class="class-item-vertical">
         <div class="chevron">
           <span>All Leaves</span>
         </div>
@@ -17,12 +17,12 @@
   </div>
 
   <div class="student-list-area">
-    <h2 *ngIf="loggedInUserRole === 'TEACHER'">Leave Applications for Class {{ selectedClass }}</h2>
+    <h2 *ngIf="loggedInUserRole === 'TEACHER'">Leave Applications for Class {{ loggedInUserClass }}</h2>
     <h2 *ngIf="loggedInUserRole === 'ADMIN'">
       Leave Applications {{ selectedClass !== 'all' ? 'for Class ' + selectedClass : '- All Leaves' }}
     </h2>
 
-    <div class="filter-options" *ngIf="allLeaves.length > 0">
+    <div class="filter-options">
       <div class="form-group">
         <label for="date" class="form-label">Filter by Date:</label>
         <mat-form-field appearance="outline">
@@ -42,7 +42,19 @@
       </div>
       <button class="clear-filter-button" (click)="clearFilter()">Clear Filter</button>
       <button *ngIf="loggedInUserRole === 'ADMIN'" class="delete-all-button" (click)="deleteAllFilteredLeaves()">Delete
-        All</button>
+        Leaves</button>
+    </div>
+
+    <div class="top-pagination-controls" *ngIf="totalElements > 0">
+      <div class="page-info">
+        Total: {{ totalElements }} leaves
+      </div>
+      <div class="page-size">
+        Applications per page:
+        <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+          <option *ngFor="let size of pageSizes" [ngValue]="size">{{ size }}</option>
+        </select>
+      </div>
     </div>
 
     <div *ngIf="filteredLeaves.length > 0; else noLeavesContainer">
@@ -96,8 +108,28 @@
       </div>
     </div>
     <ng-template #noLeavesContainer>
-      <p class="no-students">No leave applications found{{ selectedClass !== 'all' ? ' for the selected class and date.'
-        : ' for the applied filters.' }}</p>
+      <p class="no-students">No leave applications found{{ selectedClass !== 'all' && loggedInUserRole === 'ADMIN' ? '
+        for the selected class.'
+        : (loggedInUserRole === 'TEACHER' ? ' for your class.' : '') }} for the applied filters.</p>
     </ng-template>
+
+    <div class="pagination-controls" *ngIf="totalElements > 0">
+      <div class="pagination-buttons">
+        <button (click)="prevPage()" [disabled]="currentPage === 0">Previous</button>
+
+        <ng-container *ngFor="let pageItem of getPaginationDisplayPages()">
+          <ng-container *ngIf="pageItem !== '...'; else ellipsisTemplate">
+            <button (click)="goToPage(+pageItem)" [class.active]="currentPage === +pageItem">
+              {{ +pageItem + 1 }}
+            </button>
+          </ng-container>
+          <ng-template #ellipsisTemplate>
+            <span class="ellipsis">{{ pageItem }}</span>
+          </ng-template>
+        </ng-container>
+
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages - 1">Next</button>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil, switchMap } from 'rxjs';
+import { Subject, takeUntil, switchMap, Observable, debounceTime, distinctUntilChanged } from 'rxjs';
 import { TeacherService } from '../../services/teacher.service';
 import { jwtDecode } from 'jwt-decode';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,33 +12,43 @@ import { MatIconModule } from '@angular/material/icon';
 import Swal from 'sweetalert2';
 import { from, concatMap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { LeaveApplication, LeaveService } from '../../services/leave.service';
+import { LeaveApplication, LeaveService, PaginatedResponse } from '../../services/leave.service';
 
 @Component({
   selector: 'app-view-leaves',
   templateUrl: './view-leaves.component.html',
   styleUrls: ['./view-leaves.component.css'],
-  imports: [CommonModule,
+  standalone: true,
+  imports: [
+    CommonModule,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatIconModule],
+    MatIconModule
+  ],
 })
 export class ViewLeavesComponent implements OnInit, OnDestroy {
   loggedInUserRole: string = '';
   loggedInUserId: string = '';
   loggedInUserClass: string = '';
-  allLeaves: LeaveApplication[] = [];
   filteredLeaves: LeaveApplication[] = [];
-  userId: string = '';
+
   classList: string[] = [
     'Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
   ];
-  selectedClass: string = 'all'; // Initialize to 'all'
-  selectedDate: any = '';
+  selectedClass: string = 'all';
+  selectedDate: Date | null = null;
   studentIdFilter: string = '';
+
+  currentPage: number = 0;
+  pageSize: number = 10;
+  totalElements: number = 0;
+  totalPages: number = 0;
+  pageSizes: number[] = [3, 10, 20, 50];
+
+  private studentIdInputSubject = new Subject<string>();
   private ngUnsubscribe = new Subject<void>();
 
   constructor(
@@ -55,9 +65,18 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
       }
     });
     this.loadInitialData();
+
+    this.studentIdInputSubject.pipe(
+      debounceTime(800),
+      distinctUntilChanged(),
+      takeUntil(this.ngUnsubscribe)
+    ).subscribe(() => {
+      this.currentPage = 0;
+      this.fetchLeaves();
+    });
   }
 
-  loadInitialData() {
+  loadInitialData(): void {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken: any = jwtDecode(token);
@@ -65,8 +84,8 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
       this.loggedInUserId = decodedToken.userId;
 
       if (this.loggedInUserRole === 'ADMIN') {
-        this.selectedClass = localStorage.getItem('lastSelectedClass') ? localStorage.getItem('lastSelectedClass')! : 'all';
-        this.loadLeaves(this.selectedClass);
+        this.selectedClass = localStorage.getItem('lastSelectedClass') || 'all';
+        this.fetchLeaves();
       } else if (this.loggedInUserRole === 'TEACHER') {
         this.getTeacherClassAndLoadLeaves();
       }
@@ -76,108 +95,119 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+    this.studentIdInputSubject.complete();
   }
 
   getTeacherClassAndLoadLeaves(): void {
     this.teacherService.getTeacher(this.loggedInUserId).pipe(
       takeUntil(this.ngUnsubscribe),
       switchMap((teacher: any) => {
+        this.loggedInUserClass = teacher.classTeacher;
         this.selectedClass = teacher.classTeacher;
-        return this.leaveService.getLeavesByClass(this.selectedClass);
+        return this.fetchLeaves();
       })
     ).subscribe({
-      next: (leaves) => {
-        this.allLeaves = leaves;
-        this.sortAndFilterLeaves();
-      },
+      next: () => { },
       error: (error: any) => {
         console.error('Error fetching teacher details or leaves:', error);
+        Swal.fire('Error!', 'Failed to load teacher details or leave applications.', 'error');
       }
     });
   }
 
-  loadLeaves(className: string): void {
-    this.selectedClass = className;
-    if (className === 'all') {
-      this.leaveService.getAllLeaves().pipe(
-        takeUntil(this.ngUnsubscribe)
-      ).subscribe({
-        next: (leaves) => {
-          this.allLeaves = leaves;
-          this.sortAndFilterLeaves();
-          localStorage.removeItem('lastSelectedClass'); // Optionally remove last selected class
-        },
-        error: (error) => {
-          console.error('Error loading all leaves:', error);
-          Swal.fire('Error!', 'Failed to load all leave applications.', 'error');
-        }
-      });
-    } else {
-      this.leaveService.getLeavesByClass(className).pipe(
-        takeUntil(this.ngUnsubscribe)
-      ).subscribe({
-        next: (leaves) => {
-          this.allLeaves = leaves;
-          this.sortAndFilterLeaves();
-          localStorage.setItem('lastSelectedClass', className);
-        },
-        error: (error) => {
-          console.error(`Error loading leaves for class ${className}:`, error);
-          Swal.fire('Error!', `Failed to load leave applications for class ${className}.`, 'error');
-        }
-      });
+  fetchLeaves(): Observable<PaginatedResponse<LeaveApplication>> {
+    let classFilterToSend: string | undefined = undefined;
+
+    if (this.loggedInUserRole === 'ADMIN') {
+      classFilterToSend = this.selectedClass === 'all' ? undefined : this.selectedClass;
+      if (this.selectedClass === 'all') {
+        localStorage.removeItem('lastSelectedClass');
+      } else {
+        localStorage.setItem('lastSelectedClass', this.selectedClass);
+      }
+    } else if (this.loggedInUserRole === 'TEACHER') {
+      classFilterToSend = this.loggedInUserClass;
     }
+
+    const formattedDate = this.selectedDate ? this.formatDate(this.selectedDate) : undefined;
+    const studentIdToFilter = this.studentIdFilter ? this.studentIdFilter : undefined;
+
+    const leavesObservable = this.leaveService.getLeavesPaginated(
+      this.currentPage,
+      this.pageSize,
+      classFilterToSend,
+      studentIdToFilter,
+      formattedDate,
+      'leaveDate',
+      'desc'
+    );
+
+    leavesObservable.pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe({
+        next: (response: PaginatedResponse<LeaveApplication>) => {
+          this.filteredLeaves = response.content;
+          this.totalElements = response.totalElements;
+          this.totalPages = response.totalPages;
+          this.currentPage = response.number;
+        },
+        error: (error) => {
+          console.error('Error loading leave applications:', error);
+          Swal.fire('Error!', 'Failed to load leave applications.', 'error');
+          this.filteredLeaves = [];
+          this.totalElements = 0;
+          this.totalPages = 0;
+        }
+      });
+    return leavesObservable;
   }
 
-  sortAndFilterLeaves(): void {
-    this.filteredLeaves = this.allLeaves.sort((a, b) => {
-      const dateA = new Date(a.leaveDate);
-      const dateB = new Date(b.leaveDate);
-      return dateB.getTime() - dateA.getTime();
-    }).filter((leave) => {
-      const classFilter = this.selectedClass === 'all' || leave.className === this.selectedClass;
-      let dateFilter = true;
-      if (this.selectedDate) {
-        const selectedDateObject = new Date(this.selectedDate);
-        const year = selectedDateObject.getFullYear();
-        const month = (selectedDateObject.getMonth() + 1).toString().padStart(2, '0');
-        const day = selectedDateObject.getDate().toString().padStart(2, '0');
-        const formattedSelectedDate = `${year}-${month}-${day}`;
-        dateFilter = leave.leaveDate === formattedSelectedDate;
-      }
-      const studentIdFilter = !this.studentIdFilter || leave.studentId.toLowerCase().includes(this.studentIdFilter.toLowerCase());
-      return classFilter && dateFilter && studentIdFilter;
-    });
+  formatDate(date: Date): string {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
-  onClassSelect(selectedClass: string): void {
-    this.loadLeaves(selectedClass);
+  onClassSelect(className: string): void {
+    this.selectedClass = className;
+    this.currentPage = 0;
+    if (this.loggedInUserRole === 'ADMIN' && className === 'all') {
+      this.selectedDate = null;
+      this.studentIdFilter = '';
+    }
+    this.fetchLeaves();
   }
 
   onDateSelect(): void {
-    this.sortAndFilterLeaves();
+    this.currentPage = 0;
+    this.fetchLeaves();
   }
 
   onStudentIdInput(): void {
-    this.sortAndFilterLeaves();
+    this.studentIdInputSubject.next(this.studentIdFilter);
   }
 
   clearFilter(): void {
-    this.selectedDate = '';
+    this.selectedDate = null;
     this.studentIdFilter = '';
-    this.selectedClass = localStorage.getItem('lastSelectedClass') ? localStorage.getItem('lastSelectedClass')! : 'all';
-    this.loadLeaves(this.selectedClass);
+    this.currentPage = 0;
+
+    if (this.loggedInUserRole === 'ADMIN') {
+      this.selectedClass = localStorage.getItem('lastSelectedClass') || 'all';
+    }
+    this.fetchLeaves();
   }
 
   deleteAllFilteredLeaves(): void {
     if (this.filteredLeaves.length === 0) {
-      Swal.fire('Info', 'No leaves are currently filtered to delete.', 'info');
+      Swal.fire('Info', 'No leaves are currently displayed to delete.', 'info');
       return;
     }
 
     Swal.fire({
       title: 'Are you sure?',
-      text: `You want to delete all ${this.filteredLeaves.length} leave applications?`,
+      text: `You want to delete all ${this.filteredLeaves.length} leave applications displayed on this page?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
@@ -195,10 +225,10 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
           complete: () => {
             Swal.fire(
               'Deleted!',
-              'All filtered leave applications deleted successfully.',
+              'All displayed leave applications deleted successfully.',
               'success'
             );
-            this.loadLeaves(this.selectedClass);
+            this.fetchLeaves();
           },
           error: (error) => {
             console.error('Error deleting leaves:', error);
@@ -207,7 +237,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
               'Failed to delete one or more leave applications.',
               'error'
             );
-            this.loadLeaves(this.selectedClass);
+            this.fetchLeaves();
           }
         });
       }
@@ -232,7 +262,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
               response,
               'success'
             );
-            this.loadLeaves(this.selectedClass);
+            this.fetchLeaves();
           },
           error: (error) => {
             console.error('Error deleting leave:', error);
@@ -245,5 +275,76 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
         });
       }
     });
+  }
+
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+      this.fetchLeaves();
+    }
+  }
+
+  nextPage(): void {
+    this.goToPage(this.currentPage + 1);
+  }
+
+  prevPage(): void {
+    this.goToPage(this.currentPage - 1);
+  }
+
+  onPageSizeChange(newPageSize: number): void {
+    this.pageSize = newPageSize;
+    this.currentPage = 0;
+    this.fetchLeaves();
+  }
+
+
+  getPaginationDisplayPages(): (number | string)[] {
+    const pages: (number | string)[] = [];
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const maxVisiblePages = 3;
+    if (total <= 1) {
+      return [];
+    }
+
+    let start = Math.max(0, current - Math.floor(maxVisiblePages / 2));
+    let end = start + maxVisiblePages - 1;
+
+    if (end >= total) {
+      end = total - 1;
+      start = Math.max(0, end - maxVisiblePages + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    if (!pages.includes(0)) {
+      pages.unshift('...');
+      pages.unshift(0);
+    }
+
+    if (!pages.includes(total - 1)) {
+      pages.push('...');
+      pages.push(total - 1);
+    }
+
+    const cleanedPages: (number | string)[] = [];
+    let lastAddedItem: number | string | null = null;
+    for (const item of pages) {
+      if (typeof item === 'number') {
+        if (item !== lastAddedItem) {
+          cleanedPages.push(item);
+          lastAddedItem = item;
+        }
+      } else {
+        if (lastAddedItem !== '...') {
+          cleanedPages.push(item);
+          lastAddedItem = item;
+        }
+      }
+    }
+    return cleanedPages;
   }
 }

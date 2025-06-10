@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, NgZone } from '@angular/core';
 import { RazorpayService } from '../../services/razorpay.service';
 import { PaymentData } from '../../interfaces/payment-data';
 import Swal from 'sweetalert2';
@@ -16,7 +16,8 @@ export class PaymentComponent {
 
   constructor(
     private razorpayService: RazorpayService,
-    private studentService: StudentService // Inject StudentService
+    private studentService: StudentService,
+    private ngZone: NgZone
   ) { }
 
   @Input() paymentData: PaymentData = {
@@ -107,6 +108,10 @@ export class PaymentComponent {
             },
             modal: {
               ondismiss: () => {
+                this.ngZone.run(() => {
+                  this.paymentProcessCompleted.emit();
+                });
+
                 Swal.fire({
                   icon: 'warning',
                   title: 'Payment Cancelled!',
@@ -117,8 +122,6 @@ export class PaymentComponent {
                   color: '#b91c1c',
                   timer: 4000,
                   timerProgressBar: true
-                }).then(() => {
-                  this.paymentProcessCompleted.emit();
                 });
               }
             }

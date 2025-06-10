@@ -145,6 +145,7 @@ export class PaymentTrackerComponent implements OnInit {
   }
 
   fetchFees() {
+    this.onPaymentProcessCompleted();
     this.feesService.getStudentFees(this.studentId, this.session).subscribe({
       next: (fees) => {
         this.className = fees[0].className;
@@ -419,7 +420,7 @@ export class PaymentTrackerComponent implements OnInit {
 
   onPaymentProcessingStarted(): void {
     this.ngZone.run(() => {
-      this.isLoadingPayment = true;
+      // this.isLoadingPayment = true;
       console.log('Payment processing started: UI locked.');
     });
   }
@@ -428,84 +429,30 @@ export class PaymentTrackerComponent implements OnInit {
     this.ngZone.run(() => {
       this.isLoadingPayment = false;
       console.log('Payment process completed: UI unlocked.');
+      this.cdr.detectChanges();
     });
   }
 
   handleSuccessfulPayment() {
     this.ngZone.run(() => {
-      const promises: Promise<any>[] = [];
-
-      Object.keys(this.selectedMonthsByYear).forEach(yearKey => {
-        const year = parseInt(yearKey, 10);
-        const formattedYear = `${year}-${year + 1}`;
-        this.selectedMonthsByYear[year].forEach(monthNumber => {
-          promises.push(new Promise<void>((resolve, reject) => {
-            this.feesService.getStudentFee(this.studentId, formattedYear, monthNumber).subscribe({
-              next: (fee) => {
-                const monthDetails = this.months.find(m => m.monthNumber === monthNumber && m.year === formattedYear);
-                fee.paid = true;
-                fee.manualyPaid = false;
-                fee.manualPaymentReceived = 0;
-                fee.amountPaid = monthDetails.fee + (monthDetails.busFee || 0) + (monthDetails.lateFee || 0);
-                this.feesService.updateStudentFees(fee).subscribe({
-                  next: () => resolve(),
-                  error: (err) => {
-                    console.error(`Error updating fee for month ${monthNumber} in year ${formattedYear}:`, err);
-                    reject(err);
-                  }
-                });
-              },
-              error: (err) => {
-                console.error(`Error fetching fee for month ${monthNumber} in year ${formattedYear}:`, err);
-                reject(err);
-              }
-            });
-          }));
-        });
-      });
-
       this.initPaymentData();
 
-      Promise.all(promises).then(() => {
+      this.fetchFees();
+      this.selectedMonthsByYear = {};
+      this.totalAmountToPay = 0;
+      this.cdr.detectChanges();
 
-        this.attendanceService.updateChargePaidAfterPayment(this.studentId, this.session).subscribe({
-          next: (response) => {
-            console.log('Attendance charge paid updated:', response);
-          },
-          error: (error) => {
-            console.error('Error updating attendance charge paid:', error);
-            Swal.fire('Error!', 'Failed to update unapplied leave charges.', 'error');
-          }
-        });
-
-
-        this.fetchFees();
-        this.selectedMonthsByYear = {};
-        this.totalAmountToPay = 0;
-        this.cdr.detectChanges();
-
-        Swal.fire({
-          title: '🎉 Payment Successful!',
-          text: 'Your payment has been processed successfully.',
-          icon: 'success',
-          confirmButtonText: 'OK',
-          timer: 3000,
-          timerProgressBar: true,
-        }).then(() => {
-          this.onPaymentProcessCompleted();
-        });
-      }).catch(error => {
-        console.error('One or more fee updates failed during success handling:', error);
-        Swal.fire({
-          title: 'Payment Processing Error',
-          text: 'Some months could not be marked as paid. Please contact support.',
-          icon: 'error',
-          confirmButtonText: 'OK',
-        }).then(() => {
-          this.onPaymentProcessCompleted();
-        });
+      Swal.fire({
+        title: '🎉 Payment Successful!',
+        text: 'Your payment has been processed successfully.',
+        icon: 'success',
+        confirmButtonText: 'OK',
+        timer: 3000,
+        timerProgressBar: true,
+      }).then(() => {
+        this.onPaymentProcessCompleted();
       });
-    });
+    })
   }
 
   initPaymentData() {

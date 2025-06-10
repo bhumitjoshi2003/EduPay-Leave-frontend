@@ -38,6 +38,12 @@
     </table>
   </div>
 
+  <div class="pagination-controls" *ngIf="totalPages > 1 && !loading">
+    <button class="page-button" (click)="previousPage()" [disabled]="currentPage === 0">Previous</button>
+    <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+    <button class="page-button" (click)="nextPage()" [disabled]="currentPage === totalPages - 1">Next</button>
+  </div>
+
   <div *ngIf="paymentHistory.length === 0 && !loading && !error" class="no-history-message">No payment history found.
   </div>
 </div>

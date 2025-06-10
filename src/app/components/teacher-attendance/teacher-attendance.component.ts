@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { LeaveService } from '../../services/leave.service';
 import { StudentService } from '../../services/student.service';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { CommonModule, formatDate } from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -22,99 +21,158 @@ interface Student {
 
 @Component({
   selector: 'app-teacher-attendance',
-  imports: [FormsModule, HttpClientModule,
+  imports: [
+    FormsModule,
     CommonModule,
     MatDatepickerModule,
     MatInputModule,
-    MatNativeDateModule,],
+    MatNativeDateModule,
+  ],
   templateUrl: './teacher-attendance.component.html',
   styleUrl: './teacher-attendance.component.css',
 })
 export class TeacherAttendanceComponent implements OnInit {
   students: Student[] = [];
-  leaves: string[] = [];
   attendanceDate: Date = new Date();
   selectedClass: string = '';
   absentStudents: string[] = [];
+
   teacherId: string = '';
+  isMobileView: boolean = false;
 
   constructor(
     private leaveService: LeaveService,
     private studentService: StudentService,
     private attendanceService: AttendanceService,
-    private teacherService: TeacherService 
-  ) {}
+    private teacherService: TeacherService
+  ) { }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.checkMobileView();
+  }
 
   ngOnInit(): void {
+    this.attendanceDate = this.getTodayDateWithoutTime();
     this.getTeacherId();
-    if (this.attendanceDate.getDay() === 0) {
-      this.students = [];
-    }
+    this.checkMobileView();
+  }
+
+  checkMobileView(): void {
+    this.isMobileView = window.innerWidth <= 567;
+  }
+
+  getTodayDateWithoutTime(): Date {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
   }
 
   getTeacherId(): void {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken: any = jwtDecode(token);
-      this.teacherId = decodedToken.userId; 
+      this.teacherId = decodedToken.userId;
       this.teacherService.getTeacher(this.teacherId).subscribe({
         next: (teacher: any) => {
           this.selectedClass = teacher.classTeacher;
-          this.loadStudents();
-          this.loadLeaves();
+          this.loadStudentsAndApplyAttendance();
         },
         error: (error: any) => {
           console.error('Error fetching teacher details:', error);
-        }
+          Swal.fire('Error', 'Failed to fetch teacher details.', 'error');
+        },
       });
+    } else {
+      Swal.fire('Error', 'Authentication token not found. Please login.', 'error');
     }
   }
 
-  loadStudents(): void {
-    this.studentService.getStudentsByClass(this.selectedClass).subscribe((studentLeaveDTOs) => {
-      this.students = studentLeaveDTOs.map((dto) => ({
-        studentId: dto.studentId,
-        name: dto.name,
-        absent: false,
-        chargePaid: true,
-      }));
+  loadStudentsAndApplyAttendance(): void {
+    if (this.isSunday(this.attendanceDate)) {
+      this.students = [];
+      return;
+    }
+
+    this.studentService.getStudentsByClass(this.selectedClass).subscribe({
+      next: (studentLeaveDTOs) => {
+        this.students = studentLeaveDTOs.map((dto) => ({
+          studentId: dto.studentId,
+          name: dto.name,
+          absent: false,
+          chargePaid: true,
+        }));
+        this.applyAttendanceAndLeavesToStudents();
+      },
+      error: (error) => {
+        console.error('Error loading students:', error);
+        Swal.fire('Error', 'Failed to load students for the class.', 'error');
+      },
     });
   }
 
-  loadLeaves(): void {
-    const formattedDate = this.attendanceDate.toISOString().split('T')[0];
+  applyAttendanceAndLeavesToStudents(): void {
+    const formattedDate = formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en');
 
-    this.attendanceService.getAttendanceByDateAndClass(formattedDate, this.selectedClass).subscribe((attendanceData) => {
-      if (attendanceData && attendanceData.length > 0) {
-        const attendanceMap = new Map<string, AttendanceData>();
-        attendanceData.forEach((attendance) => {
-          attendanceMap.set(attendance.studentId, attendance);
-        });
-
-        this.students.forEach((student) => {
-          const attendance = attendanceMap.get(student.studentId);
-          if (attendance) {
-            student.absent = true;
-            student.chargePaid = attendance.chargePaid;
-          } else {
-            student.absent = false;
-            student.chargePaid = true;
-          }
-        });
-      } else {
-        this.leaveService.getLeavesByDateAndClass(formattedDate, this.selectedClass).subscribe((leaves) => {
-          this.absentStudents = leaves;
+    this.attendanceService.getAttendanceByDateAndClass(formattedDate, this.selectedClass).subscribe({
+      next: (attendanceData) => {
+        if (attendanceData && attendanceData.length > 0) {
+          const attendanceMap = new Map<string, AttendanceData>();
+          attendanceData.forEach((attendance) => {
+            attendanceMap.set(attendance.studentId, attendance);
+          });
 
           this.students.forEach((student) => {
-            if (this.absentStudents.includes(student.studentId)) {
+            const attendance = attendanceMap.get(student.studentId);
+            if (attendance) {
               student.absent = true;
-              student.chargePaid = true;
+              student.chargePaid = attendance.chargePaid;
             } else {
               student.absent = false;
+              student.chargePaid = true;
             }
           });
+        } else {
+          this.leaveService.getLeavesByDateAndClass(formattedDate, this.selectedClass).subscribe({
+            next: (leaves) => {
+              this.absentStudents = leaves;
+              this.students.forEach((student) => {
+                if (this.absentStudents.includes(student.studentId)) {
+                  student.absent = true;
+                  student.chargePaid = true;
+                } else {
+                  student.absent = false;
+                  student.chargePaid = true;
+                }
+              });
+            },
+            error: (error) => {
+              console.warn('No leaves found or error fetching leaves:', error);
+            },
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Error loading attendance data:', error);
+        this.leaveService.getLeavesByDateAndClass(formattedDate, this.selectedClass).subscribe({
+          next: (leaves) => {
+            this.absentStudents = leaves;
+            this.students.forEach((student) => {
+              if (this.absentStudents.includes(student.studentId)) {
+                student.absent = true;
+                student.chargePaid = true;
+              } else {
+                student.absent = false;
+                student.chargePaid = true;
+              }
+            });
+          },
+          error: (leavesError) => {
+            console.error('Error loading leaves after attendance failed:', leavesError);
+            Swal.fire('Error', 'Failed to load attendance or leave data.', 'error');
+          },
         });
-      }
+      },
     });
   }
 
@@ -137,17 +195,19 @@ export class TeacherAttendanceComponent implements OnInit {
   onDateChange(event: any): void {
     const selectedDate = event.value;
     if (selectedDate) {
-        const offset = selectedDate.getTimezoneOffset() * 60000;
-        const adjustedDate = new Date(selectedDate.getTime() - offset);
-        this.attendanceDate = adjustedDate;
-        this.loadLeaves();
+      const offset = selectedDate.getTimezoneOffset() * 60000;
+      const adjustedDate = new Date(selectedDate.getTime() - offset);
+      adjustedDate.setHours(0, 0, 0, 0);
+      this.attendanceDate = adjustedDate;
+
+      this.loadStudentsAndApplyAttendance();
     }
   }
 
   saveAttendance(): void {
     Swal.fire({
       title: 'Confirm Save',
-      text: 'Sure you want to save the attendance?',
+      text: 'Are you sure you want to save the attendance?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -160,16 +220,18 @@ export class TeacherAttendanceComponent implements OnInit {
           .map((student) => ({
             studentId: student.studentId,
             chargePaid: student.chargePaid,
-            absentDate: this.attendanceDate.toISOString().split('T')[0],
+            absentDate: formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en'),
             className: this.selectedClass,
           }));
 
-        attendanceData.push({
-          studentId: 'X',
-          chargePaid: true,
-          absentDate: this.attendanceDate.toISOString().split('T')[0],
-          className: this.selectedClass,
-        });
+        if (attendanceData.length === 0) {
+          attendanceData.push({
+            studentId: 'X',
+            chargePaid: true,
+            absentDate: formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en'),
+            className: this.selectedClass,
+          });
+        }
 
         this.attendanceService.saveAttendance(attendanceData).subscribe({
           next: () => {
@@ -180,12 +242,13 @@ export class TeacherAttendanceComponent implements OnInit {
               timer: 2000,
               showConfirmButton: false,
             });
+            this.applyAttendanceAndLeavesToStudents();
           },
           error: (error) => {
             console.error('Error saving attendance:', error);
             Swal.fire({
               title: 'Error!',
-              text: 'Failed to save attendance. Please try again.',
+              text: error.error || 'Failed to save attendance. Please try again.',
               icon: 'error',
               timer: 2000,
               showConfirmButton: false,
@@ -197,25 +260,22 @@ export class TeacherAttendanceComponent implements OnInit {
   }
 
   isDateWithinAllowedRange(): boolean {
-    const today = new Date();
-    const lowerBound = new Date(today);
-    const upperBound = new Date(today);
-  
-    lowerBound.setDate(today.getDate() - 2);
-    upperBound.setDate(today.getDate() + 1);
-  
+    const today = this.getTodayDateWithoutTime();
     const selected = new Date(this.attendanceDate);
-    selected.setHours(0, 0, 0, 0); 
-  
-    return selected >= lowerBound && selected <= upperBound;
+    selected.setHours(0, 0, 0, 0);
+
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    return selected.getTime() === today.getTime() || selected.getTime() === yesterday.getTime();
   }
-  
+
   getRelativeDate(offset: number): string {
-    const date = new Date();
+    const date = this.getTodayDateWithoutTime();
     date.setDate(date.getDate() + offset);
-    return date.toISOString().split('T')[0];
+    return formatDate(date, 'yyyy-MM-dd', 'en');
   }
-  
+
   isSunday(date: Date | null): boolean {
     return date ? new Date(date).getDay() === 0 : false;
   }

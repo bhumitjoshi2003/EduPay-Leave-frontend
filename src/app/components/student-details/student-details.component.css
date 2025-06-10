@@ -281,6 +281,7 @@
 /* Mobile Devices (max-width: 767px) */
 @media (max-width: 767px) {
   .student-details-container {
+    width: 90%;
     padding: 15px;
     gap: 15px;
     margin: 15px auto;

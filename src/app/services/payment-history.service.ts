@@ -1,9 +1,20 @@
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PaymentHistory } from '../interfaces/payment-history';
 import { PaymentHistoryDetails } from '../interfaces/payment-response';
 import { environment } from '../../environments/environment';
+
+export interface PaginatedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -14,21 +25,54 @@ export class PaymentHistoryService {
 
   constructor(private http: HttpClient) { }
 
+  getFilteredPaymentHistory(
+    className?: string,
+    studentId?: string,
+    date?: string,
+    page: number = 0,
+    size: number = 10,
+    sortBy: string = 'paymentDate',
+    sortDir: string = 'desc'
+  ): Observable<PaginatedResponse<PaymentHistory>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', `${sortBy},${sortDir}`);
+
+    if (className) {
+      params = params.set('className', className);
+    }
+    if (studentId) {
+      params = params.set('studentId', studentId);
+    }
+    if (date) {
+      params = params.set('paymentDate', date);
+    }
+
+    return this.http.get<PaginatedResponse<PaymentHistory>>(`${this.baseUrl}/students`, { params });
+  }
+
+  getPaymentHistoryForStudent(
+    studentId: string,
+    page: number = 0,
+    size: number = 10,
+    sortBy: string = 'paymentDate',
+    sortDir: string = 'desc'
+  ): Observable<PaginatedResponse<PaymentHistory>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', `${sortBy},${sortDir}`);
+
+    return this.http.get<PaginatedResponse<PaymentHistory>>(`${this.baseUrl}/student/${studentId}`, { params });
+  }
+
   getPaymentHistory(studentId: string): Observable<PaymentHistory[]> {
     return this.http.get<PaymentHistory[]>(`${this.baseUrl}/${studentId}`);
   }
 
   getPaymentHistoryDetails(paymentId: string): Observable<PaymentHistoryDetails> {
     return this.http.get<PaymentHistoryDetails>(`${this.baseUrl}/details/${paymentId}`);
-  }
-
-  getAllPaymentHistory(): Observable<PaymentHistory[]> {
-    console.log(`${this.baseUrl}/all`);
-    return this.http.get<PaymentHistory[]>(`${this.baseUrl}/all`);
-  }
-
-  getPaymentHistoryByClass(className: string): Observable<PaymentHistory[]> {
-    return this.http.get<PaymentHistory[]>(`${this.baseUrl}/class/${className}`);
   }
 
   downloadPaymentReceipt(paymentId: string): Observable<Blob> {

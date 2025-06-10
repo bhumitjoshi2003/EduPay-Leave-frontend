@@ -2,7 +2,7 @@
   <div class="left-navigation">
     <h2>CLASSES</h2>
     <ul class="class-list-vertical">
-      <li (click)="loadAllPaymentHistory()" [class.selected]="selectedClass === 'all'" class="class-item-vertical">
+      <li (click)="onClassSelect('all')" [class.selected]="selectedClass === 'all'" class="class-item-vertical">
         <div class="chevron">
           <span>All Payments</span>
         </div>
@@ -19,7 +19,7 @@
   <div class="payment-history-area">
     <h2>Payment History {{ selectedClass !== 'all' ? 'for Class ' + selectedClass : ' - All Payments' }}</h2>
 
-    <div class="filter-options" *ngIf="paymentHistory.length > 0">
+    <div class="filter-options">
       <div class="form-group">
         <label for="date" class="form-label">Filter by Date:</label>
         <mat-form-field appearance="outline">
@@ -38,6 +38,21 @@
         </mat-form-field>
       </div>
       <button class="clear-filter-button" (click)="clearFilter()">Clear Filter</button>
+    </div>
+
+    <div *ngIf="loading" class="loading-indicator">Loading payment history...</div>
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+
+    <div class="top-pagination-controls" *ngIf="totalElements > 0">
+      <div class="page-info">
+        Total: {{ totalElements }} payments
+      </div>
+      <div class="page-size">
+        Payments per page:
+        <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+          <option *ngFor="let size of pageSizes" [ngValue]="size">{{ size }}</option>
+        </select>
+      </div>
     </div>
 
     <div *ngIf="filteredPayments.length > 0; else noPaymentsContainer">
@@ -60,11 +75,12 @@
               <td>{{ payment.studentName }}</td>
               <td>{{ payment.amountPaid }}</td>
               <td>{{ payment.paymentDate | date:'yyyy-MM-dd' }}</td>
-              <td [ngClass]="{'status-success': payment.status.toLowerCase() === 'success'}" styles="color: green">{{
-                payment.status |
-                uppercase}}</td>
+              <td
+                [ngClass]="{'status-success': payment.status.toLowerCase() === 'success', 'status-failed': payment.status.toLowerCase() !== 'success'}">
+                {{
+                payment.status | uppercase}}</td>
               <td>
-                <button (click)="downloadPaymentReceipt(payment.paymentId)" class="download-button">
+                <button (click)="downloadPaymentReceipt(payment.paymentId, $event)" class="download-button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
                     fill="currentColor">
                     <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
@@ -97,12 +113,12 @@
           </div>
           <div class="card-row">
             <span class="card-label">Status:</span>
-            <span class="card-value" [ngClass]="{'status-success': payment.status.toLowerCase() === 'success'}">{{
+            <span class="card-value"
+              [ngClass]="{'status-success': payment.status.toLowerCase() === 'success', 'status-failed': payment.status.toLowerCase() !== 'success'}">{{
               payment.status | uppercase}}</span>
           </div>
           <div class="card-actions">
-            <button (click)="downloadPaymentReceipt(payment.paymentId); $event.stopPropagation()"
-              class="download-button">
+            <button (click)="downloadPaymentReceipt(payment.paymentId, $event)" class="download-button">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                 <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
               </svg>
@@ -113,8 +129,26 @@
       </div>
     </div>
     <ng-template #noPaymentsContainer>
-      <p class="no-payments">No payment history found{{ selectedClass !== 'all' ? ' for the selected class and filters.'
-        : ' for the applied filters.' }}</p>
+      <p class="no-payments">No payment history found for the applied filters.</p>
     </ng-template>
+
+    <div class="pagination-controls" *ngIf="totalElements > 0">
+      <div class="pagination-buttons">
+        <button (click)="prevPage()" [disabled]="currentPage === 0">Previous</button>
+
+        <ng-container *ngFor="let pageItem of getPaginationDisplayPages()">
+          <ng-container *ngIf="pageItem !== '...'; else ellipsisTemplate">
+            <button (click)="goToPage(+pageItem)" [class.active]="currentPage === +pageItem">
+              {{ +pageItem + 1 }}
+            </button>
+          </ng-container>
+          <ng-template #ellipsisTemplate>
+            <span class="ellipsis">{{ pageItem }}</span>
+          </ng-template>
+        </ng-container>
+
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages - 1">Next</button>
+      </div>
+    </div>
   </div>
 </div>

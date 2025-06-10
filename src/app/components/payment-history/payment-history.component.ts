@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PaymentHistory } from '../../interfaces/payment-history';
-import { PaymentHistoryService } from '../../services/payment-history.service';
+import { PaginatedResponse, PaymentHistoryService } from '../../services/payment-history.service'; // Import PaginatedResponse
 import { jwtDecode } from 'jwt-decode';
 import { saveAs } from 'file-saver';
 import { FormsModule } from '@angular/forms';
@@ -16,13 +16,16 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-payment-history',
   templateUrl: './payment-history.component.html',
-  imports: [CommonModule,
+  standalone: true,
+  imports: [
+    CommonModule,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatIconModule],
+    MatIconModule
+  ],
   styleUrls: ['./payment-history.component.css'],
 })
 export class PaymentHistoryComponent implements OnInit {
@@ -31,6 +34,11 @@ export class PaymentHistoryComponent implements OnInit {
   error: string = '';
   role: string = '';
   studentId: string = '';
+
+  currentPage: number = 0;
+  pageSize: number = 10;
+  totalPages: number = 0;
+  totalElements: number = 0;
 
   constructor(
     private http: HttpClient,
@@ -47,33 +55,75 @@ export class PaymentHistoryComponent implements OnInit {
 
       if (this.role === 'STUDENT') {
         this.studentId = decodedToken.userId;
+        this.fetchPaymentHistory();
       } else {
         this.route.params.subscribe((params) => {
           const routeStudentId = params['studentId'];
           if (routeStudentId) {
             this.studentId = routeStudentId;
+            this.fetchPaymentHistory();
+          } else {
+            this.error = 'Student ID not provided to view payment history.';
+            this.loading = false;
           }
         });
       }
-      this.fetchPaymentHistory();
+    } else {
+      this.error = 'Authentication token not found. Please log in.';
+      this.loading = false;
+      this.router.navigate(['/login']);
     }
   }
 
   fetchPaymentHistory(): void {
+    if (!this.studentId) {
+      this.error = 'Student ID is required to fetch payment history.';
+      this.loading = false;
+      return;
+    }
+
     this.loading = true;
     this.error = '';
 
-    this.paymentHistoryService.getPaymentHistory(this.studentId).subscribe({
-      next: (data) => {
-        this.paymentHistory = data;
+    this.paymentHistoryService.getPaymentHistoryForStudent(
+      this.studentId,
+      this.currentPage,
+      this.pageSize
+    ).subscribe({
+      next: (response: PaginatedResponse<PaymentHistory>) => {
+        this.paymentHistory = response.content;
+        this.totalElements = response.totalElements;
+        this.totalPages = response.totalPages;
+        this.currentPage = response.number;
         this.loading = false;
       },
       error: (err) => {
-        this.error = 'Failed to fetch payment history.';
+        this.error = 'Failed to fetch payment history. Please try again.';
         console.error('Error fetching payment history:', err);
         this.loading = false;
       },
     });
+  }
+
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages && page !== this.currentPage) {
+      this.currentPage = page;
+      this.fetchPaymentHistory();
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+      this.fetchPaymentHistory();
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.fetchPaymentHistory();
+    }
   }
 
   viewPaymentDetails(paymentId: string): void {

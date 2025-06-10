@@ -10,7 +10,7 @@ describe('ApplyLeaveComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ApplyLeaveComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ApplyLeaveComponent);
     component = fixture.componentInstance;

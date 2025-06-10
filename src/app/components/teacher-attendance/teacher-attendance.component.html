@@ -33,11 +33,13 @@
       <div class="attendance-buttons">
         <button *ngIf="!student.absent" (click)="markAbsent(student.studentId)" class="attendance-button absent"
           [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)">
-          Mark Absent
+          <ng-container *ngIf="!isMobileView">Mark Absent</ng-container>
+          <ng-container *ngIf="isMobileView">Mark A</ng-container>
         </button>
         <button *ngIf="student.absent" (click)="markPresent(student.studentId)" class="attendance-button present"
           [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)">
-          Mark Present
+          <ng-container *ngIf="!isMobileView">Mark Present</ng-container>
+          <ng-container *ngIf="isMobileView">Mark P</ng-container>
         </button>
       </div>
     </li>

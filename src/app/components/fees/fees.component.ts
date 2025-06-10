@@ -145,6 +145,7 @@ export class PaymentTrackerComponent implements OnInit {
   }
 
   fetchFees() {
+    this.onPaymentProcessCompleted();
     this.feesService.getStudentFees(this.studentId, this.session).subscribe({
       next: (fees) => {
         this.className = fees[0].className;
@@ -419,7 +420,7 @@ export class PaymentTrackerComponent implements OnInit {
 
   onPaymentProcessingStarted(): void {
     this.ngZone.run(() => {
-      this.isLoadingPayment = true;
+      // this.isLoadingPayment = true;
       console.log('Payment processing started: UI locked.');
     });
   }
@@ -428,6 +429,7 @@ export class PaymentTrackerComponent implements OnInit {
     this.ngZone.run(() => {
       this.isLoadingPayment = false;
       console.log('Payment process completed: UI unlocked.');
+      this.cdr.detectChanges();
     });
   }
 

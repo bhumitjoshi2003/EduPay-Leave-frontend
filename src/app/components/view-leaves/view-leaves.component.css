@@ -119,7 +119,6 @@
 .leave-table-container {
   display: block;
   overflow-x: auto;
-  /* Ensures horizontal scrolling for the table */
   margin-top: 15px;
   box-shadow: 0 3px 7px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
@@ -130,7 +129,6 @@
   width: 100%;
   border-collapse: collapse;
   min-width: 700px;
-  /* Ensures the table is wide enough to trigger scroll if content doesn't fit */
 }
 
 .leave-table th,
@@ -340,7 +338,6 @@
   font-weight: 600;
   color: #333;
   background-color: #f0f3f6;
-  /* Changed background-color as requested */
   padding: 10px 15px;
   border-right: 1px solid #e0e0e0;
   display: flex;
@@ -363,7 +360,6 @@
   background-color: #f8fbfc;
   padding: 10px 15px;
   text-align: center;
-  /* Changed to center for delete button */
   border-top: 1px solid #f0f0f0;
 }
 
@@ -387,6 +383,116 @@
   background-color: #e74c3c;
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* --- Top Pagination Controls (New) --- */
+.top-pagination-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 10px 15px;
+  background-color: #e0f2f1;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  font-size: 0.9em;
+  color: #004d40;
+  gap: 10px;
+}
+
+.top-pagination-controls .page-info {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.top-pagination-controls .page-size {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.top-pagination-controls .page-size select {
+  padding: 7px 10px;
+  border: 1px solid #00acc1;
+  border-radius: 5px;
+  background-color: white;
+  color: #004d40;
+  font-size: 0.9em;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.top-pagination-controls .page-size select:focus {
+  border-color: #00838f;
+  box-shadow: 0 0 0 2px rgba(0, 172, 193, 0.2);
+}
+
+
+/* --- Bottom Pagination Controls (Modified) --- */
+.pagination-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  /* Center the buttons */
+  align-items: center;
+  margin-top: 30px;
+  /* Increased margin to separate from content */
+  padding: 15px 20px;
+  background-color: #e0f2f1;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  font-size: 0.9em;
+  color: #004d40;
+  gap: 15px;
+}
+
+.pagination-controls .pagination-buttons {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+  /* Ensure buttons are centered within their container */
+  flex-grow: 1;
+  /* Allow buttons to take up available space */
+}
+
+.pagination-controls .pagination-buttons button {
+  background-color: #00acc1;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  font-weight: 500;
+  min-width: 40px;
+}
+
+.pagination-controls .pagination-buttons button:hover:not(:disabled) {
+  background-color: #00838f;
+  transform: translateY(-1px);
+}
+
+.pagination-controls .pagination-buttons button:disabled {
+  background-color: #b0bec5;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.pagination-controls .pagination-buttons button.active {
+  background-color: #004d40;
+  font-weight: bold;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.pagination-controls .ellipsis {
+  padding: 8px 5px;
+  color: #004d40;
+  font-weight: bold;
 }
 
 
@@ -454,6 +560,38 @@
 
   .filter-options .form-group {
     flex-basis: 180px;
+  }
+
+  /* Tablet Adjustments for Top Pagination */
+  .top-pagination-controls {
+    flex-direction: row;
+    justify-content: space-between;
+    /* Aligns page info to left, page size to right */
+    padding: 12px 15px;
+    gap: 15px;
+  }
+
+  .top-pagination-controls .page-info,
+  .top-pagination-controls .page-size {
+    width: auto;
+    /* Allow natural width */
+    justify-content: flex-start;
+    /* Align left */
+  }
+
+  /* Tablet Adjustments for Bottom Pagination */
+  .pagination-controls {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+  }
+
+  .pagination-buttons {
+    width: auto;
+    justify-content: center;
+    flex-grow: 0;
   }
 }
 
@@ -574,12 +712,10 @@
   /* --- Mobile View Specifics --- */
   .leave-table-container {
     display: none;
-
   }
 
   .leave-cards-container {
     display: flex;
-    /* Show the cards on mobile */
     padding: 0;
   }
 
@@ -598,5 +734,48 @@
   .card-delete-button {
     padding: 7px 12px;
     font-size: 0.75em;
+  }
+
+  /* Mobile Adjustments for Top Pagination */
+  .top-pagination-controls {
+    padding: 10px;
+    font-size: 0.8em;
+    gap: 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .top-pagination-controls .page-info,
+  .top-pagination-controls .page-size {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .top-pagination-controls .page-size select {
+    padding: 5px 8px;
+    font-size: 0.8em;
+  }
+
+  .pagination-controls {
+    padding: 10px;
+    font-size: 0.8em;
+    gap: 10px;
+    flex-direction: column;
+  }
+
+  .pagination-buttons {
+    width: 100%;
+  }
+
+  .pagination-buttons button {
+    padding: 6px 9px;
+    font-size: 0.8em;
+    min-width: 30px;
+  }
+
+  .pagination-buttons .ellipsis {
+    padding: 6px 3px;
   }
 }

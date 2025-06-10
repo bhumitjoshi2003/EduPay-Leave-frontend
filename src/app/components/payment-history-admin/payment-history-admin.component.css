@@ -247,7 +247,7 @@
   margin-bottom: 3px;
   font-weight: bold;
   color: #004d40;
-  font-size: 0.8em;
+  font-size: 0.75em;
 }
 
 .filter-options .mat-form-field-wrapper {
@@ -310,6 +310,14 @@
 
 .status-success {
   font-weight: bold;
+  color: green;
+  /* Added color for success status */
+}
+
+.status-failed {
+  font-weight: bold;
+  color: red;
+  /* Added color for failed/other status */
 }
 
 .payment-history-table tbody tr.clickable-row {
@@ -317,6 +325,116 @@
   transition: background-color 0.2s ease-in-out;
 }
 
+/* --- Top Pagination Controls (New) --- */
+.top-pagination-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 10px 15px;
+  background-color: #e0f2f1;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  font-size: 0.9em;
+  color: #004d40;
+  gap: 10px;
+}
+
+.top-pagination-controls .page-info {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.top-pagination-controls .page-size {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.top-pagination-controls .page-size select {
+  padding: 7px 10px;
+  border: 1px solid #00acc1;
+  border-radius: 5px;
+  background-color: white;
+  color: #004d40;
+  font-size: 0.9em;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.top-pagination-controls .page-size select:focus {
+  border-color: #00838f;
+  box-shadow: 0 0 0 2px rgba(0, 172, 193, 0.2);
+}
+
+
+/* --- Bottom Pagination Controls (Modified) --- */
+.pagination-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+  padding: 15px 20px;
+  background-color: #e0f2f1;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  font-size: 0.9em;
+  color: #004d40;
+  gap: 15px;
+}
+
+.pagination-controls .pagination-buttons {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.pagination-controls .pagination-buttons button {
+  background-color: #00acc1;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  font-weight: 500;
+  min-width: 40px;
+}
+
+.pagination-controls .pagination-buttons button:hover:not(:disabled) {
+  background-color: #00838f;
+  transform: translateY(-1px);
+}
+
+.pagination-controls .pagination-buttons button:disabled {
+  background-color: #b0bec5;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.pagination-controls .pagination-buttons button.active {
+  background-color: #004d40;
+  font-weight: bold;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.pagination-controls .ellipsis {
+  padding: 8px 5px;
+  color: #004d40;
+  font-weight: bold;
+}
+
+
+/* Responsive Adjustments */
+
+/* Tablet Devices (max-width: 1023px) */
 @media (max-width: 1023px) {
   .payment-history-container {
     padding: 20px;
@@ -411,8 +529,38 @@
   .clear-filter-button {
     font-size: 0.85em;
   }
+
+  /* Tablet Adjustments for Top Pagination */
+  .top-pagination-controls {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 12px 15px;
+    gap: 15px;
+  }
+
+  .top-pagination-controls .page-info,
+  .top-pagination-controls .page-size {
+    width: auto;
+    justify-content: flex-start;
+  }
+
+  /* Tablet Adjustments for Bottom Pagination */
+  .pagination-controls {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+  }
+
+  .pagination-buttons {
+    width: auto;
+    justify-content: center;
+    flex-grow: 0;
+  }
 }
 
+/* Mobile Devices (max-width: 767px) */
 @media (max-width: 767px) {
   .payment-history-container {
     flex-direction: column;
@@ -547,7 +695,7 @@
   }
 
   .filter-options .form-label {
-    font-size: 0.75em;
+    font-size: 0.7em;
   }
 
   .filter-options .mat-input-element {
@@ -562,6 +710,49 @@
     font-size: 0.8em;
     margin-left: 0;
     min-width: 48%;
+  }
+
+  /* Mobile Adjustments for Top Pagination */
+  .top-pagination-controls {
+    padding: 10px;
+    font-size: 0.8em;
+    gap: 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .top-pagination-controls .page-info,
+  .top-pagination-controls .page-size {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .top-pagination-controls .page-size select {
+    padding: 5px 8px;
+    font-size: 0.8em;
+  }
+
+  .pagination-controls {
+    padding: 10px;
+    font-size: 0.8em;
+    gap: 10px;
+    flex-direction: column;
+  }
+
+  .pagination-buttons {
+    width: 100%;
+  }
+
+  .pagination-buttons button {
+    padding: 6px 9px;
+    font-size: 0.8em;
+    min-width: 30px;
+  }
+
+  .pagination-buttons .ellipsis {
+    padding: 6px 3px;
   }
 }
 
@@ -719,17 +910,14 @@
 
 /* --- Responsive Display Utilities --- */
 
-/* Hide on screens larger than mobile (default table view) */
 .d-none {
   display: none !important;
 }
 
-/* Show on screens larger than mobile (default table view) */
 .d-block {
   display: block !important;
 }
 
-/* Initially hide cards and show table */
 .cards-wrapper {
   display: none;
 }
@@ -742,7 +930,6 @@
 /* Mobile Styles (up to 767px) */
 @media (max-width: 767px) {
 
-  /* Hide table, show cards */
   .table-wrapper {
     display: none !important;
   }
@@ -752,7 +939,6 @@
   }
 
   .payment-history-table {
-    /* Ensure table styles are overridden for mobile */
     display: none;
     overflow-x: hidden;
     white-space: normal;
@@ -784,8 +970,6 @@
 
 /* Tablets and Desktops (768px and up) */
 @media (min-width: 768px) {
-
-  /* Show table, hide cards */
   .table-wrapper {
     display: block !important;
   }
@@ -796,12 +980,10 @@
 
   .payment-history-table {
     display: block;
-    /* Re-enable table's block display for scrolling */
   }
 
   .payment-history-table thead,
   .payment-history-table tbody {
     display: table;
-    /* Re-enable table display */
   }
 }

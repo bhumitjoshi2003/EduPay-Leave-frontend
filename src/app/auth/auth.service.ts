@@ -52,4 +52,13 @@ export class AuthService {
     }
     return '';
   }
+
+  getUserId(): string {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      return decodedToken.userId;
+    }
+    return '';
+  }
 }

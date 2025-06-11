@@ -2,6 +2,8 @@ import { Component, OnInit, ElementRef, ViewChild, HostListener, ChangeDetectorR
 import { EventService } from '../../services/event.service';
 import { Event } from '../../interfaces/event-calendar.component';
 import { AuthService } from '../../auth/auth.service';
+import { StudentService } from '../../services/student.service';
+import { TeacherService } from '../../services/teacher.service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay } from 'date-fns';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormsModule, FormArray } from '@angular/forms';
@@ -37,6 +39,8 @@ export class EventCalendarComponent implements OnInit {
   eventMap = new Map<string, Event[]>();
 
   currentUserRole = '';
+  currentUserClass: string | null = null; // Will store the student's class if applicable
+
   selectedEvent: Event | null = null;
   showSidebar = false;
   isEditing = false;
@@ -52,7 +56,9 @@ export class EventCalendarComponent implements OnInit {
     private eventService: EventService,
     private authService: AuthService,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private studentService: StudentService,
+    private teacherService: TeacherService
   ) { }
 
   @HostListener('window:resize', ['$event'])
@@ -65,7 +71,54 @@ export class EventCalendarComponent implements OnInit {
     this.initCategoryColors();
     this.checkMobileView();
     this.generateCalendarDays();
-    this.loadEvents();
+
+
+    const userId = this.authService.getUserId();
+    if (this.currentUserRole === 'STUDENT') {
+      if (userId) {
+        this.studentService.getStudent(userId).subscribe({
+          next: (studentDetails) => {
+            console.log(studentDetails.className);
+            this.currentUserClass = studentDetails.className;
+            this.loadEvents();
+          },
+          error: (err) => {
+            console.error('Error fetching student details:', err);
+            this.currentUserClass = null;
+            this.loadEvents();
+          }
+        });
+      } else {
+        console.warn('Student role detected, but no student ID found from AuthService.');
+        this.currentUserClass = null;
+        this.loadEvents();
+      }
+    } else {
+      this.loadEvents();
+    }
+
+
+    if (this.currentUserRole === 'TEACHER') {
+      if (userId) {
+        this.teacherService.getTeacher(userId).subscribe({
+          next: (teachertDetails) => {
+            this.currentUserClass = teachertDetails.classTeacher;
+            this.loadEvents();
+          },
+          error: (err) => {
+            console.error('Error fetching teacher details:', err);
+            this.currentUserClass = null;
+            this.loadEvents();
+          }
+        });
+      } else {
+        console.warn('Student role detected, but no teacher ID found from AuthService.');
+        this.currentUserClass = null;
+        this.loadEvents();
+      }
+    } else {
+      this.loadEvents();
+    }
   }
 
   private checkMobileView(): void {
@@ -132,19 +185,32 @@ export class EventCalendarComponent implements OnInit {
     this.eventMap.clear();
 
     const filtered = this.allEvents.filter(event => {
-      // Ensure targetAudience is an array before checking includes
       const eventTargetAudiences = Array.isArray(event.targetAudience) ? event.targetAudience : [];
 
       if (this.currentUserRole === 'ADMIN') {
         return true;
       }
-      // Assuming the backend stores 'STUDENT', 'TEACHER', 'ALL' in uppercase as per admin's input
+
+      if (eventTargetAudiences.includes('ALL')) {
+        return true;
+      }
+
       if (this.currentUserRole === 'STUDENT') {
-        return eventTargetAudiences.includes('STUDENT') || eventTargetAudiences.includes('ALL');
+        const isTargetedToStudentRole = eventTargetAudiences.includes('STUDENTS');
+
+        const isTargetedToStudentClass = this.currentUserClass && eventTargetAudiences.some(audience => audience === this.currentUserClass);
+
+        return isTargetedToStudentRole || isTargetedToStudentClass;
       }
+
       if (this.currentUserRole === 'TEACHER') {
-        return eventTargetAudiences.includes('TEACHER') || eventTargetAudiences.includes('ALL');
+        const isTargetedToTeacherRole = eventTargetAudiences.includes('TEACHERS');
+
+        const isTargetedToStudentClass = this.currentUserClass && eventTargetAudiences.some(audience => audience === this.currentUserClass);
+
+        return isTargetedToTeacherRole || isTargetedToStudentClass;
       }
+
       return false;
     });
 
@@ -266,7 +332,7 @@ export class EventCalendarComponent implements OnInit {
       if (typeof formValue.targetAudience === 'string') {
         updatedEvent.targetAudience = formValue.targetAudience
           .split(',')
-          .map((audience: string) => audience.trim().toUpperCase())
+          .map((audience: string) => audience.trim().toUpperCase()) // Ensure consistency, especially for class numbers like '1'
           .filter((audience: string) => audience !== '');
       } else {
         updatedEvent.targetAudience = [];

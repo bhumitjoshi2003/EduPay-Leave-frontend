@@ -278,7 +278,7 @@
 
 .sidebar-body {
     flex-grow: 1;
-    padding: 0 20px;
+    padding-left: 20px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -562,10 +562,8 @@
     }
 }
 
-
 .edit-btn {
-    background: #6a82fb;
-    /* A nice blue/purple from your link color */
+    background: #37b0f1;
     border: none;
     color: white;
     font-size: 0.9em;
@@ -574,7 +572,6 @@
     border-radius: 6px;
     transition: background-color 0.2s ease, transform 0.1s ease;
     margin-right: 10px;
-    /* Space between edit and close button */
     font-weight: 600;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
@@ -651,18 +648,15 @@
 
 .remove-link-btn {
     background-color: #dc3545;
-    /* Red for remove */
     color: white;
     border: none;
     border-radius: 50%;
-    /* Circular button */
     width: 28px;
     height: 28px;
     font-size: 1.1em;
     cursor: pointer;
     transition: background-color 0.2s ease;
     flex-shrink: 0;
-    /* Prevent button from shrinking */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -692,17 +686,14 @@
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    /* Align buttons to the right */
     gap: 10px;
     margin-top: 20px;
     padding-top: 15px;
     border-top: 1px solid #eee;
-    /* A subtle line above buttons */
 }
 
 .save-btn {
     background-color: #007bff;
-    /* Primary blue for save */
     color: white;
     border: none;
     padding: 10px 20px;
@@ -726,7 +717,6 @@
 
 .cancel-btn {
     background-color: #6c757d;
-    /* Grey for cancel */
     color: white;
     border: none;
     padding: 10px 20px;

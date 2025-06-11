@@ -1,4 +1,3 @@
-// event-form.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, AbstractControl, FormArray } from '@angular/forms'; // <--- ADD FormArray HERE
 import { EventService } from '../../services/event.service';
@@ -69,8 +68,8 @@ export class EventFormComponent implements OnInit {
       endTime: [''],
       location: [''],
       category: ['', Validators.required],
-      targetAudience: [[], Validators.required], // Correct for mat-select multiple
-      videoLinks: this.fb.array([]) // <--- Initialize as an empty FormArray
+      targetAudience: [[], Validators.required],
+      videoLinks: this.fb.array([])
     }, { validators: dateRangeValidator });
   }
 
@@ -88,11 +87,9 @@ export class EventFormComponent implements OnInit {
   loadEventData(id: number): void {
     this.eventService.getEventById(id).subscribe({
       next: (event: Event) => {
-        // Clear existing videoLinks controls if any
         while (this.videoLinks.length !== 0) {
           this.videoLinks.removeAt(0);
         }
-        // Add controls for each video link from the loaded event
         event.videoLinks?.forEach(link => this.videoLinks.push(this.fb.control(link)));
 
         this.eventForm.patchValue({
@@ -104,8 +101,7 @@ export class EventFormComponent implements OnInit {
           endTime: event.endTime,
           location: event.location,
           category: event.category,
-          targetAudience: event.targetAudience, // This should already be an array
-          // videoLinks is now handled by the FormArray above, so no patchValue needed here
+          targetAudience: event.targetAudience,
         });
       },
       error: (err) => {
@@ -114,12 +110,10 @@ export class EventFormComponent implements OnInit {
     });
   }
 
-  // Getter for videoLinks FormArray (similar to event-calendar.component.ts)
   get videoLinks(): FormArray {
     return this.eventForm.get('videoLinks') as FormArray;
   }
 
-  // Methods to add/remove video links dynamically
   addVideoLink(): void {
     this.videoLinks.push(this.fb.control(''));
   }
@@ -130,9 +124,7 @@ export class EventFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.eventForm.valid) {
-      const eventData: Event = this.eventForm.value; // FormArray handles videoLinks automatically
-      // No manual splitting/mapping for videoLinks or targetAudience needed here
-      // as form controls will provide the correct types.
+      const eventData: Event = this.eventForm.value;
 
       if (this.isEditMode && this.eventId !== null) {
         this.eventService.updateEvent(this.eventId, eventData).subscribe({

@@ -1,0 +1,91 @@
+<div class="event-form-container">
+    <h2>{{ isEditMode ? 'Edit Event' : 'Create New Event' }}</h2>
+
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="event-form">
+
+        <div class="form-group">
+            <label for="title">Event Title:</label>
+            <input id="title" type="text" formControlName="title" placeholder="e.g. Annual Sports Day" required>
+            <div class="error-message" *ngIf="hasError('title', 'required')">Title is required</div>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" formControlName="description" rows="3"></textarea>
+            <div class="error-message" *ngIf="hasError('description', 'required')">Description is required</div>
+        </div>
+
+        <div class="date-time-group">
+            <div class="form-group half-width">
+                <label for="startDate">Start Date:</label>
+                <input id="startDate" type="date" formControlName="startDate" required>
+                <div class="error-message" *ngIf="hasError('startDate', 'required')">Start Date is required</div>
+            </div>
+
+            <div class="form-group half-width">
+                <label for="startTime">Start Time (HH:MM):</label>
+                <input id="startTime" type="time" formControlName="startTime">
+            </div>
+        </div>
+
+        <div class="date-time-group">
+            <div class="form-group half-width">
+                <label for="endDate">End Date (Optional):</label>
+                <input id="endDate" type="date" formControlName="endDate">
+            </div>
+
+            <div class="form-group half-width">
+                <label for="endTime">End Time (HH:MM):</label>
+                <input id="endTime" type="time" formControlName="endTime">
+            </div>
+        </div>
+
+        <div class="error-message"
+            *ngIf="eventForm.hasError('dateRangeInvalid') && (eventForm.get('endDate')?.touched || eventForm.get('startDate')?.touched)">
+            End date cannot be before start date.
+        </div>
+
+        <div class="form-group">
+            <label for="location">Location (Optional):</label>
+            <input id="location" type="text" formControlName="location" placeholder="e.g. School Hall, Play Ground">
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <select id="category" formControlName="category" required>
+                <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+            <div class="error-message" *ngIf="hasError('category', 'required')">Category is required</div>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Target Audience</mat-label>
+            <mat-select formControlName="targetAudience" multiple>
+                <mat-option *ngFor="let audience of targetAudiences" [value]="audience">{{ audience }}</mat-option>
+            </mat-select>
+            <mat-error *ngIf="hasError('targetAudience', 'required')">Target Audience is required</mat-error>
+        </mat-form-field>
+
+        <div class="form-group video-links-group">
+            <label>Video Links:</label>
+            <div formArrayName="videoLinks" class="video-links-array">
+                <div *ngFor="let linkControl of videoLinks.controls; let i = index" class="video-link-item">
+                    <input type="url" [id]="'videoLink' + i" [formControlName]="i" placeholder="Video URL {{i + 1}}">
+                    <button type="button" (click)="removeVideoLink(i)" class="remove-link-btn">
+                        &times; </button>
+                </div>
+            </div>
+            <button type="button" (click)="addVideoLink()" class="add-link-btn">
+                + Add Link
+            </button>
+        </div>
+
+
+        <div class="form-actions">
+            <button type="submit" [disabled]="!eventForm.valid" class="save-btn">
+                {{ isEditMode ? 'Update Event' : 'Create Event' }}
+            </button>
+            <button type="button" class="cancel-btn" (click)="onCancel()">Cancel</button>
+        </div>
+    </form>
+</div>

@@ -20,6 +20,8 @@ import { TeacherDetailsComponent } from './components/teacher-details/teacher-de
 import { RegisterComponent } from './components/register/register.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { NoticeComponent } from './components/notice/notice.component';
+import { EventCalendarComponent } from './components/event-calendar/event-calendar.component';
+import { EventFormComponent } from './components/event-form/event-form.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -48,9 +50,12 @@ export const routes: Routes = [
             { path: 'fees/:studentId', component: PaymentTrackerComponent },
             { path: 'payment-history-admin', component: PaymentHistoryAdminComponent },
             { path: 'teacher-list', component: TeacherListComponent },
-            { path: 'teacher-details/:teacherId', component: TeacherDetailsComponent},
+            { path: 'teacher-details/:teacherId', component: TeacherDetailsComponent },
             { path: 'notice', component: NoticeComponent },
             { path: 'register', component: RegisterComponent },
+            { path: 'event-calendar', component: EventCalendarComponent },
+            { path: 'event-new', component: EventFormComponent },
+            { path: 'event-edit/:id', component: EventFormComponent },
         ],
     },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },

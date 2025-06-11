@@ -428,7 +428,6 @@ export class PaymentTrackerComponent implements OnInit {
   onPaymentProcessCompleted(): void {
     this.ngZone.run(() => {
       this.isLoadingPayment = false;
-      console.log('Payment process completed: UI unlocked.');
       this.cdr.detectChanges();
     });
   }

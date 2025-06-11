@@ -1,0 +1,159 @@
+<div class="calendar-container" (click)="closeSidebar()">
+    <div class="calendar-header">
+        <button (click)="goToPreviousMonth()">&#x2190;</button>
+        <h2>{{ formatDate(currentDate, 'MMMM yyyy') }}</h2>
+        <button (click)="goToNextMonth()">&#x2192;</button>
+    </div>
+
+    <div class="calendar-weekdays">
+        <div *ngFor="let d of ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']">{{ d }}</div>
+    </div>
+
+    <div class="calendar-grid">
+        <ng-container *ngFor="let dayCell of daysInMonth">
+            <div class="calendar-day" [class.empty]="!dayCell.date"
+                [class.today]="dayCell.date && isToday(dayCell.date)"
+                (click)="dayCell.date && (isMobileView ? toggleMobileDayEvents(dayCell) : openDayPopover($event, dayCell.date))">
+                <ng-container *ngIf="dayCell.date">
+                    <span class="day-number">
+                        {{ formatDate(dayCell.date, 'd') }}
+                        <span *ngIf="isMobileView" class="weekday-name">
+                            {{ dayCell.date | date:'EEE' }}
+                        </span>
+                    </span>
+
+                    <ng-container *ngIf="isMobileView">
+                        <div *ngIf="dayCell.events.length" class="mobile-event-list"
+                            [class.expanded]="dayCell.expanded">
+                            <div *ngFor="let ev of dayCell.events" class="event-item"
+                                [ngStyle]="{'background-color': getEventColor(ev.category || 'Default')}"
+                                (click)="showEventDetails(ev, $event)">
+                                {{ ev.title }}
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="!isMobileView">
+                        <div *ngIf="dayCell.events.length" class="desktop-event-list">
+                            <div *ngFor="let ev of dayCell.events" class="event-item"
+                                [ngStyle]="{'background-color': getEventColor(ev.category || 'Default')}"
+                                (click)="showEventDetails(ev, $event)"> {{ ev.title }}
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </ng-container>
+    </div>
+
+    <div *ngIf="showSidebar" class="backdrop" (click)="closeSidebar()"></div>
+    <div *ngIf="showSidebar && selectedEvent" class="event-sidebar visible" (click)="$event.stopPropagation()">
+        <img *ngIf="true" src="IASbuilding.avif" class="event-image">
+        <div class="sidebar-header">
+            <div class="sidebar-header-content">
+                <h3>{{ selectedEvent.title }}</h3>
+                <button *ngIf="!isEditing && this.currentUserRole==='ADMIN'" class="edit-btn"
+                    (click)="toggleEditMode($event)">Edit</button>
+                <button class="close-btn" (click)="closeSidebar()">×</button>
+            </div>
+        </div>
+        <div class="sidebar-body">
+            <ng-container *ngIf="!isEditing">
+                <p class="event-description">{{ selectedEvent.description }}</p>
+                <p>
+                    <ng-container *ngIf="selectedEvent.startDate === selectedEvent.endDate;  else showStartAndEndDate">
+                        <strong>Date:</strong> {{ getFormattedDate(selectedEvent.startDate, 'PPP') }}
+                    </ng-container>
+
+                    <ng-template #showStartAndEndDate>
+                        <strong>Start Date:</strong> {{ getFormattedDate(selectedEvent.startDate, 'PPP') }}
+                        <ng-container *ngIf="selectedEvent.endDate">
+                            <p>
+                                <strong>End Date:</strong> {{ getFormattedDate(selectedEvent.endDate, 'PPP') }}
+                            </p>
+                        </ng-container>
+                    </ng-template>
+                </p>
+                <p *ngIf="selectedEvent.startTime"><strong>Time:</strong> {{ selectedEvent.startTime }}
+                    <ng-container *ngIf="selectedEvent.endTime"> - {{ selectedEvent.endTime }}</ng-container>
+                </p>
+                <p *ngIf="selectedEvent.location"><strong>Venue:</strong> {{ selectedEvent.location }}</p>
+                <ng-container *ngIf="selectedEvent.videoLinks?.length">
+                    <p class="video-links-heading"><strong>Video Links:</strong></p>
+                    <ul>
+                        <li *ngFor="let l of selectedEvent.videoLinks"><a [href]="l" target="_blank">{{ l }}</a></li>
+                    </ul>
+                </ng-container>
+            </ng-container>
+
+            <ng-container *ngIf="isEditing">
+                <form [formGroup]="eventForm" (ngSubmit)="saveEventChanges()" class="edit-form-container">
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input id="title" type="text" formControlName="title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <textarea id="description" formControlName="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="startDate">Start Date:</label>
+                        <input id="startDate" type="date" formControlName="startDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endDate">End Date:</label>
+                        <input id="endDate" type="date" formControlName="endDate">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="startTime">Start Time:</label>
+                        <input id="startTime" type="time" formControlName="startTime">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endTime">End Time:</label>
+                        <input id="endTime" type="time" formControlName="endTime">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Venue:</label>
+                        <input id="location" type="text" formControlName="location">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category:</label>
+                        <select id="category" formControlName="category" required>
+                            <option *ngFor="let category of categoryColors.keys()" [value]="category">{{ category }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="targetAudience">Target Audience (comma-separated):</label>
+                        <textarea id="targetAudience" formControlName="targetAudience" rows="2"
+                            placeholder="e.g., STUDENT, TEACHER, ALL"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Video Links:</label>
+                        <div formArrayName="videoLinks">
+                            <div *ngFor="let linkControl of videoLinks.controls; let i = index" class="video-link-item">
+                                <input type="url" [formControlName]="i" placeholder="Video URL">
+                                <button type="button" (click)="removeVideoLink(i)" class="remove-link-btn">x</button>
+                            </div>
+                        </div>
+                        <button type="button" (click)="addVideoLink()" class="add-link-btn">+ Add Link</button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" [disabled]="!eventForm.valid" class="save-btn">Save Changes</button>
+                        <button type="button" class="cancel-btn" (click)="toggleEditMode($event)">Cancel</button>
+                    </div>
+                </form>
+            </ng-container>
+        </div>
+    </div>
+</div>

@@ -39,7 +39,7 @@ export class EventCalendarComponent implements OnInit {
   eventMap = new Map<string, Event[]>();
 
   currentUserRole = '';
-  currentUserClass: string | null = null; // Will store the student's class if applicable
+  currentUserClass: string | null = null;
 
   selectedEvent: Event | null = null;
   showSidebar = false;
@@ -216,6 +216,7 @@ export class EventCalendarComponent implements OnInit {
 
     filtered.forEach(ev => {
       const start = new Date(ev.startDate);
+
       const end = ev.endDate ? new Date(ev.endDate) : start;
       eachDayOfInterval({ start, end }).forEach(day => {
         const key = format(day, 'yyyy-MM-dd');
@@ -284,10 +285,9 @@ export class EventCalendarComponent implements OnInit {
     console.log('1. Event object received:', event);
     console.log('2. event.targetAudience from backend (expected Array<string>):', event.targetAudience);
 
-    // Convert the targetAudience array to a comma-separated string for the textarea
     const targetAudienceString = Array.isArray(event.targetAudience)
       ? event.targetAudience.join(', ')
-      : ''; // Handle cases where it might not be an array or is null/undefined
+      : '';
     console.log('3. targetAudienceString (prepared for form input):', targetAudienceString);
 
     const videoLinksArray = this.fb.array(event.videoLinks ? event.videoLinks.map(link => this.fb.control(link)) : []);
@@ -298,12 +298,12 @@ export class EventCalendarComponent implements OnInit {
       title: [event.title, Validators.required],
       description: [event.description],
       startDate: [event.startDate, Validators.required],
-      endDate: [event.endDate],
+      endDate: [event.endDate, Validators.required],
       startTime: [event.startTime],
       endTime: [event.endTime],
       location: [event.location],
       category: [event.category, Validators.required],
-      targetAudience: [targetAudienceString], // Assign the comma-separated string
+      targetAudience: [targetAudienceString],
       videoLinks: videoLinksArray,
     });
 
@@ -328,11 +328,10 @@ export class EventCalendarComponent implements OnInit {
         id: eventIdToUpdate
       };
 
-      // Manually process targetAudience string from form back into an array
       if (typeof formValue.targetAudience === 'string') {
         updatedEvent.targetAudience = formValue.targetAudience
           .split(',')
-          .map((audience: string) => audience.trim().toUpperCase()) // Ensure consistency, especially for class numbers like '1'
+          .map((audience: string) => audience.trim().toUpperCase())
           .filter((audience: string) => audience !== '');
       } else {
         updatedEvent.targetAudience = [];

@@ -279,6 +279,7 @@
 .sidebar-body {
     flex-grow: 1;
     padding-left: 20px;
+    margin-bottom: 15px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -304,7 +305,7 @@
 
 .sidebar-body .video-links-heading {
     margin-top: 15px;
-    margin-bottom: 5px;
+    margin-bottom: 7px;
 }
 
 .sidebar-body ul {
@@ -615,9 +616,7 @@
     background-color: #fcfcfc;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     width: 100%;
-    /* Make inputs take full width of their container */
     box-sizing: border-box;
-    /* Include padding and border in the element's total width and height */
 }
 
 .form-group input:focus,
@@ -628,9 +627,7 @@
     outline: none;
 }
 
-/* Specific styling for the target audience input if it's text for now */
 .form-group input[type="text"][formControlName="targetAudience"] {
-    /* You might want a different styling or hint for multiple values */
     font-style: italic;
     color: #888;
 }

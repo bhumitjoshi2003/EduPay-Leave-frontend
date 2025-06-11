@@ -51,7 +51,7 @@ export class EventFormComponent implements OnInit {
   eventId: number | null = null;
 
   categories: string[] = ['Academic', 'Sports', 'Cultural', 'Social', 'Holiday', 'Meeting', 'Other'];
-  targetAudiences: string[] = ['All', 'Teachers', 'Students', 'Nursery', 'LGK', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+  targetAudiences: string[] = ['ALL', 'TEACHERS', 'STUDENTS', 'NURSERY', 'LGK', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
 
   constructor(
     private fb: FormBuilder,

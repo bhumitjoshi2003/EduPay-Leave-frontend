@@ -60,12 +60,19 @@
         <div class="sidebar-body">
             <ng-container *ngIf="!isEditing">
                 <p class="event-description">{{ selectedEvent.description }}</p>
-                <p><strong>Start Date:</strong> {{ getFormattedDate(selectedEvent.startDate, 'PPP') }}
-                    <ng-container *ngIf="selectedEvent.endDate">
-                        <p>
-                            <strong>End Date:</strong> {{ getFormattedDate(selectedEvent.endDate, 'PPP') }}
-                        </p>
+                <p>
+                    <ng-container *ngIf="selectedEvent.startDate === selectedEvent.endDate;  else showStartAndEndDate">
+                        <strong>Date:</strong> {{ getFormattedDate(selectedEvent.startDate, 'PPP') }}
                     </ng-container>
+
+                    <ng-template #showStartAndEndDate>
+                        <strong>Start Date:</strong> {{ getFormattedDate(selectedEvent.startDate, 'PPP') }}
+                        <ng-container *ngIf="selectedEvent.endDate">
+                            <p>
+                                <strong>End Date:</strong> {{ getFormattedDate(selectedEvent.endDate, 'PPP') }}
+                            </p>
+                        </ng-container>
+                    </ng-template>
                 </p>
                 <p *ngIf="selectedEvent.startTime"><strong>Time:</strong> {{ selectedEvent.startTime }}
                     <ng-container *ngIf="selectedEvent.endTime"> - {{ selectedEvent.endTime }}</ng-container>

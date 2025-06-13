@@ -1,7 +1,7 @@
 .event-form-container {
     max-width: 700px;
     width: 90%;
-    margin: 30px auto;
+    margin: 15px auto;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -317,14 +317,15 @@ textarea {
 
 @media (max-width: 768px) {
     .event-form-container {
-        margin: 0px 0px;
+        margin: 10px 0px;
         padding: 10px 15px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        width: 90%;
+        width: 91%;
     }
 
     h2 {
-        font-size: 1.8em;
+        font-size: 1.4em;
+        font-weight: bolder;
         margin-bottom: 25px;
     }
 

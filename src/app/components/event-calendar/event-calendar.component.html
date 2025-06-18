@@ -74,8 +74,10 @@
                         </ng-container>
                     </ng-template>
                 </p>
-                <p *ngIf="selectedEvent.startTime"><strong>Time:</strong> {{ selectedEvent.startTime }}
-                    <ng-container *ngIf="selectedEvent.endTime"> - {{ selectedEvent.endTime }}</ng-container>
+                <p *ngIf="selectedEvent.startTime"><strong>Time:</strong> {{ formatTimeDisplay(selectedEvent.startTime)
+                    }}
+                    <ng-container *ngIf="selectedEvent.endTime"> - {{ formatTimeDisplay(selectedEvent.endTime)
+                        }}</ng-container>
                 </p>
                 <p *ngIf="selectedEvent.location"><strong>Venue:</strong> {{ selectedEvent.location }}</p>
                 <ng-container *ngIf="selectedEvent.videoLinks?.length">

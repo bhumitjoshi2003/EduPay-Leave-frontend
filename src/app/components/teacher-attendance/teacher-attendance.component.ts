@@ -224,14 +224,12 @@ export class TeacherAttendanceComponent implements OnInit {
             className: this.selectedClass,
           }));
 
-        if (attendanceData.length === 0) {
-          attendanceData.push({
-            studentId: 'X',
-            chargePaid: true,
-            absentDate: formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en'),
-            className: this.selectedClass,
-          });
-        }
+        attendanceData.push({
+          studentId: 'X',
+          chargePaid: true,
+          absentDate: formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en'),
+          className: this.selectedClass,
+        });
 
         this.attendanceService.saveAttendance(attendanceData).subscribe({
           next: () => {

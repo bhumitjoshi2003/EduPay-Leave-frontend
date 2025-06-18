@@ -38,6 +38,13 @@
     </nav>
 
     <div class="profile-area">
+      <button mat-icon-button (click)="navigateToNotifications()">
+        <mat-icon [matBadge]="unreadNotificationCount" [matBadgeHidden]="unreadNotificationCount === 0"
+          matBadgeColor="warn">
+          notifications
+        </mat-icon>
+      </button>
+
       <button mat-icon-button [matMenuTriggerFor]="profileMenu">
         <mat-icon>account_circle</mat-icon>
       </button>

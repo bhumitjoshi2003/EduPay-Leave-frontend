@@ -23,6 +23,7 @@ import { NoticeComponent } from './components/notice/notice.component';
 import { EventCalendarComponent } from './components/event-calendar/event-calendar.component';
 import { EventFormComponent } from './components/event-form/event-form.component';
 import { NotificationComponent } from './components/notification/notification.component';
+import { ViewNotificationComponent } from './components/view-notification/view-notification.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -57,7 +58,8 @@ export const routes: Routes = [
             { path: 'event-calendar', component: EventCalendarComponent },
             { path: 'event-new', component: EventFormComponent },
             { path: 'event-edit/:id', component: EventFormComponent },
-            { path: 'notification-form', component: NotificationComponent }
+            { path: 'notification-form', component: NotificationComponent },
+            { path: 'view-notification', component: ViewNotificationComponent }
         ],
     },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },

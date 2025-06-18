@@ -1,0 +1,132 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { NotificationService } from '../../services/notification.service';
+import { UserNotification } from '../../interfaces/user-notification';
+
+@Component({
+  selector: 'app-view-notification',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule
+  ],
+  providers: [DatePipe],
+  templateUrl: './view-notification.component.html',
+  styleUrls: ['./view-notification.component.css']
+})
+export class ViewNotificationComponent implements OnInit {
+
+  userNotifications: UserNotification[] = [];
+  isLoading: boolean = true;
+
+  constructor(
+    private notificationService: NotificationService,
+    private datePipe: DatePipe
+  ) { }
+
+  ngOnInit(): void {
+    this.loadUserNotifications();
+  }
+
+  loadUserNotifications(): void {
+    this.isLoading = true;
+    this.notificationService.getUserNotifications().subscribe({
+      next: (data) => {
+        this.userNotifications = data;
+        this.isLoading = false;
+
+        if (this.userNotifications.some(n => !n.isRead)) {
+          this.notificationService.markAllNotificationsAsRead().subscribe({
+            next: () => {
+              this.userNotifications.forEach(n => n.isRead = true);
+            },
+            error: (err) => {
+              console.error('Mark read error:', err);
+            }
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Fetch error:', err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  markAllAsRead(): void {
+    this.notificationService.markAllNotificationsAsRead().subscribe({
+      next: () => {
+        this.userNotifications.forEach(n => n.isRead = true);
+      },
+      error: (err) => {
+        console.error('Mark all read error:', err);
+      }
+    });
+  }
+
+  get isMarkAllAsReadDisabled(): boolean {
+    return this.userNotifications.length === 0 || this.userNotifications.every(n => n.isRead);
+  }
+
+  formatDate(dateString: string | undefined): string {
+    if (!dateString) {
+      return '';
+    }
+
+    const notificationDate = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - notificationDate.getTime()) / 1000);
+
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const weeks = Math.floor(days / 7);
+    const months = Math.floor(days / 30);
+
+    if (seconds < 60) {
+      return seconds === 0 ? 'just now' : `${seconds} second${seconds === 1 ? '' : 's'} ago`;
+    } else if (minutes < 60) {
+      return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+    } else if (hours < 24) {
+      return `${hours} hr${hours === 1 ? '' : 's'} ago`;
+    } else if (days < 7) {
+      return `${days} day${days === 1 ? '' : 's'} ago`;
+    } else if (weeks < 4) {
+      return `${weeks} week${weeks === 1 ? '' : 's'} ago`;
+    } else if (months <= 12) {
+      return `${months} month${months === 1 ? '' : 's'} ago`;
+    } else {
+      return this.datePipe.transform(notificationDate, 'MMM d, y') || '';
+    }
+  }
+
+  getNotificationClass(isRead: boolean): string {
+    return isRead ? 'notification-item read' : 'notification-item unread';
+  }
+
+  getTypeClass(type: string | undefined): string {
+    switch (type?.toUpperCase()) {
+      case 'MEETING': return 'type-meeting';
+      case 'FUNCTION': return 'type-function';
+      case 'SPORTS': return 'type-sports';
+      case 'PAYMENT': return 'type-payment';
+      case 'LEAVES': return 'type-leaves';
+      case 'ANNOUNCEMENT': return 'type-announcement';
+      default: return 'type-others';
+    }
+  }
+
+  getTypeIcon(type: string | undefined): string {
+    switch (type?.toUpperCase()) {
+      case 'MEETING': return '🗓️ Meeting';
+      case 'FUNCTION': return '✨ Function';
+      case 'SPORTS': return '⚽ Sports';
+      case 'PAYMENT': return '💳 Payment';
+      case 'LEAVES': return '🌴 Leaves';
+      case 'ANNOUNCEMENT': return '📣 Announcement';
+      default: return '🛎️ Reminder';
+    }
+  }
+
+}

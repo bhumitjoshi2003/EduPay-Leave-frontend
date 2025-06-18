@@ -103,10 +103,10 @@
     position: absolute;
     top: 10px;
     right: 20px;
-    /* Adjusted to be closer to the right corner */
     display: flex;
     align-items: center;
     z-index: 10;
+    gap: 10px;
 }
 
 .profile-area button {
@@ -225,18 +225,11 @@
 
 .detail-value {
     flex-grow: 1;
-    /* Allows the value to take up the remaining space */
     font-weight: bold;
-    /* Keeps the value text bold */
     text-transform: capitalize;
-    /* Converts "ADMIN" to "Admin", "TEACHER" to "Teacher", etc. */
     font-size: inherit;
-    /* Inherit from .user-main-info */
     color: inherit;
-    /* Inherit from .user-main-info */
 }
-
-/* REMOVED: Old .user-id-role-row, .user-main-info span, .user-id, .user-role, .user-class-teacher rules */
 
 .profile-separator {
     border: none;
@@ -341,6 +334,7 @@
     }
 
     .logo-container {
+        justify-content: flex-start;
         margin-bottom: 10px;
         width: 100%;
         order: 1;
@@ -459,19 +453,20 @@
     .profile-area {
         top: 5px;
         right: 5px;
+        margin-right: 20px;
     }
 
     .profile-area button {
         margin: 2px -2px;
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         padding: 4px;
     }
 
     .profile-area button mat-icon {
-        font-size: 14px;
-        width: 14px;
-        height: 14px;
+        font-size: 17x;
+        width: 17px;
+        height: 17px;
     }
 
     .content-area {
@@ -536,8 +531,6 @@
         font-size: 16px;
         margin-right: 10px;
     }
-
-    /* REMOVED: Old .user-id, .user-role, .user-class-teacher specific mobile rules */
 
     .profile-separator {
         margin: 8px 0;

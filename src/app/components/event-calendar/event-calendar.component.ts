@@ -146,6 +146,19 @@ export class EventCalendarComponent implements OnInit {
     return format(date, fmt);
   }
 
+  formatTimeDisplay(timeStr: string | undefined | null): string {
+    if (!timeStr) {
+      return '';
+    }
+    try {
+      const date = new Date(`2000-01-01T${timeStr}`);
+      return format(date, 'h:mm a');
+    } catch (e) {
+      console.error('Error formatting time string:', timeStr, e);
+      return timeStr;
+    }
+  }
+
   goToPreviousMonth(): void {
     this.currentDate = subMonths(this.currentDate, 1);
     this.refreshCalendar();

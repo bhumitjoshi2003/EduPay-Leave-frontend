@@ -38,7 +38,7 @@ export class TeacherAttendanceComponent implements OnInit {
   absentStudents: string[] = [];
 
   teacherId: string = '';
-  isMobileView: boolean = false;
+  disableDeleteButton: boolean = false;
 
   constructor(
     private leaveService: LeaveService,
@@ -47,19 +47,9 @@ export class TeacherAttendanceComponent implements OnInit {
     private teacherService: TeacherService
   ) { }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.checkMobileView();
-  }
-
   ngOnInit(): void {
     this.attendanceDate = this.getTodayDateWithoutTime();
     this.getTeacherId();
-    this.checkMobileView();
-  }
-
-  checkMobileView(): void {
-    this.isMobileView = window.innerWidth <= 567;
   }
 
   getTodayDateWithoutTime(): Date {
@@ -116,7 +106,12 @@ export class TeacherAttendanceComponent implements OnInit {
 
     this.attendanceService.getAttendanceByDateAndClass(formattedDate, this.selectedClass).subscribe({
       next: (attendanceData) => {
+        if (attendanceData && attendanceData.length === 0) {
+          this.disableDeleteButton = true;
+        }
+
         if (attendanceData && attendanceData.length > 0) {
+          this.disableDeleteButton = false;
           const attendanceMap = new Map<string, AttendanceData>();
           attendanceData.forEach((attendance) => {
             attendanceMap.set(attendance.studentId, attendance);
@@ -263,7 +258,7 @@ export class TeacherAttendanceComponent implements OnInit {
     selected.setHours(0, 0, 0, 0);
 
     const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
+    yesterday.setDate(today.getDate() - 2);
 
     return selected.getTime() === today.getTime() || selected.getTime() === yesterday.getTime();
   }
@@ -277,4 +272,42 @@ export class TeacherAttendanceComponent implements OnInit {
   isSunday(date: Date | null): boolean {
     return date ? new Date(date).getDay() === 0 : false;
   }
+
+  deleteAttendance(): void {
+    if (!this.isDateWithinAllowedRange()) {
+      Swal.fire('Not Allowed', 'You can only delete attendance for today or yesterday.', 'warning');
+      return;
+    }
+
+    if (this.isSunday(this.attendanceDate)) {
+      Swal.fire('Invalid Date', 'Cannot delete attendance for Sundays.', 'info');
+      return;
+    }
+
+    Swal.fire({
+      title: 'Confirm Deletion',
+      text: 'Are you sure you want to delete the attendance for this date?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const formattedDate = formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en');
+        this.attendanceService.deleteAttendanceByDateAndClass(formattedDate, this.selectedClass).subscribe({
+          next: () => {
+            Swal.fire('Deleted!', 'Attendance has been deleted.', 'success');
+            this.loadStudentsAndApplyAttendance(); // refresh the student list
+          },
+          error: (error) => {
+            console.error('Error deleting attendance:', error);
+            Swal.fire('Error', error.error || 'Failed to delete attendance.', 'error');
+          },
+        });
+      }
+    });
+  }
+
 }

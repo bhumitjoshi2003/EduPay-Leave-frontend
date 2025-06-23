@@ -1,6 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild, HostListener, ChangeDetectorRef } from '@angular/core';
 import { EventService } from '../../services/event.service';
-import { Event } from '../../interfaces/event-calendar.component';
 import { AuthService } from '../../auth/auth.service';
 import { StudentService } from '../../services/student.service';
 import { TeacherService } from '../../services/teacher.service';
@@ -9,10 +8,12 @@ import { CommonModule } from '@angular/common';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormsModule, FormArray } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { environment } from '../../../environments/environment';
+import { CalendarEvent } from '../../interfaces/event-calendar.component'; // Ensure this interface has imageUrl: string | null;
 
 interface DayCell {
   date: Date | null;
-  events: Event[];
+  events: CalendarEvent[];
   expanded?: boolean;
 }
 
@@ -32,25 +33,32 @@ interface DayCell {
 export class EventCalendarComponent implements OnInit {
 
   @ViewChild('calendarContainer') calendarContainerRef!: ElementRef;
+  // IMPORTANT: This ViewChild is for the file input in the *edit sidebar*, matching #fileInput in HTML
+  @ViewChild('fileInput') fileInput!: ElementRef; // <-- ADDED ViewChild for the file input
 
   currentDate = new Date();
   daysInMonth: DayCell[] = [];
-  allEvents: Event[] = [];
-  eventMap = new Map<string, Event[]>();
+  allEvents: CalendarEvent[] = [];
+  eventMap = new Map<string, CalendarEvent[]>();
 
   currentUserRole = '';
   currentUserClass: string | null = null;
 
-  selectedEvent: Event | null = null;
+  selectedEvent: CalendarEvent | null = null;
   showSidebar = false;
   isEditing = false;
-  eventForm!: FormGroup;
+  eventForm!: FormGroup; // Defined here, initialized in constructor or initEventForm
 
   categories: string[] = ['Academic', 'Sports', 'Cultural', 'Social', 'Holiday', 'Meeting', 'Other'];
 
   categoryColors = new Map<string, string>();
 
   isMobileView: boolean = false;
+
+  // Image related properties
+  selectedFile: File | null = null;
+  imagePreviewUrl: string | ArrayBuffer | null = null;
+  // private currentEventImageUrl: string | null = null; // Removed - imageUrl in form is now the source of truth
 
   constructor(
     private eventService: EventService,
@@ -59,10 +67,26 @@ export class EventCalendarComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private studentService: StudentService,
     private teacherService: TeacherService
-  ) { }
+  ) {
+    // Initialize eventForm here with all controls, including imageUrl
+    this.eventForm = this.fb.group({
+      id: [null], // Will be set when patching
+      title: ['', Validators.required],
+      description: [''],
+      startDate: ['', Validators.required],
+      endDate: [''],
+      startTime: [''],
+      endTime: [''],
+      location: [''],
+      category: ['', Validators.required],
+      targetAudience: [''], // Will be processed to array before sending
+      videoLinks: this.fb.array([]),
+      imageUrl: [null] // Initialize imageUrl control
+    });
+  }
 
   @HostListener('window:resize', ['$event'])
-  onResize(event?: Event) {
+  onResize(event: UIEvent) {
     this.checkMobileView();
   }
 
@@ -72,52 +96,50 @@ export class EventCalendarComponent implements OnInit {
     this.checkMobileView();
     this.generateCalendarDays();
 
-
     const userId = this.authService.getUserId();
+    const loadEventsAfterDetails = () => {
+      this.loadEvents();
+    };
+
     if (this.currentUserRole === 'STUDENT') {
       if (userId) {
         this.studentService.getStudent(userId).subscribe({
           next: (studentDetails) => {
             console.log(studentDetails.className);
             this.currentUserClass = studentDetails.className;
-            this.loadEvents();
+            loadEventsAfterDetails();
           },
           error: (err) => {
             console.error('Error fetching student details:', err);
             this.currentUserClass = null;
-            this.loadEvents();
+            loadEventsAfterDetails();
           }
         });
       } else {
         console.warn('Student role detected, but no student ID found from AuthService.');
         this.currentUserClass = null;
-        this.loadEvents();
+        loadEventsAfterDetails();
       }
-    } else {
-      this.loadEvents();
-    }
-
-
-    if (this.currentUserRole === 'TEACHER') {
+    } else if (this.currentUserRole === 'TEACHER') {
       if (userId) {
         this.teacherService.getTeacher(userId).subscribe({
           next: (teachertDetails) => {
             this.currentUserClass = teachertDetails.classTeacher;
-            this.loadEvents();
+            loadEventsAfterDetails();
           },
           error: (err) => {
             console.error('Error fetching teacher details:', err);
             this.currentUserClass = null;
-            this.loadEvents();
+            loadEventsAfterDetails();
           }
         });
       } else {
-        console.warn('Student role detected, but no teacher ID found from AuthService.');
+        console.warn('Teacher role detected, but no teacher ID found from AuthService.');
         this.currentUserClass = null;
-        this.loadEvents();
+        loadEventsAfterDetails();
       }
     } else {
-      this.loadEvents();
+      loadEventsAfterDetails();
     }
   }
 
@@ -159,6 +181,18 @@ export class EventCalendarComponent implements OnInit {
     }
   }
 
+  // Helper to get full image URL
+  getFullImageUrl(relativePath: string | null | undefined): string {
+    if (!relativePath) {
+      return '';
+    }
+    // Ensure the path is correct depending on how your backend returns it.
+    // If relativePath is just filename:
+    // return `${environment.apiUrl}/api/files/event-images/${relativePath}`;
+    // If relativePath already includes /api/files/event-images/:
+    return `${environment.apiUrl}${relativePath}`;
+  }
+
   goToPreviousMonth(): void {
     this.currentDate = subMonths(this.currentDate, 1);
     this.refreshCalendar();
@@ -172,7 +206,7 @@ export class EventCalendarComponent implements OnInit {
   private refreshCalendar(): void {
     this.generateCalendarDays();
     this.loadEvents();
-    this.closeSidebar();
+    this.closeSidebar(); // Ensure sidebar closes on month change
   }
 
   private generateCalendarDays(): void {
@@ -210,26 +244,20 @@ export class EventCalendarComponent implements OnInit {
 
       if (this.currentUserRole === 'STUDENT') {
         const isTargetedToStudentRole = eventTargetAudiences.includes('STUDENTS');
-
         const isTargetedToStudentClass = this.currentUserClass && eventTargetAudiences.some(audience => audience === this.currentUserClass);
-
         return isTargetedToStudentRole || isTargetedToStudentClass;
       }
 
       if (this.currentUserRole === 'TEACHER') {
         const isTargetedToTeacherRole = eventTargetAudiences.includes('TEACHERS');
-
-        const isTargetedToStudentClass = this.currentUserClass && eventTargetAudiences.some(audience => audience === this.currentUserClass);
-
-        return isTargetedToTeacherRole || isTargetedToStudentClass;
+        const isTargetedToTeacherClass = this.currentUserClass && eventTargetAudiences.some(audience => audience === this.currentUserClass);
+        return isTargetedToTeacherRole || isTargetedToTeacherClass;
       }
-
       return false;
     });
 
     filtered.forEach(ev => {
       const start = new Date(ev.startDate);
-
       const end = ev.endDate ? new Date(ev.endDate) : start;
       eachDayOfInterval({ start, end }).forEach(day => {
         const key = format(day, 'yyyy-MM-dd');
@@ -268,20 +296,39 @@ export class EventCalendarComponent implements OnInit {
     }
   }
 
-  showEventDetails(ev: Event, e: MouseEvent): void {
+  showEventDetails(ev: CalendarEvent, e: MouseEvent): void {
     e.stopPropagation();
     this.selectedEvent = ev;
     this.showSidebar = true;
-    this.isEditing = false;
-    this.initEventForm(ev);
+    this.isEditing = false; // Always start in view mode
+
+    this.initEventForm(ev); // Initialize form with selected event data
+    this.resetImageState(); // <-- Call reset image state
+    // Ensure native file input is clear upon opening sidebar
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+    this.cdr.detectChanges(); // Force change detection if needed for immediate display
   }
 
   toggleEditMode(e: MouseEvent): void {
     e.stopPropagation();
     this.isEditing = !this.isEditing;
+
     if (this.isEditing && this.selectedEvent) {
-      this.initEventForm(this.selectedEvent);
+      this.initEventForm(this.selectedEvent); // Re-initialize form to ensure correct state
+      this.resetImageState(); // <-- Call reset image state when entering edit mode
+      // Ensure native file input is clear when entering edit mode
+      if (this.fileInput) {
+        this.fileInput.nativeElement.value = '';
+      }
+    } else {
+      // Exiting edit mode, if you want to revert form state, you can reset or re-init here
+      // For now, we'll just rely on closing sidebar to reset
+      this.eventForm.reset(); // Clear form when exiting edit mode
+      // This also resets the image controls within the form
     }
+    this.cdr.detectChanges(); // Force change detection
   }
 
   closeSidebar(): void {
@@ -291,9 +338,22 @@ export class EventCalendarComponent implements OnInit {
     if (this.eventForm) {
       this.eventForm.reset();
     }
+    this.resetImageState(); // <-- Call reset image state on sidebar close
+    // Ensure native file input is clear upon sidebar close
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+    this.cdr.detectChanges(); // Force change detection
   }
 
-  private initEventForm(event: Event): void {
+  // ADDED: Centralized method to reset image-related component properties
+  private resetImageState(): void {
+    this.selectedFile = null;
+    this.imagePreviewUrl = null;
+    // The imageUrl in the form control itself will be managed by initEventForm or removeImage
+  }
+
+  private initEventForm(event: CalendarEvent): void {
     console.log('--- initEventForm called ---');
     console.log('1. Event object received:', event);
     console.log('2. event.targetAudience from backend (expected Array<string>):', event.targetAudience);
@@ -303,25 +363,30 @@ export class EventCalendarComponent implements OnInit {
       : '';
     console.log('3. targetAudienceString (prepared for form input):', targetAudienceString);
 
-    const videoLinksArray = this.fb.array(event.videoLinks ? event.videoLinks.map(link => this.fb.control(link)) : []);
-    console.log('4. videoLinksArray (prepared for form):', videoLinksArray.value);
+    // Clear previous FormArray controls before adding new ones
+    while (this.videoLinks.length !== 0) {
+      this.videoLinks.removeAt(0);
+    }
+    event.videoLinks?.forEach(link => this.videoLinks.push(this.fb.control(link)));
 
-    this.eventForm = this.fb.group({
-      id: [event.id],
-      title: [event.title, Validators.required],
-      description: [event.description],
-      startDate: [event.startDate, Validators.required],
-      endDate: [event.endDate, Validators.required],
-      startTime: [event.startTime],
-      endTime: [event.endTime],
-      location: [event.location],
-      category: [event.category, Validators.required],
-      targetAudience: [targetAudienceString],
-      videoLinks: videoLinksArray,
+    this.eventForm.patchValue({
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      startDate: event.startDate,
+      endDate: event.endDate,
+      startTime: event.startTime,
+      endTime: event.endTime,
+      location: event.location,
+      category: event.category,
+      targetAudience: targetAudienceString,
+      // imageUrl from the event is patched directly into the form control
+      imageUrl: event.imageUrl // This sets the initial image URL for the form
     });
 
     this.cdr.detectChanges();
     console.log('5. eventForm.get("targetAudience") value after initialization:', this.eventForm.get('targetAudience')?.value);
+    console.log('6. eventForm.get("imageUrl") value after initialization:', this.eventForm.get('imageUrl')?.value);
     console.log('--- initEventForm finished ---');
   }
 
@@ -329,27 +394,92 @@ export class EventCalendarComponent implements OnInit {
     return this.eventForm.get('videoLinks') as FormArray;
   }
 
-  saveEventChanges(): void {
-    if (this.eventForm.valid && this.selectedEvent) {
-      const eventIdToUpdate: number | undefined = this.selectedEvent.id;
-      if (typeof eventIdToUpdate !== 'number') return;
+  addVideoLink(): void {
+    this.videoLinks.push(this.fb.control(''));
+  }
 
+  removeVideoLink(index: number): void {
+    this.videoLinks.removeAt(index);
+  }
+
+  // --- MODIFIED: Image file selection handler ---
+  onFileSelected(event: Event): void {
+    const fileInput = event.target as HTMLInputElement;
+    if (fileInput.files && fileInput.files.length > 0) {
+      this.selectedFile = fileInput.files[0];
+
+      // Generate preview
+      const reader = new FileReader();
+      reader.onload = e => this.imagePreviewUrl = reader.result;
+      reader.readAsDataURL(this.selectedFile);
+
+      // CRITICAL: When a new file is selected, nullify the imageUrl in the form control.
+      // This signifies that the *existing* image (if any) is to be replaced by the new file.
+      this.eventForm.get('imageUrl')?.setValue(null);
+
+    } else {
+      // Case where the user opens the file dialog but cancels, or clears the input manually
+      this.selectedFile = null;
+      this.imagePreviewUrl = null;
+      // Do NOT set imageUrl to null here. The form control should retain its value
+      // from `patchValue` if it had one, or `null` if removeImage was called.
+      // The current state of eventForm.imageUrl is the source of truth.
+      if (this.selectedEvent && this.selectedEvent.imageUrl && !this.eventForm.get('imageUrl')?.value) {
+        // If there was an original image and the form's imageUrl became null (e.g., via user selecting, then cancelling),
+        // revert to the original imageUrl.
+        // This handles the scenario where a user might select a file, then cancel the file dialog,
+        // and you want the previously saved image to reappear.
+        this.eventForm.get('imageUrl')?.setValue(this.selectedEvent.imageUrl);
+      }
+    }
+  }
+
+  // --- MODIFIED: Remove image handler ---
+  removeImage(): void {
+    // 1. Clear component state for new file selection/preview
+    this.selectedFile = null;
+    this.imagePreviewUrl = null;
+
+    // 2. CRITICAL: Explicitly set the imageUrl in the Reactive Form to null.
+    // This value will be sent to the backend to remove the image association.
+    this.eventForm.get('imageUrl')?.setValue(null);
+
+    // 3. Reset the native HTML file input element.
+    // This clears the visually selected file name from the input field.
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  saveEventChanges(): void {
+    if (this.eventForm.valid && this.selectedEvent && this.selectedEvent.id) {
+      const eventIdToUpdate: number = this.selectedEvent.id;
       const formValue = this.eventForm.value;
 
-      const updatedEvent: Event = {
-        ...formValue,
-        id: eventIdToUpdate
-      };
+      // Process targetAudience
+      let processedTargetAudience: string[] = [];
+      const formTargetAudience = formValue.targetAudience;
 
-      if (typeof formValue.targetAudience === 'string') {
-        updatedEvent.targetAudience = formValue.targetAudience
+      if (typeof formTargetAudience === 'string') {
+        processedTargetAudience = formTargetAudience
           .split(',')
           .map((audience: string) => audience.trim().toUpperCase())
           .filter((audience: string) => audience !== '');
-      } else {
-        updatedEvent.targetAudience = [];
+      } else if (Array.isArray(formTargetAudience)) {
+        processedTargetAudience = formTargetAudience
+          .map((audience: any) => String(audience).trim().toUpperCase())
+          .filter((audience: string) => audience !== '');
       }
 
+      // Create the updated event object
+      const updatedEvent: CalendarEvent = {
+        ...this.selectedEvent, // Start with original event to retain all properties including ID
+        ...formValue, // Overlay form values
+        id: eventIdToUpdate, // Ensure ID is correct
+        targetAudience: processedTargetAudience, // Assign processed audience
+      };
+
+      // Convert dates to ISO string format (YYYY-MM-DD) for backend
       if (updatedEvent.startDate) {
         updatedEvent.startDate = new Date(updatedEvent.startDate).toISOString().split('T')[0];
       }
@@ -359,30 +489,44 @@ export class EventCalendarComponent implements OnInit {
 
       console.log('Attempting to save event:', updatedEvent);
 
-      this.eventService.updateEvent(eventIdToUpdate, updatedEvent).subscribe({
-        next: (res) => {
-          console.log('Event updated successfully:', res);
-          this.refreshCalendar();
-          this.closeSidebar();
-        },
-        error: (err) => {
-          console.error('Error updating event:', err);
-          alert('Failed to save event. Please try again.');
-        }
-      });
+      // --- MODIFIED: Streamlined Image handling logic ---
+      if (this.selectedFile) {
+        // Case 1: A new file has been selected, upload it first
+        this.eventService.uploadEventImage(this.selectedFile).subscribe({
+          next: (response) => {
+            updatedEvent.imageUrl = response.imageUrl; // Set the new image URL from upload response
+            this.proceedToUpdateEvent(eventIdToUpdate, updatedEvent);
+          },
+          error: (err) => {
+            console.error('Error uploading image:', err);
+            alert('Failed to upload image. Event not saved.');
+          }
+        });
+      } else {
+        // Case 2: No new file selected. The imageUrl in `updatedEvent` should reflect the form's state.
+        // It will be null if removeImage() was called, or the original URL if it was kept.
+        updatedEvent.imageUrl = this.eventForm.get('imageUrl')?.value;
+        this.proceedToUpdateEvent(eventIdToUpdate, updatedEvent);
+      }
 
     } else {
       console.warn('Form is invalid or no event selected. Cannot save changes.');
-      this.eventForm.markAllAsTouched();
+      this.eventForm.markAllAsTouched(); // Mark all controls as touched to display validation errors
     }
   }
 
-  addVideoLink(): void {
-    this.videoLinks.push(this.fb.control(''));
-  }
-
-  removeVideoLink(index: number): void {
-    this.videoLinks.removeAt(index);
+  private proceedToUpdateEvent(eventId: number, event: CalendarEvent): void {
+    this.eventService.updateEvent(eventId, event).subscribe({
+      next: (res) => {
+        console.log('Event updated successfully:', res);
+        this.refreshCalendar(); // Refresh calendar to show updated event
+        this.closeSidebar(); // Close sidebar after successful update
+      },
+      error: (err) => {
+        console.error('Error updating event:', err);
+        alert('Failed to save event. Please try again.');
+      }
+    });
   }
 
 }

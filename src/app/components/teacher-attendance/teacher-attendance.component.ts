@@ -109,7 +109,6 @@ export class TeacherAttendanceComponent implements OnInit {
         if (attendanceData && attendanceData.length === 0) {
           this.disableDeleteButton = true;
         }
-
         if (attendanceData && attendanceData.length > 0) {
           this.disableDeleteButton = false;
           const attendanceMap = new Map<string, AttendanceData>();

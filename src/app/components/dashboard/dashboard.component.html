@@ -38,7 +38,7 @@
     </nav>
 
     <div class="profile-area">
-      <button mat-icon-button (click)="navigateToNotifications()">
+      <button class="notification-button" mat-icon-button (click)="navigateToNotifications()">
         <mat-icon [matBadge]="unreadNotificationCount" [matBadgeHidden]="unreadNotificationCount === 0"
           matBadgeColor="warn">
           notifications

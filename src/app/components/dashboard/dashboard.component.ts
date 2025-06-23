@@ -1,5 +1,3 @@
-// src/app/components/dashboard/dashboard.component.ts
-
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
@@ -18,7 +16,6 @@ import { WelcomeDialogComponent } from '../welcome-dialog/welcome-dialog.compone
 import { Subject, takeUntil, interval, Subscription } from 'rxjs';
 import { NotificationService } from '../../services/notification.service';
 import { ViewNotificationComponent } from '../view-notification/view-notification.component';
-
 
 @Component({
   selector: 'app-dashboard',

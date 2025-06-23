@@ -80,6 +80,22 @@
             </button>
         </div>
 
+        <div class="form-group">
+            <label for="eventImage">Event Image:</label>
+            <input type="file" id="eventImage" accept="image/*" (change)="onFileSelected($event)" #fileInput>
+            <div *ngIf="selectedFile">Selected: {{ selectedFile.name }}</div>
+            <div *ngIf="imagePreviewUrl" class="image-preview-container">
+                <img [src]="imagePreviewUrl" alt="Image Preview" class="image-preview">
+                <button type="button" (click)="removeImage()" class="remove-image-btn">Remove Image</button>
+            </div>
+            <div *ngIf="isEditMode && eventForm.get('imageUrl')?.value && !imagePreviewUrl"
+                class="image-preview-container">
+                <img [src]="getFullImageUrl(eventForm.get('imageUrl')?.value)" alt="Current Event Image"
+                    class="image-preview">
+                <button type="button" (click)="removeImage()" class="remove-image-btn">Remove Image</button>
+            </div>
+        </div>
+
 
         <div class="form-actions">
             <button type="submit" [disabled]="!eventForm.valid" class="save-btn">

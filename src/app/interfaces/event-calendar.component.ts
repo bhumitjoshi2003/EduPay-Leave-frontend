@@ -1,4 +1,4 @@
-export interface Event {
+export interface CalendarEvent {
     id?: number;
     title: string;
     description: string;
@@ -10,8 +10,7 @@ export interface Event {
     category: string;
     targetAudience: string[];
     videoLinks?: string[];
-    createdBy?: string;
+    imageUrl?: string | null;
     createdAt?: string;
     updatedAt?: string;
-    imageUrl?: string;
 }

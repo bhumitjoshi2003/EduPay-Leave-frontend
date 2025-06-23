@@ -33,9 +33,18 @@
         routerLinkActive #rla14="routerLinkActive" [active]="rla14.isActive">Event Calendar</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/event-new" routerLinkActive #rla15="routerLinkActive"
         [active]="rla15.isActive">Create Event</a>
+      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/notification-form" routerLinkActive
+        #rla15="routerLinkActive" [active]="rla15.isActive">Create Notification</a>
     </nav>
 
     <div class="profile-area">
+      <button class="notification-button" mat-icon-button (click)="navigateToNotifications()">
+        <mat-icon [matBadge]="unreadNotificationCount" [matBadgeHidden]="unreadNotificationCount === 0"
+          matBadgeColor="warn">
+          notifications
+        </mat-icon>
+      </button>
+
       <button mat-icon-button [matMenuTriggerFor]="profileMenu">
         <mat-icon>account_circle</mat-icon>
       </button>

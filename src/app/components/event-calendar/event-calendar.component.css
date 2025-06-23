@@ -279,6 +279,7 @@
 .sidebar-body {
     flex-grow: 1;
     padding-left: 20px;
+    padding-right: 20px;
     margin-bottom: 15px;
     display: flex;
     flex-direction: column;
@@ -731,4 +732,110 @@
 
 .sidebar-header-content {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+
+
+.form-group input[type="file"] {
+    /* Style the file input button (browser default styling is hard to change directly,
+       but we can style the area around it and its text) */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9em;
+    color: #555;
+    background-color: #fcfcfc;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    /* Indicate it's clickable */
+}
+
+.form-group input[type="file"]::-webkit-file-upload-button {
+    /* Styles for the actual button part of the file input in WebKit browsers */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-right: 10px;
+    /* Space between button and file name */
+}
+
+.form-group input[type="file"]::-webkit-file-upload-button:hover {
+    background-color: #0056b3;
+}
+
+/* Fallback/Firefox for file input button if needed */
+.form-group input[type="file"]::file-selector-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-right: 10px;
+}
+
+.form-group input[type="file"]::file-selector-button:hover {
+    background-color: #0056b3;
+}
+
+/* Style for displaying the selected file name */
+.form-group div {
+    font-size: 0.85em;
+    color: #666;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    /* Space below file name, before preview */
+}
+
+/* Image Preview Container */
+.image-preview-container {
+    margin-top: 10px;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f9f9f9;
+    position: relative;
+    /* For positioning the remove button */
+}
+
+.image-preview {
+    max-width: 100%;
+    max-height: 200px;
+    /* Limit height to prevent excessive stretching */
+    height: auto;
+    object-fit: contain;
+    /* Ensures the image fits within the bounds without cropping */
+    border-radius: 4px;
+    margin-bottom: 10px;
+    /* Space between image and remove button */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Remove Image Button */
+.remove-image-btn {
+    background-color: #dc3545;
+    /* Red */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 15px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-weight: 600;
+}
+
+.remove-image-btn:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
 }

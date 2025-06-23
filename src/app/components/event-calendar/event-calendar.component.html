@@ -48,7 +48,7 @@
 
     <div *ngIf="showSidebar" class="backdrop" (click)="closeSidebar()"></div>
     <div *ngIf="showSidebar && selectedEvent" class="event-sidebar visible" (click)="$event.stopPropagation()">
-        <img *ngIf="true" src="IASbuilding.avif" class="event-image">
+        <img *ngIf="selectedEvent.imageUrl" [src]="getFullImageUrl(selectedEvent.imageUrl)" class="event-image">
         <div class="sidebar-header">
             <div class="sidebar-header-content">
                 <h3>{{ selectedEvent.title }}</h3>
@@ -61,7 +61,7 @@
             <ng-container *ngIf="!isEditing">
                 <p class="event-description">{{ selectedEvent.description }}</p>
                 <p>
-                    <ng-container *ngIf="selectedEvent.startDate === selectedEvent.endDate;  else showStartAndEndDate">
+                    <ng-container *ngIf="selectedEvent.startDate === selectedEvent.endDate; else showStartAndEndDate">
                         <strong>Date:</strong> {{ getFormattedDate(selectedEvent.startDate, 'PPP') }}
                     </ng-container>
 
@@ -74,8 +74,10 @@
                         </ng-container>
                     </ng-template>
                 </p>
-                <p *ngIf="selectedEvent.startTime"><strong>Time:</strong> {{ selectedEvent.startTime }}
-                    <ng-container *ngIf="selectedEvent.endTime"> - {{ selectedEvent.endTime }}</ng-container>
+                <p *ngIf="selectedEvent.startTime"><strong>Time:</strong> {{ formatTimeDisplay(selectedEvent.startTime)
+                    }}
+                    <ng-container *ngIf="selectedEvent.endTime"> - {{ formatTimeDisplay(selectedEvent.endTime)
+                        }}</ng-container>
                 </p>
                 <p *ngIf="selectedEvent.location"><strong>Venue:</strong> {{ selectedEvent.location }}</p>
                 <ng-container *ngIf="selectedEvent.videoLinks?.length">
@@ -147,6 +149,24 @@
                         </div>
                         <button type="button" (click)="addVideoLink()" class="add-link-btn">+ Add Link</button>
                     </div>
+
+                    <div class="form-group">
+                        <label for="eventImage">Event Image:</label>
+                        <input type="file" id="eventImage" accept="image/*" (change)="onFileSelected($event)"
+                            #fileInput>
+                        <div *ngIf="selectedFile">Selected: {{ selectedFile.name }}</div>
+                        <div *ngIf="imagePreviewUrl" class="image-preview-container">
+                            <img [src]="imagePreviewUrl" alt="Image Preview" class="image-preview">
+                            <button type="button" (click)="removeImage()" class="remove-image-btn">Remove Image</button>
+                        </div>
+                        <div *ngIf="eventForm.get('imageUrl')?.value && !imagePreviewUrl"
+                            class="image-preview-container">
+                            <img [src]="getFullImageUrl(eventForm.get('imageUrl')?.value)" alt="Current Event Image"
+                                class="image-preview">
+                            <button type="button" (click)="removeImage()" class="remove-image-btn">Remove Image</button>
+                        </div>
+                    </div>
+
 
                     <div class="form-actions">
                         <button type="submit" [disabled]="!eventForm.valid" class="save-btn">Save Changes</button>

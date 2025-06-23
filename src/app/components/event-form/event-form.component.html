@@ -5,7 +5,7 @@
 
         <div class="form-group">
             <label for="title">Event Title:</label>
-            <input id="title" type="text" formControlName="title" placeholder="e.g. Annual Sports Day" required>
+            <input id="title" type="text" formControlName="title" required>
             <div class="error-message" *ngIf="hasError('title', 'required')">Title is required</div>
         </div>
 
@@ -47,7 +47,7 @@
 
         <div class="form-group">
             <label for="location">Location (Optional):</label>
-            <input id="location" type="text" formControlName="location" placeholder="e.g. School Hall, Play Ground">
+            <input id="location" type="text" formControlName="location">
         </div>
 
         <div class="form-group">
@@ -70,7 +70,7 @@
             <label>Video Links:</label>
             <div formArrayName="videoLinks" class="video-links-array">
                 <div *ngFor="let linkControl of videoLinks.controls; let i = index" class="video-link-item">
-                    <input type="url" [id]="'videoLink' + i" [formControlName]="i" placeholder="Video URL {{i + 1}}">
+                    <input type="url" [id]="'videoLink' + i" [formControlName]="i">
                     <button type="button" (click)="removeVideoLink(i)" class="remove-link-btn">
                         &times; </button>
                 </div>
@@ -78,6 +78,22 @@
             <button type="button" (click)="addVideoLink()" class="add-link-btn">
                 + Add Link
             </button>
+        </div>
+
+        <div class="form-group">
+            <label for="eventImage">Event Image:</label>
+            <input type="file" id="eventImage" accept="image/*" (change)="onFileSelected($event)" #fileInput>
+            <div *ngIf="selectedFile">Selected: {{ selectedFile.name }}</div>
+            <div *ngIf="imagePreviewUrl" class="image-preview-container">
+                <img [src]="imagePreviewUrl" alt="Image Preview" class="image-preview">
+                <button type="button" (click)="removeImage()" class="remove-image-btn">Remove Image</button>
+            </div>
+            <div *ngIf="isEditMode && eventForm.get('imageUrl')?.value && !imagePreviewUrl"
+                class="image-preview-container">
+                <img [src]="getFullImageUrl(eventForm.get('imageUrl')?.value)" alt="Current Event Image"
+                    class="image-preview">
+                <button type="button" (click)="removeImage()" class="remove-image-btn">Remove Image</button>
+            </div>
         </div>
 
 

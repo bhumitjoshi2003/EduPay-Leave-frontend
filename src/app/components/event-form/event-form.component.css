@@ -1,7 +1,7 @@
 .event-form-container {
     max-width: 700px;
     width: 90%;
-    margin: 30px auto;
+    margin: 15px auto;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -315,16 +315,148 @@ textarea {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
+/* --- ADDED Styles for the Image Input Section --- */
+
+.form-group input[type="file"] {
+    /* Styles the overall input field for file selection */
+    padding: 12px 15px;
+    /* Consistent with other inputs */
+    border: 1px solid #c7c7c7;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #333;
+    background-color: #fcfcfc;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    /* Indicates it's clickable */
+}
+
+/* Styles for the actual "Choose File" button within the file input */
+.form-group input[type="file"]::-webkit-file-upload-button {
+    background-color: #007bff;
+    /* Primary blue for the button */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    /* Slightly smaller radius for internal button */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-right: 10px;
+    /* Space between button and file name */
+}
+
+.form-group input[type="file"]::-webkit-file-upload-button:hover {
+    background-color: #0056b3;
+    /* Darker blue on hover */
+}
+
+/* Firefox and other browsers using the new standard */
+.form-group input[type="file"]::file-selector-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-right: 10px;
+}
+
+.form-group input[type="file"]::file-selector-button:hover {
+    background-color: #0056b3;
+}
+
+/* Style for displaying the selected file name (e.g., "Selected: image.jpg") */
+.form-group>div:not(.image-preview-container) {
+    /* Target the div containing file name specifically */
+    font-size: 0.9em;
+    /* Slightly smaller font than label */
+    color: #666;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    /* Space below file name, before preview */
+    padding-left: 5px;
+    /* Indent slightly for alignment */
+}
+
+/* Image Preview Container */
+.image-preview-container {
+    margin-top: 15px;
+    /* More space above the preview box */
+    border: 1px dashed #c7c7c7;
+    /* Consistent border style */
+    border-radius: 8px;
+    /* Consistent radius */
+    padding: 15px;
+    /* More padding inside the container */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fcfcfc;
+    /* Consistent background */
+    position: relative;
+    /* For positioning the remove button if you ever want to overlay it */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    /* Subtle inner shadow */
+}
+
+.image-preview {
+    max-width: 100%;
+    max-height: 250px;
+    /* Increased max height for larger forms */
+    height: auto;
+    object-fit: contain;
+    /* Ensures the image fits within the bounds without cropping */
+    border-radius: 6px;
+    /* Match internal elements */
+    margin-bottom: 15px;
+    /* Space between image and remove button */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* Stronger shadow for the image itself */
+}
+
+/* Remove Image Button */
+.remove-image-btn {
+    background-color: #f44336;
+    /* Red for removal */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    /* Consistent radius */
+    padding: 10px 20px;
+    /* Larger padding for better click area */
+    font-size: 0.95em;
+    /* Match other buttons */
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-weight: 500;
+    /* Match other buttons */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow */
+}
+
+.remove-image-btn:hover {
+    background-color: #d32f2f;
+    /* Darker red on hover */
+    transform: translateY(-1px);
+}
+
+/* --- END ADDED Styles --- */
+
 @media (max-width: 768px) {
     .event-form-container {
-        margin: 0px 0px;
+        margin: 10px 0px;
         padding: 10px 15px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        width: 90%;
+        width: 91%;
     }
 
     h2 {
-        font-size: 1.8em;
+        font-size: 1.4em;
+        font-weight: bolder;
         margin-bottom: 25px;
     }
 
@@ -345,6 +477,39 @@ textarea {
     .form-group select {
         padding: 10px 12px;
         font-size: 0.95em;
+    }
+
+    /* Mobile specific file input styles */
+    .form-group input[type="file"] {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+
+    .form-group input[type="file"]::-webkit-file-upload-button,
+    .form-group input[type="file"]::file-selector-button {
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+
+    .form-group>div:not(.image-preview-container) {
+        font-size: 0.8em;
+        margin-bottom: 8px;
+    }
+
+    .image-preview-container {
+        padding: 10px;
+        margin-top: 10px;
+    }
+
+    .image-preview {
+        max-height: 180px;
+        /* Adjust for mobile view */
+        margin-bottom: 10px;
+    }
+
+    .remove-image-btn {
+        padding: 8px 15px;
+        font-size: 0.85em;
     }
 
     .date-time-group {

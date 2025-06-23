@@ -4,6 +4,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/rou
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatBadgeModule } from '@angular/material/badge';
 import { AuthService } from '../../auth/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import { CommonModule } from '@angular/common';
@@ -12,7 +13,9 @@ import { TeacherService } from '../../services/teacher.service';
 import { AdminService } from '../../services/admin.service';
 import { MatDialog } from '@angular/material/dialog';
 import { WelcomeDialogComponent } from '../welcome-dialog/welcome-dialog.component';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, interval, Subscription } from 'rxjs';
+import { NotificationService } from '../../services/notification.service';
+import { ViewNotificationComponent } from '../view-notification/view-notification.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,7 +28,8 @@ import { Subject, takeUntil } from 'rxjs';
     MatMenuModule,
     MatIconModule,
     MatDividerModule,
-    CommonModule
+    CommonModule,
+    MatBadgeModule // <--- Added MatBadgeModule to imports array
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
@@ -40,6 +44,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   hasShownWelcomeMessage: boolean = false;
   private ngUnsubscribe = new Subject<void>();
   private welcomeMessageKey = 'hasShownWelcome';
+  unreadNotificationCount: number = 0;
+  private pollingIntervalSubscription: Subscription | undefined; // Changed type to Subscription
 
   constructor(
     private router: Router,
@@ -47,18 +53,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private teacherService: TeacherService,
     private adminService: AdminService,
-    private dialog: MatDialog
+    private dialog: MatDialog, // MatDialog injected
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit() {
     this.loadWelcomeMessageState();
     this.getDetails();
     this.handleInitialNavigation();
+    this.setupNotificationPolling();
   }
 
   ngOnDestroy(): void {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+    if (this.pollingIntervalSubscription) {
+      this.pollingIntervalSubscription.unsubscribe();
+    }
   }
 
   loadWelcomeMessageState() {
@@ -81,6 +92,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.Role = decodedToken.role;
       this.Id = decodedToken.userId;
       this.fetchUserDetails();
+      this.getUnreadCount();
     }
   }
 
@@ -157,6 +169,50 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  setupNotificationPolling(): void {
+    this.pollingIntervalSubscription = interval(30000)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(() => {
+        this.getUnreadCount();
+      });
+  }
+
+  getUnreadCount(): void {
+    if (this.Role && this.Id && localStorage.getItem('token')) {
+      this.notificationService.getUnreadNotificationCount().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+        next: (count) => {
+          this.unreadNotificationCount = count;
+        },
+        error: (err) => {
+          console.error('Error fetching unread notification count:', err);
+          this.unreadNotificationCount = 0;
+        }
+      });
+    } else {
+      this.unreadNotificationCount = 0;
+    }
+  }
+
+  // --- IMPORTANT CHANGE HERE ---
+  navigateToNotifications(): void {
+    // Open ViewNotificationComponent as a MatDialog
+    const dialogRef = this.dialog.open(ViewNotificationComponent, {
+      maxWidth: '800px', // Set a max width for the dialog
+      width: '90%',      // Set a percentage width
+      maxHeight: '90vh', // Set a max height to keep it responsive
+      height: 'auto',    // Allow height to adjust based on content
+      panelClass: 'custom-notification-dialog', // Optional: for custom styling
+      data: {} // No specific data needed for ViewNotificationComponent based on its current implementation
+    });
+
+    // You might want to update the unread count when the dialog is closed
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Notification dialog was closed', result);
+      this.getUnreadCount(); // Refresh the unread count after the user closes the dialog
+    });
+  }
+  // -----------------------------
 
   isStudent(): boolean {
     return this.Role === 'STUDENT';

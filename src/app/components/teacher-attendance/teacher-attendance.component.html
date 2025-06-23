@@ -9,10 +9,18 @@
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
 
-    <button class="attendance-button save" [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
-      (click)="saveAttendance()">
-      Save
-    </button>
+    <div class="action-buttons">
+      <button class="attendance-button save" [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
+        (click)="saveAttendance()">
+        Save
+      </button>
+
+      <button class="attendance-button delete"
+        [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate) || disableDeleteButton"
+        (click)="deleteAttendance()">
+        Delete
+      </button>
+    </div>
   </div>
 
   <div *ngIf="!isDateWithinAllowedRange()" class="warning" class="attendance-restriction-message">
@@ -33,13 +41,11 @@
       <div class="attendance-buttons">
         <button *ngIf="!student.absent" (click)="markAbsent(student.studentId)" class="attendance-button absent"
           [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)">
-          <ng-container *ngIf="!isMobileView">Mark Absent</ng-container>
-          <ng-container *ngIf="isMobileView">Mark A</ng-container>
+          <ng-container>Mark Absent</ng-container>
         </button>
         <button *ngIf="student.absent" (click)="markPresent(student.studentId)" class="attendance-button present"
           [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)">
-          <ng-container *ngIf="!isMobileView">Mark Present</ng-container>
-          <ng-container *ngIf="isMobileView">Mark P</ng-container>
+          <ng-container>Mark Present</ng-container>
         </button>
       </div>
     </li>

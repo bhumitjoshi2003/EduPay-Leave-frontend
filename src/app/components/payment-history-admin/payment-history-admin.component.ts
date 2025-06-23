@@ -48,7 +48,7 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
   pageSize: number = 10;
   totalElements: number = 0;
   totalPages: number = 0;
-  pageSizes: number[] = [3, 10, 20, 50];
+  pageSizes: number[] = [5, 10, 20, 50];
 
   constructor(private router: Router, private paymentHistoryService: PaymentHistoryService, private datePipe: DatePipe) { }
 

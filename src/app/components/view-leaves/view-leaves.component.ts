@@ -46,7 +46,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   pageSize: number = 10;
   totalElements: number = 0;
   totalPages: number = 0;
-  pageSizes: number[] = [3, 10, 20, 50];
+  pageSizes: number[] = [5, 10, 20, 50];
 
   private studentIdInputSubject = new Subject<string>();
   private ngUnsubscribe = new Subject<void>();

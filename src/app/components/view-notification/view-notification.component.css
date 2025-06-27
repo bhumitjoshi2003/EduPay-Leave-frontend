@@ -134,8 +134,12 @@ mat-list-item:hover {
     color: #9C27B0;
 }
 
-.notif-icon.type-others {
+.notif-icon.type-reminder {
     color: #607D8B;
+}
+
+.notif-icon.type-others {
+    color: #fc8105;
 }
 
 .notification-item {

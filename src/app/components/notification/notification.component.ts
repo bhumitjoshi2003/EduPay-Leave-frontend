@@ -41,7 +41,7 @@ export class NotificationComponent implements OnInit {
   selectedNotificationId: number | null = null;
 
   audienceOptions: string[] = ['ALL', 'STUDENTS', 'TEACHERS'];
-  typeOptions: string[] = ['MEETING', 'FUNCTION', 'SPORTS', 'PAYMENT', 'LEAVES', 'ANNOUNCEMENT', 'OTHERS'];
+  typeOptions: string[] = ['MEETING', 'FUNCTION', 'SPORTS', 'PAYMENT', 'LEAVES', 'ANNOUNCEMENT', 'REMINDER'];
 
   // Map for dynamic class names and icons
   typeStyles = new Map<string, { className: string, icon: string }>();

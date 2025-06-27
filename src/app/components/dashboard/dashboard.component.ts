@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
@@ -53,8 +53,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private teacherService: TeacherService,
     private adminService: AdminService,
-    private dialog: MatDialog, // MatDialog injected
-    private notificationService: NotificationService
+    private dialog: MatDialog,
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -183,14 +184,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.notificationService.getUnreadNotificationCount().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
         next: (count) => {
           this.unreadNotificationCount = count;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Error fetching unread notification count:', err);
           this.unreadNotificationCount = 0;
+          this.cdr.detectChanges();
         }
       });
     } else {
       this.unreadNotificationCount = 0;
+      this.cdr.detectChanges();
     }
   }
 

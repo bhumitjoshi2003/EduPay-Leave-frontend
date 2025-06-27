@@ -113,7 +113,8 @@ export class ViewNotificationComponent implements OnInit {
       case 'PAYMENT': return 'type-payment';
       case 'LEAVES': return 'type-leaves';
       case 'ANNOUNCEMENT': return 'type-announcement';
-      default: return 'type-others';
+      case 'REMINDER': return 'type-reminder';
+      default: return `type-others`;
     }
   }
 
@@ -125,7 +126,7 @@ export class ViewNotificationComponent implements OnInit {
       case 'PAYMENT': return '💳 Payment';
       case 'LEAVES': return '🌴 Leaves';
       case 'ANNOUNCEMENT': return '📣 Announcement';
-      default: return '🛎️ Reminder';
+      default: return `🛎️ ${type}`;
     }
   }
 

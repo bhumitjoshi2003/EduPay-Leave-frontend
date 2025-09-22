@@ -24,7 +24,7 @@
   </div>
 
   <div *ngIf="!isDateWithinAllowedRange()" class="warning" class="attendance-restriction-message">
-    Attendance can only be modified for dates between {{ getRelativeDate(-2) }} and {{ getRelativeDate(1) }}.
+    Attendance can only be modified for dates between {{ getRelativeDate(-1) }} and {{ getRelativeDate(0) }}.
   </div>
 
   <div *ngIf="isSunday(attendanceDate) && isDateWithinAllowedRange()"

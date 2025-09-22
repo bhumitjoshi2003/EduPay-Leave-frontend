@@ -257,7 +257,7 @@ export class TeacherAttendanceComponent implements OnInit {
     selected.setHours(0, 0, 0, 0);
 
     const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 2);
+    yesterday.setDate(today.getDate() - 1);
 
     return selected.getTime() === today.getTime() || selected.getTime() === yesterday.getTime();
   }

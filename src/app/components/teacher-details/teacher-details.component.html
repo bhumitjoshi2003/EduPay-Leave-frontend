@@ -7,7 +7,7 @@
         <button (click)="saveTeacherDetails()">Save</button>
         <button (click)="cancelEditMode()">Cancel</button>
       </div>
-      <button (click)="changePassword()">Change Password</button> 
+      <button (click)="changePassword()">Change Password</button>
     </div>
   </div>
 
@@ -24,12 +24,14 @@
     <div class="detail-item">
       <span class="label">Email:</span>
       <span class="value" *ngIf="!isEditing">{{ teacherDetails.email }}</span>
-      <input type="email" *ngIf="isEditing" [(ngModel)]="updatedDetails.email" (input)="updateFieldValue('email', $event)">
+      <input type="email" *ngIf="isEditing" [(ngModel)]="updatedDetails.email"
+        (input)="updateFieldValue('email', $event)">
     </div>
     <div class="detail-item">
       <span class="label">Phone:</span>
       <span class="value" *ngIf="!isEditing">{{ teacherDetails.phoneNumber }}</span>
-      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.phoneNumber" (input)="updateFieldValue('phoneNumber', $event)">
+      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.phoneNumber"
+        (input)="updateFieldValue('phoneNumber', $event)">
     </div>
     <div class="detail-item">
       <span class="label">Date of Birth:</span>
@@ -38,15 +40,18 @@
     </div>
     <div class="detail-item">
       <span class="label">Class Teacher:</span>
-      <span class="value" *ngIf="!isEditing">{{ teacherDetails.classTeacher ? teacherDetails.classTeacher : 'Not Assigned' }}</span>
-      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.classTeacher" (input)="updateFieldValue('classTeacher', $event)" placeholder="Not Assigned">
+      <span class="value" *ngIf="!isEditing">
+        {{ teacherDetails.classTeacher ? teacherDetails.classTeacher : 'Not Assigned' }}</span>
+      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.classTeacher"
+        (input)="updateFieldValue('classTeacher', $event)" placeholder="Not Assigned">
     </div>
   </div>
 
   <div class="actions">
   </div>
 
-  <button class="back-button" (click)="goBackToTeacherList()">Back to Teacher List</button>
+  <button *ngIf="getUserRole()==='ADMIN'" class="back-button" (click)="goBackToTeacherList()">Back to Teacher
+    List</button>
 </div>
 
 <div *ngIf="!teacherDetails">

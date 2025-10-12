@@ -87,6 +87,10 @@
         <td class="label">Late Fees:</td>
         <td>{{ paymentDetails.lateFees | currency: 'INR' }}</td>
       </tr>
+      <tr *ngIf="paymentDetails.platformFee > 0">
+        <td class="label">Platform Fee:</td>
+        <td>{{ paymentDetails.platformFee | currency: 'INR' }}</td>
+      </tr>
       <tr>
         <td class="label">Total Amount:</td>
         <td>{{ paymentDetails.amount | currency: 'INR' }}</td>

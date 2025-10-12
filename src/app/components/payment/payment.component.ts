@@ -36,7 +36,8 @@ export class PaymentComponent {
     paidManually: false,
     amountPaid: 0,
     additionalCharges: 0,
-    lateFees: 0
+    lateFees: 0,
+    platformFee: 0
   };
 
   @Input() disabled: boolean = false;

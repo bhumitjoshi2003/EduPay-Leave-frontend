@@ -16,6 +16,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AttendanceService } from '../../services/attendance.service';
 
+
+const PLATFORM_FEE_PERCENTAGE = 0.015;
+
 @Component({
   selector: 'app-payment-tracker',
   standalone: true,
@@ -59,6 +62,7 @@ export class PaymentTrackerComponent implements OnInit {
   lateFees: number = 0;
   lateFeePerDay: number[] = [12, 15, 18, 21];
   isLoadingPayment: boolean = false;
+  platformFeeAmount: number = 0;
 
   currentMonth = new Date().getMonth() + 1;
   academicCurrentMonth = this.getAcademicMonth(this.currentMonth);
@@ -79,7 +83,8 @@ export class PaymentTrackerComponent implements OnInit {
     paidManually: false,
     amountPaid: 0,
     additionalCharges: 0,
-    lateFees: 0
+    lateFees: 0,
+    platformFee: 0
   };
 
   ngOnInit() {
@@ -290,6 +295,34 @@ export class PaymentTrackerComponent implements OnInit {
   }
 
 
+  private recalculateTotals(): void {
+    let subTotal = 0;
+
+    Object.keys(this.selectedMonthsByYear).forEach(yearKey => {
+      const year = parseInt(yearKey, 10);
+      this.selectedMonthsByYear[year].forEach(monthNumber => {
+        const month = this.months.find(m => m.month === monthNumber);
+        if (month) {
+          subTotal += month.fee + (month.busFee || 0) + month.lateFee;
+        }
+      });
+    });
+
+    const year = this.selectedYear;
+    if (this.selectedMonthsByYear[year]?.length > 0 && this.totalUnappliedLeaveCharge > 0) {
+      subTotal += this.totalUnappliedLeaveCharge;
+    }
+
+    // 3. Calculate Platform Fee
+    this.platformFeeAmount = Math.ceil(subTotal * PLATFORM_FEE_PERCENTAGE);
+
+    this.totalAmountToPay = subTotal + this.platformFeeAmount;
+
+    this.paymentData.totalAmount = this.totalAmountToPay;
+    this.paymentData.platformFee = this.platformFeeAmount;
+  }
+
+
   toggleMonthSelection(month: any) {
     if (!month.paid) {
       if (this.isLoadingPayment) {
@@ -303,15 +336,16 @@ export class PaymentTrackerComponent implements OnInit {
 
       const index = this.selectedMonthsByYear[year].indexOf(month.month);
       if (index === -1) {
-        this.totalAmountToPay += month.fee + (month.busFee || 0) + month.lateFee;
-        if (this.selectedMonthsByYear[year].length === 0 && this.totalUnappliedLeaveCharge > 0) {
-          this.totalAmountToPay += this.totalUnappliedLeaveCharge;
-        }
+        // this.totalAmountToPay += month.fee + (month.busFee || 0) + month.lateFee;
+        // if (this.selectedMonthsByYear[year].length === 0 && this.totalUnappliedLeaveCharge > 0) {
+        //   this.totalAmountToPay += this.totalUnappliedLeaveCharge;
+        // }
         this.selectedMonthsByYear[year].push(month.month);
         this.lastSelectedMonth = month;
 
         this.populateMonthDetails(month)
           .then(() => {
+            this.recalculateTotals();
             this.updatePaymentData(month, true);
           })
           .catch((error) => {
@@ -319,9 +353,10 @@ export class PaymentTrackerComponent implements OnInit {
           });
 
       } else {
-        this.totalAmountToPay -= month.fee + (month.busFee || 0) + month.lateFee;
+        //   this.totalAmountToPay -= month.fee + (month.busFee || 0) + month.lateFee;
         this.selectedMonthsByYear[year].splice(index, 1);
         this.updatePaymentData(month, false);
+        this.recalculateTotals();
 
         if (this.lastSelectedMonth === month) {
           if (this.selectedMonthsByYear[year].length > 0) {
@@ -338,9 +373,9 @@ export class PaymentTrackerComponent implements OnInit {
           } else {
             this.selectedMonthDetails = null;
             this.lastSelectedMonth = null;
-            if (this.totalUnappliedLeaveCharge > 0) {
-              this.totalAmountToPay -= this.totalUnappliedLeaveCharge;
-            }
+            // if (this.totalUnappliedLeaveCharge > 0) {
+            //   this.totalAmountToPay -= this.totalUnappliedLeaveCharge;
+            // }
           }
         }
       }
@@ -414,6 +449,7 @@ export class PaymentTrackerComponent implements OnInit {
     this.paymentData.paidManually = this.paidManually;
     this.paymentData.amountPaid = this.paidManually ? this.amountPaid : this.totalAmountToPay;
     this.paymentData.additionalCharges = this.totalUnappliedLeaveCharge;
+    this.paymentData.platformFee = this.platformFeeAmount;
 
     console.log(this.paymentData);
   }
@@ -468,9 +504,11 @@ export class PaymentTrackerComponent implements OnInit {
       this.paymentData.session = "",
       this.paymentData.paidManually = false,
       this.paymentData.amountPaid = 0,
-      this.totalUnappliedLeaves = 0;
-    this.totalUnappliedLeaveCharge = 0,
-      this.paymentData.lateFees = 0;
+      this.paymentData.lateFees = 0,
+      this.paymentData.platformFee = 0,
+      this.totalUnappliedLeaves = 0,
+      this.totalUnappliedLeaveCharge = 0,
+      this.platformFeeAmount = 0;
   }
 
   markAsManuallyPaid() {

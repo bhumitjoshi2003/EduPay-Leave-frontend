@@ -90,6 +90,13 @@
             <strong>Unapplied Leave Charge:</strong>
             <span style="color: rgb(239, 64, 64)">₹{{ selectedMonthDetails.additionalCharges}}</span>
           </div>
+          <ng-container *ngIf="platformFeeAmount > 0">
+            <hr>
+            <div class="detail-item platform-fee-item">
+              <strong>Platform Fee:</strong>
+              <span>₹{{ platformFeeAmount }}</span>
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>

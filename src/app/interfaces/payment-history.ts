@@ -6,4 +6,5 @@ export interface PaymentHistory {
     paymentDate: string;
     status: string;
     className: string;
+    platformFee: number;
 }

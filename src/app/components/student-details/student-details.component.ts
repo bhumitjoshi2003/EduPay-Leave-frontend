@@ -21,6 +21,8 @@ interface StudentDetails {
   takesBus?: boolean;
   distance?: number | null;
   joiningDate?: string;
+  leavingDate?: string;
+  status?: string;
 }
 
 @Component({

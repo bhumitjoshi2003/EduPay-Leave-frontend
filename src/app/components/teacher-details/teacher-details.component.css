@@ -11,9 +11,9 @@
   flex-direction: column;
   gap: 30px;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  max-width: 1200px;
-  margin: 30px auto;
-  width: 95%;
+  /* max-width: 1200px; */
+  margin: 5px auto;
+  width: 92%;
 }
 
 .header {

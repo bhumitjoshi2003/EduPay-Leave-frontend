@@ -79,6 +79,16 @@
       <input type="date" *ngIf="isEditing" [(ngModel)]="updatedDetails.joiningDate"
         (input)="updateFieldValue('joiningDate', $event)">
     </div>
+    <div *ngIf="getUserRole() === 'ADMIN' && (studentDetails.leavingDate || isEditing)" class="detail-item">
+      <span class="label">Leaving Date:</span>
+
+      <span class="value" *ngIf="!isEditing && studentDetails.leavingDate">
+        {{ studentDetails.leavingDate | date }}
+      </span>
+
+      <input type="date" *ngIf="isEditing" [(ngModel)]="updatedDetails.leavingDate"
+        (input)="updateFieldValue('leavingDate', $event)">
+    </div>
   </div>
 
   <div *ngIf="getUserRole() !== 'STUDENT'" class="actions">

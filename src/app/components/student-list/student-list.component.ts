@@ -18,8 +18,9 @@ interface Student {
 })
 
 export class StudentListComponent implements OnInit {
-  students: Student[] = [];
+  activeStudents: Student[] = [];
   newStudents: Student[] = [];
+  inactiveStudents: Student[] = [];
   teacherId: string = '';
   loggedInUserRole: string = '';
   selectedClass: string = '';
@@ -69,13 +70,16 @@ export class StudentListComponent implements OnInit {
   }
 
   loadStudents(): void {
-    this.studentService.getStudentsByClass(this.selectedClass).subscribe((students) => {
-      this.students = students;
+    this.studentService.getActiveStudentsByClass(this.selectedClass).subscribe((students) => {
+      this.activeStudents = students;
     });
     if (this.loggedInUserRole === 'ADMIN') {
       console.log("admin");
       this.studentService.getNewStudentsByClass(this.selectedClass).subscribe((students) => {
         this.newStudents = students;
+      });
+      this.studentService.getInactiveStudentsByClass(this.selectedClass).subscribe((students) => {
+        this.inactiveStudents = students;
       });
     }
     localStorage.setItem('lastSelectedClass', this.selectedClass);

@@ -5,8 +5,7 @@
   border-radius: 15px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   animation: fadeIn 0.8s ease-in-out;
-  max-width: 1300px;
-  margin: 20px auto;
+  margin: 10px auto;
   width: 95%;
 }
 

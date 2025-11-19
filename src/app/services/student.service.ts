@@ -20,8 +20,8 @@ export class StudentService {
     return this.http.get<any>(`${this.baseUrl}/${studentId}`);
   }
 
-  getStudentsByClass(selectedClass: string): Observable<StudentDTO[]> {
-    return this.http.get<StudentDTO[]>(`${this.baseUrl}/class/${selectedClass}`);
+  getActiveStudentsByClass(selectedClass: string): Observable<StudentDTO[]> {
+    return this.http.get<StudentDTO[]>(`${this.baseUrl}/active/class/${selectedClass}`);
   }
 
   updateStudent(studentId: string, updatedDetails: any): Observable<any> {
@@ -35,4 +35,9 @@ export class StudentService {
   getNewStudentsByClass(selectedClass: string): Observable<StudentDTO[]> {
     return this.http.get<StudentDTO[]>(`${this.baseUrl}/new/class/${selectedClass}`);
   }
+
+  getInactiveStudentsByClass(selectedClass: string): Observable<StudentDTO[]> {
+    return this.http.get<StudentDTO[]>(`${this.baseUrl}/inactive/class/${selectedClass}`);
+  }
+
 }

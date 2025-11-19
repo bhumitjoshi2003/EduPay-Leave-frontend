@@ -107,25 +107,25 @@ export class ViewNotificationComponent implements OnInit {
 
   getTypeClass(type: string | undefined): string {
     switch (type?.toUpperCase()) {
-      case 'MEETING': return 'type-meeting';
-      case 'FUNCTION': return 'type-function';
-      case 'SPORTS': return 'type-sports';
-      case 'PAYMENT': return 'type-payment';
-      case 'LEAVES': return 'type-leaves';
-      case 'ANNOUNCEMENT': return 'type-announcement';
-      case 'REMINDER': return 'type-reminder';
+      case 'Meeting': return 'type-meeting';
+      case 'Function': return 'type-function';
+      case 'Sports': return 'type-sports';
+      case 'Payment': return 'type-payment';
+      case 'Holiday': return 'type-holiday';
+      case 'Announcement': return 'type-announcement';
+      case 'Reminder': return 'type-reminder';
       default: return `type-others`;
     }
   }
 
   getTypeIcon(type: string | undefined): string {
     switch (type?.toUpperCase()) {
-      case 'MEETING': return '🗓️ Meeting';
-      case 'FUNCTION': return '✨ Function';
-      case 'SPORTS': return '⚽ Sports';
-      case 'PAYMENT': return '💳 Payment';
-      case 'LEAVES': return '🌴 Leaves';
-      case 'ANNOUNCEMENT': return '📣 Announcement';
+      case 'Meeting': return '🗓️ Meeting';
+      case 'Function': return '✨ Function';
+      case 'Sports': return '⚽ Sports';
+      case 'Payment': return '💳 Payment';
+      case 'Holiday': return '📣 Holiday';
+      case 'Announcement': return '📣 Announcement';
       default: return `🛎️ ${type}`;
     }
   }

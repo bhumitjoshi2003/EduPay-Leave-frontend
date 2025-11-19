@@ -2,7 +2,7 @@
     padding: 30px auto;
     width: 90%;
     margin: 15px auto;
-    max-width: 1000px;
+    /* max-width: 1000px; */
     display: flex;
     flex-direction: column;
     gap: 50px;
@@ -283,7 +283,7 @@ mat-form-field {
     color: #333;
 }
 
-.type-leaves {
+.type-holiday {
     background-color: #00BCD4;
 }
 

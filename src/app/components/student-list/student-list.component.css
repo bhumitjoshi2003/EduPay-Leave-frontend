@@ -8,7 +8,7 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   animation: fadeIn 0.8s ease-in-out;
   padding: 30px;
-  max-width: 1200px;
+  /* max-width: 1200px; */
   margin: 0px auto;
   width: 95%;
 }
@@ -116,8 +116,9 @@
   padding: 0;
 }
 
-.student-item,
-.new-student-item {
+.active-student-item,
+.new-student-item,
+.inactive-student-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -135,8 +136,17 @@
   border-left: 8px solid rgb(57, 195, 50);
 }
 
-.student-item:hover {
+.inactive-student-item {
+  background-color: #fdf2e3;
+  border-left: 8px solid rgb(220, 121, 121);
+}
+
+.active-student-item:hover {
   background-color: #f0f4c3;
+}
+
+.inactive-student-item:hover {
+  background-color: #fae9d2;
 }
 
 .student-info {
@@ -161,7 +171,8 @@
   text-overflow: ellipsis;
 }
 
-.view-details-button {
+.view-details-button,
+.inactive-view-details-button {
   background-color: #4caf50;
   color: white;
   border: none;
@@ -175,6 +186,14 @@
 
 .view-details-button:hover {
   background-color: #388e3c;
+}
+
+.inactive-view-details-button {
+  background-color: #e26d53;
+}
+
+.inactive-view-details-button:hover {
+  background-color: #e25353;
 }
 
 .no-students {
@@ -239,7 +258,7 @@
     margin-bottom: 15px;
   }
 
-  .student-item,
+  .active-student-item,
   .new-student-item {
     padding: 12px;
   }
@@ -256,7 +275,8 @@
     font-size: 0.85em;
   }
 
-  .view-details-button {
+  .view-details-button,
+  .inactive-view-details-button {
     padding: 6px 12px;
     font-size: 0.85em;
   }
@@ -338,7 +358,7 @@
     margin-bottom: 10px;
   }
 
-  .student-item,
+  .active-student-item,
   .new-student-item {
     padding: 8px 10px;
     align-items: center;
@@ -359,7 +379,8 @@
     font-size: 0.8em;
   }
 
-  .view-details-button {
+  .view-details-button,
+  .inactive-view-details-button {
     display: none;
   }
 }

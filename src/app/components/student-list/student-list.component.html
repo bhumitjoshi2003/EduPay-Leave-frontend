@@ -14,9 +14,10 @@
   <div class="student-list-area">
     <h2 *ngIf="loggedInUserRole === 'TEACHER'">Students of Class {{ selectedClass }}</h2>
     <h2 *ngIf="loggedInUserRole === 'ADMIN' && selectedClass">Students of Class {{ selectedClass }}</h2>
-    <div *ngIf="students.length > 0; else noStudentsContainer">
+    <div *ngIf="activeStudents.length > 0; else noStudentsContainer">
       <ul class="student-list">
-        <li *ngFor="let student of students" class="student-item" (click)="viewStudentDetails(student.studentId)">
+        <li *ngFor="let student of activeStudents" class="active-student-item"
+          (click)="viewStudentDetails(student.studentId)">
           <div class="student-info">
             <span class="student-name">{{ student.name }}</span>
             <span class="student-id">({{ student.studentId }})</span>
@@ -33,6 +34,18 @@
             <span class="student-id">({{ student.studentId }})</span>
           </div>
           <button class="view-details-button" (click)="viewStudentDetails(student.studentId)">View Details</button>
+        </li>
+      </ul>
+
+      <ul class="student-list">
+        <li *ngFor="let student of inactiveStudents" class="inactive-student-item"
+          (click)="viewStudentDetails(student.studentId)">
+          <div class="student-info">
+            <span class="student-name">{{ student.name }}</span>
+            <span class="student-id">({{ student.studentId }})</span>
+          </div>
+          <button class="inactive-view-details-button" (click)="viewStudentDetails(student.studentId)">View
+            Details</button>
         </li>
       </ul>
     </div>

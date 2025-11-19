@@ -24,7 +24,7 @@ import Swal from 'sweetalert2';
 export class HomeComponent implements OnInit {
   authenticated = false;
   showLoginForm = false;
-  studentId = '';
+  userId = '';
   password = '';
   loginState = 'initial';
   hidePassword = true;
@@ -49,7 +49,7 @@ export class HomeComponent implements OnInit {
   }
 
   submitLogin() {
-    if (!this.studentId.trim() || !this.password.trim()) {
+    if (!this.userId.trim() || !this.password.trim()) {
       Swal.fire({
         icon: 'warning',
         title: 'Missing Information',
@@ -59,7 +59,7 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    this.authService.login(this.studentId, this.password).subscribe({
+    this.authService.login(this.userId, this.password).subscribe({
       next: (token) => {
         if (typeof localStorage !== 'undefined') {
           localStorage.setItem('token', token);

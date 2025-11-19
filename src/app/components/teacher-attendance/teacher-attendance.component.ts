@@ -84,7 +84,7 @@ export class TeacherAttendanceComponent implements OnInit {
       return;
     }
 
-    this.studentService.getStudentsByClass(this.selectedClass).subscribe({
+    this.studentService.getActiveStudentsByClass(this.selectedClass).subscribe({
       next: (studentLeaveDTOs) => {
         this.students = studentLeaveDTOs.map((dto) => ({
           studentId: dto.studentId,

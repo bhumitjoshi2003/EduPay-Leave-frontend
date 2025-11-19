@@ -3,7 +3,7 @@
     border: 1px solid #b0b0b0;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    max-width: 1000px;
+    /* max-width: 1000px; */
     margin: 10px auto;
     position: relative;
     overflow: hidden;

@@ -41,7 +41,7 @@ export class NotificationComponent implements OnInit {
   selectedNotificationId: number | null = null;
 
   audienceOptions: string[] = ['ALL', 'STUDENTS', 'TEACHERS'];
-  typeOptions: string[] = ['MEETING', 'FUNCTION', 'SPORTS', 'PAYMENT', 'LEAVES', 'ANNOUNCEMENT', 'REMINDER'];
+  typeOptions: string[] = ['Meeting', 'Function', 'Sports', 'Payment', 'Holiday', 'Announcement', 'Reminder'];
 
   // Map for dynamic class names and icons
   typeStyles = new Map<string, { className: string, icon: string }>();
@@ -78,14 +78,14 @@ export class NotificationComponent implements OnInit {
   }
 
   private initTypeStyles(): void {
-    this.typeStyles.set('DEFAULT', { className: 'type-others', icon: 'notifications' });
-    this.typeStyles.set('MEETING', { className: 'type-meeting', icon: 'meeting_room' });
-    this.typeStyles.set('FUNCTION', { className: 'type-function', icon: 'event' });
-    this.typeStyles.set('SPORTS', { className: 'type-sports', icon: 'sports_soccer' });
-    this.typeStyles.set('PAYMENT', { className: 'type-payment', icon: 'payment' });
-    this.typeStyles.set('LEAVES', { className: 'type-leaves', icon: 'beach_access' });
-    this.typeStyles.set('ANNOUNCEMENT', { className: 'type-announcement', icon: 'announcement' });
-    this.typeStyles.set('OTHERS', { className: 'type-others', icon: 'notifications' });
+    this.typeStyles.set('Meeting', { className: 'type-meeting', icon: 'meeting_room' });
+    this.typeStyles.set('Function', { className: 'type-function', icon: 'event' });
+    this.typeStyles.set('Sports', { className: 'type-sports', icon: 'sports_soccer' });
+    this.typeStyles.set('Payment', { className: 'type-payment', icon: 'payment' });
+    this.typeStyles.set('Holiday', { className: 'type-holiday', icon: 'notifications' });
+    this.typeStyles.set('Announcement', { className: 'type-announcement', icon: 'announcement' });
+    this.typeStyles.set('Default', { className: 'type-others', icon: 'notifications' });
+    this.typeStyles.set('Others', { className: 'type-others', icon: 'notifications' });
   }
 
   getTypeClass(type: string | undefined): string {

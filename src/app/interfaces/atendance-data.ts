@@ -1,6 +1,6 @@
 export interface AttendanceData {
     studentId: string;
     chargePaid: boolean;
-    absentDate: string;
+    date: string;
     className: string;
 }

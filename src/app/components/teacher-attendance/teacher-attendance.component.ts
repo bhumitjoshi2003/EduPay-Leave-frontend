@@ -214,14 +214,14 @@ export class TeacherAttendanceComponent implements OnInit {
           .map((student) => ({
             studentId: student.studentId,
             chargePaid: student.chargePaid,
-            absentDate: formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en'),
+            date: formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en'),
             className: this.selectedClass,
           }));
 
         attendanceData.push({
           studentId: 'X',
           chargePaid: true,
-          absentDate: formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en'),
+          date: formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en'),
           className: this.selectedClass,
         });
 

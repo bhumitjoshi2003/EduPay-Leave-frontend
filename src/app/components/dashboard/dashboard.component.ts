@@ -87,7 +87,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   getDetails() {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       const decodedToken: any = jwtDecode(token);
       this.Role = decodedToken.role;
@@ -180,7 +180,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   getUnreadCount(): void {
-    if (this.Role && this.Id && localStorage.getItem('token')) {
+    if (this.Role && this.Id && localStorage.getItem('accessToken')) {
       this.notificationService.getUnreadNotificationCount().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
         next: (count) => {
           this.unreadNotificationCount = count;

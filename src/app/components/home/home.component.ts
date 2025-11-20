@@ -32,7 +32,7 @@ export class HomeComponent implements OnInit {
   constructor(private authService: AuthService, private snackBar: MatSnackBar, private router: Router) { }
 
   ngOnInit() {
-    if (typeof localStorage !== 'undefined' && localStorage.getItem('token')) {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('accessToken')) {
       this.authenticated = true;
       this.router.navigate(['/dashboard']);
     }
@@ -60,9 +60,10 @@ export class HomeComponent implements OnInit {
     }
 
     this.authService.login(this.userId, this.password).subscribe({
-      next: (token) => {
+      next: (response) => {
         if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('token', token);
+          localStorage.setItem('accessToken', response.accessToken);
+          localStorage.setItem('refreshToken', response.refreshToken);
         }
         this.authenticated = true;
         this.showLoginForm = false;
@@ -85,9 +86,7 @@ export class HomeComponent implements OnInit {
   }
 
   logout() {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('token');
-    }
+    this.authService.logout();
     this.authenticated = false;
   }
 

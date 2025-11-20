@@ -59,7 +59,7 @@ export class TeacherAttendanceComponent implements OnInit {
   }
 
   getTeacherId(): void {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       const decodedToken: any = jwtDecode(token);
       this.teacherId = decodedToken.userId;

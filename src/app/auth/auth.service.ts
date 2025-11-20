@@ -23,9 +23,15 @@ export class AuthService {
     return this.http.post(this.apiUrl + '/register', userData, { responseType: 'text' });
   }
 
-  login(userId: string, password: string): Observable<string> {
-    return this.http.post(this.apiUrl + '/login', { userId, password }, { responseType: 'text' });
+  login(userId: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, { userId, password });
   }
+
+  refreshToken() {
+    const refreshToken = localStorage.getItem("refreshToken");
+    return this.http.post(`${this.apiUrl}/refresh-token`, { refreshToken });
+  }
+
 
   changePassword(request: ChangePasswordRequest): Observable<any> {
     return this.http.post(this.apiUrl + '/change-password', request, { responseType: 'text' });
@@ -41,11 +47,12 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('token');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
   }
 
   getUserRole(): string {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       const decodedToken: any = jwtDecode(token);
       return decodedToken.role;
@@ -54,7 +61,7 @@ export class AuthService {
   }
 
   getUserId(): string {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       const decodedToken: any = jwtDecode(token);
       return decodedToken.userId;

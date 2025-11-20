@@ -76,7 +76,7 @@ export class ApplyLeaveComponent implements OnInit {
   }
 
   getStudentId(): void {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       const decodedToken: any = jwtDecode(token);
       this.studentId = decodedToken.userId;

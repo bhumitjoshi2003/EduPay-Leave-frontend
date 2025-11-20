@@ -27,14 +27,14 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
     private attendanceService: AttendanceService,
     @Inject(PLATFORM_ID) private platformId: Object,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngAfterViewInit(): void {
     this.createCharts();
   }
 
   ngOnInit(): void {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       const decodedToken: any = jwtDecode(token);
       this.role = decodedToken.role;
@@ -64,7 +64,7 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
     const startMonth = 4;
     const endMonth = 3;
 
-    if (today.getMonth() < 3) { 
+    if (today.getMonth() < 3) {
       academicYearStart = today.getFullYear() - 1;
       academicYearEnd = today.getFullYear();
     } else {

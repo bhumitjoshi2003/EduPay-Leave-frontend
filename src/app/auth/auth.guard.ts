@@ -11,7 +11,7 @@ export class AuthGuard implements CanActivate {
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): boolean {
-    if (localStorage.getItem('token')) {
+    if (localStorage.getItem('accessToken')) {
       return true; // User is authenticated
     } else {
       localStorage.setItem('redirectUrl', state.url); // Store attempted URL

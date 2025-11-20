@@ -48,7 +48,7 @@ export class PaymentHistoryComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       const decodedToken: any = jwtDecode(token);
       this.role = decodedToken.role;

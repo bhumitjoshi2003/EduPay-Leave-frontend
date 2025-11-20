@@ -37,7 +37,7 @@ export class TeacherListComponent implements OnInit, OnDestroy {
   }
 
   getUserRoleAndLoadTeachers(): void {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       const decodedToken: any = jwtDecode(token);
       this.loggedInUserRole = decodedToken.role;
@@ -46,7 +46,7 @@ export class TeacherListComponent implements OnInit, OnDestroy {
         this.loadAllTeachers();
       } else {
         console.warn('Non-admin user trying to access teacher list.');
-        this.router.navigate(['/dashboard']); 
+        this.router.navigate(['/dashboard']);
       }
     } else {
       console.error('No token found');

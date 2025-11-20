@@ -39,7 +39,7 @@ export class StudentListComponent implements OnInit {
   }
 
   getUserRoleAndLoadData(): void {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       const decodedToken: any = jwtDecode(token);
       this.loggedInUserRole = decodedToken.role;

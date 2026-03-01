@@ -9,8 +9,8 @@ import { CalendarEvent } from '../interfaces/event-calendar.component';
 })
 export class EventService {
 
-  private apiUrl = `${environment.apiUrl}/api/events`;
-  private fileUploadApiUrl = `${environment.apiUrl}/api/files`;
+  private apiUrl = `${environment.apiUrl}/events`;
+  private fileUploadApiUrl = `${environment.apiUrl}/files`;
 
   constructor(private http: HttpClient) { }
 

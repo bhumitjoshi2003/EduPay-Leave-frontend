@@ -9,7 +9,7 @@ import { UserNotification } from '../interfaces/user-notification';
   providedIn: 'root'
 })
 export class NotificationService {
-  private apiUrl = `${environment.apiUrl}/api/notification`;
+  private apiUrl = `${environment.apiUrl}/notification`;
 
   constructor(private http: HttpClient) { }
 

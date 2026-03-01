@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
 })
 export class RazorpayService {
 
-  private baseUrl = `${environment.apiUrl}/api/payments`;
+  private baseUrl = `${environment.apiUrl}/payments`;
 
   constructor(private http: HttpClient) { }
 

@@ -103,12 +103,12 @@ export class EventFormComponent implements OnInit {
     if (!relativePath) {
       return '';
     }
-    // Ensure the path is correct if relativePath already includes '/api/files/event-images/'
+    // Ensure the path is correct if relativePath already includes '/files/event-images/'
     // You might need to adjust this based on how your backend generates the relativePath
-    if (relativePath.startsWith('/api/files/event-images/')) {
+    if (relativePath.startsWith('/files/event-images/')) {
       return `${environment.apiUrl}${relativePath}`;
     }
-    return `${environment.apiUrl}/api/files/event-images/${relativePath}`; // Common format if backend returns just filename
+    return `${environment.apiUrl}/files/event-images/${relativePath}`; // Common format if backend returns just filename
   }
 
 

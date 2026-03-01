@@ -21,7 +21,7 @@ export interface PaginatedResponse<T> {
 })
 export class PaymentHistoryService {
 
-  private baseUrl = `${environment.apiUrl}/api/payments/history`;
+  private baseUrl = `${environment.apiUrl}/payments/history`;
 
   constructor(private http: HttpClient) { }
 

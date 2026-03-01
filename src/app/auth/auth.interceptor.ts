@@ -26,10 +26,10 @@ export class AuthInterceptor implements HttpInterceptor {
     const accessToken = localStorage.getItem('accessToken');
 
     const isAuthUrl =
-      request.url.includes('/api/auth/login') ||
-      request.url.includes('/api/auth/refresh-token') ||
-      request.url.includes('/api/auth/request-password-reset') ||
-      request.url.includes('/api/auth/reset-password');
+      request.url.includes('/auth/login') ||
+      request.url.includes('/auth/refresh-token') ||
+      request.url.includes('/auth/request-password-reset') ||
+      request.url.includes('/auth/reset-password');
 
     // ✅ Attach access token only for non-auth URLs
     if (!isAuthUrl && accessToken) {

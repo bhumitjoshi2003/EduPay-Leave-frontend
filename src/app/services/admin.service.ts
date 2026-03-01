@@ -8,8 +8,8 @@ import { environment } from '../../environments/environment';
 })
 export class AdminService {
 
-  private baseUrl = `${environment.apiUrl}/api/admins`;
-  private noticeUrl = `${environment.apiUrl}/api/admin`;
+  private baseUrl = `${environment.apiUrl}/admins`;
+  private noticeUrl = `${environment.apiUrl}/admin`;
 
   constructor(private http: HttpClient) { }
 

@@ -188,8 +188,8 @@ export class EventCalendarComponent implements OnInit {
     }
     // Ensure the path is correct depending on how your backend returns it.
     // If relativePath is just filename:
-    // return `${environment.apiUrl}/api/files/event-images/${relativePath}`;
-    // If relativePath already includes /api/files/event-images/:
+    // return `${environment.apiUrl}/files/event-images/${relativePath}`;
+    // If relativePath already includes /files/event-images/:
     return `${environment.apiUrl}${relativePath}`;
   }
 

@@ -20,7 +20,7 @@ export interface AuditLog {
 })
 export class AuditService {
 
-    private apiUrl = `${environment.apiUrl}/api/audit`;
+    private apiUrl = `${environment.apiUrl}/audit`;
 
     constructor(private http: HttpClient) { }
 

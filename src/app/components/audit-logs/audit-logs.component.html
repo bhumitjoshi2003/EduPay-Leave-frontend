@@ -1,72 +1,113 @@
-<h2>Audit Logs</h2>
+<div class="audit-wrapper">
+    <div class="header-section">
+        <div>
+            <h1>Audit Intelligence</h1>
+            <p>Official record of system modifications and institutional updates</p>
 
-<div class="filters">
+        </div>
+    </div>
 
-    <input placeholder="User ID" [(ngModel)]="filters.username">
+    <div class="search-card">
+        <div class="modern-grid-layout">
+            <div class="field">
+                <label>Operator ID</label>
+                <input type="text" placeholder="Search User..." [(ngModel)]="filters.username">
+            </div>
 
-    <input placeholder="Action" [(ngModel)]="filters.action">
+            <div class="field">
+                <label>Action Type</label>
+                <select [(ngModel)]="filters.action">
+                    <option value="">All Activities</option>
+                    <option *ngFor="let type of actionTypes" [value]="type">{{type}}</option>
+                </select>
+            </div>
 
-    <input placeholder="Entity" [(ngModel)]="filters.entityName">
+            <div class="field">
+                <label>Entity</label>
+                <input type="text" placeholder="e.g. Student" [(ngModel)]="filters.entityName">
+            </div>
 
-    <input type="date" [(ngModel)]="filters.startDate">
+            <div class="field date-range-field">
+                <label>Date Range</label>
+                <div class="date-inputs-wrapper">
+                    <input type="date" [(ngModel)]="filters.startDate">
+                    <span class="to-text">to</span>
+                    <input type="date" [(ngModel)]="filters.endDate">
+                </div>
+            </div>
 
-    <input type="date" [(ngModel)]="filters.endDate">
+            <div class="field action-field">
+                <button class="search-btn" (click)="applyFilters()">Search Logs</button>
+            </div>
+        </div>
+    </div>
 
-    <button (click)="applyFilters()">Search</button>
+    <div class="data-card">
+        <div class="table-container">
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Time & Date</th>
+                        <th>Identity</th>
+                        <th>Resource</th>
+                        <th>Operation</th>
+                        <th class="actions-head">Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let log of logs">
+                        <td class="time-cell">
+                            <span class="date">{{log.timestamp | date:'MMM dd, yyyy'}}</span>
+                            <span class="time">{{log.timestamp | date:'hh:mm:ss a'}}</span>
+                        </td>
+                        <td>
+                            <div class="user-info">
+                                <span class="user-icon">{{log.username.charAt(0)}}</span>
+                                <div>
+                                    <div class="uid">{{log.username}}</div>
+                                    <div class="role">{{log.role}}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="entity-pill">{{log.entityName}}</span></td>
+                        <td>
+                            <span class="action-pill" [ngClass]="getActionCategory(log.action)">
+                                {{log.action}}
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <button class="view-btn" (click)="viewDetails(log)">View</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-</div>
+        <div class="pagination-bar">
+            <span>Page {{page + 1}} of {{totalPages}}</span>
+            <div class="page-nav">
+                <button [disabled]="page === 0" (click)="prevPage()">Prev</button>
+                <button [disabled]="page >= totalPages - 1" (click)="nextPage()">Next</button>
+            </div>
+        </div>
+    </div>
 
-<table>
-
-    <thead>
-        <tr>
-            <th>Timestamp</th>
-            <th>User</th>
-            <th>Role</th>
-            <th>Entity</th>
-            <th>Action</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        <tr *ngFor="let log of logs">
-
-            <td>{{log.timestamp | date:'short'}}</td>
-            <td>{{log.username}}</td>
-            <td>{{log.role}}</td>
-            <td>{{log.entityName}}</td>
-            <td>{{log.action}}</td>
-
-            <td>
-                <button (click)="viewDetails(log)">
-                    View
-                </button>
-            </td>
-
-        </tr>
-    </tbody>
-
-</table>
-
-<div class="pagination">
-
-    <button (click)="prevPage()">Prev</button>
-
-    Page {{page + 1}} / {{totalPages}}
-
-    <button (click)="nextPage()">Next</button>
-
-</div>
-
-<div *ngIf="selectedLog" class="details">
-
-    <h3>Audit Details</h3>
-
-    <h4>Old Value</h4>
-    <pre>{{ formatJson(selectedLog.oldValue) }}</pre>
-
-    <h4>New Value</h4>
-    <pre>{{ formatJson(selectedLog.newValue) }}</pre>
-
+    <div class="modal-backdrop" *ngIf="selectedLog" (click)="closeDetails()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Change Breakdown</h3>
+                <button class="close-x" (click)="closeDetails()">&times;</button>
+            </div>
+            <div class="comparison-grid">
+                <div class="diff-panel">
+                    <label class="old">BEFORE</label>
+                    <pre><code>{{ formatJson(selectedLog.oldValue) || 'Empty Set' }}</code></pre>
+                </div>
+                <div class="diff-panel">
+                    <label class="new">AFTER</label>
+                    <pre><code>{{ formatJson(selectedLog.newValue) }}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

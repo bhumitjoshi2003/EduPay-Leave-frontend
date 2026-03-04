@@ -27,14 +27,14 @@
         [active]="rla12.isActive">Teachers</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/notice" routerLinkActive #rla13="routerLinkActive"
         [active]="rla13.isActive">Notice</a>
-      <!-- <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/register" routerLinkActive #rla13="routerLinkActive"
+      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/register" routerLinkActive #rla13="routerLinkActive"
         [active]="rla13.isActive">Register</a>
       <a *ngIf="isStudent() || isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/event-calendar"
         routerLinkActive #rla14="routerLinkActive" [active]="rla14.isActive">Event Calendar</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/event-new" routerLinkActive #rla15="routerLinkActive"
         [active]="rla15.isActive">Create Event</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/audit-logs" routerLinkActive #rla16="routerLinkActive"
-        [active]="rla16.isActive">Audit Logs</a> -->
+        [active]="rla16.isActive">Audit Logs</a>
     </nav>
 
     <div class="profile-area">

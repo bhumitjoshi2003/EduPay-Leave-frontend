@@ -1,0 +1,72 @@
+<h2>Audit Logs</h2>
+
+<div class="filters">
+
+    <input placeholder="User ID" [(ngModel)]="filters.username">
+
+    <input placeholder="Action" [(ngModel)]="filters.action">
+
+    <input placeholder="Entity" [(ngModel)]="filters.entityName">
+
+    <input type="date" [(ngModel)]="filters.startDate">
+
+    <input type="date" [(ngModel)]="filters.endDate">
+
+    <button (click)="applyFilters()">Search</button>
+
+</div>
+
+<table>
+
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>User</th>
+            <th>Role</th>
+            <th>Entity</th>
+            <th>Action</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr *ngFor="let log of logs">
+
+            <td>{{log.timestamp | date:'short'}}</td>
+            <td>{{log.username}}</td>
+            <td>{{log.role}}</td>
+            <td>{{log.entityName}}</td>
+            <td>{{log.action}}</td>
+
+            <td>
+                <button (click)="viewDetails(log)">
+                    View
+                </button>
+            </td>
+
+        </tr>
+    </tbody>
+
+</table>
+
+<div class="pagination">
+
+    <button (click)="prevPage()">Prev</button>
+
+    Page {{page + 1}} / {{totalPages}}
+
+    <button (click)="nextPage()">Next</button>
+
+</div>
+
+<div *ngIf="selectedLog" class="details">
+
+    <h3>Audit Details</h3>
+
+    <h4>Old Value</h4>
+    <pre>{{ formatJson(selectedLog.oldValue) }}</pre>
+
+    <h4>New Value</h4>
+    <pre>{{ formatJson(selectedLog.newValue) }}</pre>
+
+</div>

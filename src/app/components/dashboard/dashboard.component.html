@@ -33,6 +33,8 @@
         routerLinkActive #rla14="routerLinkActive" [active]="rla14.isActive">Event Calendar</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/event-new" routerLinkActive #rla15="routerLinkActive"
         [active]="rla15.isActive">Create Event</a>
+      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/audit-logs" routerLinkActive #rla16="routerLinkActive"
+        [active]="rla16.isActive">Audit Logs</a>
     </nav>
 
     <div class="profile-area">

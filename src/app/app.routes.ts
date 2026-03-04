@@ -22,6 +22,7 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
 import { NoticeComponent } from './components/notice/notice.component';
 import { EventCalendarComponent } from './components/event-calendar/event-calendar.component';
 import { EventFormComponent } from './components/event-form/event-form.component';
+import { AuditLogsComponent } from './components/audit-logs/audit-logs.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -56,6 +57,7 @@ export const routes: Routes = [
             { path: 'event-calendar', component: EventCalendarComponent },
             { path: 'event-new', component: EventFormComponent },
             { path: 'event-edit/:id', component: EventFormComponent },
+            { path: 'audit-logs', component: AuditLogsComponent },
         ],
     },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },

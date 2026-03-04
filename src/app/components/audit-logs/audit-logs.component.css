@@ -1,0 +1,44 @@
+.filters {
+    margin-bottom: 20px;
+}
+
+.filters input {
+    margin-right: 10px;
+    padding: 6px;
+}
+
+pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 13px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border-bottom: 1px solid #ddd;
+    padding: 8px;
+}
+
+th {
+    background: #f4f4f4;
+}
+
+button {
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.details {
+    margin-top: 20px;
+    background: #fafafa;
+    padding: 15px;
+    border: 1px solid #ddd;
+}

@@ -102,4 +102,9 @@ export class AuditLogsComponent implements OnInit {
       return value;
     }
   }
+
+  formatRole(role: string): string {
+    if (!role) return '';
+    return role.replace('ROLE_', '').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+  }
 }

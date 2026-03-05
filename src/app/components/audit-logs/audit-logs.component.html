@@ -57,15 +57,20 @@
                 <tbody>
                     <tr *ngFor="let log of logs">
                         <td class="time-cell">
-                            <span class="date">{{log.timestamp | date:'MMM dd, yyyy'}}</span>
-                            <span class="time">{{log.timestamp | date:'hh:mm:ss a'}}</span>
+                            <div class="time-display-wrapper">
+                                <span class="main-date">{{log.timestamp | date:'MMM dd, yyyy'}}</span>
+                                <div class="time-badge">
+                                    <span class="dot"></span>
+                                    {{log.timestamp | date:'hh:mm a'}}
+                                </div>
+                            </div>
                         </td>
                         <td>
                             <div class="user-info">
                                 <span class="user-icon">{{log.username.charAt(0)}}</span>
-                                <div>
+                                <div class="user-text-group">
                                     <div class="uid">{{log.username}}</div>
-                                    <div class="role">{{log.role}}</div>
+                                    <div class="role">{{formatRole(log.role)}}</div>
                                 </div>
                             </div>
                         </td>

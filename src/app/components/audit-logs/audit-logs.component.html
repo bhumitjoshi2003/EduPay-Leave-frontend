@@ -111,23 +111,43 @@
     <div class="modal-backdrop" *ngIf="selectedLog" (click)="closeDetails()">
         <div class="modal-content" (click)="$event.stopPropagation()">
             <div class="modal-header">
-                <h3>Change Breakdown</h3>
+                <div class="header-main">
+                    <div class="title-icon">
+                        <span class="icon-pulse"></span>
+                    </div>
+                    <div>
+                        <h3>Change Breakdown</h3>
+                    </div>
+                </div>
                 <button class="close-x" (click)="closeDetails()">&times;</button>
             </div>
 
             <div class="comparison-grid">
-                <div class="diff-panel">
-                    <label class="diff-label old">ORIGINAL STATE</label>
-                    <pre><code>{{ formatJson(selectedLog.oldValue) || 'No previous data' }}</code></pre>
+                <div class="diff-panel original">
+                    <div class="diff-header">
+                        <span class="status-indicator"></span>
+                        <label>Previous Data</label>
+                    </div>
+                    <div class="code-container">
+                        <pre><code>{{ formatJson(selectedLog.oldValue) || '// No previous data recorded' }}</code></pre>
+                    </div>
                 </div>
-                <div class="diff-panel">
-                    <label class="diff-label new">UPDATED STATE</label>
-                    <pre><code>{{ formatJson(selectedLog.newValue) }}</code></pre>
+
+                <div class="diff-panel updated">
+                    <div class="diff-header">
+                        <span class="status-indicator"></span>
+                        <label>Updated Data</label>
+                    </div>
+                    <div class="code-container">
+                        <pre><code>{{ formatJson(selectedLog.newValue) }}</code></pre>
+                    </div>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button class="close-btn-footer" (click)="closeDetails()">Close Record</button>
+                <button class="close-btn-footer" (click)="closeDetails()">
+                    Close
+                </button>
             </div>
         </div>
     </div>

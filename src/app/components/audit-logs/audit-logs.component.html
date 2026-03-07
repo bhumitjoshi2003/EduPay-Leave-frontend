@@ -1,9 +1,8 @@
 <div class="audit-wrapper">
     <div class="header-section">
         <div>
-            <h1>Audit Intelligence</h1>
+            <h1>Administrative Activity Ledger</h1>
             <p>Official record of system modifications and institutional updates</p>
-
         </div>
     </div>
 
@@ -56,7 +55,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let log of logs">
-                        <td class="time-cell">
+                        <td data-label="Time & Date" class="time-cell">
                             <div class="time-display-wrapper">
                                 <span class="main-date">{{log.timestamp | date:'MMM dd, yyyy'}}</span>
                                 <div class="time-badge">
@@ -65,7 +64,8 @@
                                 </div>
                             </div>
                         </td>
-                        <td>
+
+                        <td data-label="Identity">
                             <div class="user-info">
                                 <span class="user-icon">{{log.username.charAt(0)}}</span>
                                 <div class="user-text-group">
@@ -74,14 +74,21 @@
                                 </div>
                             </div>
                         </td>
-                        <td><span class="entity-pill">{{log.entityName}}</span></td>
-                        <td>
-                            <span class="action-pill" [ngClass]="getActionCategory(log.action)">
-                                {{log.action}}
-                            </span>
+
+                        <td data-label="Resource">
+                            <span class="entity-pill">{{log.entityName}}</span>
                         </td>
-                        <td class="actions-cell">
-                            <button class="view-btn" (click)="viewDetails(log)">View</button>
+
+                        <td data-label="Operation">
+                            <div class="action-pill-container">
+                                <span class="action-pill" [ngClass]="getActionCategory(log.action)">
+                                    {{log.action}}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td data-label="Details" class="actions-cell">
+                            <button class="view-btn" (click)="viewDetails(log)">View Details</button>
                         </td>
                     </tr>
                 </tbody>
@@ -89,10 +96,14 @@
         </div>
 
         <div class="pagination-bar">
-            <span>Page {{page + 1}} of {{totalPages}}</span>
+            <span class="page-info">Showing Page {{page + 1}} of {{totalPages}}</span>
             <div class="page-nav">
-                <button [disabled]="page === 0" (click)="prevPage()">Prev</button>
-                <button [disabled]="page >= totalPages - 1" (click)="nextPage()">Next</button>
+                <button class="nav-btn" [disabled]="page === 0" (click)="prevPage()">
+                    Previous
+                </button>
+                <button class="nav-btn" [disabled]="page >= totalPages - 1" (click)="nextPage()">
+                    Next
+                </button>
             </div>
         </div>
     </div>
@@ -103,15 +114,20 @@
                 <h3>Change Breakdown</h3>
                 <button class="close-x" (click)="closeDetails()">&times;</button>
             </div>
+
             <div class="comparison-grid">
                 <div class="diff-panel">
-                    <label class="old">BEFORE</label>
-                    <pre><code>{{ formatJson(selectedLog.oldValue) || 'Empty Set' }}</code></pre>
+                    <label class="diff-label old">ORIGINAL STATE</label>
+                    <pre><code>{{ formatJson(selectedLog.oldValue) || 'No previous data' }}</code></pre>
                 </div>
                 <div class="diff-panel">
-                    <label class="new">AFTER</label>
+                    <label class="diff-label new">UPDATED STATE</label>
                     <pre><code>{{ formatJson(selectedLog.newValue) }}</code></pre>
                 </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="close-btn-footer" (click)="closeDetails()">Close Record</button>
             </div>
         </div>
     </div>

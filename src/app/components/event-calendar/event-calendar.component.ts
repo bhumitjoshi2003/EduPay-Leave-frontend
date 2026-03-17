@@ -10,6 +10,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { environment } from '../../../environments/environment';
 import { CalendarEvent } from '../../interfaces/event-calendar.component'; // Ensure this interface has imageUrl: string | null;
+import { AttendanceService } from '../../services/attendance.service';
+import { forkJoin } from 'rxjs';
 
 interface DayCell {
   date: Date | null;
@@ -41,6 +43,9 @@ export class EventCalendarComponent implements OnInit {
   allEvents: CalendarEvent[] = [];
   eventMap = new Map<string, CalendarEvent[]>();
 
+  attendanceMap: { [date: string]: string } = {};
+  studentId: string = '';
+
   currentUserRole = '';
   currentUserClass: string | null = null;
 
@@ -66,7 +71,8 @@ export class EventCalendarComponent implements OnInit {
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private studentService: StudentService,
-    private teacherService: TeacherService
+    private teacherService: TeacherService,
+    private attendanceService: AttendanceService
   ) {
     // Initialize eventForm here with all controls, including imageUrl
     this.eventForm = this.fb.group({
@@ -97,6 +103,7 @@ export class EventCalendarComponent implements OnInit {
     this.generateCalendarDays();
 
     const userId = this.authService.getUserId();
+    this.studentId = userId || '';
     const loadEventsAfterDetails = () => {
       this.loadEvents();
     };
@@ -223,7 +230,7 @@ export class EventCalendarComponent implements OnInit {
     const y = this.currentDate.getFullYear();
     const m = this.currentDate.getMonth() + 1;
     this.eventService.getEventsForMonthAndYear(y, m).subscribe({
-      next: evs => { this.allEvents = evs; this.populateEvents(); },
+      next: evs => { this.allEvents = evs; this.populateEvents(); this.loadAttendance(); },
       error: console.error
     });
   }
@@ -529,4 +536,59 @@ export class EventCalendarComponent implements OnInit {
     });
   }
 
+  private loadAttendance(): void {
+    if (!this.studentId) return;
+
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth() + 1;
+
+    const absent$ = this.attendanceService.getMonthlyAttendance(this.studentId, year, month);
+    const workingDays$ = this.attendanceService.getMonthlyAttendance('X', year, month);
+
+    forkJoin([absent$, workingDays$]).subscribe({
+      next: ([absentData, workingDaysData]: [any[], any[]]) => {
+
+        const absentSet = new Set(absentData.map(a => a.date));
+        const workingSet = new Set(workingDaysData.map(w => w.date));
+
+        this.attendanceMap = {};
+
+        const today = new Date();
+
+        this.daysInMonth.forEach(cell => {
+          if (!cell.date) return;
+
+          const dateStr = format(cell.date, 'yyyy-MM-dd');
+          const cellDate = new Date(dateStr);
+
+          if (cellDate > today) {
+            return;
+          }
+
+          if (workingSet.has(dateStr)) {
+
+            if (absentSet.has(dateStr)) {
+              this.attendanceMap[dateStr] = 'A';
+            } else {
+              this.attendanceMap[dateStr] = 'P';
+            }
+
+          } else {
+            this.attendanceMap[dateStr] = 'H';
+          }
+
+        });
+
+        console.log('attendanceMap:', this.attendanceMap);
+      },
+      error: (err) => {
+        console.error('Error loading attendance:', err);
+      }
+    });
+  }
+
+  getDateKey(date: Date | null): string {
+    if (!date) return '';
+    return format(date, 'yyyy-MM-dd');
+  }
 }

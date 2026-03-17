@@ -17,9 +17,22 @@
                 <ng-container *ngIf="dayCell.date">
                     <span class="day-number">
                         {{ formatDate(dayCell.date, 'd') }}
-                        <span *ngIf="isMobileView" class="weekday-name">
+                        <div *ngIf="isMobileView" class="weekday-name">
                             {{ dayCell.date | date:'EEE' }}
+                        </div>
+
+                        <span *ngIf="attendanceMap[getDateKey(dayCell.date)] === 'P'" class="attendance-circle present"
+                            title="Present">
+                            P
                         </span>
+
+                        <span *ngIf="attendanceMap[getDateKey(dayCell.date)] === 'A'" class="attendance-circle absent"
+                            title="Absent">
+                            A
+                        </span>
+
+                        <span *ngIf="attendanceMap[getDateKey(dayCell.date)] === 'H'" class="attendance-circle holiday"
+                            title="Holiday">H</span>
                     </span>
 
                     <ng-container *ngIf="isMobileView">

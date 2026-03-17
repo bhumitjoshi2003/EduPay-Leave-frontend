@@ -36,4 +36,10 @@ export class AttendanceService {
     return this.http.delete<string>(`${this.apiUrl}/date/${absentDate}/class/${className}`, { responseType: 'text' as 'json' }
     );
   }
+
+  getMonthlyAttendance(studentId: string, year: number, month: number): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.apiUrl}/student/${studentId}/month/${month}/year/${year}`
+    );
+  }
 }

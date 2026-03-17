@@ -1,5 +1,5 @@
 <div class="student-list-container">
-  <div *ngIf="loggedInUserRole === 'ADMIN'" class="left-navigation">
+  <div *ngIf="loggedInUserRole === 'ADMIN' || loggedInUserRole === 'FINANCE_ADMIN'" class="left-navigation">
     <h2>Classes</h2>
     <ul class="class-list-vertical">
       <li *ngFor="let className of classList" (click)="onClassSelect(className)"
@@ -13,7 +13,8 @@
 
   <div class="student-list-area">
     <h2 *ngIf="loggedInUserRole === 'TEACHER'">Students of Class {{ selectedClass }}</h2>
-    <h2 *ngIf="loggedInUserRole === 'ADMIN' && selectedClass">Students of Class {{ selectedClass }}</h2>
+    <h2 *ngIf="(loggedInUserRole === 'ADMIN' || loggedInUserRole === 'FINANCE_ADMIN') && selectedClass">Students of
+      Class {{ selectedClass }}</h2>
     <div *ngIf="activeStudents.length > 0; else noStudentsContainer">
       <ul class="student-list">
         <li *ngFor="let student of activeStudents" class="active-student-item"

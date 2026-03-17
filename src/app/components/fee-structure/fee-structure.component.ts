@@ -221,7 +221,7 @@ export class FeeStructureComponent implements OnInit {
     const token = localStorage.getItem('accessToken');
     if (token) {
       const decodedToken: any = jwtDecode(token);
-      return decodedToken.role === "ADMIN";
+      return decodedToken.role === "FINANCE_ADMIN";
     }
     return false;
   }

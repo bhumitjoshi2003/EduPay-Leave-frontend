@@ -157,7 +157,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard/fees']);
       } else if (this.Role === 'TEACHER') {
         this.router.navigate(['/dashboard/teacher-attendance']);
-      } else if (this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN') {
+      } else if (this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN' || this.Role === 'FINANCE_ADMIN') {
         this.router.navigate(['/dashboard/fee-structure']);
       } else {
         this.router.navigate(['/dashboard']);
@@ -175,6 +175,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   isAdmin(): boolean {
     return this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN';
+  }
+
+  isFinanceAdmin(): boolean {
+    return this.Role === 'FINANCE_ADMIN';
   }
 
   logout() {

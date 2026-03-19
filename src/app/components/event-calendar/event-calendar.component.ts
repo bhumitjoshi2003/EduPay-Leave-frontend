@@ -231,7 +231,7 @@ export class EventCalendarComponent implements OnInit {
     const m = this.currentDate.getMonth() + 1;
     this.eventService.getEventsForMonthAndYear(y, m).subscribe({
       next: evs => {
-        this.allEvents = evs; this.populateEvents(); this.loadAttendance();
+        this.allEvents = evs; this.populateEvents();
         if (this.currentUserRole === 'STUDENT') {
           this.loadAttendance();
         } else {

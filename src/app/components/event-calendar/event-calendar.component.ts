@@ -230,7 +230,15 @@ export class EventCalendarComponent implements OnInit {
     const y = this.currentDate.getFullYear();
     const m = this.currentDate.getMonth() + 1;
     this.eventService.getEventsForMonthAndYear(y, m).subscribe({
-      next: evs => { this.allEvents = evs; this.populateEvents(); this.loadAttendance(); },
+      next: evs => {
+        this.allEvents = evs; this.populateEvents(); this.loadAttendance();
+        if (this.currentUserRole === 'STUDENT') {
+          this.loadAttendance();
+        } else {
+          this.attendanceMap = {};
+        }
+
+      },
       error: console.error
     });
   }
@@ -537,13 +545,13 @@ export class EventCalendarComponent implements OnInit {
   }
 
   private loadAttendance(): void {
-    if (!this.studentId) return;
+    if (!this.studentId || !this.currentUserClass) return;
 
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth() + 1;
 
-    const absent$ = this.attendanceService.getMonthlyAttendance(this.studentId, year, month);
-    const workingDays$ = this.attendanceService.getMonthlyAttendance('X', year, month);
+    const absent$ = this.attendanceService.getMonthlyAttendance(this.studentId, this.currentUserClass, year, month);
+    const workingDays$ = this.attendanceService.getMonthlyAttendance('X', this.currentUserClass, year, month);
 
     forkJoin([absent$, workingDays$]).subscribe({
       next: ([absentData, workingDaysData]: [any[], any[]]) => {

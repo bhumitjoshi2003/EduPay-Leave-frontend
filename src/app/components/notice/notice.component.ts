@@ -22,7 +22,7 @@ export class NoticeComponent implements OnInit {
   isAdmin = false;
 
   classList: string[] = [
-    'All', 'Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
+    'All', 'Play group', 'Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
   ];
 
   constructor(
@@ -56,7 +56,7 @@ export class NoticeComponent implements OnInit {
       });
       return;
     }
-  
+
     Swal.fire({
       title: 'Are you sure?',
       text: 'You want to send this notice to all students.',
@@ -68,7 +68,7 @@ export class NoticeComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         const emailData = this.emailForm.value;
-  
+
         Swal.fire({
           title: 'Sending Emails...',
           text: 'Please wait while the emails are being sent.',
@@ -77,7 +77,7 @@ export class NoticeComponent implements OnInit {
             Swal.showLoading();
           }
         });
-  
+
         this.loading = true;
         this.adminService.sendNoticeToStudents(emailData).subscribe(
           (response: any) => {

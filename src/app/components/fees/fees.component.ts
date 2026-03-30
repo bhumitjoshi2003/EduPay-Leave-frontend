@@ -67,6 +67,8 @@ export class PaymentTrackerComponent implements OnInit {
   currentMonth = new Date().getMonth() + 1;
   academicCurrentMonth = this.getAcademicMonth(this.currentMonth);
 
+  currentAcademicYear: string = '';
+
   paymentData: PaymentData = {
     totalAmount: 0,
     monthSelectionString: "000000000000",
@@ -96,6 +98,8 @@ export class PaymentTrackerComponent implements OnInit {
       }
     });
     if (this.role === 'STUDENT') this.getStudentId();
+    const today = new Date();
+    this.currentAcademicYear = this.getAcademicYear(today);
     this.fetchSessions();
   }
 
@@ -235,6 +239,15 @@ export class PaymentTrackerComponent implements OnInit {
 
   checkAndDisplayFeeWarnings() {
     if (this.role === 'STUDENT') {
+      const selectedYear = this.getSessionStartYear(this.session);
+      const currentYear = this.getSessionStartYear(this.currentAcademicYear);
+
+      if (selectedYear > currentYear) {
+        this.pastUnpaidMonthsWithLateFees = '';
+        this.unpaidCurrentMonthMessage = '';
+        return;
+      }
+
       const today = new Date();
       const currentCalendarMonth = today.getMonth() + 1;
       const currentAcademicMonth = this.getAcademicMonth(currentCalendarMonth);
@@ -266,6 +279,10 @@ export class PaymentTrackerComponent implements OnInit {
 
 
   calculateLateFees(academicFeeMonth: number): number {
+    if (this.session !== this.currentAcademicYear) {
+      return 0;
+    }
+
     const today = new Date();
     const currentMonth = today.getMonth() + 1;
     const academicCurrentMonth = this.getAcademicMonth(currentMonth);
@@ -608,5 +625,35 @@ export class PaymentTrackerComponent implements OnInit {
         text: 'Please select months and enter the amount received.',
       });
     }
+  }
+
+  getAcademicYear(date: Date): string {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+
+    if (month >= 4) {
+      return `${year}-${year + 1}`;
+    } else {
+      return `${year - 1}-${year}`;
+    }
+  }
+
+  isLate(month: any): boolean {
+    const selectedYear = this.getSessionStartYear(this.session);
+    const currentYear = this.getSessionStartYear(this.currentAcademicYear);
+
+    if (selectedYear > currentYear) return false;
+
+    if (selectedYear < currentYear) {
+      return !month.paid && !month.manuallyPaid;
+    }
+
+    return !month.paid &&
+      !month.manuallyPaid &&
+      month.month <= this.academicCurrentMonth;
+  }
+
+  getSessionStartYear(session: string): number {
+    return parseInt(session.substring(0, 4));
   }
 }

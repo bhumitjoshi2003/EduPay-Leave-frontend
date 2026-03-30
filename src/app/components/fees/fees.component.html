@@ -22,7 +22,7 @@
      'manually-paid': month.manuallyPaid,
      'unpaid': !month.paid && !month.manuallyPaid,
      'selected': month.selected,
-     'late': !month.paid && !month.manuallyPaid && month.month <= academicCurrentMonth
+     'late': isLate(month)
    }"
       (click)="role !== 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : (role === 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : null)">
       <div class="month-name">{{ month.name }}</div>

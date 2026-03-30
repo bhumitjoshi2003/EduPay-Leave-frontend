@@ -15,7 +15,7 @@
     <h2 *ngIf="loggedInUserRole === 'TEACHER'">Students of Class {{ selectedClass }}</h2>
     <h2 *ngIf="(loggedInUserRole === 'ADMIN' || loggedInUserRole === 'FINANCE_ADMIN') && selectedClass">Students of
       Class {{ selectedClass }}</h2>
-    <div *ngIf="activeStudents.length > 0; else noStudentsContainer">
+    <div *ngIf="(activeStudents.length + inactiveStudents.length + newStudents.length) > 0; else noStudentsContainer">
       <ul class="student-list">
         <li *ngFor="let student of activeStudents" class="active-student-item"
           (click)="viewStudentDetails(student.studentId)">

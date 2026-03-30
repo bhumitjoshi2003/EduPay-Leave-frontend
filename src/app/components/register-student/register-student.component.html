@@ -2,7 +2,7 @@
     <h2>Register New Student</h2>
     <form [formGroup]="studentForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
-            <label for="studentId">Student ID:</label>
+            <label for="studentId">Student ID<span class="required">*</span>:</label>
             <input type="text" id="studentId" formControlName="studentId" class="form-control">
             <div *ngIf="studentForm.controls['studentId'].invalid && (studentForm.controls['studentId'].dirty || studentForm.controls['studentId'].touched)"
                 class="error-message">
@@ -11,7 +11,7 @@
         </div>
 
         <div class="form-group">
-            <label for="name">Name:</label>
+            <label for="name">Name<span class="required">*</span>:</label>
             <input type="text" id="name" formControlName="name" class="form-control">
             <div *ngIf="studentForm.controls['name'].invalid && (studentForm.controls['name'].dirty || studentForm.controls['name'].touched)"
                 class="error-message">
@@ -20,7 +20,7 @@
         </div>
 
         <div class="form-group">
-            <label for="email">Email:</label>
+            <label for="email">Email<span class="required">*</span>:</label>
             <input type="email" id="email" formControlName="email" class="form-control">
             <div *ngIf="studentForm.controls['email'].invalid && (studentForm.controls['email'].dirty || studentForm.controls['email'].touched)"
                 class="error-message">
@@ -39,7 +39,7 @@
         </div>
 
         <div class="form-group">
-            <label for="dob">Date of Birth:</label>
+            <label for="dob">Date of Birth<span class="required">*</span>:</label>
             <input type="date" id="dob" formControlName="dob" class="form-control">
             <div *ngIf="studentForm.controls['dob'].invalid && (studentForm.controls['dob'].dirty || studentForm.controls['dob'].touched)"
                 class="error-message">
@@ -48,7 +48,7 @@
         </div>
 
         <div class="form-group">
-            <label for="className">Class:</label>
+            <label for="className">Class<span class="required">*</span>:</label>
             <input type="text" id="className" formControlName="className" class="form-control">
             <div *ngIf="studentForm.controls['className'].invalid && (studentForm.controls['className'].dirty || studentForm.controls['className'].touched)"
                 class="error-message">
@@ -57,7 +57,7 @@
         </div>
 
         <div class="form-group">
-            <label for="gender">Gender:</label>
+            <label for="gender">Gender<span class="required">*</span>:</label>
             <select id="gender" formControlName="gender" class="form-control">
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -80,7 +80,7 @@
         </div>
 
         <div class="form-group">
-            <label for="joiningDate">Joining Date:</label>
+            <label for="joiningDate">Joining Date<span class="required">*</span>:</label>
             <input type="date" id="joiningDate" formControlName="joiningDate" class="form-control">
             <div *ngIf="studentForm.controls['joiningDate'].invalid && (studentForm.controls['joiningDate'].dirty || studentForm.controls['joiningDate'].touched)"
                 class="error-message">

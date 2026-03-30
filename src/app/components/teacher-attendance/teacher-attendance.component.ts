@@ -39,6 +39,14 @@ export class TeacherAttendanceComponent implements OnInit {
 
   teacherId: string = '';
   disableDeleteButton: boolean = false;
+  loggedInUserRole: string = '';
+  hasStudents: boolean = false;
+
+  classList: string[] = [
+    'Play group', 'Nursery', 'LKG', 'UKG', '1', '2', '3', '4',
+    '5', '6', '7', '8', '9', '10', '11', '12'
+  ];
+
 
   constructor(
     private leaveService: LeaveService,
@@ -49,7 +57,7 @@ export class TeacherAttendanceComponent implements OnInit {
 
   ngOnInit(): void {
     this.attendanceDate = this.getTodayDateWithoutTime();
-    this.getTeacherId();
+    this.getUserRoleAndLoadData();
   }
 
   getTodayDateWithoutTime(): Date {
@@ -58,24 +66,43 @@ export class TeacherAttendanceComponent implements OnInit {
     return today;
   }
 
-  getTeacherId(): void {
+  getUserRoleAndLoadData(): void {
     const token = localStorage.getItem('accessToken');
+
     if (token) {
       const decodedToken: any = jwtDecode(token);
+      this.loggedInUserRole = decodedToken.role;
       this.teacherId = decodedToken.userId;
-      this.teacherService.getTeacher(this.teacherId).subscribe({
-        next: (teacher: any) => {
-          this.selectedClass = teacher.classTeacher;
-          this.loadStudentsAndApplyAttendance();
-        },
-        error: (error: any) => {
-          console.error('Error fetching teacher details:', error);
-          Swal.fire('Error', 'Failed to fetch teacher details.', 'error');
-        },
-      });
+
+      if (this.loggedInUserRole === 'ADMIN') {
+        this.selectedClass = localStorage.getItem('lastSelectedClass') || this.classList[0];
+        this.loadStudentsAndApplyAttendance();
+      } else {
+        this.getTeacherClassAndLoadStudents();
+      }
+
     } else {
-      Swal.fire('Error', 'Authentication token not found. Please login.', 'error');
+      Swal.fire('Error', 'Authentication token not found.', 'error');
     }
+  }
+
+
+  getTeacherClassAndLoadStudents(): void {
+    this.teacherService.getTeacher(this.teacherId).subscribe({
+      next: (teacher: any) => {
+        this.selectedClass = teacher.classTeacher;
+        this.loadStudentsAndApplyAttendance();
+      },
+      error: () => {
+        Swal.fire('Error', 'Failed to fetch teacher details.', 'error');
+      },
+    });
+  }
+
+  onClassSelect(selectedClass: string): void {
+    this.selectedClass = selectedClass;
+    localStorage.setItem('lastSelectedClass', selectedClass);
+    this.loadStudentsAndApplyAttendance();
   }
 
   loadStudentsAndApplyAttendance(): void {
@@ -92,11 +119,12 @@ export class TeacherAttendanceComponent implements OnInit {
           absent: false,
           chargePaid: true,
         }));
+        this.hasStudents = this.students.length > 0;
         this.applyAttendanceAndLeavesToStudents();
       },
       error: (error) => {
         console.error('Error loading students:', error);
-        Swal.fire('Error', 'Failed to load students for the class.', 'error');
+        Swal.fire('Error', 'Failed to load students.', 'error');
       },
     });
   }
@@ -252,14 +280,16 @@ export class TeacherAttendanceComponent implements OnInit {
   }
 
   isDateWithinAllowedRange(): boolean {
+    if (this.loggedInUserRole === 'ADMIN') { return true; }
+
     const today = this.getTodayDateWithoutTime();
     const selected = new Date(this.attendanceDate);
     selected.setHours(0, 0, 0, 0);
 
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
+    const pastLimit = new Date(today);
+    pastLimit.setDate(today.getDate() - 3);
 
-    return selected.getTime() === today.getTime() || selected.getTime() === yesterday.getTime();
+    return selected >= pastLimit && selected <= today;
   }
 
   getRelativeDate(offset: number): string {

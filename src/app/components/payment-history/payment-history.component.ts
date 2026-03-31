@@ -12,12 +12,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
+import { MODULE_MESSAGES } from '../../config/module-messages.config';
 
 @Component({
   selector: 'app-payment-history',
   templateUrl: './payment-history.component.html',
   standalone: true,
   imports: [
+    ComingSoonComponent,
     CommonModule,
     FormsModule,
     MatFormFieldModule,
@@ -29,6 +32,9 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./payment-history.component.css'],
 })
 export class PaymentHistoryComponent implements OnInit {
+
+  comingSoonConfig = MODULE_MESSAGES.paymentHistory;
+  showFeesModule: boolean = false;
   paymentHistory: PaymentHistory[] = [];
   loading: boolean = true;
   error: string = '';

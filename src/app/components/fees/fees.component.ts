@@ -15,6 +15,8 @@ import { AuthService } from '../../auth/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AttendanceService } from '../../services/attendance.service';
+import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
+import { MODULE_MESSAGES } from '../../config/module-messages.config';
 
 
 const PLATFORM_FEE_PERCENTAGE = 0.015;
@@ -22,7 +24,7 @@ const PLATFORM_FEE_PERCENTAGE = 0.015;
 @Component({
   selector: 'app-payment-tracker',
   standalone: true,
-  imports: [FormsModule, CommonModule, PaymentComponent, MatFormFieldModule, MatInputModule],
+  imports: [ComingSoonComponent, FormsModule, CommonModule, PaymentComponent, MatFormFieldModule, MatInputModule],
   templateUrl: './fees.component.html',
   styleUrls: ['./fees.component.css']
 })
@@ -39,6 +41,8 @@ export class PaymentTrackerComponent implements OnInit {
     private attendanceService: AttendanceService
   ) { }
 
+  comingSoonConfig = MODULE_MESSAGES.fees;
+  showFeesModule: boolean = false;
   unpaidCurrentMonthMessage: any = '';
   pastUnpaidMonthsWithLateFees: string = '';
   selectedYear: number = new Date().getFullYear();

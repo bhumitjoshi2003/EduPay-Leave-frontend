@@ -1,49 +1,60 @@
-<div class="payment-history-container">
-  <h2>Payment History</h2>
+<div *ngIf="showFeesModule; else comingSoonTemplate">
+  <div class="payment-history-container">
+    <h2>Payment History</h2>
 
-  <div *ngIf="loading" class="loading-message">Loading payment history...</div>
-  <div *ngIf="error" class="error-message">{{ error }}</div>
+    <div *ngIf="loading" class="loading-message">Loading payment history...</div>
+    <div *ngIf="error" class="error-message">{{ error }}</div>
 
-  <div class="table-container" *ngIf="paymentHistory.length > 0">
-    <table>
-      <thead>
-        <tr>
-          <th>Payment ID</th>
-          <th>Amount</th>
-          <th>Payment Date</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let payment of paymentHistory" (click)="viewPaymentDetails(payment.paymentId)" class="payment-row">
-          <td data-label="Payment ID:"><span class="payment-value">{{ payment.paymentId }}</span></td>
-          <td data-label="Amount:"><span class="payment-value">{{ payment.amountPaid | currency: 'INR' }}</span></td>
-          <td data-label="Payment Date:"><span class="payment-value">{{ payment.paymentDate | date: 'MMM d, y, h:mm a'
-              }}</span></td>
-          <td data-label="Status:"><span class="payment-value"
-              [ngClass]="{'status-success': payment.status === 'success'}">{{ payment.status | uppercase }}</span></td>
-          <td data-label="Receipt:">
-            <span class="payment-value download-value">
-              <button (click)="downloadPaymentReceipt(payment.paymentId); $event.stopPropagation();"
-                class="download-button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-                </svg>
-              </button>
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <div class="table-container" *ngIf="paymentHistory.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>Payment ID</th>
+            <th>Amount</th>
+            <th>Payment Date</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let payment of paymentHistory" (click)="viewPaymentDetails(payment.paymentId)"
+            class="payment-row">
+            <td data-label="Payment ID:"><span class="payment-value">{{ payment.paymentId }}</span></td>
+            <td data-label="Amount:"><span class="payment-value">{{ payment.amountPaid | currency: 'INR' }}</span></td>
+            <td data-label="Payment Date:"><span class="payment-value">{{ payment.paymentDate | date: 'MMM d, y, h:mm a'
+                }}</span></td>
+            <td data-label="Status:"><span class="payment-value"
+                [ngClass]="{'status-success': payment.status === 'success'}">{{ payment.status | uppercase }}</span>
+            </td>
+            <td data-label="Receipt:">
+              <span class="payment-value download-value">
+                <button (click)="downloadPaymentReceipt(payment.paymentId); $event.stopPropagation();"
+                  class="download-button">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                    fill="currentColor">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                  </svg>
+                </button>
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-  <div class="pagination-controls" *ngIf="totalPages > 1 && !loading">
-    <button class="page-button" (click)="previousPage()" [disabled]="currentPage === 0">Previous</button>
-    <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
-    <button class="page-button" (click)="nextPage()" [disabled]="currentPage === totalPages - 1">Next</button>
-  </div>
+    <div class="pagination-controls" *ngIf="totalPages > 1 && !loading">
+      <button class="page-button" (click)="previousPage()" [disabled]="currentPage === 0">Previous</button>
+      <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+      <button class="page-button" (click)="nextPage()" [disabled]="currentPage === totalPages - 1">Next</button>
+    </div>
 
-  <div *ngIf="paymentHistory.length === 0 && !loading && !error" class="no-history-message">No payment history found.
+    <div *ngIf="paymentHistory.length === 0 && !loading && !error" class="no-history-message">No payment history found.
+    </div>
   </div>
 </div>
+
+<ng-template #comingSoonTemplate>
+  <app-coming-soon [title]="comingSoonConfig.title" [message]="comingSoonConfig.message"
+    [subMessage]="comingSoonConfig.subMessage">
+  </app-coming-soon>
+</ng-template>

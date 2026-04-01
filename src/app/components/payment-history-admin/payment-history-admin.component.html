@@ -1,154 +1,162 @@
-<div class="payment-history-container">
-  <div class="left-navigation">
-    <h2>CLASSES</h2>
-    <ul class="class-list-vertical">
-      <li (click)="onClassSelect('all')" [class.selected]="selectedClass === 'all'" class="class-item-vertical">
-        <div class="chevron">
-          <span>All Payments</span>
-        </div>
-      </li>
-      <li *ngFor="let className of classList" (click)="onClassSelect(className)"
-        [class.selected]="className !== 'all' && className === selectedClass" class="class-item-vertical">
-        <div class="chevron">
-          <span>{{ className }}</span>
-        </div>
-      </li>
-    </ul>
-  </div>
-
-  <div class="payment-history-area">
-    <h2>Payment History {{ selectedClass !== 'all' ? 'for Class ' + selectedClass : ' - All Payments' }}</h2>
-
-    <div class="filter-options">
-      <div class="form-group">
-        <label for="date" class="form-label">Filter by Date:</label>
-        <mat-form-field appearance="outline">
-          <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" (ngModelChange)="onDateSelect()"
-            id="date">
-          <mat-datepicker-toggle matSuffix [for]="picker">
-            <mat-icon>calendar_today</mat-icon>
-          </mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
-      </div>
-      <div class="form-group">
-        <label for="studentIdFilter" class="form-label">Filter by Student ID:</label>
-        <mat-form-field appearance="outline">
-          <input matInput [(ngModel)]="studentIdFilter" (input)="onStudentIdInput()" id="studentIdFilter">
-        </mat-form-field>
-      </div>
-      <button class="clear-filter-button" (click)="clearFilter()">Clear Filter</button>
+<div *ngIf="showFeesModule; else comingSoonTemplate">
+  <div class="payment-history-container">
+    <div class="left-navigation">
+      <h2>CLASSES</h2>
+      <ul class="class-list-vertical">
+        <li (click)="onClassSelect('all')" [class.selected]="selectedClass === 'all'" class="class-item-vertical">
+          <div class="chevron">
+            <span>All Payments</span>
+          </div>
+        </li>
+        <li *ngFor="let className of classList" (click)="onClassSelect(className)"
+          [class.selected]="className !== 'all' && className === selectedClass" class="class-item-vertical">
+          <div class="chevron">
+            <span>{{ className }}</span>
+          </div>
+        </li>
+      </ul>
     </div>
 
-    <div *ngIf="loading" class="loading-indicator">Loading payment history...</div>
-    <div *ngIf="error" class="error-message">{{ error }}</div>
+    <div class="payment-history-area">
+      <h2>Payment History {{ selectedClass !== 'all' ? 'for Class ' + selectedClass : ' - All Payments' }}</h2>
 
-    <div class="top-pagination-controls" *ngIf="totalElements > 0">
-      <div class="page-info">
-        Total: {{ totalElements }} payments
-      </div>
-      <div class="page-size">
-        Payments per page:
-        <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
-          <option *ngFor="let size of pageSizes" [ngValue]="size">{{ size }}</option>
-        </select>
-      </div>
-    </div>
-
-    <div *ngIf="filteredPayments.length > 0; else noPaymentsContainer">
-      <div class="table-wrapper d-none d-md-block">
-        <table class="payment-history-table">
-          <thead>
-            <tr>
-              <th>Student ID</th>
-              <th>Student Name</th>
-              <th>Amount Paid</th>
-              <th>Payment Date</th>
-              <th>Status</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let payment of filteredPayments" class="payment-row clickable-row"
-              (click)="viewPaymentDetails(payment.paymentId)">
-              <td>{{ payment.studentId }}</td>
-              <td>{{ payment.studentName }}</td>
-              <td>{{ payment.amountPaid }}</td>
-              <td>{{ payment.paymentDate | date:'yyyy-MM-dd' }}</td>
-              <td
-                [ngClass]="{'status-success': payment.status.toLowerCase() === 'success', 'status-failed': payment.status.toLowerCase() !== 'success'}">
-                {{
-                payment.status | uppercase}}</td>
-              <td>
-                <button (click)="downloadPaymentReceipt(payment.paymentId, $event)" class="download-button">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
-                    fill="currentColor">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="filter-options">
+        <div class="form-group">
+          <label for="date" class="form-label">Filter by Date:</label>
+          <mat-form-field appearance="outline">
+            <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" (ngModelChange)="onDateSelect()"
+              id="date">
+            <mat-datepicker-toggle matSuffix [for]="picker">
+              <mat-icon>calendar_today</mat-icon>
+            </mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="form-group">
+          <label for="studentIdFilter" class="form-label">Filter by Student ID:</label>
+          <mat-form-field appearance="outline">
+            <input matInput [(ngModel)]="studentIdFilter" (input)="onStudentIdInput()" id="studentIdFilter">
+          </mat-form-field>
+        </div>
+        <button class="clear-filter-button" (click)="clearFilter()">Clear Filter</button>
       </div>
 
-      <div class="cards-wrapper d-block d-md-none">
-        <div *ngFor="let payment of filteredPayments" class="payment-card clickable-card"
-          (click)="viewPaymentDetails(payment.paymentId)">
-          <div class="card-row">
-            <span class="card-label">Student ID:</span>
-            <span class="card-value">{{ payment.studentId }}</span>
-          </div>
-          <div class="card-row">
-            <span class="card-label">Student Name:</span>
-            <span class="card-value">{{ payment.studentName }}</span>
-          </div>
-          <div class="card-row">
-            <span class="card-label">Amount Paid:</span>
-            <span class="card-value">{{ payment.amountPaid }}</span>
-          </div>
-          <div class="card-row">
-            <span class="card-label">Payment Date:</span>
-            <span class="card-value">{{ payment.paymentDate | date:'yyyy-MM-dd' }}</span>
-          </div>
-          <div class="card-row">
-            <span class="card-label">Status:</span>
-            <span class="card-value"
-              [ngClass]="{'status-success': payment.status.toLowerCase() === 'success', 'status-failed': payment.status.toLowerCase() !== 'success'}">{{
-              payment.status | uppercase}}</span>
-          </div>
-          <div class="card-actions">
-            <button (click)="downloadPaymentReceipt(payment.paymentId, $event)" class="download-button">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-              </svg>
-              Download Receipt
-            </button>
+      <div *ngIf="loading" class="loading-indicator">Loading payment history...</div>
+      <div *ngIf="error" class="error-message">{{ error }}</div>
+
+      <div class="top-pagination-controls" *ngIf="totalElements > 0">
+        <div class="page-info">
+          Total: {{ totalElements }} payments
+        </div>
+        <div class="page-size">
+          Payments per page:
+          <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+            <option *ngFor="let size of pageSizes" [ngValue]="size">{{ size }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div *ngIf="filteredPayments.length > 0; else noPaymentsContainer">
+        <div class="table-wrapper d-none d-md-block">
+          <table class="payment-history-table">
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Amount Paid</th>
+                <th>Payment Date</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let payment of filteredPayments" class="payment-row clickable-row"
+                (click)="viewPaymentDetails(payment.paymentId)">
+                <td>{{ payment.studentId }}</td>
+                <td>{{ payment.studentName }}</td>
+                <td>{{ payment.amountPaid }}</td>
+                <td>{{ payment.paymentDate | date:'yyyy-MM-dd' }}</td>
+                <td
+                  [ngClass]="{'status-success': payment.status.toLowerCase() === 'success', 'status-failed': payment.status.toLowerCase() !== 'success'}">
+                  {{
+                  payment.status | uppercase}}</td>
+                <td>
+                  <button (click)="downloadPaymentReceipt(payment.paymentId, $event)" class="download-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                      fill="currentColor">
+                      <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="cards-wrapper d-block d-md-none">
+          <div *ngFor="let payment of filteredPayments" class="payment-card clickable-card"
+            (click)="viewPaymentDetails(payment.paymentId)">
+            <div class="card-row">
+              <span class="card-label">Student ID:</span>
+              <span class="card-value">{{ payment.studentId }}</span>
+            </div>
+            <div class="card-row">
+              <span class="card-label">Student Name:</span>
+              <span class="card-value">{{ payment.studentName }}</span>
+            </div>
+            <div class="card-row">
+              <span class="card-label">Amount Paid:</span>
+              <span class="card-value">{{ payment.amountPaid }}</span>
+            </div>
+            <div class="card-row">
+              <span class="card-label">Payment Date:</span>
+              <span class="card-value">{{ payment.paymentDate | date:'yyyy-MM-dd' }}</span>
+            </div>
+            <div class="card-row">
+              <span class="card-label">Status:</span>
+              <span class="card-value"
+                [ngClass]="{'status-success': payment.status.toLowerCase() === 'success', 'status-failed': payment.status.toLowerCase() !== 'success'}">{{
+                payment.status | uppercase}}</span>
+            </div>
+            <div class="card-actions">
+              <button (click)="downloadPaymentReceipt(payment.paymentId, $event)" class="download-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                </svg>
+                Download Receipt
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <ng-template #noPaymentsContainer>
-      <p class="no-payments">No payment history found for the applied filters.</p>
-    </ng-template>
+      <ng-template #noPaymentsContainer>
+        <p class="no-payments">No payment history found for the applied filters.</p>
+      </ng-template>
 
-    <div class="pagination-controls" *ngIf="totalElements > 0">
-      <div class="pagination-buttons">
-        <button (click)="prevPage()" [disabled]="currentPage === 0">Previous</button>
+      <div class="pagination-controls" *ngIf="totalElements > 0">
+        <div class="pagination-buttons">
+          <button (click)="prevPage()" [disabled]="currentPage === 0">Previous</button>
 
-        <ng-container *ngFor="let pageItem of getPaginationDisplayPages()">
-          <ng-container *ngIf="pageItem !== '...'; else ellipsisTemplate">
-            <button (click)="goToPage(+pageItem)" [class.active]="currentPage === +pageItem">
-              {{ +pageItem + 1 }}
-            </button>
+          <ng-container *ngFor="let pageItem of getPaginationDisplayPages()">
+            <ng-container *ngIf="pageItem !== '...'; else ellipsisTemplate">
+              <button (click)="goToPage(+pageItem)" [class.active]="currentPage === +pageItem">
+                {{ +pageItem + 1 }}
+              </button>
+            </ng-container>
+            <ng-template #ellipsisTemplate>
+              <span class="ellipsis">{{ pageItem }}</span>
+            </ng-template>
           </ng-container>
-          <ng-template #ellipsisTemplate>
-            <span class="ellipsis">{{ pageItem }}</span>
-          </ng-template>
-        </ng-container>
 
-        <button (click)="nextPage()" [disabled]="currentPage === totalPages - 1">Next</button>
+          <button (click)="nextPage()" [disabled]="currentPage === totalPages - 1">Next</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<ng-template #comingSoonTemplate>
+  <app-coming-soon [title]="comingSoonConfig.title" [message]="comingSoonConfig.message"
+    [subMessage]="comingSoonConfig.subMessage">
+  </app-coming-soon>
+</ng-template>

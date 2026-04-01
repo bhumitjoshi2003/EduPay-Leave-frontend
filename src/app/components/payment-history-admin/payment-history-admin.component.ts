@@ -13,12 +13,16 @@ import { PaymentHistory } from '../../interfaces/payment-history';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { saveAs } from 'file-saver';
+import { MODULE_MESSAGES } from '../../config/module-messages.config';
+import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
 
 @Component({
   selector: 'app-payment-history-admin',
   templateUrl: './payment-history-admin.component.html',
   styleUrls: ['./payment-history-admin.component.css'],
-  imports: [CommonModule,
+  imports: [
+    ComingSoonComponent,
+    CommonModule,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -31,6 +35,8 @@ import { saveAs } from 'file-saver';
 })
 export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
 
+  comingSoonConfig = MODULE_MESSAGES.paymentHistory;
+  showFeesModule: boolean = false;
   filteredPayments: PaymentHistory[] = [];
   classList: string[] = [
     'Play group', 'Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',

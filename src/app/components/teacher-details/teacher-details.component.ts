@@ -36,7 +36,11 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
   showConfirmNewPassword = false;
   private readonly eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
   private readonly eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off"><path d="M17.94 17.94A10.01 10.01 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M15 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/><path d="M3 3l18 18"/></svg>`;
-
+  classList: string[] = [
+    'Play group', 'Nursery', 'LKG', 'UKG',
+    '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', '10', '11', '12'
+  ];
 
   constructor(
     private route: ActivatedRoute,
@@ -286,7 +290,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-    getEyeIcon(type: 'eye' | 'eye-off'): string {
+  getEyeIcon(type: 'eye' | 'eye-off'): string {
     return type === 'eye' ? this.eyeIcon : this.eyeOffIcon;
   }
 }

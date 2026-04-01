@@ -24,8 +24,12 @@
     <div class="detail-item">
       <span class="label">Class:</span>
       <span class="value" *ngIf="!isEditing">{{ studentDetails.className }}</span>
-      <input type="text" *ngIf="isEditing && getUserRole() === 'ADMIN'" [(ngModel)]="updatedDetails.className"
-        (input)="updateFieldValue('className', $event)">
+      <select *ngIf="isEditing && getUserRole() === 'ADMIN'" [(ngModel)]="updatedDetails.className"
+        (input)="updateFieldValue('className', $event)" class="form-control">
+        <option *ngFor="let className of classList" [value]="className">
+          {{ className }}
+        </option>
+      </select>
       <span class="value" *ngIf="isEditing && getUserRole() !== 'ADMIN'">{{ studentDetails.className }}</span>
     </div>
     <div class="detail-item">

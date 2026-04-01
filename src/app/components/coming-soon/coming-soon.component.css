@@ -158,30 +158,3 @@
     background: #eee;
     border-radius: 8px;
 }
-
-
-
-
-/* @media (max-width: 768px) {
-
-    .main-text {
-        display: none;
-        /* ❌ hide long text */
-}
-
-.divider {
-    display: none;
-    /* optional */
-}
-
-.sub-text {
-    font-size: 14px;
-    color: #666;
-}
-
-h1 {
-    font-size: 22px;
-}
-}
-
-*/

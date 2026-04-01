@@ -14,7 +14,12 @@ import { AuthService } from '../../auth/auth.service';
 })
 export class RegisterStudentComponent implements OnInit {
   studentForm: FormGroup;
-  isBusUser = false; // Track the state of the bus user toggle
+  isBusUser = false;
+  classList: string[] = [
+    'Play group', 'Nursery', 'LKG', 'UKG',
+    '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', '10', '11', '12'
+  ];
 
   constructor(
     private fb: FormBuilder,

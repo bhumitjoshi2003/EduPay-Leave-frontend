@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TeacherService } from '../../services/teacher.service'; 
+import { TeacherService } from '../../services/teacher.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
@@ -16,6 +16,11 @@ import { AuthService } from '../../auth/auth.service';
 })
 export class RegisterTeacherComponent implements OnInit {
   teacherForm: FormGroup;
+  classList: string[] = [
+    'Play group', 'Nursery', 'LKG', 'UKG',
+    '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', '10', '11', '12'
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -30,7 +35,7 @@ export class RegisterTeacherComponent implements OnInit {
       phoneNumber: ['', Validators.pattern('^[0-9]{10}$')],
       dob: ['', Validators.required],
       gender: ['', Validators.required],
-      classTeacher: [''] 
+      classTeacher: ['']
     });
   }
 

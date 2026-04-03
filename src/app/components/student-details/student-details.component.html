@@ -15,7 +15,8 @@
     <div class="detail-item">
       <span class="label">Name:</span>
       <span class="value" *ngIf="!isEditing">{{ studentDetails.name }}</span>
-      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.name" (input)="updateFieldValue('name', $event)">
+      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.name" (input)="updateFieldValue('name', $event)"
+        [class.invalid-field]="validationErrors['name']">
     </div>
     <div class="detail-item">
       <span class="label">Student ID:</span>
@@ -36,13 +37,13 @@
       <span class="label">Phone:</span>
       <span class="value" *ngIf="!isEditing">{{ studentDetails.phoneNumber }}</span>
       <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.phoneNumber"
-        (input)="updateFieldValue('phoneNumber', $event)">
+        (input)="updateFieldValue('phoneNumber', $event)" [class.invalid-field]="validationErrors['phoneNumber']">
     </div>
     <div class="detail-item">
       <span class="label">Email:</span>
       <span class="value" *ngIf="!isEditing">{{ studentDetails.email }}</span>
       <input type="email" *ngIf="isEditing" [(ngModel)]="updatedDetails.email"
-        (input)="updateFieldValue('email', $event)">
+        (input)="updateFieldValue('email', $event)" [class.invalid-field]="validationErrors['email']">
     </div>
     <div class="detail-item">
       <span class="label">Date of Birth:</span>
@@ -75,7 +76,7 @@
       <span class="label">Distance (km):</span>
       <span class="value" *ngIf="!isEditing">{{ studentDetails.distance }}</span>
       <input type="number" *ngIf="isEditing" [(ngModel)]="updatedDetails.distance"
-        (input)="updateFieldValue('distance', $event)">
+        (input)="updateFieldValue('distance', $event)" [class.invalid-field]="validationErrors['distance']">
     </div>
     <div *ngIf="getUserRole() === 'ADMIN'" class="detail-item">
       <span class="label">Joining Date:</span>

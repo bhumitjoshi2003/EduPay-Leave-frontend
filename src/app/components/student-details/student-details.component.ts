@@ -27,6 +27,7 @@ interface StudentDetails {
 
 @Component({
   selector: 'app-student-details',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './student-details.component.html',
   styleUrl: './student-details.component.css'
@@ -42,7 +43,11 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
   showOldPassword = false;
   showNewPassword = false;
   showConfirmNewPassword = false;
-  effectiveFromMonth: number | null = null; // To store the selected month
+  effectiveFromMonth: number | null = null;
+
+  // Track validation errors for CSS classes
+  validationErrors: { [key: string]: boolean } = {};
+
   academicMonths = [
     { value: 0, label: 'New Academic Year' },
     { value: 1, label: 'April' }, { value: 2, label: 'May' }, { value: 3, label: 'June' },
@@ -123,6 +128,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     }).then((result) => {
       if (result.isConfirmed) {
         this.isEditing = true;
+        this.validationErrors = {};
       }
     });
   }
@@ -131,6 +137,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     this.isEditing = false;
     this.updatedDetails = { ...this.studentDetails! };
     this.effectiveFromMonth = null;
+    this.validationErrors = {};
     Swal.fire({
       icon: 'info',
       title: 'Cancelled',
@@ -140,7 +147,67 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  validateFields(): boolean {
+    this.validationErrors = {};
+    let isValid = true;
+    let errors: string[] = [];
+
+    if (!this.updatedDetails) return false;
+
+    // Name Validation
+    if (!this.updatedDetails.name || this.updatedDetails.name.trim().length === 0) {
+      this.validationErrors['name'] = true;
+      errors.push("Student Name is mandatory.");
+      isValid = false;
+    }
+
+    // Phone Validation
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!this.updatedDetails.phoneNumber || this.updatedDetails.phoneNumber.trim().length === 0) {
+      this.validationErrors['phoneNumber'] = true;
+      errors.push("Phone Number is mandatory.");
+      isValid = false;
+    } else if (!phoneRegex.test(this.updatedDetails.phoneNumber)) {
+      this.validationErrors['phoneNumber'] = true;
+      errors.push("Phone Number must be exactly 10 digits.");
+      isValid = false;
+    }
+
+    // Email Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!this.updatedDetails.email || this.updatedDetails.email.trim().length === 0) {
+      this.validationErrors['email'] = true;
+      errors.push("Email Address is mandatory.");
+      isValid = false;
+    } else if (!emailRegex.test(this.updatedDetails.email)) {
+      this.validationErrors['email'] = true;
+      errors.push("Please enter a valid email address.");
+      isValid = false;
+    }
+
+    // Distance Validation
+    if (this.updatedDetails.takesBus && (this.updatedDetails.distance === null || this.updatedDetails.distance === undefined)) {
+      this.validationErrors['distance'] = true;
+      errors.push("Distance is required when Bus Facility is enabled.");
+      isValid = false;
+    }
+
+    if (!isValid) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Failed',
+        html: `<ul style="text-align: left;">${errors.map(err => `<li>${err}</li>`).join('')}</ul>`,
+      });
+    }
+
+    return isValid;
+  }
+
   async saveStudentDetails(): Promise<void> {
+    if (!this.validateFields()) {
+      return;
+    }
+
     let needsEffectiveMonth = false;
 
     if (this.updatedDetails && this.studentDetails) {
@@ -196,10 +263,10 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
           };
           this.studentService.updateStudent(this.studentId, payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
             next: (response) => {
-              console.log('Details updated successfully:', response);
               this.studentDetails = { ...this.updatedDetails };
               this.isEditing = false;
               this.effectiveFromMonth = null;
+              this.validationErrors = {};
               Swal.fire({
                 icon: 'success',
                 title: 'Success!',
@@ -224,7 +291,13 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
 
   updateFieldValue(field: keyof StudentDetails, event: any): void {
     if (this.updatedDetails) {
-      this.updatedDetails[field] = (field === 'takesBus') ? event.target.checked : event.target.value;
+      const value = (field === 'takesBus') ? event.target.checked : event.target.value;
+      this.updatedDetails[field] = value;
+
+      // Clear error immediately when user fixes the field
+      if (this.validationErrors[field]) {
+        delete this.validationErrors[field];
+      }
     }
   }
 
@@ -313,7 +386,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
         const { oldPassword, newPassword, confirmNewPassword } = result.value as any;
 
         if (newPassword.length < 6) {
-          Swal.showValidationMessage('New password must be at least 6 characters');
+          Swal.fire('Error', 'New password must be at least 6 characters', 'error');
           return;
         }
 
@@ -329,11 +402,6 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
 
         if (newPassword !== confirmNewPassword) {
           Swal.fire('Error', 'New passwords do not match', 'error');
-          return;
-        }
-
-        if (newPassword.length <= 6) {
-          Swal.fire('Error', 'New password must be more than 6 characters', 'error');
           return;
         }
 

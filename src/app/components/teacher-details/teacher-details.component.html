@@ -3,12 +3,13 @@
     <div class="header">
       <h2>Teacher Profile</h2>
       <div class="header-buttons">
-        <button *ngIf="getUserRole() === 'ADMIN' && !isEditing" (click)="enableEditMode()">Edit Details</button>
+        <button type="button" *ngIf="getUserRole() === 'ADMIN' && !isEditing" (click)="enableEditMode()">Edit
+          Details</button>
         <div *ngIf="getUserRole() === 'ADMIN' && isEditing">
-          <button (click)="saveTeacherDetails(editForm.valid)">Save</button>
-          <button (click)="cancelEditMode()">Cancel</button>
+          <button type="submit" (click)="saveTeacherDetails(editForm)">Save</button>
+          <button type="button" (click)="cancelEditMode()">Cancel</button>
         </div>
-        <button (click)="changePassword()">Change Password</button>
+        <button type="button" (click)="changePassword()">Change Password</button>
       </div>
     </div>
 
@@ -17,7 +18,8 @@
         <span class="label">Name:</span>
         <span class="value" *ngIf="!isEditing">{{ teacherDetails.name }}</span>
         <input type="text" *ngIf="isEditing" name="name" [(ngModel)]="updatedDetails.name"
-          (input)="updateFieldValue('name', $event)" required #name="ngModel">
+          (input)="updateFieldValue('name', $event)" required #name="ngModel"
+          [class.is-invalid]="name.invalid && name.touched">
       </div>
 
       <div class="detail-item">
@@ -29,21 +31,24 @@
         <span class="label">Email:</span>
         <span class="value" *ngIf="!isEditing">{{ teacherDetails.email }}</span>
         <input type="email" *ngIf="isEditing" name="email" [(ngModel)]="updatedDetails.email"
-          (input)="updateFieldValue('email', $event)" required email #email="ngModel">
+          (input)="updateFieldValue('email', $event)" required email #email="ngModel"
+          [class.is-invalid]="email.invalid && email.touched">
       </div>
 
       <div class="detail-item">
         <span class="label">Phone:</span>
         <span class="value" *ngIf="!isEditing">{{ teacherDetails.phoneNumber }}</span>
         <input type="text" *ngIf="isEditing" name="phoneNumber" [(ngModel)]="updatedDetails.phoneNumber"
-          (input)="updateFieldValue('phoneNumber', $event)" required pattern="^[0-9]{10}$" #phone="ngModel">
+          (input)="updateFieldValue('phoneNumber', $event)" required pattern="^[0-9]{10}$" #phone="ngModel"
+          [class.is-invalid]="phone.invalid && phone.touched">
       </div>
 
       <div class="detail-item">
         <span class="label">Date of Birth:</span>
         <span class="value" *ngIf="!isEditing">{{ teacherDetails.dob }}</span>
         <input type="date" *ngIf="isEditing" name="dob" [(ngModel)]="updatedDetails.dob"
-          (input)="updateFieldValue('dob', $event)" required #dob="ngModel">
+          (input)="updateFieldValue('dob', $event)" required #dob="ngModel"
+          [class.is-invalid]="dob.invalid && dob.touched">
       </div>
 
       <div class="detail-item">

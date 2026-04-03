@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TeacherService } from '../../services/teacher.service';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
-import { FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, FormBuilder, FormGroup, Validators, NgForm } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
 import Swal from 'sweetalert2';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -37,12 +37,6 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
   showConfirmNewPassword = false;
   private readonly eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
   private readonly eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off"><path d="M17.94 17.94A10.01 10.01 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M15 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/><path d="M3 3l18 18"/></svg>`;
-
-  classList: string[] = [
-    'Play group', 'Nursery', 'LKG', 'UKG',
-    '1', '2', '3', '4', '5', '6', '7',
-    '8', '9', '10', '11', '12'
-  ];
 
   constructor(
     private route: ActivatedRoute,
@@ -121,19 +115,46 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  saveTeacherDetails(isValid: boolean | null): void {
-    if (!isValid) {
+  // Accepts NgForm now
+  saveTeacherDetails(form: NgForm): void {
+    if (form.invalid) {
+      // 1. Mark all fields as touched to trigger CSS red borders
+      form.control.markAllAsTouched();
+
+      // 2. Compile specific error messages based on validation rules
+      let errorMessages = '<ul class="swal-error-list">';
+
+      const controls = form.controls;
+      if (controls['name']?.errors?.['required']) errorMessages += '<li>Name is required.</li>';
+
+      if (controls['email']?.errors) {
+        if (controls['email'].errors['required']) errorMessages += '<li>Email is required.</li>';
+        if (controls['email'].errors['email']) errorMessages += '<li>Please enter a valid email address.</li>';
+      }
+
+      if (controls['phoneNumber']?.errors) {
+        if (controls['phoneNumber'].errors['required']) errorMessages += '<li>Phone number is required.</li>';
+        if (controls['phoneNumber'].errors['pattern']) errorMessages += '<li>Phone number must be exactly 10 digits.</li>';
+      }
+
+      if (controls['dob']?.errors?.['required']) errorMessages += '<li>Date of Birth is required.</li>';
+
+      errorMessages += '</ul>';
+
+      // 3. Show detailed SweetAlert
       Swal.fire({
         icon: 'error',
-        title: 'Invalid Input',
-        text: 'Please ensure all fields are filled correctly (Valid Email, 10-digit Phone, etc.)',
+        title: 'Oops... Invalid Details',
+        html: errorMessages, // Use html property for the list
+        confirmButtonColor: '#d33',
       });
       return;
     }
 
+    // Proceeds normally if form is valid
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Do you want to save the changes to the teacher details?',
+      text: 'Do you want to save the changes?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -174,7 +195,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/dashboard/teacher-list']);
   }
 
-  // Password change methods remain exactly as they were...
+  // --- Password change methods (unchanged) ---
   changePassword(): void {
     const showOldPassword = (this.role !== 'ADMIN');
     this.showOldPassword = false;

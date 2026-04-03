@@ -315,3 +315,16 @@
     min-width: unset;
   }
 }
+
+input.ng-invalid.ng-touched {
+  border: 1px solid #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.swal-error-list {
+  text-align: left;
+  list-style-type: disc;
+  margin-left: 20px;
+  margin-top: 10px;
+  color: #545454;
+}

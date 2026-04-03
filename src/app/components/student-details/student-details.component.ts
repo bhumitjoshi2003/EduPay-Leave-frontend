@@ -312,6 +312,11 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         const { oldPassword, newPassword, confirmNewPassword } = result.value as any;
 
+        if (newPassword.length < 6) {
+          Swal.showValidationMessage('New password must be at least 6 characters');
+          return;
+        }
+
         if (showOldPassword && !oldPassword) {
           Swal.fire('Error', 'Current Password is required', 'error');
           return;

@@ -245,6 +245,11 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
           return;
         }
 
+        if (newPassword.length < 6) {
+          Swal.showValidationMessage('New password must be at least 6 characters');
+          return;
+        }
+
         if (!newPassword || !confirmNewPassword) {
           Swal.fire('Error', 'New Password and Confirm New Password are required', 'error');
           return;

@@ -1,0 +1,66 @@
+<div class="admin-details-container" *ngIf="updatedDetails">
+    <form #adminForm="ngForm" (ngSubmit)="saveAdmin(adminForm)">
+        <div class="header">
+            <h2>{{ isNewAdmin ? 'Create New Admin' : 'Admin Profile' }}</h2>
+            <div class="header-buttons">
+                <button type="button" *ngIf="!isEditing && canEdit()" (click)="enableEditMode()">Edit Details</button>
+
+                <div *ngIf="isEditing">
+                    <button type="submit" class="save-btn">Save</button>
+                    <button type="button" class="cancel-btn" (click)="cancelEdit()">Cancel</button>
+                </div>
+
+                <button type="button" class="delete-btn" *ngIf="loggedInUserRole === 'SUPER_ADMIN' && !isNewAdmin"
+                    (click)="deleteAdmin()">
+                    Delete Admin
+                </button>
+            </div>
+        </div>
+
+        <div class="details-grid">
+            <div class="detail-item">
+                <span class="label">Admin ID:</span>
+                <span class="value" *ngIf="!isNewAdmin">{{ updatedDetails.adminId }}</span>
+                <input type="text" *ngIf="isNewAdmin" name="adminId" [(ngModel)]="updatedDetails.adminId" required
+                    placeholder="e.g. A1005">
+            </div>
+
+            <div class="detail-item">
+                <span class="label">Full Name:</span>
+                <span class="value" *ngIf="!isEditing">{{ updatedDetails.name }}</span>
+                <input type="text" *ngIf="isEditing" name="name" [(ngModel)]="updatedDetails.name" required>
+            </div>
+
+            <div class="detail-item">
+                <span class="label">Email:</span>
+                <span class="value" *ngIf="!isEditing">{{ updatedDetails.email }}</span>
+                <input type="email" *ngIf="isEditing" name="email" [(ngModel)]="updatedDetails.email" required email>
+            </div>
+
+            <div class="detail-item">
+                <span class="label">Phone:</span>
+                <span class="value" *ngIf="!isEditing">{{ updatedDetails.phoneNumber }}</span>
+                <input type="text" *ngIf="isEditing" name="phone" [(ngModel)]="updatedDetails.phoneNumber" required
+                    pattern="^[0-9]{10}$">
+            </div>
+
+            <div class="detail-item">
+                <span class="label">Gender:</span>
+                <span class="value" *ngIf="!isEditing">{{ updatedDetails.gender }}</span>
+                <select *ngIf="isEditing" name="gender" [(ngModel)]="updatedDetails.gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div class="detail-item">
+                <span class="label">Date of Birth:</span>
+                <span class="value" *ngIf="!isEditing">{{ updatedDetails.dob }}</span>
+                <input type="date" *ngIf="isEditing" name="dob" [(ngModel)]="updatedDetails.dob" required>
+            </div>
+        </div>
+
+        <button type="button" class="back-button" (click)="goBack()">Back to Admin List</button>
+    </form>
+</div>

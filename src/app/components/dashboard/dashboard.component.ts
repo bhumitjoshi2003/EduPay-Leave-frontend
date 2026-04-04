@@ -115,7 +115,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       });
     } else if (this.Role === 'ADMIN' && this.Id) {
-      this.adminService.getAdmin(this.Id).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      this.adminService.getAdminById(this.Id).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
         next: (admin) => {
           this.Name = admin.name;
           this.showWelcomeMessageOnce();
@@ -179,6 +179,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   isFinanceAdmin(): boolean {
     return this.Role === 'FINANCE_ADMIN';
+  }
+
+  isSuperAdmin(): boolean {
+    return this.Role === 'SUPER_ADMIN';
   }
 
   logout() {

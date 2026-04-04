@@ -22,6 +22,8 @@
         routerLinkActive #rla11="routerLinkActive" [active]="rla11.isActive">Payment History</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/teacher-list" routerLinkActive #rla12="routerLinkActive"
         [active]="rla12.isActive">Teachers</a>
+      <a *ngIf="isAdmin() || isSuperAdmin()" mat-tab-link routerLink="/dashboard/admin-list" routerLinkActive
+        #rla12="routerLinkActive" [active]="rla12.isActive">Admins</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/notice" routerLinkActive #rla13="routerLinkActive"
         [active]="rla13.isActive">Notice</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/register" routerLinkActive #rla13="routerLinkActive"

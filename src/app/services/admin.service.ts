@@ -13,7 +13,7 @@ export class AdminService {
 
   constructor(private http: HttpClient) { }
 
-  getAdmin(adminId: string): Observable<any> {
+  getAdminById(adminId: string): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/${adminId}`);
   }
 

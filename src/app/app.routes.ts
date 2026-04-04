@@ -23,6 +23,8 @@ import { NoticeComponent } from './components/notice/notice.component';
 import { EventCalendarComponent } from './components/event-calendar/event-calendar.component';
 import { EventFormComponent } from './components/event-form/event-form.component';
 import { AuditLogsComponent } from './components/audit-logs/audit-logs.component';
+import { AdminListComponent } from './components/admin-list/admin-list.component';
+import { AdminDetailsComponent } from './components/admin-details/admin-details.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -58,6 +60,8 @@ export const routes: Routes = [
             { path: 'event-new', component: EventFormComponent },
             { path: 'event-edit/:id', component: EventFormComponent },
             { path: 'audit-logs', component: AuditLogsComponent },
+            { path: 'admin-list', component: AdminListComponent },
+            { path: 'admin-details/:adminId', component: AdminDetailsComponent }
         ],
     },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },

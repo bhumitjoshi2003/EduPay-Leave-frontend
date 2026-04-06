@@ -1,0 +1,67 @@
+<div class="registration-container">
+    <div class="form-card">
+        <div class="card-header">
+            <h2>Register New Administrator</h2>
+            <p>Fill in the details to create a new administrative account.</p>
+        </div>
+
+        <form #regForm="ngForm" (ngSubmit)="onSubmit(regForm)" novalidate>
+            <div class="form-grid">
+
+                <div class="field-group">
+                    <label>Admin ID <span class="req">*</span></label>
+                    <input type="text" name="adminId" [(ngModel)]="adminData.adminId" #adminId="ngModel" required
+                        placeholder="ADM-001" [class.invalid-field]="adminId.invalid && adminId.touched">
+                    <small class="error-text" *ngIf="adminId.invalid && adminId.touched">ID is required</small>
+                </div>
+
+                <div class="field-group">
+                    <label>Full Name <span class="req">*</span></label>
+                    <input type="text" name="name" [(ngModel)]="adminData.name" #name="ngModel" required
+                        placeholder="John Doe" [class.invalid-field]="name.invalid && name.touched">
+                    <small class="error-text" *ngIf="name.invalid && name.touched">Name is required</small>
+                </div>
+
+                <div class="field-group">
+                    <label>Email Address <span class="req">*</span></label>
+                    <input type="email" name="email" [(ngModel)]="adminData.email" #email="ngModel" required email
+                        placeholder="admin@example.com" [class.invalid-field]="email.invalid && email.touched">
+                    <small class="error-text" *ngIf="email.invalid && email.touched">Valid email required</small>
+                </div>
+
+                <div class="field-group">
+                    <label>Phone Number <span class="req">*</span></label>
+                    <input type="text" name="phone" [(ngModel)]="adminData.phoneNumber" #phone="ngModel" required
+                        pattern="^[0-9]{10}$" placeholder="10-digit number"
+                        [class.invalid-field]="phone.invalid && phone.touched">
+                    <small class="error-text" *ngIf="phone.invalid && phone.touched">10 digits required</small>
+                </div>
+
+                <div class="field-group">
+                    <label>Gender <span class="req">*</span></label>
+                    <select name="gender" [(ngModel)]="adminData.gender" #gender="ngModel" required
+                        [class.invalid-field]="gender.invalid && gender.touched">
+                        <option value="" disabled selected>Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <small class="error-text" *ngIf="gender.invalid && gender.touched">Gender is required</small>
+                </div>
+
+                <div class="field-group">
+                    <label>Date of Birth <span class="req">*</span></label>
+                    <input type="date" name="dob" [(ngModel)]="adminData.dob" #dob="ngModel" required
+                        [class.invalid-field]="dob.invalid && dob.touched">
+                    <small class="error-text" *ngIf="dob.invalid && dob.touched">DOB is required</small>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+                <button type="submit" class="btn-submit">Register Admin</button>
+            </div>
+        </form>
+    </div>
+</div>

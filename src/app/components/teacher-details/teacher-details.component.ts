@@ -195,7 +195,6 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/dashboard/teacher-list']);
   }
 
-  // --- Password change methods (unchanged) ---
   changePassword(): void {
     const showOldPassword = (this.role !== 'ADMIN');
     this.showOldPassword = false;

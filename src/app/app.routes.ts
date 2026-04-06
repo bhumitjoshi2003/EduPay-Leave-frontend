@@ -25,6 +25,7 @@ import { EventFormComponent } from './components/event-form/event-form.component
 import { AuditLogsComponent } from './components/audit-logs/audit-logs.component';
 import { AdminListComponent } from './components/admin-list/admin-list.component';
 import { AdminDetailsComponent } from './components/admin-details/admin-details.component';
+import { RegisterAdminComponent } from './components/register-admin/register-admin.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -61,7 +62,8 @@ export const routes: Routes = [
             { path: 'event-edit/:id', component: EventFormComponent },
             { path: 'audit-logs', component: AuditLogsComponent },
             { path: 'admin-list', component: AdminListComponent },
-            { path: 'admin-details/:adminId', component: AdminDetailsComponent }
+            { path: 'admin-details/:adminId', component: AdminDetailsComponent },
+            { path: 'register-admin', component: RegisterAdminComponent }
         ],
     },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },

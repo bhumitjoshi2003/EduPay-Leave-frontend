@@ -1,6 +1,13 @@
 <div class="admin-list-container">
     <div class="admin-list-area">
-        <h2>List of Administrators</h2>
+        <div class="list-header">
+            <h2>List of Administrators</h2>
+            <button *ngIf="loggedInUserRole === 'SUPER_ADMIN'" class="create-admin-button"
+                (click)="navigateToRegisterAdmin()">
+                Register New Admin
+            </button>
+        </div>
+
         <div *ngIf="admins.length > 0; else noAdminsContainer">
             <ul class="admin-list">
                 <li *ngFor="let admin of admins" class="admin-item" (click)="viewAdminDetails(admin.adminId)">
@@ -10,8 +17,9 @@
                     </div>
 
                     <div class="button-group">
-                        <button class="view-details-button" (click)="viewAdminDetails(admin.adminId)">View
-                            Details</button>
+                        <button class="view-details-button" (click)="viewAdminDetails(admin.adminId)">
+                            View Details
+                        </button>
 
                         <button *ngIf="loggedInUserRole === 'SUPER_ADMIN'" class="delete-button"
                             (click)="deleteAdmin($event, admin.adminId)">

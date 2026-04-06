@@ -92,4 +92,8 @@ export class AdminListComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  navigateToRegisterAdmin(): void {
+    this.router.navigate(['/dashboard/register-admin']);
+  }
 }

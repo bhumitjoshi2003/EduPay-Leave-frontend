@@ -159,6 +159,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard/teacher-attendance']);
       } else if (this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN' || this.Role === 'FINANCE_ADMIN') {
         this.router.navigate(['/dashboard/fee-structure']);
+      } else if (this.Role === 'SUPER_ADMIN') {
+        this.router.navigate(['/dashboard/admin-list']);
       } else {
         this.router.navigate(['/dashboard']);
       }

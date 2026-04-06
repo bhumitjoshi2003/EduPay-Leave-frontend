@@ -1,0 +1,121 @@
+.registration-container {
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    background-color: #f4f7f6;
+    min-height: 85vh;
+}
+
+.form-card {
+    background: white;
+    width: 100%;
+    max-width: 850px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    padding: 40px;
+    border-top: 6px solid #1f6f8b;
+}
+
+.card-header {
+    margin-bottom: 30px;
+}
+
+.card-header h2 {
+    color: #1f6f8b;
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.card-header p {
+    color: #718096;
+    margin-top: 5px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field-group label {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 0.9rem;
+}
+
+.req {
+    color: #e53e3e;
+}
+
+input,
+select {
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #1f6f8b;
+    box-shadow: 0 0 0 3px rgba(31, 111, 139, 0.1);
+}
+
+/* --- Validation State --- */
+.invalid-field {
+    border-color: #e53e3e !important;
+    background-color: #fff5f5;
+}
+
+.error-text {
+    color: #e53e3e;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.form-actions {
+    margin-top: 40px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding-top: 20px;
+    border-top: 1px solid #edf2f7;
+}
+
+button {
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+    border: none;
+}
+
+.btn-submit {
+    background: #1f6f8b;
+    color: white;
+}
+
+.btn-submit:hover {
+    background: #14505d;
+    transform: translateY(-1px);
+}
+
+.btn-cancel {
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}

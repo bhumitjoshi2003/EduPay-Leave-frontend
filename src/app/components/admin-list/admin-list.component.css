@@ -10,6 +10,48 @@
     width: 95%;
 }
 
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #4fbdbd;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+.list-header h2 {
+    border-bottom: none !important;
+    /* Overriding the existing h2 border */
+    margin-bottom: 0 !important;
+    width: auto !important;
+}
+
+.create-admin-button {
+    background: linear-gradient(135deg, #28a745, #218838);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);
+}
+
+.create-admin-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
+    background: linear-gradient(135deg, #218838, #1e7e34);
+}
+
+.plus-icon {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
 .admin-list-container h2 {
     color: #1f6f8b;
     margin-bottom: 20px;
@@ -178,5 +220,16 @@
 
     .admin-info {
         width: 100%;
+    }
+
+    .list-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .create-admin-button {
+        width: 100%;
+        justify-content: center;
     }
 }

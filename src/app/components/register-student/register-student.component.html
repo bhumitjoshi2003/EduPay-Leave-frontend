@@ -2,7 +2,7 @@
     <h2>Register New Student</h2>
     <form [formGroup]="studentForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
-            <label for="studentId">Student ID<span class="required">*</span>:</label>
+            <label for="studentId">Student ID<span class="required">*</span></label>
             <input type="text" id="studentId" formControlName="studentId" class="form-control">
             <div *ngIf="studentForm.controls['studentId'].invalid && (studentForm.controls['studentId'].dirty || studentForm.controls['studentId'].touched)"
                 class="error-message">
@@ -11,7 +11,7 @@
         </div>
 
         <div class="form-group">
-            <label for="name">Name<span class="required">*</span>:</label>
+            <label for="name">Name<span class="required">*</span></label>
             <input type="text" id="name" formControlName="name" class="form-control">
             <div *ngIf="studentForm.controls['name'].invalid && (studentForm.controls['name'].dirty || studentForm.controls['name'].touched)"
                 class="error-message">
@@ -20,7 +20,7 @@
         </div>
 
         <div class="form-group">
-            <label for="email">Email<span class="required">*</span>:</label>
+            <label for="email">Email<span class="required">*</span></label>
             <input type="email" id="email" formControlName="email" class="form-control">
             <div *ngIf="studentForm.controls['email'].invalid && (studentForm.controls['email'].dirty || studentForm.controls['email'].touched)"
                 class="error-message">
@@ -30,7 +30,7 @@
         </div>
 
         <div class="form-group">
-            <label for="phoneNumber">Phone Number:</label>
+            <label for="phoneNumber">Phone Number</label>
             <input type="text" id="phoneNumber" formControlName="phoneNumber" class="form-control">
             <div *ngIf="studentForm.controls['phoneNumber'].invalid && (studentForm.controls['phoneNumber'].dirty || studentForm.controls['phoneNumber'].touched)"
                 class="error-message">
@@ -39,7 +39,7 @@
         </div>
 
         <div class="form-group">
-            <label for="dob">Date of Birth<span class="required">*</span>:</label>
+            <label for="dob">Date of Birth<span class="required">*</span></label>
             <input type="date" id="dob" formControlName="dob" class="form-control">
             <div *ngIf="studentForm.controls['dob'].invalid && (studentForm.controls['dob'].dirty || studentForm.controls['dob'].touched)"
                 class="error-message">
@@ -48,7 +48,7 @@
         </div>
 
         <div class="form-group">
-            <label for="className">Class<span class="required">*</span>:</label>
+            <label for="className">Class<span class="required">*</span></label>
             <select id="className" formControlName="className" class="form-control">
                 <option value="" disabled selected></option>
                 <option *ngFor="let className of classList" [value]="className">
@@ -62,7 +62,7 @@
         </div>
 
         <div class="form-group">
-            <label for="gender">Gender<span class="required">*</span>:</label>
+            <label for="gender">Gender<span class="required">*</span></label>
             <select id="gender" formControlName="gender" class="form-control">
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -75,17 +75,17 @@
         </div>
 
         <div class="form-group">
-            <label for="fatherName">Father's Name:</label>
+            <label for="fatherName">Father's Name</label>
             <input type="text" id="fatherName" formControlName="fatherName" class="form-control">
         </div>
 
         <div class="form-group">
-            <label for="motherName">Mother's Name:</label>
+            <label for="motherName">Mother's Name</label>
             <input type="text" id="motherName" formControlName="motherName" class="form-control">
         </div>
 
         <div class="form-group">
-            <label for="joiningDate">Joining Date<span class="required">*</span>:</label>
+            <label for="joiningDate">Joining Date<span class="required">*</span></label>
             <input type="date" id="joiningDate" formControlName="joiningDate" class="form-control">
             <div *ngIf="studentForm.controls['joiningDate'].invalid && (studentForm.controls['joiningDate'].dirty || studentForm.controls['joiningDate'].touched)"
                 class="error-message">
@@ -94,7 +94,7 @@
         </div>
 
         <div class="form-group">
-            <label class="switch-label">Need Bus Service:</label>
+            <label class="switch-label">Need Bus Service</label>
             <div class="switch-container">
                 <label class="switch">
                     <input type="checkbox" id="takesBus" formControlName="takesBus">
@@ -107,7 +107,7 @@
 
 
         <div class="form-group" *ngIf="isBusUser">
-            <label for="distance">Distance (KM):</label>
+            <label for="distance">Distance (KM)</label>
             <input type="number" id="distance" formControlName="distance" class="form-control"
                 placeholder="Enter distance in KM">
             <div *ngIf="studentForm.controls['distance'].invalid && (studentForm.controls['distance'].dirty || studentForm.controls['distance'].touched)"

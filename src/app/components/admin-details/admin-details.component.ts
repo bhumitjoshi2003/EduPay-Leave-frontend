@@ -34,6 +34,9 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
   isEditing: boolean = false;
   isNewAdmin: boolean = false;
 
+  private readonly eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  private readonly eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.01 10.01 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M15 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/><path d="M3 3l18 18"/></svg>`;
+
   private ngUnsubscribe = new Subject<void>();
 
   constructor(
@@ -83,18 +86,10 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
     }
     this.isNewAdmin = true;
     this.isEditing = true;
-    this.updatedDetails = {
-      adminId: '',
-      name: '',
-      email: '',
-      phoneNumber: '',
-      dob: '',
-      gender: ''
-    };
+    this.updatedDetails = { adminId: '', name: '', email: '', phoneNumber: '', dob: '', gender: '' };
   }
 
   canEdit(): boolean {
-    // Super Admin can edit anyone; Admin can only edit themselves
     return this.loggedInUserRole === 'SUPER_ADMIN' || this.loggedInUserId === this.adminId;
   }
 
@@ -113,7 +108,8 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
 
   saveAdmin(form: NgForm): void {
     if (form.invalid) {
-      Swal.fire('Error', 'Please fill all required fields correctly.', 'error');
+      form.control.markAllAsTouched();
+      Swal.fire('Error', 'Please correct the invalid fields.', 'error');
       return;
     }
 
@@ -123,7 +119,7 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
 
     Swal.fire({
       title: 'Confirm Save',
-      text: 'Do you want to save these administrator details?',
+      text: 'Save administrator details?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Yes, Save'
@@ -135,6 +131,83 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
             this.router.navigate(['/dashboard/admin-list']);
           },
           error: (err) => Swal.fire('Error', err.error?.message || 'Server error occurred', 'error')
+        });
+      }
+    });
+  }
+
+  changePassword(): void {
+    const isOwnAccount = (this.loggedInUserId === this.adminId);
+    const isSuperAdminResettingOther = (this.loggedInUserRole === 'SUPER_ADMIN' && !isOwnAccount);
+
+    const showOldPasswordField = isOwnAccount;
+
+    Swal.fire({
+      title: isOwnAccount ? 'Change Your Password' : 'Reset Admin Password',
+      html: `
+        <div class="swal-password-container">
+          ${showOldPasswordField ? `
+            <div class="pw-wrapper">
+              <input id="oldPw" type="password" class="swal2-input" placeholder="Current Password">
+              <span id="toggleOld" class="pw-toggle">${this.eyeOffIcon}</span>
+            </div>` : ''}
+          <div class="pw-wrapper">
+            <input id="newPw" type="password" class="swal2-input" placeholder="New Password">
+            <span id="toggleNew" class="pw-toggle">${this.eyeOffIcon}</span>
+          </div>
+          <div class="pw-wrapper">
+            <input id="confirmPw" type="password" class="swal2-input" placeholder="Confirm New Password">
+            <span id="toggleConfirm" class="pw-toggle">${this.eyeOffIcon}</span>
+          </div>
+        </div>`,
+      showCancelButton: true,
+      confirmButtonText: 'Update Password',
+      preConfirm: () => {
+        const oldP = showOldPasswordField ? (document.getElementById('oldPw') as HTMLInputElement).value : '';
+        const newP = (document.getElementById('newPw') as HTMLInputElement).value;
+        const confP = (document.getElementById('confirmPw') as HTMLInputElement).value;
+        return { oldP, newP, confP };
+      },
+      didRender: () => {
+        const setup = (btnId: string, inputId: string) => {
+          document.getElementById(btnId)?.addEventListener('click', (e) => {
+            const input = document.getElementById(inputId) as HTMLInputElement;
+            const isShowing = input.type === 'text';
+            input.type = isShowing ? 'password' : 'text';
+            (e.currentTarget as HTMLElement).innerHTML = isShowing ? this.eyeOffIcon : this.eyeIcon;
+          });
+        };
+        if (showOldPasswordField) setup('toggleOld', 'oldPw');
+        setup('toggleNew', 'newPw');
+        setup('toggleConfirm', 'confirmPw');
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const { oldP, newP, confP } = result.value as any;
+
+        if (showOldPasswordField && !oldP) {
+          Swal.fire('Error', 'Current password is required to verify identity.', 'error');
+          return;
+        }
+        if (newP.length < 6) {
+          Swal.fire('Error', 'New password must be at least 6 characters.', 'error');
+          return;
+        }
+        if (newP !== confP) {
+          Swal.fire('Error', 'New passwords do not match.', 'error');
+          return;
+        }
+
+        const payload = {
+          userId: this.adminId,
+          oldPassword: oldP,
+          newPassword: newP,
+          isAdministrativeReset: isSuperAdminResettingOther
+        };
+
+        this.authService.changePassword(payload).subscribe({
+          next: () => Swal.fire('Success', 'Password updated successfully', 'success'),
+          error: (err) => Swal.fire('Error', err.error || 'Failed to update password', 'error')
         });
       }
     });

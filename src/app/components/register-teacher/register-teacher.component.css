@@ -28,6 +28,10 @@ body {
     animation: fadeIn 1s ease-out;
 }
 
+.required {
+    color: #e53e3e;
+}
+
 .form-toggle-nav {
     display: flex;
     margin-bottom: 20px;

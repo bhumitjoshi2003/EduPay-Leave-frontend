@@ -4,6 +4,17 @@
     /* ENSURED THIS IS HERE */
 }
 
+.invalid-field {
+    border-color: #e53e3e !important;
+    background-color: #fff5f5;
+}
+
+.error-message {
+    color: #e53e3e;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
 h2 {
     text-align: center;
     font-size: 2rem;

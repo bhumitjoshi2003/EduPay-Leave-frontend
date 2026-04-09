@@ -204,6 +204,7 @@
 @media (max-width: 767px) {
     .admin-list-container {
         padding: 10px;
+        width: 95%;
     }
 
     .admin-item {

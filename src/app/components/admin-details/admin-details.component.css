@@ -167,8 +167,21 @@ select.is-invalid {
         gap: 15px;
     }
 
+    .admin-details-container {
+        width: 90%;
+        padding: 15px;
+        gap: 15px;
+        margin: 15px auto;
+    }
+
     .header-buttons {
         width: 100%;
         justify-content: space-between;
+    }
+
+    .admin-details-container {
+        padding: 10px;
+        width: 94%;
+        flex-direction: column;
     }
 }

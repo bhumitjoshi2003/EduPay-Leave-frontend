@@ -68,7 +68,8 @@
           </div>
 
           <hr class="profile-separator" />
-          <button *ngIf="isStudent() || isTeacher()" mat-menu-item (click)="navigateToMyProfile()" class="profile-btn">
+          <button *ngIf="isStudent() || isTeacher() || isAdmin()" mat-menu-item (click)="navigateToMyProfile()"
+            class="profile-btn">
             <mat-icon class="button-icon">person</mat-icon> My Profile
           </button>
           <button mat-menu-item class="logout-button" (click)="logout()" class="logout-btn">

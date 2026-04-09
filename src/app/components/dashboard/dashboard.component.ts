@@ -200,5 +200,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.isTeacher() && this.Id) {
       this.router.navigate(['/dashboard/teacher-details', this.Id]);
     }
+    if (this.isAdmin() && this.Id) {
+      this.router.navigate(['/dashboard/admin-details', this.Id]);
+    }
   }
 }

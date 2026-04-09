@@ -3,7 +3,6 @@
         <div class="header">
             <div class="title-section">
                 <h2>{{ isNewAdmin ? 'Create New Admin' : 'Admin Profile' }}</h2>
-                <span class="badge" *ngIf="loggedInUserId === adminId">Your Profile</span>
             </div>
 
             <div class="header-buttons">
@@ -16,7 +15,7 @@
                     <button type="button" class="cancel-btn" (click)="cancelEdit()">Cancel</button>
                 </div>
 
-                <button type="button" class="password-btn" (click)="changePassword()"
+                <button type="button" class="edit-btn" (click)="changePassword()"
                     *ngIf="!isNewAdmin && (loggedInUserId === adminId || loggedInUserRole === 'SUPER_ADMIN')">
                     Change Password
                 </button>

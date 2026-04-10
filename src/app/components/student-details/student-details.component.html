@@ -103,7 +103,7 @@
     <button (click)="viewLeaves()" class="view-leaves-button">View Applied Leaves</button>
     <button *ngIf="getUserRole() === 'ADMIN'" class="fees" (click)="viewFeeDetails()">View Fee Details</button>
   </div>
-  <button class="back-button" *ngIf="getUserRole() === 'STUDENT'" (click)="goBack()">Go Back</button>
+  <button class="back-button" (click)="goBack()">Back to Student List</button>
 </div>
 
 <div *ngIf="!studentDetails">

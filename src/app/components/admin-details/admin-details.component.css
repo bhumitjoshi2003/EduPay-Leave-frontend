@@ -1,7 +1,7 @@
+/* --- Main Container (Teacher Profile Style) --- */
 .admin-details-container {
     padding: 50px;
     font-family: 'Poppins', sans-serif;
-    /* Applying teacher component's background style */
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
@@ -13,61 +13,17 @@
     gap: 30px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     margin: 20px auto;
-    width: 90%;
+    width: 92%;
 }
 
-button {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 12px;
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1em;
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
-    white-space: nowrap;
-}
-
-button:not(.cancel-btn, .delete-btn, .back-button),
-.password-btn {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-}
-
-.save-btn,
-.edit-btn {
-    background: linear-gradient(135deg, #28a745, #20c997) !important;
-}
-
-.cancel-btn,
-.delete-btn,
-.back-button {
-    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
-}
-
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
-}
-
+/* --- Header & Title --- */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 15px;
-    margin-bottom: 0;
-    border-bottom: none;
     padding-bottom: 30px;
-}
-
-.header-buttons {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    flex-grow: 1;
-    align-items: center;
 }
 
 .title-section h2 {
@@ -81,7 +37,16 @@ button:hover {
     flex-shrink: 0;
 }
 
-/* Applying gradients to all buttons */
+.header-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    flex-grow: 1;
+    align-items: center;
+}
+
+/* --- Global Button Core Styles --- */
 button {
     padding: 12px 20px;
     border: none;
@@ -91,7 +56,6 @@ button {
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1em;
-    background: linear-gradient(135deg, #4fbdbd, #1f6f8b);
     box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
     white-space: nowrap;
 }
@@ -99,42 +63,31 @@ button {
 button:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
-    opacity: 1;
-    /* Resetting previous opacity on hover */
 }
 
-/* Resetting default rule from original CSS */
-button:not(.cancel-btn, .delete-btn, .back-button, .password-btn) {
-    background: linear-gradient(135deg, #4fbdbd, #1f6f8b);
-    color: white;
-}
 
+.edit-btn,
 .save-btn {
     background: linear-gradient(135deg, #28a745, #20c997) !important;
-    color: white;
 }
 
-/* Cancel and Delete use the Teacher list's Red/Orange style on hover */
+.password-btn,
+.delete-btn,
 .cancel-btn {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: white;
-}
-
-.delete-btn {
-    background: linear-gradient(135deg, #ff4757, #ff6b81);
-    color: white;
+    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
 }
 
 .back-button {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: white;
-    margin-top: 20px;
+    background: linear-gradient(135deg, #4fbdbd, #1f6f8b);
+    margin-top: 50px;
     width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
 }
 
 .details-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 25px;
 }
 
@@ -143,14 +96,12 @@ button:not(.cancel-btn, .delete-btn, .back-button, .password-btn) {
     border-radius: 15px;
     padding: 20px 25px;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     border-left: 6px solid #4fbdbd;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    gap: 10px;
-    /* Space between label and value */
 }
 
 .detail-item:hover {
@@ -161,32 +112,29 @@ button:not(.cancel-btn, .delete-btn, .back-button, .password-btn) {
 .label {
     font-weight: 600;
     color: #333;
-    font-size: 1.2em;
-    /* Slightly larger like the screenshot */
-    text-transform: none;
-    width: 100%;
+    font-size: 1.1em;
+    width: 40%;
 }
 
 .value {
     color: #111;
-    font-size: 1.3em;
-    /* Bold and clear value */
+    font-size: 1.2em;
     font-weight: 500;
     word-break: break-word;
-    text-align: left;
-    /* Aligned to the left like teacher profile */
-    width: 100%;
+    text-align: right;
+    width: 60%;
 }
 
+/* --- Input Fields --- */
 input,
 select {
     width: 100% !important;
-    margin-left: 0 !important;
     padding: 12px;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1em;
     background: #fff;
+    box-sizing: border-box;
 }
 
 input:focus,
@@ -196,142 +144,63 @@ select:focus {
     outline: none;
 }
 
-/* Validation styling */
 input.is-invalid,
 select.is-invalid {
     border: 2px solid #dc3545 !important;
     background-color: #fff8f8;
 }
 
-/* Responsive Adjustments matched to teacher component */
+/* --- Responsive Adjustments --- */
+
+/* Tablet View: Drop to 2 columns */
 @media (max-width: 1023px) {
     .admin-details-container {
-        padding: 20px;
-        gap: 20px;
-    }
-
-    .title-section h2 {
-        font-size: 1.8em;
-    }
-
-    .header-buttons button {
-        padding: 10px 16px;
-        font-size: 0.9em;
-    }
-
-    .header-buttons {
-        gap: 10px;
+        padding: 30px;
+        width: 95%;
     }
 
     .details-grid {
-        gap: 20px;
-    }
-
-    .detail-item {
-        padding: 18px 20px;
-    }
-
-    .label {
-        font-size: 1em;
-    }
-
-    .value {
-        font-size: 1.05em;
-    }
-
-    input,
-    select {
-        padding: 8px 12px;
-        font-size: 0.95em;
-    }
-
-    .back-button {
-        padding: 12px 24px;
-        font-size: 0.9em;
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 767px) {
     .admin-details-container {
-        padding: 10px;
-        gap: 15px;
-        margin: 15px auto;
-        width: 94%;
-        flex-direction: column;
+        padding: 15px;
+        gap: 20px;
+        width: 93%;
     }
 
     .header {
         flex-direction: column;
         align-items: center;
-        gap: 15px;
-        width: 100%;
-        padding-bottom: 15px;
-        margin-bottom: 10px;
+        text-align: center;
     }
 
     .title-section h2 {
-        font-size: 1.5em;
-        text-align: center;
+        font-size: 1.6em;
         width: 100%;
         padding-bottom: 8px;
     }
 
-    .title-section {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-    }
-
     .header-buttons {
         width: 100%;
-        justify-content: space-around;
+        justify-content: center;
         gap: 8px;
     }
 
     .header-buttons button {
-        padding: 8px 12px;
-        font-size: 0.8em;
         flex-grow: 1;
-        min-width: unset;
+        font-size: 0.85em;
+        padding: 10px;
     }
 
     .details-grid {
-        gap: 15px;
         grid-template-columns: 1fr;
     }
 
     .detail-item {
-        flex-direction: column;
-        align-items: flex-start;
         padding: 15px;
-        gap: 5px;
-    }
-
-    .label {
-        flex-basis: auto;
-        font-size: 0.95em;
-        width: 100%;
-    }
-
-    .value {
-        text-align: left;
-        font-size: 1em;
-        width: 100%;
-    }
-
-    input,
-    select {
-        margin-left: 0;
-        width: 100%;
-        padding: 8px 10px;
-        font-size: 0.9em;
-    }
-
-    .back-button {
-        padding: 10px 20px;
-        font-size: 0.85em;
-        width: 100%;
-        min-width: unset;
     }
 }
 

@@ -1,12 +1,12 @@
 .admin-list-container {
     display: flex;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #eaf6f6, #f0f8ff);
     border-radius: 15px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
     animation: fadeIn 0.8s ease-in-out;
     padding: 30px;
-    margin: 20px auto;
+    margin: auto auto;
     width: 95%;
 }
 

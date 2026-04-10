@@ -55,8 +55,15 @@
         <span class="label">Class Teacher:</span>
         <span class="value" *ngIf="!isEditing">
           {{ teacherDetails.classTeacher ? teacherDetails.classTeacher : 'Not Assigned' }}</span>
-        <input type="text" *ngIf="isEditing" name="classTeacher" [(ngModel)]="updatedDetails.classTeacher"
-          (input)="updateFieldValue('classTeacher', $event)" placeholder="Not Assigned">
+
+        <select *ngIf="isEditing" name="classTeacher" [(ngModel)]="updatedDetails.classTeacher"
+          (change)="updateFieldValue('classTeacher', $event)">
+          <option value="">Not Assigned</option>
+          <option *ngFor="let className of classList" [value]="className">
+            {{ className }}
+          </option>
+        </select>
+
       </div>
     </div>
   </form>

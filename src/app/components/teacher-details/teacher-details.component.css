@@ -298,6 +298,23 @@
     width: 100%;
   }
 
+  select {
+    width: 100% !important;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    background: #fff;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+
+  select:focus {
+    border-color: #4fbdbd;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 189, 189, 0.2);
+  }
+
   .detail-item input[type="text"],
   .detail-item input[type="email"],
   .detail-item input[type="date"] {

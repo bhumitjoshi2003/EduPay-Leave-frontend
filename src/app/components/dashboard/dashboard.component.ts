@@ -156,8 +156,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       if (this.Role === 'STUDENT') {
         this.router.navigate(['/dashboard/apply-leave']);
       } else if (this.Role === 'TEACHER') {
-        this.router.navigate(['/dashboard/teacher-attendance']);
-      } else if (this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN' || this.Role === 'FINANCE_ADMIN') {
+        this.router.navigate(['/dashboard/event-calendar']);
+      } else if (this.Role === 'ADMIN') {
         this.router.navigate(['/dashboard/fee-structure']);
       } else if (this.Role === 'SUPER_ADMIN') {
         this.router.navigate(['/dashboard/admin-list']);
@@ -177,10 +177,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   isAdmin(): boolean {
     return this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN';
-  }
-
-  isFinanceAdmin(): boolean {
-    return this.Role === 'FINANCE_ADMIN';
   }
 
   isSuperAdmin(): boolean {

@@ -202,7 +202,7 @@ export class BusFeesComponent implements OnInit {
     const token = localStorage.getItem('accessToken');
     if (token) {
       const decodedToken: any = jwtDecode(token);
-      return decodedToken.role === "FINANCE_ADMIN";
+      return decodedToken.role === "SUPER_ADMIN";
     }
     return false;
   }

@@ -1,12 +1,12 @@
 .admin-list-container {
     display: flex;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #eaf6f6, #f0f8ff);
     border-radius: 15px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
     animation: fadeIn 0.8s ease-in-out;
     padding: 30px;
-    margin: auto auto;
+    margin: 20px auto;
     width: 95%;
 }
 
@@ -21,7 +21,6 @@
 
 .list-header h2 {
     border-bottom: none !important;
-    /* Overriding the existing h2 border */
     margin-bottom: 0 !important;
     width: auto !important;
 }
@@ -214,13 +213,12 @@
         gap: 10px;
     }
 
-    .button-group {
-        width: 100%;
-        justify-content: flex-end;
-    }
-
     .admin-info {
         width: 100%;
+    }
+
+    .button-group {
+        display: none;
     }
 
     .list-header {

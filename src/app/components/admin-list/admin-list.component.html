@@ -20,7 +20,6 @@
                         <button class="view-details-button" (click)="viewAdminDetails(admin.adminId)">
                             View Details
                         </button>
-
                         <button *ngIf="loggedInUserRole === 'SUPER_ADMIN'" class="delete-button"
                             (click)="deleteAdmin($event, admin.adminId)">
                             Delete

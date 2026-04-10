@@ -128,7 +128,8 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
         action.pipe(takeUntil(this.ngUnsubscribe)).subscribe({
           next: () => {
             Swal.fire('Saved!', 'Admin details updated successfully.', 'success');
-            this.router.navigate(['/dashboard/admin-list']);
+            this.isEditing = false;
+            this.updatedDetails = { ...this.adminDetails! };
           },
           error: (err) => Swal.fire('Error', err.error?.message || 'Server error occurred', 'error')
         });

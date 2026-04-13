@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AdminService } from '../../services/admin.service';
 import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import Swal from 'sweetalert2';
@@ -22,7 +22,8 @@ export class AdminListComponent implements OnInit, OnDestroy {
 
   constructor(
     private adminService: AdminService,
-    private router: Router
+    private router: Router,
+    private authStateService: AuthStateService
   ) { }
 
   ngOnInit(): void {
@@ -35,11 +36,10 @@ export class AdminListComponent implements OnInit, OnDestroy {
   }
 
   checkAccessAndLoadAdmins(): void {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      this.loggedInUserRole = decodedToken.role;
-      this.currentUserId = decodedToken.userId;
+    const user = this.authStateService.getUser();
+    if (user) {
+      this.loggedInUserRole = user.role;
+      this.currentUserId = user.userId;
 
       if (this.loggedInUserRole === 'ADMIN' || this.loggedInUserRole === 'SUPER_ADMIN') {
         this.loadAdmins();

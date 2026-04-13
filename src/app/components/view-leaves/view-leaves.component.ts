@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, switchMap, Observable, debounceTime, distinctUntilChanged } from 'rxjs';
 import { TeacherService } from '../../services/teacher.service';
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -54,7 +54,8 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private leaveService: LeaveService,
-    private teacherService: TeacherService
+    private teacherService: TeacherService,
+    private authStateService: AuthStateService
   ) { }
 
   ngOnInit(): void {
@@ -77,11 +78,10 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   }
 
   loadInitialData(): void {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      this.loggedInUserRole = decodedToken.role;
-      this.loggedInUserId = decodedToken.userId;
+    const user = this.authStateService.getUser();
+    if (user) {
+      this.loggedInUserRole = user.role;
+      this.loggedInUserId = user.userId;
 
       if (this.loggedInUserRole === 'ADMIN') {
         this.selectedClass = localStorage.getItem('lastSelectedClass') || 'all';

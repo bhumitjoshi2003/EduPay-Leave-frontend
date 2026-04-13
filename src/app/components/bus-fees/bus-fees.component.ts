@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BusFeesService, BusFee } from '../../services/bus-fees.service';
 import { Subject, takeUntil } from 'rxjs';
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -22,7 +22,10 @@ export class BusFeesComponent implements OnInit, OnDestroy {
   isEditing = false;
   originalBusFees: BusFee[] = [];
 
-  constructor(private busFeesService: BusFeesService) { }
+  constructor(
+    private busFeesService: BusFeesService,
+    private authStateService: AuthStateService
+  ) { }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -206,12 +209,7 @@ export class BusFeesComponent implements OnInit, OnDestroy {
   }
 
   canEdit(): boolean {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      return decodedToken.role === "SUPER_ADMIN";
-    }
-    return false;
+    return this.authStateService.getUserRole() === 'SUPER_ADMIN';
   }
 
   trackByIndex(index: number): number { return index; }

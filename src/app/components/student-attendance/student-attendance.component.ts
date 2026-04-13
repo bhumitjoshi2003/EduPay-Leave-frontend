@@ -3,7 +3,7 @@ import Chart from 'chart.js/auto';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { forkJoin, Subject, takeUntil } from 'rxjs';
 import { AttendanceService } from '../../services/attendance.service';
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -27,7 +27,8 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy, AfterViewI
   constructor(
     private attendanceService: AttendanceService,
     @Inject(PLATFORM_ID) private platformId: Object,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private authStateService: AuthStateService
   ) { }
 
   ngOnDestroy(): void {
@@ -40,13 +41,12 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   ngOnInit(): void {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      this.role = decodedToken.role;
+    const user = this.authStateService.getUser();
+    if (user) {
+      this.role = user.role;
 
       if (this.role === 'STUDENT') {
-        this.studentId = decodedToken.userId;
+        this.studentId = user.userId;
       } else {
         this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
           const routeStudentId = params['studentId'];

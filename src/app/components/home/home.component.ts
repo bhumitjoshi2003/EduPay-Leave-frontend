@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 
@@ -29,10 +30,15 @@ export class HomeComponent implements OnInit {
   loginState = 'initial';
   hidePassword = true;
 
-  constructor(private authService: AuthService, private snackBar: MatSnackBar, private router: Router) { }
+  constructor(
+    private authService: AuthService,
+    private authStateService: AuthStateService,
+    private snackBar: MatSnackBar,
+    private router: Router
+  ) { }
 
   ngOnInit() {
-    if (typeof localStorage !== 'undefined' && localStorage.getItem('accessToken')) {
+    if (this.authStateService.isLoggedIn()) {
       this.authenticated = true;
       this.router.navigate(['/dashboard']);
     }
@@ -61,10 +67,7 @@ export class HomeComponent implements OnInit {
 
     this.authService.login(this.userId, this.password).subscribe({
       next: (response) => {
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('accessToken', response.accessToken);
-          localStorage.setItem('refreshToken', response.refreshToken);
-        }
+        this.authStateService.setUser(response);
         this.authenticated = true;
         this.showLoginForm = false;
         this.loginState = 'initial';
@@ -86,8 +89,10 @@ export class HomeComponent implements OnInit {
   }
 
   logout() {
-    this.authService.logout();
-    this.authenticated = false;
+    this.authService.logout().subscribe({
+      next: () => { this.authenticated = false; },
+      error: () => { this.authenticated = false; }
+    });
   }
 
   togglePasswordVisibility() {

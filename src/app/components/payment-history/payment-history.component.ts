@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PaymentHistory } from '../../interfaces/payment-history';
 import { PaginatedResponse, PaymentHistoryService } from '../../services/payment-history.service'; // Import PaginatedResponse
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { saveAs } from 'file-saver';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -52,7 +52,8 @@ export class PaymentHistoryComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
-    private paymentHistoryService: PaymentHistoryService
+    private paymentHistoryService: PaymentHistoryService,
+    private authStateService: AuthStateService
   ) { }
 
   ngOnDestroy(): void {
@@ -61,13 +62,12 @@ export class PaymentHistoryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      this.role = decodedToken.role;
+    const user = this.authStateService.getUser();
+    if (user) {
+      this.role = user.role;
 
       if (this.role === 'STUDENT') {
-        this.studentId = decodedToken.userId;
+        this.studentId = user.userId;
         this.fetchPaymentHistory();
       } else {
         this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {

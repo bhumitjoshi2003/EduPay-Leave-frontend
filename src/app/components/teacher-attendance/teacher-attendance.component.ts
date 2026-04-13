@@ -9,7 +9,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import Swal from 'sweetalert2';
 import { AttendanceData } from '../../interfaces/atendance-data';
 import { AttendanceService } from '../../services/attendance.service';
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { TeacherService } from '../../services/teacher.service';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -54,7 +54,8 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
     private leaveService: LeaveService,
     private studentService: StudentService,
     private attendanceService: AttendanceService,
-    private teacherService: TeacherService
+    private teacherService: TeacherService,
+    private authStateService: AuthStateService
   ) { }
 
   ngOnDestroy(): void {
@@ -74,12 +75,11 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
   }
 
   getUserRoleAndLoadData(): void {
-    const token = localStorage.getItem('accessToken');
+    const user = this.authStateService.getUser();
 
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      this.loggedInUserRole = decodedToken.role;
-      this.teacherId = decodedToken.userId;
+    if (user) {
+      this.loggedInUserRole = user.role;
+      this.teacherId = user.userId;
 
       if (this.loggedInUserRole === 'ADMIN') {
         this.selectedClass = localStorage.getItem('lastSelectedClass') || this.classList[0];
@@ -87,9 +87,6 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
       } else {
         this.getTeacherClassAndLoadStudents();
       }
-
-    } else {
-      Swal.fire('Error', 'Authentication token not found.', 'error');
     }
   }
 

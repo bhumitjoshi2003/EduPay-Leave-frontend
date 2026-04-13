@@ -9,7 +9,7 @@ import { StudentService } from '../../services/student.service';
 import { BusFeesService } from '../../services/bus-fees.service';
 import Swal from 'sweetalert2';
 import { PaymentData } from '../../interfaces/payment-data';
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
@@ -40,7 +40,8 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private busFeesService: BusFeesService,
     private authService: AuthService,
-    private attendanceService: AttendanceService
+    private attendanceService: AttendanceService,
+    private authStateService: AuthStateService
   ) { }
 
   comingSoonConfig = MODULE_MESSAGES.fees;
@@ -115,11 +116,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
   }
 
   getStudentId(): void {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      this.studentId = decodedToken.userId;
-    }
+    this.studentId = this.authStateService.getUserId();
   }
 
   fetchSessions() {

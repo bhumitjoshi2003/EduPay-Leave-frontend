@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { jwtDecode } from 'jwt-decode';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AuthStateService } from './auth-state.service';
 
 interface ChangePasswordRequest {
   userId: string;
@@ -17,21 +17,28 @@ export class AuthService {
 
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authStateService: AuthStateService) { }
 
   register(userData: any): Observable<any> {
     return this.http.post(this.apiUrl + '/register', userData, { responseType: 'text' });
   }
 
   login(userId: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, { userId, password });
+    return this.http.post<any>(`${this.apiUrl}/login`, { userId, password }, { withCredentials: true });
   }
 
-  refreshToken() {
-    const refreshToken = localStorage.getItem("refreshToken");
-    return this.http.post(`${this.apiUrl}/refresh-token`, { refreshToken });
+  refreshToken(): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/refresh-token`, {}, { withCredentials: true });
   }
 
+  logout(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true, responseType: 'text' }).pipe(
+      tap(() => {
+        this.authStateService.clearUser();
+        localStorage.removeItem('redirectUrl');
+      })
+    );
+  }
 
   changePassword(request: ChangePasswordRequest): Observable<any> {
     return this.http.post(this.apiUrl + '/change-password', request, { responseType: 'text' });
@@ -42,30 +49,14 @@ export class AuthService {
   }
 
   resetPassword(token: string, newPassword: string): Observable<any> {
-    console.log(this.apiUrl + '/reset-password?token=' + token);
     return this.http.post(this.apiUrl + '/reset-password?token=' + token, { newPassword }, { responseType: 'text' });
   }
 
-  logout() {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-  }
-
   getUserRole(): string {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      return decodedToken.role;
-    }
-    return '';
+    return this.authStateService.getUserRole();
   }
 
   getUserId(): string {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      return decodedToken.userId;
-    }
-    return '';
+    return this.authStateService.getUserId();
   }
 }

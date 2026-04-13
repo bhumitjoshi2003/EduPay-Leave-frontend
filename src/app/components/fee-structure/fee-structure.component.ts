@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { BusFeesComponent } from '../bus-fees/bus-fees.component';
 import { FeeStructure, FeeStructureService } from '../../services/fee-structure.service';
 import { Subject, takeUntil } from 'rxjs';
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -24,7 +24,10 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
   feeStructures: FeeStructure[] = [];
   originalFeeStructure: FeeStructure[] = [];
 
-  constructor(private feeStructureService: FeeStructureService) { }
+  constructor(
+    private feeStructureService: FeeStructureService,
+    private authStateService: AuthStateService
+  ) { }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -228,11 +231,6 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
   trackByClassName(index: number, fee: FeeStructure): string { return fee.className; }
 
   canEdit(): boolean {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      return decodedToken.role === "SUPER_ADMIN";
-    }
-    return false;
+    return this.authStateService.getUserRole() === 'SUPER_ADMIN';
   }
 }

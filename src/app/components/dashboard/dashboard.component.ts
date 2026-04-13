@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatBadgeModule } from '@angular/material/badge';
 import { AuthService } from '../../auth/auth.service';
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { CommonModule } from '@angular/common';
 import { StudentService } from '../../services/student.service';
 import { TeacherService } from '../../services/teacher.service';
@@ -47,6 +47,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private authService: AuthService,
+    private authStateService: AuthStateService,
     private studentService: StudentService,
     private teacherService: TeacherService,
     private adminService: AdminService,
@@ -82,11 +83,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   getDetails() {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      this.Role = decodedToken.role;
-      this.Id = decodedToken.userId;
+    const user = this.authStateService.getUser();
+    if (user) {
+      this.Role = user.role;
+      this.Id = user.userId;
       this.fetchUserDetails();
     }
   }
@@ -185,8 +185,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   logout() {
     localStorage.removeItem(this.welcomeMessageKey);
-    this.authService.logout();
-    this.router.navigate(['/home']);
+    this.authService.logout().subscribe({
+      next: () => this.router.navigate(['/home']),
+      error: () => this.router.navigate(['/home'])
+    });
   }
 
   navigateToMyProfile(): void {

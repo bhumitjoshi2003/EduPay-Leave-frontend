@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { StudentService } from '../../services/student.service';
 import { TeacherService } from '../../services/teacher.service';
 import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -33,7 +33,8 @@ export class StudentListComponent implements OnInit, OnDestroy {
   constructor(
     private studentService: StudentService,
     private teacherService: TeacherService,
-    private router: Router
+    private router: Router,
+    private authStateService: AuthStateService
   ) { }
 
   ngOnDestroy(): void {
@@ -46,21 +47,18 @@ export class StudentListComponent implements OnInit, OnDestroy {
   }
 
   getUserRoleAndLoadData(): void {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      this.loggedInUserRole = decodedToken.role;
-      this.teacherId = decodedToken.userId;
+    const user = this.authStateService.getUser();
+    if (user) {
+      this.loggedInUserRole = user.role;
+      this.teacherId = user.userId;
 
       if (this.loggedInUserRole === 'ADMIN') {
-        this.selectedClass = localStorage.getItem('lastSelectedClass')! ? localStorage.getItem('lastSelectedClass')! : this.classList[0];
+        this.selectedClass = localStorage.getItem('lastSelectedClass') || this.classList[0];
         this.loadStudents();
       } else if (this.loggedInUserRole === 'TEACHER') {
         this.getTeacherClassAndLoadStudents();
       }
     } else {
-      console.error('No token found');
-      this.router.navigate(['/login']);
     }
   }
 

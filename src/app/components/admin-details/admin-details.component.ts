@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import Swal from 'sweetalert2';
 
 interface Admin {
@@ -43,15 +43,15 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private adminService: AdminService,
-    private authService: AuthService
+    private authService: AuthService,
+    private authStateService: AuthStateService
   ) { }
 
   ngOnInit(): void {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decoded: any = jwtDecode(token);
-      this.loggedInUserRole = decoded.role;
-      this.loggedInUserId = decoded.userId;
+    const user = this.authStateService.getUser();
+    if (user) {
+      this.loggedInUserRole = user.role;
+      this.loggedInUserId = user.userId;
     }
 
     this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {

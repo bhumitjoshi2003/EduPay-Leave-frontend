@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { TeacherService } from '../../services/teacher.service';
 import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -24,7 +24,8 @@ export class TeacherListComponent implements OnInit, OnDestroy {
 
   constructor(
     private teacherService: TeacherService,
-    private router: Router
+    private router: Router,
+    private authStateService: AuthStateService
   ) { }
 
   ngOnInit(): void {
@@ -37,10 +38,9 @@ export class TeacherListComponent implements OnInit, OnDestroy {
   }
 
   getUserRoleAndLoadTeachers(): void {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      this.loggedInUserRole = decodedToken.role;
+    const user = this.authStateService.getUser();
+    if (user) {
+      this.loggedInUserRole = user.role;
 
       if (this.loggedInUserRole === 'ADMIN') {
         this.loadAllTeachers();

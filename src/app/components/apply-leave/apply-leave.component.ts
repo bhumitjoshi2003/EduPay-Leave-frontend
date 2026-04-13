@@ -6,7 +6,7 @@ import { LeaveService } from '../../services/leave.service';
 import { StudentService } from '../../services/student.service';
 import Swal from 'sweetalert2';
 import { LeaveRequest } from '../../interfaces/leave-request';
-import { jwtDecode } from 'jwt-decode';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { PaginatedResponse } from '../../services/payment-history.service';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -44,7 +44,8 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private leaveService: LeaveService,
-    private studentService: StudentService
+    private studentService: StudentService,
+    private authStateService: AuthStateService
   ) {
     this.leaveForm = this.fb.group({
       leaveDate: ['', Validators.required],
@@ -83,10 +84,9 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
   }
 
   getStudentId(): void {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      this.studentId = decodedToken.userId;
+    const user = this.authStateService.getUser();
+    if (user) {
+      this.studentId = user.userId;
       this.studentService.getStudent(this.studentId).pipe(takeUntil(this.destroy$)).subscribe({
         next: (student) => {
           this.className = student.className;

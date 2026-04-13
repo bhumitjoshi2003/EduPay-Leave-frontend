@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { StudentService } from '../../services/student.service';
 import { TeacherService } from '../../services/teacher.service';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
 
 interface Student {
   studentId: string;
@@ -17,7 +18,8 @@ interface Student {
   styleUrl: './student-list.component.css'
 })
 
-export class StudentListComponent implements OnInit {
+export class StudentListComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   activeStudents: Student[] = [];
   newStudents: Student[] = [];
   inactiveStudents: Student[] = [];
@@ -33,6 +35,11 @@ export class StudentListComponent implements OnInit {
     private teacherService: TeacherService,
     private router: Router
   ) { }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   ngOnInit(): void {
     this.getUserRoleAndLoadData();
@@ -58,7 +65,7 @@ export class StudentListComponent implements OnInit {
   }
 
   getTeacherClassAndLoadStudents(): void {
-    this.teacherService.getTeacher(this.teacherId).subscribe({
+    this.teacherService.getTeacher(this.teacherId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (teacher: any) => {
         this.selectedClass = teacher.classTeacher;
         this.loadStudents();
@@ -70,15 +77,15 @@ export class StudentListComponent implements OnInit {
   }
 
   loadStudents(): void {
-    this.studentService.getActiveStudentsByClass(this.selectedClass).subscribe((students) => {
+    this.studentService.getActiveStudentsByClass(this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe((students) => {
       this.activeStudents = students;
     });
     if (this.loggedInUserRole === 'ADMIN') {
       console.log("admin");
-      this.studentService.getNewStudentsByClass(this.selectedClass).subscribe((students) => {
+      this.studentService.getNewStudentsByClass(this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe((students) => {
         this.newStudents = students;
       });
-      this.studentService.getInactiveStudentsByClass(this.selectedClass).subscribe((students) => {
+      this.studentService.getInactiveStudentsByClass(this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe((students) => {
         this.inactiveStudents = students;
       });
     }
@@ -88,6 +95,9 @@ export class StudentListComponent implements OnInit {
   viewStudentDetails(studentId: string): void {
     this.router.navigate(['/dashboard/student-details', studentId]);
   }
+
+  trackByStudentId(index: number, student: Student): string { return student.studentId; }
+  trackByClass(index: number, className: string): string { return className; }
 
   onClassSelect(selectedClass: string): void {
     this.selectedClass = selectedClass;

@@ -6,7 +6,7 @@
       <div class="session-select-wrapper">
         <label for="session-select">Academic Session:</label>
         <select id="session-select" [(ngModel)]="currentSession" (change)="changeSession(currentSession)">
-          <option *ngFor="let session of sessions" [value]="session">{{ session }}</option>
+          <option *ngFor="let session of sessions; trackBy: trackBySession" [value]="session">{{ session }}</option>
         </select>
       </div>
 
@@ -39,7 +39,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let fee of feeStructures">
+            <tr *ngFor="let fee of feeStructures; trackBy: trackByClassName">
               <td>
                 <input *ngIf="isEditing" type="text" [(ngModel)]="fee.className" />
                 <span *ngIf="!isEditing">{{ fee.className }}</span>

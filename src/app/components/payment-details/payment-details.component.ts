@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PaymentHistoryService } from '../../services/payment-history.service';
 import { PaymentHistoryDetails } from '../../interfaces/payment-response'; 
 import { CommonModule } from '@angular/common';
 import saveAs from 'file-saver';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-payment-details',
@@ -11,7 +12,8 @@ import saveAs from 'file-saver';
   imports: [CommonModule],
   styleUrls: ['./payment-details.component.css']
 })
-export class PaymentDetailsComponent implements OnInit {
+export class PaymentDetailsComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   paymentId: string = '';
   paymentDetails: PaymentHistoryDetails | null = null;
   loading: boolean = true;
@@ -20,8 +22,13 @@ export class PaymentDetailsComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, private paymentHistoryService: PaymentHistoryService) {}
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.paymentId = params['paymentId'];
       this.fetchPaymentDetails();
     });

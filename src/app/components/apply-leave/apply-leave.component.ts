@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule, formatDate } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { LeaveRequest } from '../../interfaces/leave-request';
 import { jwtDecode } from 'jwt-decode';
 import { PaginatedResponse } from '../../services/payment-history.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-apply-leave',
@@ -15,7 +16,8 @@ import { PaginatedResponse } from '../../services/payment-history.service';
   styleUrls: ['./apply-leave.component.css'],
   imports: [ReactiveFormsModule, CommonModule],
 })
-export class ApplyLeaveComponent implements OnInit {
+export class ApplyLeaveComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   leaveForm: FormGroup;
   errorMessage: string = '';
   studentId: string = '';
@@ -51,6 +53,11 @@ export class ApplyLeaveComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngOnInit(): void {
     const today = new Date();
     this.today = formatDate(today, 'yyyy-MM-dd', 'en');
@@ -80,7 +87,7 @@ export class ApplyLeaveComponent implements OnInit {
     if (token) {
       const decodedToken: any = jwtDecode(token);
       this.studentId = decodedToken.userId;
-      this.studentService.getStudent(this.studentId).subscribe({
+      this.studentService.getStudent(this.studentId).pipe(takeUntil(this.destroy$)).subscribe({
         next: (student) => {
           this.className = student.className;
           this.loadStudentLeaves();
@@ -167,6 +174,9 @@ export class ApplyLeaveComponent implements OnInit {
       });
     }
   }
+
+  trackByLeaveDate(index: number, leave: { originalLeaveDate: string }): string { return leave.originalLeaveDate; }
+  trackByReason(index: number, reason: string): string { return reason; }
 
   check(): void {
     if (this.leaveForm.get('leaveDate')?.hasError('required')) {

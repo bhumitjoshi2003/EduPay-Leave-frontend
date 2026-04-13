@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BusFeesComponent } from '../bus-fees/bus-fees.component';
 import { FeeStructure, FeeStructureService } from '../../services/fee-structure.service';
+import { Subject, takeUntil } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import Swal from 'sweetalert2';
 
@@ -13,7 +14,8 @@ import Swal from 'sweetalert2';
   templateUrl: './fee-structure.component.html',
   styleUrls: ['./fee-structure.component.css']
 })
-export class FeeStructureComponent implements OnInit {
+export class FeeStructureComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   sessions: string[] = [];
   currentSession: string = '';
   isEditing = false;
@@ -24,12 +26,17 @@ export class FeeStructureComponent implements OnInit {
 
   constructor(private feeStructureService: FeeStructureService) { }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngOnInit(): void {
     this.fetchSessions();
   }
 
   fetchSessions(): void {
-    this.feeStructureService.getAcademicYears().subscribe(sessions => {
+    this.feeStructureService.getAcademicYears().pipe(takeUntil(this.destroy$)).subscribe(sessions => {
       this.sessions = sessions;
       if (this.sessions.length > 0) {
         this.currentSession = this.sessions[this.sessions.length - 1];
@@ -39,7 +46,7 @@ export class FeeStructureComponent implements OnInit {
   }
 
   fetchFeeStructures(): void {
-    this.feeStructureService.getFeeStructures(this.currentSession).subscribe(feeStructures => {
+    this.feeStructureService.getFeeStructures(this.currentSession).pipe(takeUntil(this.destroy$)).subscribe(feeStructures => {
       this.feeStructures = feeStructures;
       this.originalFeeStructure = JSON.parse(JSON.stringify(this.feeStructures));
     });
@@ -216,6 +223,9 @@ export class FeeStructureComponent implements OnInit {
       this.feeStructures.pop();
     }
   }
+
+  trackBySession(index: number, session: string): string { return session; }
+  trackByClassName(index: number, fee: FeeStructure): string { return fee.className; }
 
   canEdit(): boolean {
     const token = localStorage.getItem('accessToken');

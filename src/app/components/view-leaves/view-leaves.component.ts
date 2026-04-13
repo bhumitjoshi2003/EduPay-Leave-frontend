@@ -58,7 +58,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
+    this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
       const studentIdFromParams = params['studentId'];
       if (studentIdFromParams) {
         this.studentIdFilter = studentIdFromParams;
@@ -298,6 +298,10 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
     this.fetchLeaves();
   }
 
+
+  trackByLeaveId(index: number, leave: LeaveApplication): string { return leave.id; }
+  trackByClass(index: number, className: string): string { return className; }
+  trackByIndex(index: number): number { return index; }
 
   getPaginationDisplayPages(): (number | string)[] {
     const pages: (number | string)[] = [];

@@ -10,7 +10,7 @@
     </div>
 
     <div class="calendar-grid">
-        <ng-container *ngFor="let dayCell of daysInMonth">
+        <ng-container *ngFor="let dayCell of daysInMonth; trackBy: trackByDayCell">
             <div class="calendar-day" [class.empty]="!dayCell.date"
                 [class.today]="dayCell.date && isToday(dayCell.date)"
                 (click)="dayCell.date && (isMobileView ? toggleMobileDayEvents(dayCell) : openDayPopover($event, dayCell.date))">
@@ -38,7 +38,7 @@
                     <ng-container *ngIf="isMobileView">
                         <div *ngIf="dayCell.events.length" class="mobile-event-list"
                             [class.expanded]="dayCell.expanded">
-                            <div *ngFor="let ev of dayCell.events" class="event-item"
+                            <div *ngFor="let ev of dayCell.events; trackBy: trackByEvent" class="event-item"
                                 [ngStyle]="{'background-color': getEventColor(ev.category || 'Default')}"
                                 (click)="showEventDetails(ev, $event)">
                                 {{ ev.title }}
@@ -48,7 +48,7 @@
 
                     <ng-container *ngIf="!isMobileView">
                         <div *ngIf="dayCell.events.length" class="desktop-event-list">
-                            <div *ngFor="let ev of dayCell.events" class="event-item"
+                            <div *ngFor="let ev of dayCell.events; trackBy: trackByEvent" class="event-item"
                                 [ngStyle]="{'background-color': getEventColor(ev.category || 'Default')}"
                                 (click)="showEventDetails(ev, $event)"> {{ ev.title }}
                             </div>

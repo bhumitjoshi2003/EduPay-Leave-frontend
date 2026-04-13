@@ -83,7 +83,7 @@ export class PaymentComponent {
         this.razorpayService.createOrder(this.paymentData).subscribe((response: any) => {
 
           const options = {
-            key: 'rzp_test_uzFJONVXH4vqou',
+            key: response.razorpayKey,
             amount: response.amount,
             currency: 'INR',
             name: 'Indra Academy Sr. Sec. School',

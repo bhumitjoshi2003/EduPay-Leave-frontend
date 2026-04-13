@@ -3,7 +3,7 @@
       <h2>List of Teachers</h2>
       <div *ngIf="teachers.length > 0; else noTeachersContainer">
         <ul class="teacher-list">
-          <li *ngFor="let teacher of teachers" class="teacher-item" (click)="viewTeacherDetails(teacher.teacherId)">
+          <li *ngFor="let teacher of teachers; trackBy: trackByTeacherId" class="teacher-item" (click)="viewTeacherDetails(teacher.teacherId)">
             <div class="teacher-info">
               <span class="teacher-name">{{ teacher.name }}</span>
               <span class="teacher-id">({{ teacher.teacherId }})</span>

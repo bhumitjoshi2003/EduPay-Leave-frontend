@@ -1,15 +1,19 @@
 <div *ngIf="showFeesModule; else comingSoonTemplate">
   <div class="payment-tracker">
-    <div *ngIf="pastUnpaidMonthsWithLateFees" class="unpaid-month-warning">
-      <p [innerHTML]="pastUnpaidMonthsWithLateFees"></p>
+    <div *ngIf="pastUnpaidMonthNames.length > 0" class="unpaid-month-warning">
+      <p>Late fees have been applied for the following overdue {{ pastUnpaidMonthNames.length > 1 ? 'months' : 'month' }}:
+        <ng-container *ngFor="let name of pastUnpaidMonthNames; let last = last; trackBy: trackByIndex">
+          <span class="past-unpaid-month">{{ name }}</span><ng-container *ngIf="!last">, </ng-container>
+        </ng-container>.
+      </p>
     </div>
-    <div *ngIf="unpaidCurrentMonthMessage" class="unpaid-month-warning">
-      <p [innerHTML]="unpaidCurrentMonthMessage"></p>
+    <div *ngIf="unpaidCurrentMonthName" class="unpaid-month-warning">
+      <p>Reminder: Kindly ensure that the fee for <span class="unpaid-month">{{ unpaidCurrentMonthName }}</span> is paid before the end of this month to avoid late charges.</p>
     </div>
     <div class="header">
       <div class="year-select-wrapper">
         <select [disabled]="lastSelectedMonth" [(ngModel)]="session" (change)="onYearChange($event)">
-          <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+          <option *ngFor="let year of years; trackBy: trackByYear" [value]="year">{{ year }}</option>
         </select>
       </div>
       <div class="total-amount" *ngIf="role !== 'ADMIN'">
@@ -18,7 +22,7 @@
     </div>
 
     <div class="month-grid">
-      <div *ngFor="let month of months" class="month" [ngClass]="{
+      <div *ngFor="let month of months; trackBy: trackByMonth" class="month" [ngClass]="{
      'paid': month.paid,
      'manually-paid': month.manuallyPaid,
      'unpaid': !month.paid && !month.manuallyPaid,

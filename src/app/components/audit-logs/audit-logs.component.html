@@ -17,7 +17,7 @@
                 <label>Action Type</label>
                 <select [(ngModel)]="filters.action">
                     <option value="">All Activities</option>
-                    <option *ngFor="let type of actionTypes" [value]="type">{{type}}</option>
+                    <option *ngFor="let type of actionTypes; let i = index; trackBy: trackByIndex" [value]="type">{{type}}</option>
                 </select>
             </div>
 
@@ -54,7 +54,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let log of logs">
+                    <tr *ngFor="let log of logs; trackBy: trackByLogId">
                         <td data-label="Time & Date" class="time-cell">
                             <div class="time-display-wrapper">
                                 <span class="main-date">{{log.timestamp | date:'MMM dd, yyyy'}}</span>

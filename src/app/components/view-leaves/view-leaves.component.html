@@ -7,7 +7,7 @@
           <span>All Leaves</span>
         </div>
       </li>
-      <li *ngFor="let className of classList" (click)="onClassSelect(className)"
+      <li *ngFor="let className of classList; trackBy: trackByClass" (click)="onClassSelect(className)"
         [class.selected]="selectedClass !== 'all' && className === selectedClass" class="class-item-vertical">
         <div class="chevron">
           <span>{{ className }}</span>
@@ -52,7 +52,7 @@
       <div class="page-size">
         Applications per page:
         <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
-          <option *ngFor="let size of pageSizes" [ngValue]="size">{{ size }}</option>
+          <option *ngFor="let size of pageSizes; let i = index; trackBy: trackByIndex" [ngValue]="size">{{ size }}</option>
         </select>
       </div>
     </div>
@@ -70,7 +70,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let leave of filteredLeaves" class="leave-row">
+            <tr *ngFor="let leave of filteredLeaves; trackBy: trackByLeaveId" class="leave-row">
               <td>{{ leave.studentId }}</td>
               <td>{{ leave.studentName }}</td>
               <td>{{ leave.leaveDate }}</td>
@@ -84,7 +84,7 @@
       </div>
 
       <div class="leave-cards-container">
-        <div class="leave-card" *ngFor="let leave of filteredLeaves">
+        <div class="leave-card" *ngFor="let leave of filteredLeaves; trackBy: trackByLeaveId">
           <div class="card-item">
             <span class="card-label">Student ID:</span>
             <span class="card-value">{{ leave.studentId }}</span>
@@ -117,7 +117,7 @@
       <div class="pagination-buttons">
         <button (click)="prevPage()" [disabled]="currentPage === 0">Previous</button>
 
-        <ng-container *ngFor="let pageItem of getPaginationDisplayPages()">
+        <ng-container *ngFor="let pageItem of getPaginationDisplayPages(); let i = index; trackBy: trackByIndex">
           <ng-container *ngIf="pageItem !== '...'; else ellipsisTemplate">
             <button (click)="goToPage(+pageItem)" [class.active]="currentPage === +pageItem">
               {{ +pageItem + 1 }}

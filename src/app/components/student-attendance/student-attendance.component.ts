@@ -1,7 +1,7 @@
-import { Component, OnInit, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID, ViewChild } from '@angular/core';
 import Chart from 'chart.js/auto';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject, takeUntil } from 'rxjs';
 import { AttendanceService } from '../../services/attendance.service';
 import { jwtDecode } from 'jwt-decode';
 import { ActivatedRoute } from '@angular/router';
@@ -12,7 +12,8 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./student-attendance.component.css'],
   imports: [CommonModule],
 })
-export class StudentAttendanceComponent implements OnInit, AfterViewInit {
+export class StudentAttendanceComponent implements OnInit, OnDestroy, AfterViewInit {
+  private destroy$ = new Subject<void>();
   studentId = '';
   attendanceData: { month: string; presentDays: number; absentDays: number }[] = [];
   overallData: { presentDays: number; absentDays: number } = { presentDays: 0, absentDays: 0 };
@@ -29,6 +30,11 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute
   ) { }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngAfterViewInit(): void {
     this.createCharts();
   }
@@ -42,7 +48,7 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
       if (this.role === 'STUDENT') {
         this.studentId = decodedToken.userId;
       } else {
-        this.route.params.subscribe(params => {
+        this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
           const routeStudentId = params['studentId'];
           if (routeStudentId) { this.studentId = routeStudentId; }
         });
@@ -82,7 +88,7 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
       observables.push(this.attendanceService.getAttendanceCounts(this.studentId, academicYearEnd, month));
     }
 
-    forkJoin(observables).subscribe((results) => {
+    forkJoin(observables).pipe(takeUntil(this.destroy$)).subscribe((results) => {
       this.attendanceData = results.map((counts, index) => {
         const workingDays = counts.totalAbsent;
         const absentDays = counts.studentAbsent;
@@ -112,6 +118,8 @@ export class StudentAttendanceComponent implements OnInit, AfterViewInit {
       setTimeout(() => this.createCharts(), 100);
     });
   }
+
+  trackByMonth(index: number, data: { month: string }): string { return data.month; }
 
   createCharts(): void {
     if (isPlatformBrowser(this.platformId)) {

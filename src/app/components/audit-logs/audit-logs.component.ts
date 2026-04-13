@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuditLog, AuditService } from '../../services/audit.service';
+import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -10,7 +11,8 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './audit-logs.component.html',
   styleUrl: './audit-logs.component.css'
 })
-export class AuditLogsComponent implements OnInit {
+export class AuditLogsComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   logs: AuditLog[] = [];
   page = 0;
   size = 20;
@@ -39,12 +41,18 @@ export class AuditLogsComponent implements OnInit {
 
   constructor(private auditService: AuditService) { }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngOnInit() {
     this.loadLogs();
   }
 
   loadLogs() {
     this.auditService.getAuditLogs(this.page, this.size, this.filters)
+      .pipe(takeUntil(this.destroy$))
       .subscribe(res => {
         this.logs = res.content;
         this.totalPages = res.totalPages;
@@ -102,6 +110,9 @@ export class AuditLogsComponent implements OnInit {
       return value;
     }
   }
+
+  trackByLogId(index: number, log: AuditLog): number { return log.id; }
+  trackByIndex(index: number): number { return index; }
 
   formatRole(role: string): string {
     if (!role) return '';

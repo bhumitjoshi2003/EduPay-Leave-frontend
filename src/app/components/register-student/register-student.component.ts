@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
 import { StudentService } from '../../services/student.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -12,7 +13,8 @@ import { AuthService } from '../../auth/auth.service';
   imports: [CommonModule, ReactiveFormsModule],
   styleUrls: ['./register-student.component.css']
 })
-export class RegisterStudentComponent implements OnInit {
+export class RegisterStudentComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   studentForm: FormGroup;
   isBusUser = false;
   classList: string[] = [
@@ -43,8 +45,13 @@ export class RegisterStudentComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngOnInit(): void {
-    this.studentForm.get('takesBus')?.valueChanges.subscribe(value => {
+    this.studentForm.get('takesBus')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
       this.isBusUser = value;
       if (this.isBusUser) {
         this.studentForm.get('distance')?.setValidators([Validators.required]);

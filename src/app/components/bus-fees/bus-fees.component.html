@@ -5,7 +5,7 @@
         <div class="session-select-wrapper">
             <label for="session-select">Academic Session:</label>
             <select id="session-select" [(ngModel)]="currentSession" (change)="changeSession(currentSession)">
-                <option *ngFor="let session of academicYears" [value]="session">{{ session }}</option>
+                <option *ngFor="let session of academicYears; trackBy: trackBySession" [value]="session">{{ session }}</option>
             </select>
         </div>
 
@@ -32,7 +32,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let fee of busFeeStructures">
+            <tr *ngFor="let fee of busFeeStructures; trackBy: trackByIndex">
                 <td>
                     <input *ngIf="isEditing" type="number" [(ngModel)]="fee.minDistance" />
                     <span *ngIf="!isEditing">{{ fee.minDistance }}</span>

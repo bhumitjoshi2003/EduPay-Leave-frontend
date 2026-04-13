@@ -1,4 +1,5 @@
-import { Component, OnInit, ElementRef, ViewChild, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { EventService } from '../../services/event.service';
 import { AuthService } from '../../auth/auth.service';
 import { StudentService } from '../../services/student.service';
@@ -11,7 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { environment } from '../../../environments/environment';
 import { CalendarEvent } from '../../interfaces/event-calendar.component'; // Ensure this interface has imageUrl: string | null;
 import { AttendanceService } from '../../services/attendance.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject, takeUntil } from 'rxjs';
 
 interface DayCell {
   date: Date | null;
@@ -32,7 +33,8 @@ interface DayCell {
   ],
   styleUrls: ['./event-calendar.component.css']
 })
-export class EventCalendarComponent implements OnInit {
+export class EventCalendarComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
 
   @ViewChild('calendarContainer') calendarContainerRef!: ElementRef;
   // IMPORTANT: This ViewChild is for the file input in the *edit sidebar*, matching #fileInput in HTML
@@ -72,7 +74,8 @@ export class EventCalendarComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private studentService: StudentService,
     private teacherService: TeacherService,
-    private attendanceService: AttendanceService
+    private attendanceService: AttendanceService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     // Initialize eventForm here with all controls, including imageUrl
     this.eventForm = this.fb.group({
@@ -110,7 +113,7 @@ export class EventCalendarComponent implements OnInit {
 
     if (this.currentUserRole === 'STUDENT') {
       if (userId) {
-        this.studentService.getStudent(userId).subscribe({
+        this.studentService.getStudent(userId).pipe(takeUntil(this.destroy$)).subscribe({
           next: (studentDetails) => {
             console.log(studentDetails.className);
             this.currentUserClass = studentDetails.className;
@@ -129,7 +132,7 @@ export class EventCalendarComponent implements OnInit {
       }
     } else if (this.currentUserRole === 'TEACHER') {
       if (userId) {
-        this.teacherService.getTeacher(userId).subscribe({
+        this.teacherService.getTeacher(userId).pipe(takeUntil(this.destroy$)).subscribe({
           next: (teachertDetails) => {
             this.currentUserClass = teachertDetails.classTeacher;
             loadEventsAfterDetails();
@@ -150,8 +153,15 @@ export class EventCalendarComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private checkMobileView(): void {
-    this.isMobileView = window.innerWidth <= 768;
+    if (isPlatformBrowser(this.platformId)) {
+      this.isMobileView = window.innerWidth <= 768;
+    }
   }
 
   private initCategoryColors(): void {
@@ -229,7 +239,7 @@ export class EventCalendarComponent implements OnInit {
   private loadEvents(): void {
     const y = this.currentDate.getFullYear();
     const m = this.currentDate.getMonth() + 1;
-    this.eventService.getEventsForMonthAndYear(y, m).subscribe({
+    this.eventService.getEventsForMonthAndYear(y, m).pipe(takeUntil(this.destroy$)).subscribe({
       next: evs => {
         this.allEvents = evs; this.populateEvents();
         if (this.currentUserRole === 'STUDENT') {
@@ -553,7 +563,7 @@ export class EventCalendarComponent implements OnInit {
     const absent$ = this.attendanceService.getMonthlyAttendance(this.studentId, this.currentUserClass, year, month);
     const workingDays$ = this.attendanceService.getMonthlyAttendance('X', this.currentUserClass, year, month);
 
-    forkJoin([absent$, workingDays$]).subscribe({
+    forkJoin([absent$, workingDays$]).pipe(takeUntil(this.destroy$)).subscribe({
       next: ([absentData, workingDaysData]: [any[], any[]]) => {
 
         const absentSet = new Set(absentData.map(a => a.date));
@@ -598,5 +608,13 @@ export class EventCalendarComponent implements OnInit {
   getDateKey(date: Date | null): string {
     if (!date) return '';
     return format(date, 'yyyy-MM-dd');
+  }
+
+  trackByDayCell(index: number, cell: DayCell): any {
+    return cell.date ? cell.date.getTime() : index;
+  }
+
+  trackByEvent(index: number, ev: CalendarEvent): any {
+    return ev.id ?? index;
   }
 }

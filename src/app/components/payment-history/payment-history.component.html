@@ -17,7 +17,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let payment of paymentHistory" (click)="viewPaymentDetails(payment.paymentId)"
+          <tr *ngFor="let payment of paymentHistory; trackBy: trackByPaymentId" (click)="viewPaymentDetails(payment.paymentId)"
             class="payment-row">
             <td data-label="Payment ID:"><span class="payment-value">{{ payment.paymentId }}</span></td>
             <td data-label="Amount:"><span class="payment-value">{{ payment.amountPaid | currency: 'INR' }}</span></td>

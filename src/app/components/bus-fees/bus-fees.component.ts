@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BusFeesService, BusFee } from '../../services/bus-fees.service';
+import { Subject, takeUntil } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import Swal from 'sweetalert2';
 
@@ -12,7 +13,8 @@ import Swal from 'sweetalert2';
   templateUrl: './bus-fees.component.html',
   styleUrls: ['./bus-fees.component.css']
 })
-export class BusFeesComponent implements OnInit {
+export class BusFeesComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   academicYears: string[] = [];
   currentSession: string = '';
   isNewSession: boolean = false;
@@ -22,12 +24,17 @@ export class BusFeesComponent implements OnInit {
 
   constructor(private busFeesService: BusFeesService) { }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngOnInit(): void {
     this.fetchAcademicYears();
   }
 
   fetchAcademicYears(): void {
-    this.busFeesService.getAcademicYears().subscribe(years => {
+    this.busFeesService.getAcademicYears().pipe(takeUntil(this.destroy$)).subscribe(years => {
       this.academicYears = years;
       if (this.academicYears.length > 0) {
         this.currentSession = this.academicYears[this.academicYears.length - 1];
@@ -37,7 +44,7 @@ export class BusFeesComponent implements OnInit {
   }
 
   fetchBusFees(): void {
-    this.busFeesService.getBusFees(this.currentSession).subscribe(fees => {
+    this.busFeesService.getBusFees(this.currentSession).pipe(takeUntil(this.destroy$)).subscribe(fees => {
       this.busFeeStructures = fees;
       this.originalBusFees = JSON.parse(JSON.stringify(this.busFeeStructures));
     });
@@ -206,6 +213,9 @@ export class BusFeesComponent implements OnInit {
     }
     return false;
   }
+
+  trackByIndex(index: number): number { return index; }
+  trackBySession(index: number, session: string): string { return session; }
 
   getFormattedSession(session: string): string {
     const parts = session.split('-');

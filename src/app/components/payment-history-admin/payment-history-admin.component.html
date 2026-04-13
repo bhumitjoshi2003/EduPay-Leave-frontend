@@ -8,7 +8,7 @@
             <span>All Payments</span>
           </div>
         </li>
-        <li *ngFor="let className of classList" (click)="onClassSelect(className)"
+        <li *ngFor="let className of classList; trackBy: trackByClass" (click)="onClassSelect(className)"
           [class.selected]="className !== 'all' && className === selectedClass" class="class-item-vertical">
           <div class="chevron">
             <span>{{ className }}</span>
@@ -51,7 +51,7 @@
         <div class="page-size">
           Payments per page:
           <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
-            <option *ngFor="let size of pageSizes" [ngValue]="size">{{ size }}</option>
+            <option *ngFor="let size of pageSizes; let i = index; trackBy: trackByIndex" [ngValue]="size">{{ size }}</option>
           </select>
         </div>
       </div>
@@ -70,7 +70,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let payment of filteredPayments" class="payment-row clickable-row"
+              <tr *ngFor="let payment of filteredPayments; trackBy: trackByPaymentId" class="payment-row clickable-row"
                 (click)="viewPaymentDetails(payment.paymentId)">
                 <td>{{ payment.studentId }}</td>
                 <td>{{ payment.studentName }}</td>
@@ -94,7 +94,7 @@
         </div>
 
         <div class="cards-wrapper d-block d-md-none">
-          <div *ngFor="let payment of filteredPayments" class="payment-card clickable-card"
+          <div *ngFor="let payment of filteredPayments; trackBy: trackByPaymentId" class="payment-card clickable-card"
             (click)="viewPaymentDetails(payment.paymentId)">
             <div class="card-row">
               <span class="card-label">Student ID:</span>
@@ -137,7 +137,7 @@
         <div class="pagination-buttons">
           <button (click)="prevPage()" [disabled]="currentPage === 0">Previous</button>
 
-          <ng-container *ngFor="let pageItem of getPaginationDisplayPages()">
+          <ng-container *ngFor="let pageItem of getPaginationDisplayPages(); let i = index; trackBy: trackByIndex">
             <ng-container *ngIf="pageItem !== '...'; else ellipsisTemplate">
               <button (click)="goToPage(+pageItem)" [class.active]="currentPage === +pageItem">
                 {{ +pageItem + 1 }}

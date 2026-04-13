@@ -93,6 +93,8 @@ export class AdminListComponent implements OnInit, OnDestroy {
     });
   }
 
+  trackByAdminId(index: number, admin: Admin): string { return admin.adminId; }
+
   navigateToRegisterAdmin(): void {
     this.router.navigate(['/dashboard/register-admin']);
   }

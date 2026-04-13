@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -14,6 +14,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
 import { MODULE_MESSAGES } from '../../config/module-messages.config';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-payment-history',
@@ -31,7 +32,8 @@ import { MODULE_MESSAGES } from '../../config/module-messages.config';
   ],
   styleUrls: ['./payment-history.component.css'],
 })
-export class PaymentHistoryComponent implements OnInit {
+export class PaymentHistoryComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
 
   comingSoonConfig = MODULE_MESSAGES.paymentHistory;
   showFeesModule: boolean = false;
@@ -53,6 +55,11 @@ export class PaymentHistoryComponent implements OnInit {
     private paymentHistoryService: PaymentHistoryService
   ) { }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngOnInit(): void {
     const token = localStorage.getItem('accessToken');
     if (token) {
@@ -63,7 +70,7 @@ export class PaymentHistoryComponent implements OnInit {
         this.studentId = decodedToken.userId;
         this.fetchPaymentHistory();
       } else {
-        this.route.params.subscribe((params) => {
+        this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {
           const routeStudentId = params['studentId'];
           if (routeStudentId) {
             this.studentId = routeStudentId;
@@ -135,6 +142,8 @@ export class PaymentHistoryComponent implements OnInit {
   viewPaymentDetails(paymentId: string): void {
     this.router.navigate(['dashboard/payment-history-details', paymentId]);
   }
+
+  trackByPaymentId(index: number, payment: PaymentHistory): string { return payment.paymentId; }
 
   downloadPaymentReceipt(paymentId: string): void {
     this.loading = true;

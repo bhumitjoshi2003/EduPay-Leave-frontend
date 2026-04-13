@@ -206,7 +206,7 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
           isAdministrativeReset: isSuperAdminResettingOther
         };
 
-        this.authService.changePassword(payload).subscribe({
+        this.authService.changePassword(payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
           next: () => Swal.fire('Success', 'Password updated successfully', 'success'),
           error: (err) => Swal.fire('Error', err.error || 'Failed to update password', 'error')
         });
@@ -224,7 +224,7 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Yes, Delete Admin'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.adminService.deleteAdmin(this.adminId).subscribe({
+        this.adminService.deleteAdmin(this.adminId).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
           next: () => {
             Swal.fire('Deleted', 'Administrator removed.', 'success');
             this.router.navigate(['/dashboard/admin-list']);

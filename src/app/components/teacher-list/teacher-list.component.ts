@@ -65,6 +65,8 @@ export class TeacherListComponent implements OnInit, OnDestroy {
     });
   }
 
+  trackByTeacherId(index: number, teacher: Teacher): string { return teacher.teacherId; }
+
   viewTeacherDetails(teacherId: string): void {
     this.router.navigate(['/dashboard/teacher-details', teacherId]);
   }

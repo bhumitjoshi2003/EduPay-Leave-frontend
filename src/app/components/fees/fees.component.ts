@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PaymentComponent } from "../payment/payment.component";
@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
 import { PaymentData } from '../../interfaces/payment-data';
 import { jwtDecode } from 'jwt-decode';
 import { ActivatedRoute } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -28,7 +29,8 @@ const PLATFORM_FEE_PERCENTAGE = 0.015;
   templateUrl: './fees.component.html',
   styleUrls: ['./fees.component.css']
 })
-export class PaymentTrackerComponent implements OnInit {
+export class PaymentTrackerComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   constructor(
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
@@ -43,8 +45,8 @@ export class PaymentTrackerComponent implements OnInit {
 
   comingSoonConfig = MODULE_MESSAGES.fees;
   showFeesModule: boolean = false;
-  unpaidCurrentMonthMessage: any = '';
-  pastUnpaidMonthsWithLateFees: string = '';
+  unpaidCurrentMonthName: string = '';
+  pastUnpaidMonthNames: string[] = [];
   selectedYear: number = new Date().getFullYear();
   months: any[] = [];
   totalAmountToPay: number = 0;
@@ -95,7 +97,7 @@ export class PaymentTrackerComponent implements OnInit {
 
   ngOnInit() {
     this.role = this.authService.getUserRole();
-    this.route.params.subscribe(params => {
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const studentIdFromParams = params['studentId'];
       if (studentIdFromParams) {
         this.studentId = studentIdFromParams;
@@ -105,6 +107,11 @@ export class PaymentTrackerComponent implements OnInit {
     const today = new Date();
     this.currentAcademicYear = this.getAcademicYear(today);
     this.fetchSessions();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   getStudentId(): void {
@@ -247,8 +254,8 @@ export class PaymentTrackerComponent implements OnInit {
       const currentYear = this.getSessionStartYear(this.currentAcademicYear);
 
       if (selectedYear > currentYear) {
-        this.pastUnpaidMonthsWithLateFees = '';
-        this.unpaidCurrentMonthMessage = '';
+        this.pastUnpaidMonthNames = [];
+        this.unpaidCurrentMonthName = '';
         return;
       }
 
@@ -261,23 +268,16 @@ export class PaymentTrackerComponent implements OnInit {
       );
 
       if (currentMonthFee && !currentMonthFee.paid) {
-        this.unpaidCurrentMonthMessage = `Reminder: Kindly ensure that the fee for <span class="unpaid-month">${this.getMonthName(currentMonthFee.monthNumber)}</span> is paid before the end of this month to avoid late charges.`;
+        this.unpaidCurrentMonthName = this.getMonthName(currentMonthFee.monthNumber);
       } else {
-        this.unpaidCurrentMonthMessage = '';
+        this.unpaidCurrentMonthName = '';
       }
 
       const pastUnpaid = this.months.filter(month => {
         return !month.paid && month.monthNumber < currentAcademicMonth && month.lateFee > 0;
       });
 
-      if (pastUnpaid.length > 0) {
-        const pastUnpaidMonthDetails = pastUnpaid.map(
-          m => `<span class="past-unpaid-month">${this.getMonthName(m.monthNumber)}</span>`
-        );
-        this.pastUnpaidMonthsWithLateFees = `Late fees have been applied for the following overdue ${pastUnpaidMonthDetails.length > 1 ? 'months' : 'month'}: ${pastUnpaidMonthDetails.join(', ')}.`;
-      } else {
-        this.pastUnpaidMonthsWithLateFees = '';
-      }
+      this.pastUnpaidMonthNames = pastUnpaid.map(m => this.getMonthName(m.monthNumber));
     }
   }
 
@@ -660,4 +660,8 @@ export class PaymentTrackerComponent implements OnInit {
   getSessionStartYear(session: string): number {
     return parseInt(session.substring(0, 4));
   }
+
+  trackByMonth(index: number, month: any): any { return month.month; }
+  trackByYear(index: number, year: string): string { return year; }
+  trackByIndex(index: number): number { return index; }
 }

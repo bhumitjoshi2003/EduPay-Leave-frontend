@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NotificationService } from '../../services/notification.service';
 import { UserNotification } from '../../interfaces/user-notification';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-view-notification',
@@ -15,7 +16,8 @@ import { UserNotification } from '../../interfaces/user-notification';
   templateUrl: './view-notification.component.html',
   styleUrls: ['./view-notification.component.css']
 })
-export class ViewNotificationComponent implements OnInit {
+export class ViewNotificationComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
 
   userNotifications: UserNotification[] = [];
   isLoading: boolean = true;
@@ -25,13 +27,18 @@ export class ViewNotificationComponent implements OnInit {
     private datePipe: DatePipe
   ) { }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngOnInit(): void {
     this.loadUserNotifications();
   }
 
   loadUserNotifications(): void {
     this.isLoading = true;
-    this.notificationService.getUserNotifications().subscribe({
+    this.notificationService.getUserNotifications().pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => {
         this.userNotifications = data;
         this.isLoading = false;
@@ -100,6 +107,8 @@ export class ViewNotificationComponent implements OnInit {
       return this.datePipe.transform(notificationDate, 'MMM d, y') || '';
     }
   }
+
+  trackByNotificationId(index: number, notif: UserNotification): number { return notif.id ?? index; }
 
   getNotificationClass(isRead: boolean): string {
     return isRead ? 'notification-item read' : 'notification-item unread';

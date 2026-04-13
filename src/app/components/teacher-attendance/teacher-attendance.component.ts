@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { LeaveService } from '../../services/leave.service';
 import { StudentService } from '../../services/student.service';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +11,7 @@ import { AttendanceData } from '../../interfaces/atendance-data';
 import { AttendanceService } from '../../services/attendance.service';
 import { jwtDecode } from 'jwt-decode';
 import { TeacherService } from '../../services/teacher.service';
+import { Subject, takeUntil } from 'rxjs';
 
 interface Student {
   studentId: string;
@@ -31,7 +32,8 @@ interface Student {
   templateUrl: './teacher-attendance.component.html',
   styleUrl: './teacher-attendance.component.css',
 })
-export class TeacherAttendanceComponent implements OnInit {
+export class TeacherAttendanceComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   students: Student[] = [];
   attendanceDate: Date = new Date();
   selectedClass: string = '';
@@ -54,6 +56,11 @@ export class TeacherAttendanceComponent implements OnInit {
     private attendanceService: AttendanceService,
     private teacherService: TeacherService
   ) { }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   ngOnInit(): void {
     this.attendanceDate = this.getTodayDateWithoutTime();
@@ -88,7 +95,7 @@ export class TeacherAttendanceComponent implements OnInit {
 
 
   getTeacherClassAndLoadStudents(): void {
-    this.teacherService.getTeacher(this.teacherId).subscribe({
+    this.teacherService.getTeacher(this.teacherId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (teacher: any) => {
         this.selectedClass = teacher.classTeacher;
         this.loadStudentsAndApplyAttendance();
@@ -111,7 +118,7 @@ export class TeacherAttendanceComponent implements OnInit {
       return;
     }
 
-    this.studentService.getActiveStudentsByClass(this.selectedClass).subscribe({
+    this.studentService.getActiveStudentsByClass(this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe({
       next: (studentLeaveDTOs) => {
         this.students = studentLeaveDTOs.map((dto) => ({
           studentId: dto.studentId,
@@ -132,7 +139,7 @@ export class TeacherAttendanceComponent implements OnInit {
   applyAttendanceAndLeavesToStudents(): void {
     const formattedDate = formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en');
 
-    this.attendanceService.getAttendanceByDateAndClass(formattedDate, this.selectedClass).subscribe({
+    this.attendanceService.getAttendanceByDateAndClass(formattedDate, this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe({
       next: (attendanceData) => {
         if (attendanceData && attendanceData.length === 0) {
           this.disableDeleteButton = true;
@@ -297,6 +304,9 @@ export class TeacherAttendanceComponent implements OnInit {
     date.setDate(date.getDate() + offset);
     return formatDate(date, 'yyyy-MM-dd', 'en');
   }
+
+  trackByStudentId(index: number, student: Student): string { return student.studentId; }
+  trackByClass(index: number, className: string): string { return className; }
 
   isSunday(date: Date | null): boolean {
     return date ? new Date(date).getDay() === 0 : false;

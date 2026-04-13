@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core'; // Ensure ViewChild and ElementRef are imported
+import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Notification } from '../../interfaces/notification';
@@ -11,6 +11,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { NotificationService } from '../../services/notification.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-notification-management',
@@ -31,7 +32,8 @@ import { NotificationService } from '../../services/notification.service';
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.css']
 })
-export class NotificationComponent implements OnInit {
+export class NotificationComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
 
   notificationForm!: FormGroup;
   notifications: Notification[] = [];
@@ -58,11 +60,18 @@ export class NotificationComponent implements OnInit {
 
   isMobile: boolean = false;
 
+  @HostListener('window:resize', ['$event'])
+  onResize(): void {
+    this.isMobile = window.innerWidth <= 768;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngOnInit(): void {
     this.isMobile = window.innerWidth <= 768;
-    window.addEventListener('resize', () => {
-      this.isMobile = window.innerWidth <= 768;
-    });
     this.initForm();
     this.initTypeStyles();
     this.loadNotifications();
@@ -99,7 +108,7 @@ export class NotificationComponent implements OnInit {
   }
 
   loadNotifications(): void {
-    this.notificationService.getAllNotifications().subscribe({
+    this.notificationService.getAllNotifications().pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => {
         this.notifications = data;
       },
@@ -195,6 +204,9 @@ export class NotificationComponent implements OnInit {
       this.notificationForm.get(key)?.setErrors(null);
     });
   }
+
+  trackByNotificationId(index: number, notification: Notification): number | undefined { return notification.id; }
+  trackByIndex(index: number): number { return index; }
 
   formatDate(dateString: string | undefined): string {
     if (!dateString) return '';

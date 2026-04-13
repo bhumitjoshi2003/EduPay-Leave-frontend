@@ -18,7 +18,7 @@
       <select id="reason" formControlName="reason" class="form-input styled-input default-select"
         (change)="onReasonChange()" required>
         <option value="" disabled>Select Reason</option>
-        <option *ngFor="let reason of reasonOptions" [value]="reason">{{ reason }}</option>
+        <option *ngFor="let reason of reasonOptions; trackBy: trackByReason" [value]="reason">{{ reason }}</option>
       </select>
     </div>
 
@@ -47,7 +47,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let leave of leaves" class="leave-row">
+          <tr *ngFor="let leave of leaves; trackBy: trackByLeaveDate" class="leave-row">
             <td>{{ leave.leaveDate }}</td>
             <td>{{ leave.reason }}</td>
             <td>
@@ -63,7 +63,7 @@
 
     <!-- Mobile Card View -->
     <div class="leave-cards-container">
-      <div *ngFor="let leave of leaves" class="leave-card">
+      <div *ngFor="let leave of leaves; trackBy: trackByLeaveDate" class="leave-card">
         <div class="card-item">
           <span class="card-label">Leave Date:</span>
           <span class="card-value">{{ leave.leaveDate }}</span>

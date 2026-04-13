@@ -28,7 +28,7 @@
                 <div class="form-group">
                     <label for="type">Type:</label>
                     <select id="type" formControlName="type" class="form-control">
-                        <option *ngFor="let type of typeOptions" [value]="type">{{ type }}</option>
+                        <option *ngFor="let type of typeOptions; let i = index; trackBy: trackByIndex" [value]="type">{{ type }}</option>
                     </select>
                     <div *ngIf="notificationForm.get('type')?.hasError('required') && notificationForm.get('type')?.touched"
                         class="error-message">
@@ -39,7 +39,7 @@
                 <div class="form-group">
                     <label for="audience">Audience:</label>
                     <select id="audience" formControlName="audience" class="form-control">
-                        <option *ngFor="let audience of audienceOptions" [value]="audience">{{ audience }}</option>
+                        <option *ngFor="let audience of audienceOptions; let i = index; trackBy: trackByIndex" [value]="audience">{{ audience }}</option>
                     </select>
                     <div *ngIf="notificationForm.get('audience')?.hasError('required') && notificationForm.get('audience')?.touched"
                         class="error-message">
@@ -63,7 +63,7 @@
         </mat-card-header>
         <mat-card-content>
             <div class="notification-cards-container">
-                <div *ngFor="let element of notifications" class="notification-card">
+                <div *ngFor="let element of notifications; trackBy: trackByNotificationId" class="notification-card">
                     <h3>{{ element.title }}</h3>
                     <div class="details-section">
                         <p class="message-line"><strong>Message:</strong> <span>{{element.message}}</span></p>

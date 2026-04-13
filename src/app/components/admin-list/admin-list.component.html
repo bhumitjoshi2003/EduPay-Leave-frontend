@@ -10,7 +10,7 @@
 
         <div *ngIf="admins.length > 0; else noAdminsContainer">
             <ul class="admin-list">
-                <li *ngFor="let admin of admins" class="admin-item" (click)="viewAdminDetails(admin.adminId)">
+                <li *ngFor="let admin of admins; trackBy: trackByAdminId" class="admin-item" (click)="viewAdminDetails(admin.adminId)">
                     <div class="admin-info">
                         <span class="admin-name">{{ admin.name }}</span>
                         <span class="admin-id-label">({{ admin.adminId }})</span>

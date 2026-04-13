@@ -180,6 +180,10 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
     this.fetchPaymentHistory();
   }
 
+  trackByPaymentId(index: number, payment: PaymentHistory): string { return payment.paymentId; }
+  trackByClass(index: number, className: string): string { return className; }
+  trackByIndex(index: number): number { return index; }
+
   getPaginationDisplayPages(): (number | string)[] {
     const pages: (number | string)[] = [];
     const total = this.totalPages;

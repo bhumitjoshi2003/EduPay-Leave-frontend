@@ -411,7 +411,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
           newPassword: newPassword
         };
 
-        this.authService.changePassword(payload).subscribe({
+        this.authService.changePassword(payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
           next: (response) => {
             Swal.fire('Success', 'Password changed successfully!', 'success');
           },

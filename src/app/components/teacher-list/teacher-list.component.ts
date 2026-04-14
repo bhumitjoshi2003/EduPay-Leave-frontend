@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
 import { TeacherService } from '../../services/teacher.service';
 import { Router } from '@angular/router';
 import { AuthStateService } from '../../auth/auth-state.service';
@@ -15,7 +15,8 @@ interface Teacher {
   selector: 'app-teacher-list',
   imports: [CommonModule],
   templateUrl: './teacher-list.component.html',
-  styleUrl: './teacher-list.component.css'
+  styleUrl: './teacher-list.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeacherListComponent implements OnInit, OnDestroy {
   teachers: Teacher[] = [];

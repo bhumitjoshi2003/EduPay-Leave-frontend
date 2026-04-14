@@ -67,28 +67,27 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
       this.studentService.addStudent(this.studentForm.value).subscribe({
         next: (response: any) => {
           console.log('Student registered successfully:', response);
-          Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: 'New student registered successfully.',
-            timer: 1500,
-            showConfirmButton: false
-          }).then(() => {
-            this.authService.register({
-              userId: response.studentId,
-              password: this.formatDateForPassword(this.studentForm.value.dob),
-              role: 'STUDENT',
-              email: this.studentForm.value.email
-            }).subscribe({
-              next: (authResponse) => {
-                console.log('User registered in auth service:', authResponse);
-              },
-              error: (authError) => {
-                console.error('Error registering user in auth service:', authError);
-              }
-            });
-            this.studentForm.reset();
-            this.isBusUser = false;
+          const tempPassword = this.generateTempPassword();
+          this.authService.register({
+            userId: response.studentId,
+            password: tempPassword,
+            role: 'STUDENT',
+            email: this.studentForm.value.email
+          }).subscribe({
+            next: () => {
+              Swal.fire({
+                icon: 'success',
+                title: 'Student Registered!',
+                html: `Registration complete.<br><br><b>Temporary Password:</b><br><code style="font-size:1.1em;letter-spacing:0.05em">${tempPassword}</code><br><small>Share this with the student. They should change it on first login.</small>`,
+                confirmButtonText: 'Done'
+              });
+              this.studentForm.reset();
+              this.isBusUser = false;
+            },
+            error: (authError) => {
+              Swal.fire('Error', 'Student record created but account setup failed. Please retry.', 'error');
+              console.error('Error registering user in auth service:', authError);
+            }
           });
         },
         error: (error) => {
@@ -113,12 +112,11 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
     }
   }
 
-  private formatDateForPassword(dob: string): string {
-    const date = new Date(dob);
-    const day = ('0' + date.getDate()).slice(-2);
-    const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+  private generateTempPassword(): string {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#$!';
+    const array = new Uint32Array(10);
+    crypto.getRandomValues(array);
+    return Array.from(array, v => chars[v % chars.length]).join('');
   }
 
   goBack() {

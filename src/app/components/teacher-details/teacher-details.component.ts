@@ -212,11 +212,11 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
       html:
         `<div class="change-password-form">
           ${showOldPassword ? `<input id="oldPassword" type="password" class="swal2-input" placeholder="Current Password">
-          <span id="showOldPassword" class="password-toggle">${this.showOldPassword ? this.getEyeIcon('eye') : this.getEyeIcon('eye-off')}</span><br>` : ''}
+          <span id="showOldPassword" class="password-toggle"><span style="display:none">${this.eyeIcon}</span><span>${this.eyeOffIcon}</span></span><br>` : ''}
           <input id="newPassword" type="password" class="swal2-input" placeholder="New Password">
-          <span id="showNewPassword" class="password-toggle">${this.showNewPassword ? this.getEyeIcon('eye') : this.getEyeIcon('eye-off')}</span><br>
+          <span id="showNewPassword" class="password-toggle"><span style="display:none">${this.eyeIcon}</span><span>${this.eyeOffIcon}</span></span><br>
           <input id="confirmNewPassword" type="password" class="swal2-input" placeholder="Confirm New Password">
-          <span id="showConfirmNewPassword" class="password-toggle">${this.showConfirmNewPassword ? this.getEyeIcon('eye') : this.getEyeIcon('eye-off')}</span>
+          <span id="showConfirmNewPassword" class="password-toggle"><span style="display:none">${this.eyeIcon}</span><span>${this.eyeOffIcon}</span></span>
         </div>`,
       focusConfirm: false,
       preConfirm: () => {
@@ -235,7 +235,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
             showOldPasswordSpan.addEventListener('click', () => {
               this.showOldPassword = !this.showOldPassword;
               (document.getElementById('oldPassword') as HTMLInputElement).type = this.showOldPassword ? 'text' : 'password';
-              showOldPasswordSpan.innerHTML = this.showOldPassword ? this.getEyeIcon('eye') : this.getEyeIcon('eye-off');
+              this.toggleEyeIcon(showOldPasswordSpan, this.showOldPassword);
             });
           }
         }
@@ -244,7 +244,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
           showNewPasswordSpan.addEventListener('click', () => {
             this.showNewPassword = !this.showNewPassword;
             (document.getElementById('newPassword') as HTMLInputElement).type = this.showNewPassword ? 'text' : 'password';
-            showNewPasswordSpan.innerHTML = this.showNewPassword ? this.getEyeIcon('eye') : this.getEyeIcon('eye-off');
+            this.toggleEyeIcon(showNewPasswordSpan, this.showNewPassword);
           });
         }
         const showConfirmNewPasswordSpan = document.getElementById('showConfirmNewPassword');
@@ -252,7 +252,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
           showConfirmNewPasswordSpan.addEventListener('click', () => {
             this.showConfirmNewPassword = !this.showConfirmNewPassword;
             (document.getElementById('confirmNewPassword') as HTMLInputElement).type = this.showConfirmNewPassword ? 'text' : 'password';
-            showConfirmNewPasswordSpan.innerHTML = this.showConfirmNewPassword ? this.getEyeIcon('eye') : this.getEyeIcon('eye-off');
+            this.toggleEyeIcon(showConfirmNewPasswordSpan, this.showConfirmNewPassword);
           });
         }
       }
@@ -278,7 +278,8 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     return newPassword === confirmNewPassword ? null : { passwordMismatch: true };
   }
 
-  getEyeIcon(type: 'eye' | 'eye-off'): string {
-    return type === 'eye' ? this.eyeIcon : this.eyeOffIcon;
+  private toggleEyeIcon(span: HTMLElement, showing: boolean): void {
+    (span.children[0] as HTMLElement).style.display = showing ? '' : 'none';
+    (span.children[1] as HTMLElement).style.display = showing ? 'none' : '';
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
 import { PaymentHistoryService, PaginatedResponse } from '../../services/payment-history.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,6 +20,7 @@ import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
   selector: 'app-payment-history-admin',
   templateUrl: './payment-history-admin.component.html',
   styleUrls: ['./payment-history-admin.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ComingSoonComponent,
     CommonModule,

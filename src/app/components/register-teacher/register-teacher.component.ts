@@ -47,27 +47,26 @@ export class RegisterTeacherComponent implements OnInit {
       this.teacherService.addTeacher(this.teacherForm.value).subscribe({
         next: (response: any) => {
           console.log('Teacher registered successfully:', response);
-          Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: 'New teacher registered successfully.',
-            timer: 1500,
-            showConfirmButton: false
-          }).then(() => {
-            this.authService.register({
-              userId: response.teacherId,
-              password: this.formatDateForPassword(this.teacherForm.value.dob),
-              role: 'TEACHER',
-              email: this.teacherForm.value.email
-            }).subscribe({
-              next: (authResponse) => {
-                console.log('User registered in auth service:', authResponse);
-              },
-              error: (authError) => {
-                console.error('Error registering user in auth service:', authError);
-              }
-            });
-            this.teacherForm.reset();
+          const tempPassword = this.generateTempPassword();
+          this.authService.register({
+            userId: response.teacherId,
+            password: tempPassword,
+            role: 'TEACHER',
+            email: this.teacherForm.value.email
+          }).subscribe({
+            next: () => {
+              Swal.fire({
+                icon: 'success',
+                title: 'Teacher Registered!',
+                html: `Registration complete.<br><br><b>Temporary Password:</b><br><code style="font-size:1.1em;letter-spacing:0.05em">${tempPassword}</code><br><small>Share this with the teacher. They should change it on first login.</small>`,
+                confirmButtonText: 'Done'
+              });
+              this.teacherForm.reset();
+            },
+            error: (authError) => {
+              Swal.fire('Error', 'Teacher record created but account setup failed. Please retry.', 'error');
+              console.error('Error registering user in auth service:', authError);
+            }
           });
         },
         error: (error) => {
@@ -92,12 +91,11 @@ export class RegisterTeacherComponent implements OnInit {
     }
   }
 
-  private formatDateForPassword(dob: string): string {
-    const date = new Date(dob);
-    const day = ('0' + date.getDate()).slice(-2);
-    const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+  private generateTempPassword(): string {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#$!';
+    const array = new Uint32Array(10);
+    crypto.getRandomValues(array);
+    return Array.from(array, v => chars[v % chars.length]).join('');
   }
 
   goBack() {

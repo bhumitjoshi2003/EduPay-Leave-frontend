@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule, formatDate } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -15,6 +15,7 @@ import { Subject, takeUntil } from 'rxjs';
   templateUrl: './apply-leave.component.html',
   styleUrls: ['./apply-leave.component.css'],
   imports: [ReactiveFormsModule, CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApplyLeaveComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();

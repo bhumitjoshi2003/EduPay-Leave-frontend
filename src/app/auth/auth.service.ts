@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthStateService } from './auth-state.service';
@@ -49,7 +49,8 @@ export class AuthService {
   }
 
   resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post(this.apiUrl + '/reset-password?token=' + token, { newPassword }, { responseType: 'text' });
+    const params = new HttpParams().set('token', token);
+    return this.http.post(this.apiUrl + '/reset-password', { newPassword }, { params, responseType: 'text' });
   }
 
   getUserRole(): string {

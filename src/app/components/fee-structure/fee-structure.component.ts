@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BusFeesComponent } from '../bus-fees/bus-fees.component';
@@ -12,7 +12,8 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, FormsModule, BusFeesComponent],
   templateUrl: './fee-structure.component.html',
-  styleUrls: ['./fee-structure.component.css']
+  styleUrls: ['./fee-structure.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeeStructureComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -26,7 +27,8 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
 
   constructor(
     private feeStructureService: FeeStructureService,
-    private authStateService: AuthStateService
+    private authStateService: AuthStateService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnDestroy(): void {
@@ -104,6 +106,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
         this.sessions.push(nextSession);
         this.currentSession = nextSession;
         this.isEditing = true;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -190,6 +193,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
           const index = this.sessions.indexOf(this.newSessionYear);
           if (index >= 0) {
             this.sessions.splice(index, 1);
+            this.cdr.markForCheck();
             if (this.sessions.length > 0) {
               this.currentSession = this.sessions[this.sessions.length - 1];
             } else {
@@ -218,6 +222,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
         examinationFee: 0,
         labCharges: 0,
       });
+      this.cdr.markForCheck();
     }
   }
 

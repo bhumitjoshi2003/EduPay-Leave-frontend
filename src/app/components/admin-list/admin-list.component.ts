@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
 import { AdminService } from '../../services/admin.service';
 import { Router } from '@angular/router';
 import { AuthStateService } from '../../auth/auth-state.service';
@@ -12,7 +12,8 @@ import { Admin } from '../../interfaces/admin';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './admin-list.component.html',
-  styleUrl: './admin-list.component.css'
+  styleUrl: './admin-list.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminListComponent implements OnInit, OnDestroy {
   admins: Admin[] = [];

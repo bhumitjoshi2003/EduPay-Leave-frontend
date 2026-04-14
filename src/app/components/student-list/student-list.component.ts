@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
 import { StudentService } from '../../services/student.service';
 import { TeacherService } from '../../services/teacher.service';
 import { Router } from '@angular/router';
@@ -15,7 +15,8 @@ interface Student {
   selector: 'app-student-list',
   imports: [CommonModule],
   templateUrl: './student-list.component.html',
-  styleUrl: './student-list.component.css'
+  styleUrl: './student-list.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class StudentListComponent implements OnInit, OnDestroy {

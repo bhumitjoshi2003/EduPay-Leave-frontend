@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID, ViewChild } from '@angular/core';
 import Chart from 'chart.js/auto';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { forkJoin, Subject, takeUntil } from 'rxjs';
@@ -11,6 +11,7 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './student-attendance.component.html',
   styleUrls: ['./student-attendance.component.css'],
   imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentAttendanceComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();

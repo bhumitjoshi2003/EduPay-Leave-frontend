@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PaymentComponent } from "../payment/payment.component";
-import { ChangeDetectorRef, NgZone } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FeesService } from '../../services/fees.service';
 import { FeeStructureService } from '../../services/fee-structure.service';
 import { StudentService } from '../../services/student.service';
@@ -27,7 +27,8 @@ const PLATFORM_FEE_PERCENTAGE = 0.015;
   standalone: true,
   imports: [ComingSoonComponent, FormsModule, CommonModule, PaymentComponent, MatFormFieldModule, MatInputModule],
   templateUrl: './fees.component.html',
-  styleUrls: ['./fees.component.css']
+  styleUrls: ['./fees.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentTrackerComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -359,6 +360,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
         //   this.totalAmountToPay += this.totalUnappliedLeaveCharge;
         // }
         this.selectedMonthsByYear[year].push(month.month);
+        this.cdr.markForCheck();
         this.lastSelectedMonth = month;
 
         this.populateMonthDetails(month)
@@ -373,6 +375,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
       } else {
         //   this.totalAmountToPay -= month.fee + (month.busFee || 0) + month.lateFee;
         this.selectedMonthsByYear[year].splice(index, 1);
+        this.cdr.markForCheck();
         this.updatePaymentData(month, false);
         this.recalculateTotals();
 

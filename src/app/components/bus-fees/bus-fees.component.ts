@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BusFeesService, BusFee } from '../../services/bus-fees.service';
@@ -11,7 +11,8 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './bus-fees.component.html',
-  styleUrls: ['./bus-fees.component.css']
+  styleUrls: ['./bus-fees.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BusFeesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -24,7 +25,8 @@ export class BusFeesComponent implements OnInit, OnDestroy {
 
   constructor(
     private busFeesService: BusFeesService,
-    private authStateService: AuthStateService
+    private authStateService: AuthStateService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnDestroy(): void {
@@ -102,6 +104,7 @@ export class BusFeesComponent implements OnInit, OnDestroy {
           return;
         }
         this.academicYears.push(newYear);
+        this.cdr.markForCheck();
         this.fetchBusFees();
         this.currentSession = newYear;
         this.isEditing = true;
@@ -118,12 +121,14 @@ export class BusFeesComponent implements OnInit, OnDestroy {
         maxDistance: null,
         fees: 0,
       });
+      this.cdr.markForCheck();
     }
   }
 
   removeRow(): void {
     if (this.isEditing && this.busFeeStructures.length > 0) {
       this.busFeeStructures.pop();
+      this.cdr.markForCheck();
     }
   }
 

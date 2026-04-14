@@ -150,15 +150,15 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
           ${showOldPasswordField ? `
             <div class="pw-wrapper">
               <input id="oldPw" type="password" class="swal2-input" placeholder="Current Password">
-              <span id="toggleOld" class="pw-toggle">${this.eyeOffIcon}</span>
+              <span id="toggleOld" class="pw-toggle"><span style="display:none">${this.eyeIcon}</span><span>${this.eyeOffIcon}</span></span>
             </div>` : ''}
           <div class="pw-wrapper">
             <input id="newPw" type="password" class="swal2-input" placeholder="New Password">
-            <span id="toggleNew" class="pw-toggle">${this.eyeOffIcon}</span>
+            <span id="toggleNew" class="pw-toggle"><span style="display:none">${this.eyeIcon}</span><span>${this.eyeOffIcon}</span></span>
           </div>
           <div class="pw-wrapper">
             <input id="confirmPw" type="password" class="swal2-input" placeholder="Confirm New Password">
-            <span id="toggleConfirm" class="pw-toggle">${this.eyeOffIcon}</span>
+            <span id="toggleConfirm" class="pw-toggle"><span style="display:none">${this.eyeIcon}</span><span>${this.eyeOffIcon}</span></span>
           </div>
         </div>`,
       showCancelButton: true,
@@ -171,11 +171,14 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
       },
       didRender: () => {
         const setup = (btnId: string, inputId: string) => {
-          document.getElementById(btnId)?.addEventListener('click', (e) => {
+          const btn = document.getElementById(btnId);
+          if (!btn) return;
+          btn.addEventListener('click', () => {
             const input = document.getElementById(inputId) as HTMLInputElement;
             const isShowing = input.type === 'text';
             input.type = isShowing ? 'password' : 'text';
-            (e.currentTarget as HTMLElement).innerHTML = isShowing ? this.eyeOffIcon : this.eyeIcon;
+            (btn.children[0] as HTMLElement).style.display = isShowing ? 'none' : '';
+            (btn.children[1] as HTMLElement).style.display = isShowing ? '' : 'none';
           });
         };
         if (showOldPasswordField) setup('toggleOld', 'oldPw');

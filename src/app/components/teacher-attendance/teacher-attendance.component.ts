@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { LeaveService } from '../../services/leave.service';
 import { StudentService } from '../../services/student.service';
 import { FormsModule } from '@angular/forms';
@@ -31,6 +31,7 @@ interface Student {
   ],
   templateUrl: './teacher-attendance.component.html',
   styleUrl: './teacher-attendance.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeacherAttendanceComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();

@@ -1,66 +1,77 @@
-<div *ngIf="details" class="month-details-container">
-  <div class="month-details">
-    <h2>{{details.monthName}} - Details</h2>
+<div *ngIf="details" class="receipt-card">
 
-    <div class="details-grid">
-      <div class="student-details">
-        <h3>Student Details</h3>
-        <div class="detail-item">
-          <strong>Student Name:</strong>
-          <span>{{ details.studentName }}</span>
-        </div>
-        <div class="detail-item">
-          <strong>Student ID:</strong>
-          <span>{{ details.studentId }}</span>
-        </div>
-        <div class="detail-item">
-          <strong>Student Class:</strong>
-          <span>{{ details.studentClass }}</span>
-        </div>
-      </div>
+  <!-- Header -->
+  <div class="receipt-header">
+    <div class="receipt-header__badge">Fee Receipt</div>
+    <div class="receipt-header__month">{{ details.monthName }}</div>
+  </div>
 
-      <div class="fee-details">
-        <h3>Academic Fee Details</h3>
-        <div class="detail-item">
-          <strong>Tuition Fee:</strong>
-          <span>₹{{ details.tuitionFee }}</span>
-        </div>
-        <div class="detail-item" *ngIf="details.annualCharges">
-          <strong>Annual Charges:</strong>
-          <span>₹{{ details.annualCharges }}</span>
-        </div>
-        <div class="detail-item" *ngIf="details.labCharges">
-          <strong>Lab Charges:</strong>
-          <span>₹{{ details.labCharges }}</span>
-        </div>
-        <div class="detail-item" *ngIf="details.ecaProject">
-          <strong>E.C.A/Project:</strong>
-          <span>₹{{ details.ecaProject }}</span>
-        </div>
-        <div class="detail-item" *ngIf="details.examinationFee">
-          <strong>Examination Fee:</strong>
-          <span>₹{{ details.examinationFee }}</span>
-        </div>
-        <div class="detail-item" *ngIf="details.busFee">
-          <strong>Bus Fees:</strong>
-          <span>₹{{ details.busFee }}</span>
-        </div>
-        <div class="detail-item" *ngIf="details.lateFee">
-          <strong>Late Fees:</strong>
-          <span style="color: rgb(239, 64, 64)">₹{{ details.lateFee }}</span>
-        </div>
-        <div class="detail-item" *ngIf="details.additionalCharges && selectedMonthCount === 1">
-          <strong>Unapplied Leave Charge:</strong>
-          <span style="color: rgb(239, 64, 64)">₹{{ details.additionalCharges }}</span>
-        </div>
-        <ng-container *ngIf="platformFeeAmount > 0">
-          <hr>
-          <div class="detail-item platform-fee-item">
-            <strong>Platform Fee:</strong>
-            <span>₹{{ platformFeeAmount }}</span>
-          </div>
-        </ng-container>
-      </div>
+  <!-- Student info band -->
+  <div class="student-band">
+    <div class="student-band__item">
+      <span class="student-band__label">Student Name</span>
+      <span class="student-band__value">{{ details.studentName }}</span>
+    </div>
+    <div class="student-band__divider"></div>
+    <div class="student-band__item">
+      <span class="student-band__label">Student ID</span>
+      <span class="student-band__value">{{ details.studentId }}</span>
+    </div>
+    <div class="student-band__divider"></div>
+    <div class="student-band__item">
+      <span class="student-band__label">Class</span>
+      <span class="student-band__value">{{ details.studentClass }}</span>
     </div>
   </div>
+
+  <!-- Fee table -->
+  <div class="fee-table">
+    <div class="fee-table__header">
+      <span>Description</span>
+      <span>Amount</span>
+    </div>
+
+    <div class="fee-table__row">
+      <span>Tuition Fee</span>
+      <span>₹{{ details.tuitionFee }}</span>
+    </div>
+    <div class="fee-table__row" *ngIf="details.annualCharges">
+      <span>Annual Charges</span>
+      <span>₹{{ details.annualCharges }}</span>
+    </div>
+    <div class="fee-table__row" *ngIf="details.labCharges">
+      <span>Lab Charges</span>
+      <span>₹{{ details.labCharges }}</span>
+    </div>
+    <div class="fee-table__row" *ngIf="details.ecaProject">
+      <span>E.C.A / Project</span>
+      <span>₹{{ details.ecaProject }}</span>
+    </div>
+    <div class="fee-table__row" *ngIf="details.examinationFee">
+      <span>Examination Fee</span>
+      <span>₹{{ details.examinationFee }}</span>
+    </div>
+    <div class="fee-table__row" *ngIf="details.busFee">
+      <span>Bus Fee</span>
+      <span>₹{{ details.busFee }}</span>
+    </div>
+    <div class="fee-table__row fee-table__row--penalty" *ngIf="details.lateFee">
+      <span>Late Fee <span class="penalty-tag">Overdue</span></span>
+      <span>₹{{ details.lateFee }}</span>
+    </div>
+    <div class="fee-table__row fee-table__row--penalty" *ngIf="details.additionalCharges && selectedMonthCount === 1">
+      <span>Unapplied Leave Charge <span class="penalty-tag">Deduction</span></span>
+      <span>₹{{ details.additionalCharges }}</span>
+    </div>
+
+    <div class="fee-table__row fee-table__row--platform" *ngIf="platformFeeAmount > 0">
+      <span>Platform Fee</span>
+      <span>₹{{ platformFeeAmount }}</span>
+    </div>
+  </div>
+
+  <!-- <div class="receipt-footer">
+    <span class="receipt-footer__note">All amounts are in Indian Rupees (₹)</span>
+  </div> -->
+
 </div>

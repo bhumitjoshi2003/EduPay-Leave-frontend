@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './fee-breakdown.component.html',
+  styleUrl: './fee-breakdown.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeeBreakdownComponent {

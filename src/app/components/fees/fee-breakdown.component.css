@@ -1,0 +1,239 @@
+/* ═══════════════════════════════════════════════
+   Fee Receipt Card — Professional School Design
+   ═══════════════════════════════════════════════ */
+
+.receipt-card {
+  margin-top: 28px;
+  background: #ffffff;
+  border-radius: 4px;
+  border: 1px solid #d0d7e2;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 2px 12px rgba(10, 36, 99, 0.08);
+}
+
+/* ── Header ───────────────────────────────────── */
+
+.receipt-header {
+  background: linear-gradient(135deg, #0d2b6b 0%, #1a4a9e 100%);
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid #c9a84c;
+}
+
+.receipt-header__badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #c9a84c;
+  background: rgba(201, 168, 76, 0.12);
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  padding: 4px 12px;
+  border-radius: 2px;
+}
+
+.receipt-header__month {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+/* ── Student Band ─────────────────────────────── */
+
+.student-band {
+  display: flex;
+  align-items: stretch;
+  background: #f4f7fc;
+  border-bottom: 1px solid #d0d7e2;
+  padding: 0 28px;
+}
+
+.student-band__item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 0;
+  flex: 1;
+}
+
+.student-band__divider {
+  width: 1px;
+  background: #d0d7e2;
+  margin: 12px 24px;
+}
+
+.student-band__label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #6b7a99;
+}
+
+.student-band__value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0d2b6b;
+}
+
+/* ── Fee Table ────────────────────────────────── */
+
+.fee-table {
+  padding: 0 28px 16px;
+}
+
+.fee-table__header {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 12px 8px;
+  margin-top: 16px;
+  border-bottom: 2px solid #0d2b6b;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #0d2b6b;
+}
+
+.fee-table__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  font-size: 0.875rem;
+  color: #2d3748;
+  border-bottom: 1px solid #edf1f7;
+  transition: background 0.15s;
+}
+
+.fee-table__row:last-child {
+  border-bottom: none;
+}
+
+.fee-table__row:hover {
+  background: #f4f7fc;
+}
+
+.fee-table__row span:last-child {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #0d2b6b;
+  min-width: 80px;
+  text-align: right;
+}
+
+/* Penalty rows (late fee, leave charge) */
+.fee-table__row--penalty {
+  background: #fff8f0;
+  border-left: 3px solid #e07b39;
+  margin-left: -3px;
+}
+
+.fee-table__row--penalty span:last-child {
+  color: #c0392b;
+}
+
+.fee-table__row--penalty:hover {
+  background: #fff2e6;
+}
+
+.penalty-tag {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #e07b39;
+  background: rgba(224, 123, 57, 0.1);
+  border: 1px solid rgba(224, 123, 57, 0.35);
+  border-radius: 2px;
+  padding: 1px 6px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Platform fee row */
+.fee-table__row--platform {
+  margin-top: 4px;
+  border-top: 1px dashed #d0d7e2;
+  border-bottom: none;
+  color: #9ca3af;
+}
+
+.fee-table__row--platform span:first-child {
+  color: #9ca3af;
+  font-style: italic;
+  font-size: 0.82rem;
+}
+
+.fee-table__row--platform span:last-child {
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+/* ── Footer ───────────────────────────────────── */
+
+.receipt-footer {
+  background: #f4f7fc;
+  border-top: 1px solid #d0d7e2;
+  padding: 8px 28px;
+  text-align: right;
+}
+
+.receipt-footer__note {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* ── Responsive ───────────────────────────────── */
+
+@media (max-width: 767px) {
+  .receipt-header {
+    padding: 14px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .receipt-header__month {
+    font-size: 1.1rem;
+  }
+
+  .student-band {
+    flex-direction: column;
+    padding: 0 16px;
+    gap: 0;
+  }
+
+  .student-band__item {
+    padding: 10px 0;
+    border-bottom: 1px dashed #d0d7e2;
+  }
+
+  .student-band__item:last-child {
+    border-bottom: none;
+  }
+
+  .student-band__divider {
+    display: none;
+  }
+
+  .fee-table {
+    padding: 0 16px 12px;
+  }
+
+  .fee-table__header,
+  .fee-table__row {
+    padding: 8px 8px;
+    font-size: 0.82rem;
+  }
+
+  .receipt-footer {
+    padding: 8px 16px;
+  }
+}

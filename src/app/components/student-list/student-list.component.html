@@ -12,9 +12,13 @@
   </div>
 
   <div class="student-list-area">
-    <h2 *ngIf="loggedInUserRole === 'TEACHER'">Students of Class {{ selectedClass }}</h2>
-    <h2 *ngIf="loggedInUserRole === 'ADMIN' && selectedClass">Students of
-      Class {{ selectedClass }}</h2>
+    <div class="student-list-area__header">
+      <h2 *ngIf="loggedInUserRole === 'TEACHER'">Students of Class {{ selectedClass }}</h2>
+      <h2 *ngIf="loggedInUserRole === 'ADMIN' && selectedClass">Students of Class {{ selectedClass }}</h2>
+      <button *ngIf="loggedInUserRole === 'ADMIN'" class="bulk-import-btn" (click)="navigateToBulkImport()">
+        &#8679; Bulk Import
+      </button>
+    </div>
     <div *ngIf="(activeStudents.length + inactiveStudents.length + newStudents.length) > 0; else noStudentsContainer">
       <ul class="student-list">
         <li *ngFor="let student of activeStudents; trackBy: trackByStudentId" class="active-student-item"

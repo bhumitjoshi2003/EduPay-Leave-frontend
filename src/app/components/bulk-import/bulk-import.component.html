@@ -1,0 +1,130 @@
+<div class="import-page">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <button class="back-btn" (click)="goToStudentList()">&#8592; Student List</button>
+    <div class="page-header__text">
+      <h1>Bulk Student Import</h1>
+      <p>Upload a CSV file to register multiple students at once.</p>
+    </div>
+    <button class="template-btn" (click)="downloadTemplate()" [disabled]="isDownloadingTemplate">
+      <span *ngIf="!isDownloadingTemplate">&#8595; Download Template</span>
+      <span *ngIf="isDownloadingTemplate">Downloading...</span>
+    </button>
+  </div>
+
+  <!-- Upload area (hidden once result is shown) -->
+  <ng-container *ngIf="!result">
+
+    <div class="instructions-card">
+      <div class="instructions-card__step">
+        <span class="step-number">1</span>
+        <span>Download the CSV template above</span>
+      </div>
+      <div class="instructions-card__divider"></div>
+      <div class="instructions-card__step">
+        <span class="step-number">2</span>
+        <span>Fill in student details — one row per student</span>
+      </div>
+      <div class="instructions-card__divider"></div>
+      <div class="instructions-card__step">
+        <span class="step-number">3</span>
+        <span>Upload the completed file below</span>
+      </div>
+    </div>
+
+    <div class="drop-zone"
+         [class.drop-zone--has-file]="selectedFile"
+         (click)="onDropZoneClick()"
+         (dragover)="onDragOver($event)"
+         (drop)="onDrop($event)">
+      <input #fileInput type="file" accept=".csv" (change)="onFileSelected($event)" class="file-input-hidden">
+
+      <ng-container *ngIf="!selectedFile">
+        <div class="drop-zone__icon">&#128196;</div>
+        <p class="drop-zone__primary">Click to browse or drag &amp; drop</p>
+        <p class="drop-zone__secondary">CSV files only</p>
+      </ng-container>
+
+      <ng-container *ngIf="selectedFile">
+        <div class="drop-zone__icon drop-zone__icon--ready">&#10003;</div>
+        <p class="drop-zone__primary drop-zone__primary--ready">{{ selectedFile.name }}</p>
+        <p class="drop-zone__secondary">{{ (selectedFile.size / 1024).toFixed(1) }} KB &nbsp;&middot;&nbsp; Click to change file</p>
+      </ng-container>
+    </div>
+
+    <div class="error-banner" *ngIf="importError">
+      &#9888; {{ importError }}
+    </div>
+
+    <div class="action-row">
+      <button class="import-btn"
+              [disabled]="!selectedFile || isImporting"
+              (click)="import()">
+        <span *ngIf="!isImporting">Import Students</span>
+        <span *ngIf="isImporting" class="loading-text">
+          <span class="spinner-inline"></span> Importing...
+        </span>
+      </button>
+    </div>
+
+  </ng-container>
+
+  <!-- Results -->
+  <ng-container *ngIf="result">
+
+    <div class="result-summary">
+      <div class="summary-card summary-card--total">
+        <span class="summary-card__value">{{ result.totalRows }}</span>
+        <span class="summary-card__label">Total Rows</span>
+      </div>
+      <div class="summary-card summary-card--success">
+        <span class="summary-card__value">{{ result.successful }}</span>
+        <span class="summary-card__label">Imported</span>
+      </div>
+      <div class="summary-card summary-card--fail">
+        <span class="summary-card__value">{{ result.failed }}</span>
+        <span class="summary-card__label">Failed</span>
+      </div>
+    </div>
+
+    <div class="result-banner result-banner--success" *ngIf="result.failed === 0">
+      &#10003; All {{ result.successful }} students were imported successfully.
+    </div>
+
+    <div class="result-banner result-banner--partial" *ngIf="result.failed > 0 && result.successful > 0">
+      &#9888; {{ result.successful }} students imported. {{ result.failed }} row(s) failed — see details below.
+    </div>
+
+    <div class="result-banner result-banner--error" *ngIf="result.successful === 0">
+      &#10007; No students were imported. Please fix the errors below and try again.
+    </div>
+
+    <div class="error-table-wrapper" *ngIf="result.errors.length > 0">
+      <h3 class="error-table__title">Failed Rows</h3>
+      <table class="error-table">
+        <thead>
+          <tr>
+            <th>Row</th>
+            <th>Student ID</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let err of result.errors; trackBy: trackByRow">
+            <td>{{ err.row }}</td>
+            <td>{{ err.studentId || '—' }}</td>
+            <td class="error-reason">{{ err.reason }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="action-row action-row--result">
+      <button class="secondary-btn" (click)="reset()">Import Another File</button>
+      <button class="import-btn" (click)="goToStudentList()">Go to Student List</button>
+    </div>
+
+  </ng-container>
+
+</div>

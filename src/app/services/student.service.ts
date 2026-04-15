@@ -9,6 +9,19 @@ interface StudentDTO {
   name: string;
 }
 
+export interface BulkImportError {
+  row: number;
+  studentId: string;
+  reason: string;
+}
+
+export interface BulkImportResult {
+  totalRows: number;
+  successful: number;
+  failed: number;
+  errors: BulkImportError[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -39,6 +52,16 @@ export class StudentService {
 
   getInactiveStudentsByClass(selectedClass: string): Observable<StudentDTO[]> {
     return this.http.get<StudentDTO[]>(`${this.baseUrl}/inactive/class/${selectedClass}`);
+  }
+
+  downloadBulkTemplate(): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/bulk/template`, { responseType: 'blob' });
+  }
+
+  bulkImport(file: File): Observable<BulkImportResult> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<BulkImportResult>(`${this.baseUrl}/bulk`, formData);
   }
 
 }

@@ -102,6 +102,22 @@
   border-radius: 10px;
 }
 
+.student-list-area__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #8fbc8f;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  gap: 12px;
+}
+
+.student-list-area__header h2 {
+  margin: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
 .student-list-area h2 {
   text-align: left;
   border-bottom: 2px solid #8fbc8f;
@@ -109,6 +125,24 @@
   margin-bottom: 20px;
   color: #2f4f4f;
   font-size: 1.4em;
+}
+
+.bulk-import-btn {
+  background: linear-gradient(135deg, #0d2b6b 0%, #1a4a9e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.bulk-import-btn:hover {
+  opacity: 0.85;
 }
 
 .student-list {

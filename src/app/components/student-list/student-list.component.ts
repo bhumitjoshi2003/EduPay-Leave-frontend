@@ -113,4 +113,8 @@ export class StudentListComponent implements OnInit, OnDestroy {
     this.selectedClass = selectedClass;
     this.loadStudents();
   }
+
+  navigateToBulkImport(): void {
+    this.router.navigate(['/dashboard/student-bulk-import']);
+  }
 }

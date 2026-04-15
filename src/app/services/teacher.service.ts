@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Teacher } from '../interfaces/teacher';
+import { BulkImportResult } from './student.service';
 
 @Injectable({
   providedIn: 'root'
@@ -27,5 +28,15 @@ export class TeacherService {
 
   addTeacher(teacherData: Omit<Teacher, 'teacherId'>): Observable<Teacher> {
     return this.http.post<Teacher>(this.baseUrl, teacherData);
+  }
+
+  downloadBulkTemplate(): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/bulk/template`, { responseType: 'blob' });
+  }
+
+  bulkImport(file: File): Observable<BulkImportResult> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<BulkImportResult>(`${this.baseUrl}/bulk`, formData);
   }
 }

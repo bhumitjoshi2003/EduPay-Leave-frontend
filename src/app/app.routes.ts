@@ -27,6 +27,7 @@ import { AdminListComponent } from './components/admin-list/admin-list.component
 import { AdminDetailsComponent } from './components/admin-details/admin-details.component';
 import { RegisterAdminComponent } from './components/register-admin/register-admin.component';
 import { BulkImportComponent } from './components/bulk-import/bulk-import.component';
+import { TeacherBulkImportComponent } from './components/teacher-bulk-import/teacher-bulk-import.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -65,7 +66,8 @@ export const routes: Routes = [
             { path: 'admin-list', component: AdminListComponent },
             { path: 'admin-details/:adminId', component: AdminDetailsComponent },
             { path: 'register-admin', component: RegisterAdminComponent },
-            { path: 'student-bulk-import', component: BulkImportComponent }
+            { path: 'student-bulk-import', component: BulkImportComponent },
+            { path: 'teacher-bulk-import', component: TeacherBulkImportComponent }
         ],
     },
     { path: '**', redirectTo: '/home', pathMatch: 'full' },

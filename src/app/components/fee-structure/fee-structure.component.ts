@@ -6,6 +6,7 @@ import { FeeStructure, FeeStructureService } from '../../services/fee-structure.
 import { Subject, takeUntil } from 'rxjs';
 import { AuthStateService } from '../../auth/auth-state.service';
 import Swal from 'sweetalert2';
+import { LoggerService } from '../../services/logger.service';
 
 @Component({
   selector: 'app-fee-structure',
@@ -28,7 +29,8 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
   constructor(
     private feeStructureService: FeeStructureService,
     private authStateService: AuthStateService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private logger: LoggerService
   ) { }
 
   ngOnDestroy(): void {
@@ -45,6 +47,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
       this.sessions = sessions;
       if (this.sessions.length > 0) {
         this.currentSession = this.sessions[this.sessions.length - 1];
+        this.cdr.markForCheck();
         this.fetchFeeStructures();
       }
     });
@@ -54,6 +57,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
     this.feeStructureService.getFeeStructures(this.currentSession).pipe(takeUntil(this.destroy$)).subscribe(feeStructures => {
       this.feeStructures = feeStructures;
       this.originalFeeStructure = JSON.parse(JSON.stringify(this.feeStructures));
+      this.cdr.markForCheck();
     });
   }
 
@@ -135,6 +139,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
     }).then((result) => {
       if (result.isConfirmed) {
         this.isEditing = true;
+        this.cdr.markForCheck();
         //  Swal.fire('Edit Mode Enabled!', '', 'success');
       }
     });
@@ -152,13 +157,13 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.isEditing = false;
         this.isNewSessionStarted = false;
+        this.cdr.markForCheck();
         this.feeStructureService.updateFeeStructures(this.currentSession, this.feeStructures).subscribe(() => {
           this.originalFeeStructure = JSON.parse(JSON.stringify(this.feeStructures));
           Swal.fire('Saved!', `Fee structure for ${this.currentSession} saved successfully.`, 'success');
-          console.log(`Fee structure for ${this.currentSession} saved:`, this.feeStructures);
         }, (error) => {
           Swal.fire('Error!', 'Failed to save the fee structure.', 'error');
-          console.error('Error saving fee structure:', error);
+          this.logger.error('Error saving fee structure:', error);
         });
       } else if (result.isDenied) {
         Swal.fire('Changes not saved', '', 'info');
@@ -204,6 +209,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
           }
         } else {
           this.feeStructures = JSON.parse(JSON.stringify(this.originalFeeStructure));
+          this.cdr.markForCheck();
         }
         Swal.fire('Cancelled!', 'Your changes have been discarded.', 'info');
       }

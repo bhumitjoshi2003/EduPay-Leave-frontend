@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { StudentService } from '../../services/student.service';
@@ -27,7 +28,8 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private studentService: StudentService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private logger: LoggerService
   ) {
     this.studentForm = this.fb.group({
       studentId: ['', Validators.required],
@@ -66,7 +68,6 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
     if (this.studentForm.valid) {
       this.studentService.addStudent(this.studentForm.value).subscribe({
         next: (response: any) => {
-          console.log('Student registered successfully:', response);
           const tempPassword = this.generateTempPassword();
           this.authService.register({
             userId: response.studentId,
@@ -86,12 +87,12 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
             },
             error: (authError) => {
               Swal.fire('Error', 'Student record created but account setup failed. Please retry.', 'error');
-              console.error('Error registering user in auth service:', authError);
+              this.logger.error('Error registering user in auth service:', authError);
             }
           });
         },
         error: (error) => {
-          console.error('Error registering student:', error);
+          this.logger.error('Error registering student:', error);
           let errorMessage = 'Failed to register new student.';
           if (error.status === 409) {
             errorMessage = error.error;

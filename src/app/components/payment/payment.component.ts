@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output, NgZone } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { RazorpayService } from '../../services/razorpay.service';
 import { PaymentData } from '../../interfaces/payment-data';
 import Swal from 'sweetalert2';
@@ -17,7 +18,8 @@ export class PaymentComponent {
   constructor(
     private razorpayService: RazorpayService,
     private studentService: StudentService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private logger: LoggerService
   ) { }
 
   @Input() paymentData: PaymentData = {
@@ -66,7 +68,6 @@ export class PaymentComponent {
     this.studentService.getStudent(studentId).subscribe({
       next: (student) => {
         this.studentDetails = student;
-        console.log(this.studentDetails.phoneNumber);
 
         if (!this.paymentData || !this.studentDetails) {
           Swal.fire({
@@ -104,7 +105,6 @@ export class PaymentComponent {
               wallet: false
             },
             handler: (paymentResponse: any) => {
-              console.log('Payment Success:', paymentResponse);
               this.verifyPayment(paymentResponse, response);
             },
             modal: {
@@ -132,7 +132,7 @@ export class PaymentComponent {
         });
       },
       error: (error) => {
-        console.error('Error fetching student details for payment:', error);
+        this.logger.error('Error fetching student details for payment:', error);
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -160,7 +160,7 @@ export class PaymentComponent {
         }
       },
       error: (err) => {
-        console.error('Error during payment verification:', err);
+        this.logger.error('Error during payment verification:', err);
         Swal.fire({
           icon: 'error',
           title: 'Verification Error!',

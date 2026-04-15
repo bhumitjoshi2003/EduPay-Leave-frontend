@@ -24,7 +24,7 @@ export class AuditService {
 
     constructor(private http: HttpClient) { }
 
-    getAuditLogs(page: number, size: number, filters: any): Observable<any> {
+    getAuditLogs(page: number, size: number, filters: any): Observable<{ content: AuditLog[]; totalElements: number; totalPages: number }> {
 
         let params = new HttpParams()
             .set('page', page)

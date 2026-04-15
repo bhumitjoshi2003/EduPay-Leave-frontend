@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { ActivatedRoute } from '@angular/router';
 import { PaymentHistoryService } from '../../services/payment-history.service';
 import { PaymentHistoryDetails } from '../../interfaces/payment-response'; 
@@ -20,7 +21,7 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
   error: string = '';
   months: string[] = [];
 
-  constructor(private route: ActivatedRoute, private paymentHistoryService: PaymentHistoryService) {}
+  constructor(private route: ActivatedRoute, private paymentHistoryService: PaymentHistoryService, private logger: LoggerService) {}
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -46,7 +47,7 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.error = 'Failed to fetch payment details.';
-        console.error('Error fetching payment details:', err);
+        this.logger.error('Error fetching payment details:', err);
         this.loading = false;
       }
     });
@@ -80,7 +81,7 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.error = 'Failed to download receipt.';
-        console.error('Download error:', err);
+        this.logger.error('Download error:', err);
         this.loading = false;
       },
     });

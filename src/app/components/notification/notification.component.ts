@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Notification } from '../../interfaces/notification';
@@ -55,7 +56,8 @@ export class NotificationComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private notificationService: NotificationService,
     private snackBar: MatSnackBar,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private logger: LoggerService
   ) { }
 
   isMobile: boolean = false;
@@ -113,7 +115,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
         this.notifications = data;
       },
       error: (err) => {
-        console.error('Error loading notifications:', err);
+        this.logger.error('Error loading notifications:', err);
         this.snackBar.open('Failed to load notifications.', 'Close', { duration: 3000 });
       }
     });
@@ -130,16 +132,11 @@ export class NotificationComponent implements OnInit, OnDestroy {
             this.resetForm();
           },
           error: (err) => {
-            console.error('Error updating notification:', err);
+            this.logger.error('Error updating notification:', err);
             this.snackBar.open('Failed to update notification.', 'Close', { duration: 3000 });
           }
         });
       } else {
-        console.log("NOT=> " + notification.message);
-        console.log(notification.type);
-        console.log(notification.audience);
-        console.log(notification.title);
-
         this.notificationService.createNotification(notification).subscribe({
           next: (res) => {
             this.snackBar.open('Notification created successfully!', 'Close', { duration: 3000 });
@@ -147,7 +144,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
             this.resetForm();
           },
           error: (err) => {
-            console.error('Error creating notification:', err);
+            this.logger.error('Error creating notification:', err);
             this.snackBar.open('Failed to create notification.', 'Close', { duration: 3000 });
           }
         });
@@ -189,7 +186,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
           this.resetForm();
         },
         error: (err) => {
-          console.error('Error deleting notification:', err);
+          this.logger.error('Error deleting notification:', err);
           this.snackBar.open('Failed to delete notification.', 'Close', { duration: 3000 });
         }
       });

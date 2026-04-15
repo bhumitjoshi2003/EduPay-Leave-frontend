@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, AbstractControl, FormArray } from '@angular/forms';
 import { EventService } from '../../services/event.service';
 import { CalendarEvent } from '../../interfaces/event-calendar.component';
@@ -72,7 +73,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private eventService: EventService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private logger: LoggerService
   ) {
     this.eventForm = this.fb.group({
       title: ['', Validators.required],
@@ -152,7 +154,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
         }
       },
       error: (err) => {
-        console.error('Error loading event for edit:', err);
+        this.logger.error('Error loading event for edit:', err);
         // Handle error, e.g., navigate away or show an error message
       }
     });
@@ -258,7 +260,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
             this.proceedToSaveEvent(eventData);
           },
           error: (uploadError) => {
-            console.error('Error uploading image:', uploadError);
+            this.logger.error('Error uploading image:', uploadError);
             alert('Failed to upload image. Event not saved.');
           }
         });
@@ -274,7 +276,6 @@ export class EventFormComponent implements OnInit, OnDestroy {
       }
 
     } else {
-      console.error('Form is invalid. Please check all fields.');
       this.eventForm.markAllAsTouched(); // Mark all controls as touched to display errors
     }
   }
@@ -285,23 +286,21 @@ export class EventFormComponent implements OnInit, OnDestroy {
     // Make sure your service methods (updateEvent, createEvent) have the correct signatures.
     if (this.isEditMode && this.eventId !== null) {
       this.eventService.updateEvent(this.eventId, eventData).subscribe({ // Assuming service takes eventData directly
-        next: (response) => {
-          console.log('Event updated successfully:', response);
+        next: () => {
           this.router.navigate(['/dashboard/event-calendar']);
         },
         error: (err) => {
-          console.error('Error updating event:', err);
+          this.logger.error('Error updating event:', err);
           alert('Failed to update event. Please try again.');
         }
       });
     } else {
       this.eventService.createEvent(eventData).subscribe({ // Assuming service takes eventData directly
-        next: (response) => {
-          console.log('Event created successfully:', response);
+        next: () => {
           this.router.navigate(['/dashboard/event-calendar']);
         },
         error: (err) => {
-          console.error('Error creating event:', err);
+          this.logger.error('Error creating event:', err);
           alert('Failed to create event. Please try again.');
         }
       });

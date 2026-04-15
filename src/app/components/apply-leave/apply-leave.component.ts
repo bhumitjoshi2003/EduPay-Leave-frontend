@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule, formatDate } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -46,7 +47,9 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private leaveService: LeaveService,
     private studentService: StudentService,
-    private authStateService: AuthStateService
+    private authStateService: AuthStateService,
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) {
     this.leaveForm = this.fb.group({
       leaveDate: ['', Validators.required],
@@ -91,10 +94,11 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
       this.studentService.getStudent(this.studentId).pipe(takeUntil(this.destroy$)).subscribe({
         next: (student) => {
           this.className = student.className;
+          this.cdr.markForCheck();
           this.loadStudentLeaves();
         },
         error: (error) => {
-          console.error('Error fetching student details:', error);
+          this.logger.error('Error fetching student details:', error);
         }
       });
     }
@@ -111,9 +115,10 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
           }));
           this.totalPages = response.totalPages;
           this.totalElements = response.totalElements;
+          this.cdr.markForCheck();
         },
         error: (error) => {
-          console.error('Error fetching student leaves:', error);
+          this.logger.error('Error fetching student leaves:', error);
         }
       });
   }
@@ -161,7 +166,7 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
               this.ngOnInit();
             },
             error: (error) => {
-              console.error('Error deleting leave:', error);
+              this.logger.error('Error deleting leave:', error);
               Swal.fire({
                 title: 'Error!',
                 text: 'Failed to delete leave. Please try again.',
@@ -267,7 +272,7 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
               this.ngOnInit();
             },
             error: (error) => {
-              console.error('Error applying leave:', error);
+              this.logger.error('Error applying leave:', error);
               this.errorMessage = 'Failed to apply leave. Please try again.';
               Swal.fire({
                 title: 'Error!',

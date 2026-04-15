@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { StudentService } from '../../services/student.service';
 import { TeacherService } from '../../services/teacher.service';
 import { Router } from '@angular/router';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
+import { LoggerService } from '../../services/logger.service';
 
 interface Student {
   studentId: string;
@@ -35,7 +36,9 @@ export class StudentListComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private teacherService: TeacherService,
     private router: Router,
-    private authStateService: AuthStateService
+    private authStateService: AuthStateService,
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnDestroy(): void {
@@ -70,25 +73,33 @@ export class StudentListComponent implements OnInit, OnDestroy {
         this.loadStudents();
       },
       error: (error: any) => {
-        console.error('Error fetching teacher details:', error);
+        this.logger.error('Error fetching teacher details:', error);
       }
     });
   }
 
   loadStudents(): void {
-    this.studentService.getActiveStudentsByClass(this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe((students) => {
+    const classAtRequest = this.selectedClass;
+    localStorage.setItem('lastSelectedClass', classAtRequest);
+
+    this.studentService.getActiveStudentsByClass(classAtRequest).pipe(takeUntil(this.destroy$)).subscribe((students) => {
+      if (this.selectedClass !== classAtRequest) return;
       this.activeStudents = students;
+      this.cdr.markForCheck();
     });
+
     if (this.loggedInUserRole === 'ADMIN') {
-      console.log("admin");
-      this.studentService.getNewStudentsByClass(this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe((students) => {
+      this.studentService.getNewStudentsByClass(classAtRequest).pipe(takeUntil(this.destroy$)).subscribe((students) => {
+        if (this.selectedClass !== classAtRequest) return;
         this.newStudents = students;
+        this.cdr.markForCheck();
       });
-      this.studentService.getInactiveStudentsByClass(this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe((students) => {
+      this.studentService.getInactiveStudentsByClass(classAtRequest).pipe(takeUntil(this.destroy$)).subscribe((students) => {
+        if (this.selectedClass !== classAtRequest) return;
         this.inactiveStudents = students;
+        this.cdr.markForCheck();
       });
     }
-    localStorage.setItem('lastSelectedClass', this.selectedClass);
   }
 
   viewStudentDetails(studentId: string): void {

@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NotificationService } from '../../services/notification.service';
@@ -24,7 +25,8 @@ export class ViewNotificationComponent implements OnInit, OnDestroy {
 
   constructor(
     private notificationService: NotificationService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private logger: LoggerService
   ) { }
 
   ngOnDestroy(): void {
@@ -49,13 +51,13 @@ export class ViewNotificationComponent implements OnInit, OnDestroy {
               this.userNotifications.forEach(n => n.isRead = true);
             },
             error: (err) => {
-              console.error('Mark read error:', err);
+              this.logger.error('Mark read error:', err);
             }
           });
         }
       },
       error: (err) => {
-        console.error('Fetch error:', err);
+        this.logger.error('Fetch error:', err);
         this.isLoading = false;
       }
     });
@@ -67,7 +69,7 @@ export class ViewNotificationComponent implements OnInit, OnDestroy {
         this.userNotifications.forEach(n => n.isRead = true);
       },
       error: (err) => {
-        console.error('Mark all read error:', err);
+        this.logger.error('Mark all read error:', err);
       }
     });
   }

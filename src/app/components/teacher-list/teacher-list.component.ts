@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { TeacherService } from '../../services/teacher.service';
 import { Router } from '@angular/router';
 import { AuthStateService } from '../../auth/auth-state.service';
@@ -26,7 +27,9 @@ export class TeacherListComponent implements OnInit, OnDestroy {
   constructor(
     private teacherService: TeacherService,
     private router: Router,
-    private authStateService: AuthStateService
+    private authStateService: AuthStateService,
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -46,11 +49,11 @@ export class TeacherListComponent implements OnInit, OnDestroy {
       if (this.loggedInUserRole === 'ADMIN') {
         this.loadAllTeachers();
       } else {
-        console.warn('Non-admin user trying to access teacher list.');
+        this.logger.error('Non-admin user trying to access teacher list.');
         this.router.navigate(['/dashboard']);
       }
     } else {
-      console.error('No token found');
+      this.logger.error('No token found');
       this.router.navigate(['/login']);
     }
   }
@@ -59,9 +62,10 @@ export class TeacherListComponent implements OnInit, OnDestroy {
     this.teacherService.getAllTeachers().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
       next: (teachers) => {
         this.teachers = teachers;
+        this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Error fetching all teachers:', error);
+        this.logger.error('Error fetching all teachers:', error);
       }
     });
   }

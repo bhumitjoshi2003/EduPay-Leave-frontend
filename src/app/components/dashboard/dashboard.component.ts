@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
@@ -52,7 +53,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private teacherService: TeacherService,
     private adminService: AdminService,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private logger: LoggerService
   ) { }
 
   ngOnInit() {
@@ -100,18 +102,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.showWelcomeMessageOnce();
         },
         error: (error) => {
-          console.error('Error fetching student details:', error);
+          this.logger.error('Error fetching student details:', error);
         }
       });
     } else if (this.Role === 'TEACHER' && this.Id) {
       this.teacherService.getTeacher(this.Id).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
         next: (teacher) => {
           this.Name = teacher.name;
-          this.ClassTeacher = teacher.classTeacher;
+          this.ClassTeacher = teacher.classTeacher ?? '';
           this.showWelcomeMessageOnce();
         },
         error: (error) => {
-          console.error('Error fetching teacher details:', error);
+          this.logger.error('Error fetching teacher details:', error);
         }
       });
     } else if (this.Role === 'ADMIN' && this.Id) {
@@ -121,7 +123,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.showWelcomeMessageOnce();
         },
         error: (error) => {
-          console.error('Error fetching admin details:', error);
+          this.logger.error('Error fetching admin details:', error);
         }
       });
     }

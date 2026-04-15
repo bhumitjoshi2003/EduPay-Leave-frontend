@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -54,7 +55,9 @@ export class PaymentHistoryComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private paymentHistoryService: PaymentHistoryService,
-    private authStateService: AuthStateService
+    private authStateService: AuthStateService,
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnDestroy(): void {
@@ -110,11 +113,13 @@ export class PaymentHistoryComponent implements OnInit, OnDestroy {
         this.totalPages = response.totalPages;
         this.currentPage = response.number;
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error = 'Failed to fetch payment history. Please try again.';
-        console.error('Error fetching payment history:', err);
+        this.logger.error('Error fetching payment history:', err);
         this.loading = false;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -154,11 +159,13 @@ export class PaymentHistoryComponent implements OnInit, OnDestroy {
         let filename = `receipt_${paymentId}.pdf`;
         saveAs(data, filename);
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error = 'Failed to download payment receipt.';
-        console.error('Error downloading payment receipt:', err);
+        this.logger.error('Error downloading payment receipt:', err);
         this.loading = false;
+        this.cdr.markForCheck();
       },
     });
   }

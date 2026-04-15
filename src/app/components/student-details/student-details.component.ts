@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StudentService } from '../../services/student.service';
 import { CommonModule } from '@angular/common';
@@ -69,7 +70,8 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private authService: AuthService,
     private fb: FormBuilder,
-    private location: Location
+    private location: Location,
+    private logger: LoggerService
   ) {
     this.changePasswordForm = this.fb.group({
       oldPassword: [''],
@@ -102,7 +104,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
         this.updatedDetails = { ...details };
       },
       error: (error) => {
-        console.error('Error fetching details:', error);
+        this.logger.error('Error fetching details:', error);
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -276,7 +278,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
               });
             },
             error: (error) => {
-              console.error('Error updating details:', error);
+              this.logger.error('Error updating details:', error);
               Swal.fire({
                 icon: 'error',
                 title: 'Error!',
@@ -413,7 +415,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
             Swal.fire('Success', 'Password changed successfully!', 'success');
           },
           error: (error) => {
-            console.error('Error changing password', error);
+            this.logger.error('Error changing password', error);
             Swal.fire('Error', error.error || 'Failed to change password', 'error');
           }
         });

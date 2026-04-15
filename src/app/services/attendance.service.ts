@@ -12,7 +12,7 @@ export class AttendanceService {
 
   constructor(private http: HttpClient) { }
 
-  saveAttendance(attendanceData: AttendanceData[]): Observable<any> {
+  saveAttendance(attendanceData: AttendanceData[]): Observable<string> {
     return this.http.post(this.apiUrl, attendanceData, { responseType: 'text' });
   }
 

@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { isPlatformBrowser } from '@angular/common';
 import { EventService } from '../../services/event.service';
 import { AuthService } from '../../auth/auth.service';
@@ -75,7 +76,8 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private teacherService: TeacherService,
     private attendanceService: AttendanceService,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private logger: LoggerService
   ) {
     // Initialize eventForm here with all controls, including imageUrl
     this.eventForm = this.fb.group({
@@ -115,18 +117,17 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
       if (userId) {
         this.studentService.getStudent(userId).pipe(takeUntil(this.destroy$)).subscribe({
           next: (studentDetails) => {
-            console.log(studentDetails.className);
             this.currentUserClass = studentDetails.className;
             loadEventsAfterDetails();
           },
           error: (err) => {
-            console.error('Error fetching student details:', err);
+            this.logger.error('Error fetching student details:', err);
             this.currentUserClass = null;
             loadEventsAfterDetails();
           }
         });
       } else {
-        console.warn('Student role detected, but no student ID found from AuthService.');
+        this.logger.error('Student role detected, but no student ID found from AuthService.');
         this.currentUserClass = null;
         loadEventsAfterDetails();
       }
@@ -134,17 +135,17 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
       if (userId) {
         this.teacherService.getTeacher(userId).pipe(takeUntil(this.destroy$)).subscribe({
           next: (teachertDetails) => {
-            this.currentUserClass = teachertDetails.classTeacher;
+            this.currentUserClass = teachertDetails.classTeacher ?? null;
             loadEventsAfterDetails();
           },
           error: (err) => {
-            console.error('Error fetching teacher details:', err);
+            this.logger.error('Error fetching teacher details:', err);
             this.currentUserClass = null;
             loadEventsAfterDetails();
           }
         });
       } else {
-        console.warn('Teacher role detected, but no teacher ID found from AuthService.');
+        this.logger.error('Teacher role detected, but no teacher ID found from AuthService.');
         this.currentUserClass = null;
         loadEventsAfterDetails();
       }
@@ -193,7 +194,7 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
       const date = new Date(`2000-01-01T${timeStr}`);
       return format(date, 'h:mm a');
     } catch (e) {
-      console.error('Error formatting time string:', timeStr, e);
+      this.logger.error('Error formatting time string:', timeStr, e);
       return timeStr;
     }
   }
@@ -249,7 +250,7 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
         }
 
       },
-      error: console.error
+      error: (err) => this.logger.error(err)
     });
   }
 
@@ -306,7 +307,6 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
   }
 
   openDayPopover(evt: MouseEvent, date: Date): void {
-    console.log(`Clicked day (desktop mode, popover functionality deprecated): ${format(date, 'yyyy-MM-dd')}`);
     evt.stopPropagation();
   }
 
@@ -379,14 +379,9 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
   }
 
   private initEventForm(event: CalendarEvent): void {
-    console.log('--- initEventForm called ---');
-    console.log('1. Event object received:', event);
-    console.log('2. event.targetAudience from backend (expected Array<string>):', event.targetAudience);
-
     const targetAudienceString = Array.isArray(event.targetAudience)
       ? event.targetAudience.join(', ')
       : '';
-    console.log('3. targetAudienceString (prepared for form input):', targetAudienceString);
 
     // Clear previous FormArray controls before adding new ones
     while (this.videoLinks.length !== 0) {
@@ -410,9 +405,6 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
     });
 
     this.cdr.detectChanges();
-    console.log('5. eventForm.get("targetAudience") value after initialization:', this.eventForm.get('targetAudience')?.value);
-    console.log('6. eventForm.get("imageUrl") value after initialization:', this.eventForm.get('imageUrl')?.value);
-    console.log('--- initEventForm finished ---');
   }
 
   get videoLinks(): FormArray {
@@ -512,8 +504,6 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
         updatedEvent.endDate = new Date(updatedEvent.endDate).toISOString().split('T')[0];
       }
 
-      console.log('Attempting to save event:', updatedEvent);
-
       // --- MODIFIED: Streamlined Image handling logic ---
       if (this.selectedFile) {
         // Case 1: A new file has been selected, upload it first
@@ -523,7 +513,7 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
             this.proceedToUpdateEvent(eventIdToUpdate, updatedEvent);
           },
           error: (err) => {
-            console.error('Error uploading image:', err);
+            this.logger.error('Error uploading image:', err);
             alert('Failed to upload image. Event not saved.');
           }
         });
@@ -535,20 +525,19 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
       }
 
     } else {
-      console.warn('Form is invalid or no event selected. Cannot save changes.');
+      this.logger.error('Form is invalid or no event selected. Cannot save changes.');
       this.eventForm.markAllAsTouched(); // Mark all controls as touched to display validation errors
     }
   }
 
   private proceedToUpdateEvent(eventId: number, event: CalendarEvent): void {
     this.eventService.updateEvent(eventId, event).subscribe({
-      next: (res) => {
-        console.log('Event updated successfully:', res);
+      next: () => {
         this.refreshCalendar(); // Refresh calendar to show updated event
         this.closeSidebar(); // Close sidebar after successful update
       },
       error: (err) => {
-        console.error('Error updating event:', err);
+        this.logger.error('Error updating event:', err);
         alert('Failed to save event. Please try again.');
       }
     });
@@ -597,10 +586,9 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
 
         });
 
-        console.log('attendanceMap:', this.attendanceMap);
       },
       error: (err) => {
-        console.error('Error loading attendance:', err);
+        this.logger.error('Error loading attendance:', err);
       }
     });
   }

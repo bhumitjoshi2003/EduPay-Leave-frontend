@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
@@ -29,7 +30,8 @@ export class NoticeComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private logger: LoggerService
   ) {
     this.emailForm = this.fb.group({
       title: ['', Validators.required],
@@ -98,7 +100,7 @@ export class NoticeComponent implements OnInit {
               text: 'Failed to send emails. Please try again.',
               confirmButtonColor: '#007BFF'
             });
-            console.error('Error sending emails:', error);
+            this.logger.error('Error sending emails:', error);
           }
         );
       }

@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TeacherService } from '../../services/teacher.service';
 import { CommonModule } from '@angular/common';
@@ -50,7 +51,8 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     private teacherService: TeacherService,
     private authService: AuthService,
     private fb: FormBuilder,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private logger: LoggerService
   ) {
     this.changePasswordForm = this.fb.group({
       oldPassword: [''],
@@ -83,7 +85,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
         this.updatedDetails = { ...details };
       },
       error: (error) => {
-        console.error('Error fetching teacher details:', error);
+        this.logger.error('Error fetching teacher details:', error);
         Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load teacher details.' });
       }
     });
@@ -182,7 +184,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
               });
             },
             error: (error) => {
-              console.error('Error updating teacher details:', error);
+              this.logger.error('Error updating teacher details:', error);
               Swal.fire({ icon: 'error', title: 'Error!', text: 'Failed to update teacher details.' });
             }
           });

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TeacherService } from '../../services/teacher.service';
 import { Router } from '@angular/router';
@@ -26,7 +27,8 @@ export class RegisterTeacherComponent implements OnInit {
     private fb: FormBuilder,
     private teacherService: TeacherService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private logger: LoggerService
   ) {
     this.teacherForm = this.fb.group({
       teacherId: ['', Validators.required],
@@ -46,7 +48,6 @@ export class RegisterTeacherComponent implements OnInit {
     if (this.teacherForm.valid) {
       this.teacherService.addTeacher(this.teacherForm.value).subscribe({
         next: (response: any) => {
-          console.log('Teacher registered successfully:', response);
           const tempPassword = this.generateTempPassword();
           this.authService.register({
             userId: response.teacherId,
@@ -65,12 +66,12 @@ export class RegisterTeacherComponent implements OnInit {
             },
             error: (authError) => {
               Swal.fire('Error', 'Teacher record created but account setup failed. Please retry.', 'error');
-              console.error('Error registering user in auth service:', authError);
+              this.logger.error('Error registering user in auth service:', authError);
             }
           });
         },
         error: (error) => {
-          console.error('Error registering teacher:', error);
+          this.logger.error('Error registering teacher:', error);
           let errorMessage = 'Failed to register new teacher.';
           if (error.status === 409) {
             errorMessage = error.error;

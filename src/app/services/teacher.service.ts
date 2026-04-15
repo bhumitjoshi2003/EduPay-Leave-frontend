@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Teacher } from '../interfaces/teacher';
 
 @Injectable({
   providedIn: 'root'
@@ -12,19 +13,19 @@ export class TeacherService {
 
   constructor(private http: HttpClient) { }
 
-  getTeacher(teacherId: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/${teacherId}`);
+  getTeacher(teacherId: string): Observable<Teacher> {
+    return this.http.get<Teacher>(`${this.baseUrl}/${teacherId}`);
   }
 
-  getAllTeachers(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}`);
+  getAllTeachers(): Observable<Teacher[]> {
+    return this.http.get<Teacher[]>(`${this.baseUrl}`);
   }
 
-  updateTeacher(teacherId: string, updatedTeacher: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/${teacherId}`, updatedTeacher);
+  updateTeacher(teacherId: string, updatedTeacher: Partial<Teacher>): Observable<Teacher> {
+    return this.http.put<Teacher>(`${this.baseUrl}/${teacherId}`, updatedTeacher);
   }
 
-  addTeacher(teacherData: any): Observable<any> {
-    return this.http.post(this.baseUrl, teacherData);
+  addTeacher(teacherData: Omit<Teacher, 'teacherId'>): Observable<Teacher> {
+    return this.http.post<Teacher>(this.baseUrl, teacherData);
   }
 }

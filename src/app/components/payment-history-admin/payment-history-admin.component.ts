@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { PaymentHistoryService, PaginatedResponse } from '../../services/payment-history.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -57,7 +58,7 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
   totalPages: number = 0;
   pageSizes: number[] = [5, 10, 20, 50];
 
-  constructor(private router: Router, private paymentHistoryService: PaymentHistoryService, private datePipe: DatePipe) { }
+  constructor(private router: Router, private paymentHistoryService: PaymentHistoryService, private datePipe: DatePipe, private logger: LoggerService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.fetchPaymentHistory();
@@ -101,14 +102,16 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
         this.totalPages = response.totalPages;
         this.currentPage = response.number;
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Error loading payment history:', error);
+        this.logger.error('Error loading payment history:', error);
         this.error = 'Failed to load payment history.';
         this.loading = false;
         this.filteredPayments = [];
         this.totalElements = 0;
         this.totalPages = 0;
+        this.cdr.markForCheck();
         Swal.fire('Error!', 'Failed to load payment history.', 'error');
       }
     });
@@ -150,11 +153,13 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
         let filename = `receipt_${paymentId}.pdf`;
         saveAs(data, filename);
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error = 'Failed to download payment receipt.';
-        console.error('Error downloading payment receipt:', err);
+        this.logger.error('Error downloading payment receipt:', err);
         this.loading = false;
+        this.cdr.markForCheck();
         Swal.fire('Error!', 'Failed to download payment receipt.', 'error');
       },
     });

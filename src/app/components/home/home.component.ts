@@ -3,6 +3,7 @@ import { AuthService } from '../../auth/auth.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { LoggerService } from '../../services/logger.service';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -34,7 +35,8 @@ export class HomeComponent implements OnInit {
     private authService: AuthService,
     private authStateService: AuthStateService,
     private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private logger: LoggerService
   ) { }
 
   ngOnInit() {
@@ -83,7 +85,7 @@ export class HomeComponent implements OnInit {
           text: 'Incorrect Credentials',
           confirmButtonColor: '#d33',
         });
-        console.error('Login error:', error);
+        this.logger.error('Login error:', error);
       }
     });
   }

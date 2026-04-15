@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID, ViewChild } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import Chart from 'chart.js/auto';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { forkJoin, Subject, takeUntil } from 'rxjs';
@@ -29,7 +30,9 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy, AfterViewI
     private attendanceService: AttendanceService,
     @Inject(PLATFORM_ID) private platformId: Object,
     private route: ActivatedRoute,
-    private authStateService: AuthStateService
+    private authStateService: AuthStateService,
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnDestroy(): void {
@@ -60,7 +63,7 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy, AfterViewI
 
   fetchAttendanceData(): void {
     if (!this.studentId) {
-      console.error('Student ID is missing.');
+      this.logger.error('Student ID is missing.');
       return;
     }
 
@@ -116,6 +119,7 @@ export class StudentAttendanceComponent implements OnInit, OnDestroy, AfterViewI
         };
       });
 
+      this.cdr.markForCheck();
       setTimeout(() => this.createCharts(), 100);
     });
   }

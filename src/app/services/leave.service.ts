@@ -78,7 +78,7 @@ export class LeaveService {
       `${this.apiUrl}/student/${studentId}`, { params });
   }
 
-  deleteLeave(studentId: string, leaveDate: string): Observable<any> {
+  deleteLeave(studentId: string, leaveDate: string): Observable<string> {
     return this.http.delete(`${this.apiUrl}/delete/${studentId}/${leaveDate}`, { responseType: 'text' });
   }
 

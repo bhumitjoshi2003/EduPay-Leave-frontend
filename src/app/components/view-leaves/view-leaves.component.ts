@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, switchMap, Observable, debounceTime, distinctUntilChanged } from 'rxjs';
@@ -56,7 +57,9 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private leaveService: LeaveService,
     private teacherService: TeacherService,
-    private authStateService: AuthStateService
+    private authStateService: AuthStateService,
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -110,7 +113,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: () => { },
       error: (error: any) => {
-        console.error('Error fetching teacher details or leaves:', error);
+        this.logger.error('Error fetching teacher details or leaves:', error);
         Swal.fire('Error!', 'Failed to load teacher details or leave applications.', 'error');
       }
     });
@@ -150,13 +153,15 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
           this.totalElements = response.totalElements;
           this.totalPages = response.totalPages;
           this.currentPage = response.number;
+          this.cdr.markForCheck();
         },
         error: (error) => {
-          console.error('Error loading leave applications:', error);
+          this.logger.error('Error loading leave applications:', error);
           Swal.fire('Error!', 'Failed to load leave applications.', 'error');
           this.filteredLeaves = [];
           this.totalElements = 0;
           this.totalPages = 0;
+          this.cdr.markForCheck();
         }
       });
     return leavesObservable;
@@ -220,9 +225,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
           concatMap(leave => this.leaveService.deleteLeaveById(leave.id)),
           takeUntil(this.ngUnsubscribe)
         ).subscribe({
-          next: (response) => {
-            console.log('Leave deleted:', response);
-          },
+          next: () => { },
           complete: () => {
             Swal.fire(
               'Deleted!',
@@ -232,7 +235,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
             this.fetchLeaves();
           },
           error: (error) => {
-            console.error('Error deleting leaves:', error);
+            this.logger.error('Error deleting leaves:', error);
             Swal.fire(
               'Error!',
               'Failed to delete one or more leave applications.',
@@ -266,7 +269,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
             this.fetchLeaves();
           },
           error: (error) => {
-            console.error('Error deleting leave:', error);
+            this.logger.error('Error deleting leave:', error);
             Swal.fire(
               'Error!',
               'Failed to delete the leave application.',

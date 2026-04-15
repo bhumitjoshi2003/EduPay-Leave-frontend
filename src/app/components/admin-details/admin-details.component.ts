@@ -114,8 +114,8 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
     }
 
     const action = this.isNewAdmin
-      ? this.adminService.createAdmin(this.updatedDetails)
-      : this.adminService.updateAdmin(this.adminId, this.updatedDetails);
+      ? this.adminService.createAdmin(this.updatedDetails!)
+      : this.adminService.updateAdmin(this.adminId, this.updatedDetails!);
 
     Swal.fire({
       title: 'Confirm Save',

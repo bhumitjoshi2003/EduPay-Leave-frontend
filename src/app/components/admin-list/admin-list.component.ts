@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { AdminService } from '../../services/admin.service';
 import { Router } from '@angular/router';
 import { AuthStateService } from '../../auth/auth-state.service';
@@ -24,7 +25,9 @@ export class AdminListComponent implements OnInit, OnDestroy {
   constructor(
     private adminService: AdminService,
     private router: Router,
-    private authStateService: AuthStateService
+    private authStateService: AuthStateService,
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -56,8 +59,8 @@ export class AdminListComponent implements OnInit, OnDestroy {
     this.adminService.getAllAdmins()
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe({
-        next: (data) => this.admins = data,
-        error: (err) => console.error('Error fetching admins:', err)
+        next: (data) => { this.admins = data; this.cdr.markForCheck(); },
+        error: (err) => this.logger.error('Error fetching admins:', err)
       });
   }
 
@@ -86,6 +89,7 @@ export class AdminListComponent implements OnInit, OnDestroy {
         this.adminService.deleteAdmin(adminId).subscribe({
           next: () => {
             this.admins = this.admins.filter(a => a.adminId !== adminId);
+            this.cdr.markForCheck();
             Swal.fire('Deleted!', 'Admin has been deleted.', 'success');
           },
           error: (err) => Swal.fire('Error', 'Failed to delete admin.', 'error')

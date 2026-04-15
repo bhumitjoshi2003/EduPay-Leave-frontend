@@ -1,0 +1,66 @@
+<div *ngIf="details" class="month-details-container">
+  <div class="month-details">
+    <h2>{{details.monthName}} - Details</h2>
+
+    <div class="details-grid">
+      <div class="student-details">
+        <h3>Student Details</h3>
+        <div class="detail-item">
+          <strong>Student Name:</strong>
+          <span>{{ details.studentName }}</span>
+        </div>
+        <div class="detail-item">
+          <strong>Student ID:</strong>
+          <span>{{ details.studentId }}</span>
+        </div>
+        <div class="detail-item">
+          <strong>Student Class:</strong>
+          <span>{{ details.studentClass }}</span>
+        </div>
+      </div>
+
+      <div class="fee-details">
+        <h3>Academic Fee Details</h3>
+        <div class="detail-item">
+          <strong>Tuition Fee:</strong>
+          <span>₹{{ details.tuitionFee }}</span>
+        </div>
+        <div class="detail-item" *ngIf="details.annualCharges">
+          <strong>Annual Charges:</strong>
+          <span>₹{{ details.annualCharges }}</span>
+        </div>
+        <div class="detail-item" *ngIf="details.labCharges">
+          <strong>Lab Charges:</strong>
+          <span>₹{{ details.labCharges }}</span>
+        </div>
+        <div class="detail-item" *ngIf="details.ecaProject">
+          <strong>E.C.A/Project:</strong>
+          <span>₹{{ details.ecaProject }}</span>
+        </div>
+        <div class="detail-item" *ngIf="details.examinationFee">
+          <strong>Examination Fee:</strong>
+          <span>₹{{ details.examinationFee }}</span>
+        </div>
+        <div class="detail-item" *ngIf="details.busFee">
+          <strong>Bus Fees:</strong>
+          <span>₹{{ details.busFee }}</span>
+        </div>
+        <div class="detail-item" *ngIf="details.lateFee">
+          <strong>Late Fees:</strong>
+          <span style="color: rgb(239, 64, 64)">₹{{ details.lateFee }}</span>
+        </div>
+        <div class="detail-item" *ngIf="details.additionalCharges && selectedMonthCount === 1">
+          <strong>Unapplied Leave Charge:</strong>
+          <span style="color: rgb(239, 64, 64)">₹{{ details.additionalCharges }}</span>
+        </div>
+        <ng-container *ngIf="platformFeeAmount > 0">
+          <hr>
+          <div class="detail-item platform-fee-item">
+            <strong>Platform Fee:</strong>
+            <span>₹{{ platformFeeAmount }}</span>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

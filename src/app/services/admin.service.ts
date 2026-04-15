@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Admin } from '../interfaces/admin';
 
 @Injectable({
   providedIn: 'root'
@@ -13,27 +14,27 @@ export class AdminService {
 
   constructor(private http: HttpClient) { }
 
-  getAdminById(adminId: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/${adminId}`);
+  getAdminById(adminId: string): Observable<Admin> {
+    return this.http.get<Admin>(`${this.baseUrl}/${adminId}`);
   }
 
-  getAllAdmins(): Observable<any[]> {
-    return this.http.get<any[]>(this.baseUrl);
+  getAllAdmins(): Observable<Admin[]> {
+    return this.http.get<Admin[]>(this.baseUrl);
   }
 
-  createAdmin(admin: any): Observable<any> {
-    return this.http.post<any>(this.baseUrl, admin);
+  createAdmin(admin: Admin): Observable<Admin> {
+    return this.http.post<Admin>(this.baseUrl, admin);
   }
 
-  updateAdmin(adminId: string, admin: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/${adminId}`, admin);
+  updateAdmin(adminId: string, admin: Admin): Observable<Admin> {
+    return this.http.put<Admin>(`${this.baseUrl}/${adminId}`, admin);
   }
 
-  deleteAdmin(adminId: string): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}/${adminId}`);
+  deleteAdmin(adminId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${adminId}`);
   }
 
-  sendNoticeToStudents(data: { title: string; subject: string; body: string }): Observable<any> {
-    return this.http.post<any>(this.noticeUrl + '/notice', data);
+  sendNoticeToStudents(data: { title: string; subject: string; body: string }): Observable<string> {
+    return this.http.post(this.noticeUrl + '/notice', data, { responseType: 'text' });
   }
 }

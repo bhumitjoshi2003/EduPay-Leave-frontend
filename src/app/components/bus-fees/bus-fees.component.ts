@@ -43,6 +43,7 @@ export class BusFeesComponent implements OnInit, OnDestroy {
       this.academicYears = years;
       if (this.academicYears.length > 0) {
         this.currentSession = this.academicYears[this.academicYears.length - 1];
+        this.cdr.markForCheck();
         this.fetchBusFees();
       }
     });
@@ -52,6 +53,7 @@ export class BusFeesComponent implements OnInit, OnDestroy {
     this.busFeesService.getBusFees(this.currentSession).pipe(takeUntil(this.destroy$)).subscribe(fees => {
       this.busFeeStructures = fees;
       this.originalBusFees = JSON.parse(JSON.stringify(this.busFeeStructures));
+      this.cdr.markForCheck();
     });
   }
 
@@ -145,6 +147,7 @@ export class BusFeesComponent implements OnInit, OnDestroy {
     }).then((result) => {
       if (result.isConfirmed) {
         this.isEditing = true;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -161,6 +164,7 @@ export class BusFeesComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.isEditing = false;
         this.isNewSession = false;
+        this.cdr.markForCheck();
         this.busFeesService.updateBusFees(this.currentSession, this.busFeeStructures).subscribe(() => {
           this.originalBusFees = JSON.parse(JSON.stringify(this.busFeeStructures));
           Swal.fire('Saved!', `Bus fees for ${this.currentSession} saved successfully.`, 'success');
@@ -200,13 +204,16 @@ export class BusFeesComponent implements OnInit, OnDestroy {
           }
           if (this.academicYears.length > 0) {
             this.currentSession = this.academicYears[this.academicYears.length - 1];
+            this.cdr.markForCheck();
             this.fetchBusFees(); // Reload data for the previous session
           } else {
             this.currentSession = '';
             this.busFeeStructures = [];
+            this.cdr.markForCheck();
           }
         } else {
           this.busFeeStructures = JSON.parse(JSON.stringify(this.originalBusFees));
+          this.cdr.markForCheck();
         }
         Swal.fire('Cancelled!', 'Bus fee changes have been discarded.', 'info');
       }

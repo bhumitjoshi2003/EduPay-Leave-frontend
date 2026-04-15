@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
 import { LeaveService } from '../../services/leave.service';
 import { StudentService } from '../../services/student.service';
 import { FormsModule } from '@angular/forms';
@@ -56,7 +57,9 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private attendanceService: AttendanceService,
     private teacherService: TeacherService,
-    private authStateService: AuthStateService
+    private authStateService: AuthStateService,
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnDestroy(): void {
@@ -113,11 +116,16 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
   loadStudentsAndApplyAttendance(): void {
     if (this.isSunday(this.attendanceDate)) {
       this.students = [];
+      this.cdr.markForCheck();
       return;
     }
 
-    this.studentService.getActiveStudentsByClass(this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe({
+    const classAtRequest = this.selectedClass;
+    const dateAtRequest = this.attendanceDate;
+
+    this.studentService.getActiveStudentsByClass(classAtRequest).pipe(takeUntil(this.destroy$)).subscribe({
       next: (studentLeaveDTOs) => {
+        if (this.selectedClass !== classAtRequest || this.attendanceDate !== dateAtRequest) return;
         this.students = studentLeaveDTOs.map((dto) => ({
           studentId: dto.studentId,
           name: dto.name,
@@ -125,10 +133,11 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
           chargePaid: true,
         }));
         this.hasStudents = this.students.length > 0;
+        this.cdr.markForCheck();
         this.applyAttendanceAndLeavesToStudents();
       },
       error: (error) => {
-        console.error('Error loading students:', error);
+        this.logger.error('Error loading students:', error);
         Swal.fire('Error', 'Failed to load students.', 'error');
       },
     });
@@ -136,9 +145,12 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 
   applyAttendanceAndLeavesToStudents(): void {
     const formattedDate = formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en');
+    const classAtRequest = this.selectedClass;
+    const dateAtRequest = this.attendanceDate;
 
-    this.attendanceService.getAttendanceByDateAndClass(formattedDate, this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe({
+    this.attendanceService.getAttendanceByDateAndClass(formattedDate, classAtRequest).pipe(takeUntil(this.destroy$)).subscribe({
       next: (attendanceData) => {
+        if (this.selectedClass !== classAtRequest || this.attendanceDate !== dateAtRequest) return;
         if (attendanceData && attendanceData.length === 0) {
           this.disableDeleteButton = true;
         }
@@ -159,9 +171,11 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
               student.chargePaid = true;
             }
           });
+          this.cdr.markForCheck();
         } else {
-          this.leaveService.getLeavesByDateAndClass(formattedDate, this.selectedClass).subscribe({
+          this.leaveService.getLeavesByDateAndClass(formattedDate, classAtRequest).subscribe({
             next: (leaves) => {
+              if (this.selectedClass !== classAtRequest || this.attendanceDate !== dateAtRequest) return;
               this.absentStudents = leaves;
               this.students.forEach((student) => {
                 if (this.absentStudents.includes(student.studentId)) {
@@ -172,17 +186,19 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
                   student.chargePaid = true;
                 }
               });
+              this.cdr.markForCheck();
             },
             error: (error) => {
-              console.warn('No leaves found or error fetching leaves:', error);
+              this.logger.error('No leaves found or error fetching leaves:', error);
             },
           });
         }
       },
       error: (error) => {
-        console.error('Error loading attendance data:', error);
-        this.leaveService.getLeavesByDateAndClass(formattedDate, this.selectedClass).subscribe({
+        this.logger.error('Error loading attendance data:', error);
+        this.leaveService.getLeavesByDateAndClass(formattedDate, classAtRequest).subscribe({
           next: (leaves) => {
+            if (this.selectedClass !== classAtRequest || this.attendanceDate !== dateAtRequest) return;
             this.absentStudents = leaves;
             this.students.forEach((student) => {
               if (this.absentStudents.includes(student.studentId)) {
@@ -193,9 +209,10 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
                 student.chargePaid = true;
               }
             });
+            this.cdr.markForCheck();
           },
           error: (leavesError) => {
-            console.error('Error loading leaves after attendance failed:', leavesError);
+            this.logger.error('Error loading leaves after attendance failed:', leavesError);
             Swal.fire('Error', 'Failed to load attendance or leave data.', 'error');
           },
         });
@@ -270,7 +287,7 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
             this.applyAttendanceAndLeavesToStudents();
           },
           error: (error) => {
-            console.error('Error saving attendance:', error);
+            this.logger.error('Error saving attendance:', error);
             Swal.fire({
               title: 'Error!',
               text: error.error || 'Failed to save attendance. Please try again.',
@@ -339,7 +356,7 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
             this.loadStudentsAndApplyAttendance(); // refresh the student list
           },
           error: (error) => {
-            console.error('Error deleting attendance:', error);
+            this.logger.error('Error deleting attendance:', error);
             Swal.fire('Error', error.error || 'Failed to delete attendance.', 'error');
           },
         });

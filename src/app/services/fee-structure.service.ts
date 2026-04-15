@@ -32,8 +32,8 @@ export class FeeStructureService {
     );
   }
 
-  getFeeStructure(session: string, className: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/${session}/${className}`);
+  getFeeStructure(session: string, className: string): Observable<FeeStructure> {
+    return this.http.get<FeeStructure>(`${this.baseUrl}/${session}/${className}`);
   }
 
   getFeeStructures(year: string): Observable<FeeStructure[]> {

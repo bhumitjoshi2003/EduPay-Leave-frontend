@@ -7,6 +7,8 @@ import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
+import { EMPTY } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-register-teacher',
@@ -46,29 +48,32 @@ export class RegisterTeacherComponent implements OnInit {
 
   onSubmit() {
     if (this.teacherForm.valid) {
-      this.teacherService.addTeacher(this.teacherForm.value).subscribe({
-        next: (response: any) => {
+      this.teacherService.addTeacher(this.teacherForm.value).pipe(
+        switchMap((response: any) => {
           const tempPassword = this.generateTempPassword();
-          this.authService.register({
+          return this.authService.register({
             userId: response.teacherId,
             password: tempPassword,
             role: 'TEACHER',
             email: this.teacherForm.value.email
-          }).subscribe({
-            next: () => {
-              Swal.fire({
-                icon: 'success',
-                title: 'Teacher Registered!',
-                html: `Registration complete.<br><br><b>Temporary Password:</b><br><code style="font-size:1.1em;letter-spacing:0.05em">${tempPassword}</code><br><small>Share this with the teacher. They should change it on first login.</small>`,
-                confirmButtonText: 'Done'
-              });
-              this.teacherForm.reset();
-            },
-            error: (authError) => {
-              Swal.fire('Error', 'Teacher record created but account setup failed. Please retry.', 'error');
+          }).pipe(
+            map(() => tempPassword),
+            catchError((authError) => {
               this.logger.error('Error registering user in auth service:', authError);
-            }
+              Swal.fire('Error', 'Teacher record created but account setup failed. Please retry.', 'error');
+              return EMPTY;
+            })
+          );
+        })
+      ).subscribe({
+        next: (tempPassword) => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Teacher Registered!',
+            html: `Registration complete.<br><br><b>Temporary Password:</b><br><code style="font-size:1.1em;letter-spacing:0.05em">${tempPassword}</code><br><small>Share this with the teacher. They should change it on first login.</small>`,
+            confirmButtonText: 'Done'
           });
+          this.teacherForm.reset();
         },
         error: (error) => {
           this.logger.error('Error registering teacher:', error);
@@ -76,11 +81,7 @@ export class RegisterTeacherComponent implements OnInit {
           if (error.status === 409) {
             errorMessage = error.error;
           }
-          Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: errorMessage,
-          });
+          Swal.fire({ icon: 'error', title: 'Error!', text: errorMessage });
         }
       });
     } else {

@@ -1,0 +1,103 @@
+<div class="sc-container">
+  <div class="sc-header">
+    <h2>Subject Configuration</h2>
+    <div class="sc-tabs">
+      <button class="sc-tab" [class.active]="activeTab === 'class'" (click)="setTab('class')">Class Subjects</button>
+      <button class="sc-tab" [class.active]="activeTab === 'streams'" (click)="setTab('streams')">Streams (11–12)</button>
+      <button class="sc-tab" [class.active]="activeTab === 'optional'" (click)="setTab('optional')">Optional Groups</button>
+    </div>
+  </div>
+
+  <!-- CLASS SUBJECTS TAB -->
+  <div *ngIf="activeTab === 'class'" class="sc-body">
+    <div class="sc-controls">
+      <label>Class</label>
+      <select [(ngModel)]="selectedClass" (ngModelChange)="onClassChange()">
+        <option *ngFor="let c of classOptions; trackBy: trackByIndex" [value]="c">Class {{ c }}</option>
+      </select>
+    </div>
+
+    <div class="sc-add-row">
+      <input [(ngModel)]="newSubjectName" placeholder="Subject name" (keyup.enter)="addClassSubject()" />
+      <button class="btn-add" (click)="addClassSubject()">+ Add</button>
+    </div>
+
+    <ul class="sc-list">
+      <li *ngFor="let s of classSubjects; trackBy: trackById" class="sc-item">
+        <span>{{ s.subjectName }}</span>
+        <button class="btn-delete" (click)="deleteClassSubject(s.id)">&#x2715;</button>
+      </li>
+      <li *ngIf="classSubjects.length === 0" class="sc-empty">No subjects defined for Class {{ selectedClass }}.</li>
+    </ul>
+  </div>
+
+  <!-- STREAMS TAB -->
+  <div *ngIf="activeTab === 'streams'" class="sc-body">
+    <div class="sc-add-row">
+      <input [(ngModel)]="newStreamName" placeholder="Stream name (e.g. PCM)" (keyup.enter)="addStream()" />
+      <button class="btn-add" (click)="addStream()">+ Add Stream</button>
+    </div>
+
+    <div *ngFor="let stream of streams; trackBy: trackById" class="sc-accordion">
+      <div class="sc-accordion-header" (click)="toggleStream(stream.id)">
+        <span class="sc-accordion-title">{{ stream.streamName }}</span>
+        <div class="sc-accordion-actions">
+          <span class="sc-chevron">{{ expandedStreamId === stream.id ? '▲' : '▼' }}</span>
+          <button class="btn-delete" (click)="$event.stopPropagation(); deleteStream(stream.id)">&#x2715;</button>
+        </div>
+      </div>
+
+      <div *ngIf="expandedStreamId === stream.id" class="sc-accordion-body">
+        <div class="sc-add-row sc-add-sub">
+          <input [(ngModel)]="newCoreSubjectName[stream.id]" placeholder="Core subject name"
+            (keyup.enter)="addCoreSubject(stream.id)" />
+          <button class="btn-add" (click)="addCoreSubject(stream.id)">+ Add</button>
+        </div>
+        <ul class="sc-list">
+          <li *ngFor="let subj of stream.coreSubjects; trackBy: trackById" class="sc-item">
+            <span>{{ subj.subjectName }}</span>
+            <button class="btn-delete" (click)="deleteCoreSubject(stream.id, subj.id)">&#x2715;</button>
+          </li>
+          <li *ngIf="stream.coreSubjects.length === 0" class="sc-empty">No core subjects yet.</li>
+        </ul>
+      </div>
+    </div>
+    <p *ngIf="streams.length === 0" class="sc-empty">No streams defined yet.</p>
+  </div>
+
+  <!-- OPTIONAL GROUPS TAB -->
+  <div *ngIf="activeTab === 'optional'" class="sc-body">
+    <p class="sc-hint">Optional groups let students in Class 11–12 pick one subject from a defined list (e.g. Physical Education, Hindi, or Computer Science).</p>
+
+    <div class="sc-add-row">
+      <input [(ngModel)]="newGroupName" placeholder="Group name (e.g. Elective)" (keyup.enter)="addOptionalGroup()" />
+      <button class="btn-add" (click)="addOptionalGroup()">+ Add Group</button>
+    </div>
+
+    <div *ngFor="let group of optionalGroups; trackBy: trackById" class="sc-accordion">
+      <div class="sc-accordion-header" (click)="toggleGroup(group.id)">
+        <span class="sc-accordion-title">{{ group.groupName }}</span>
+        <div class="sc-accordion-actions">
+          <span class="sc-chevron">{{ expandedGroupId === group.id ? '▲' : '▼' }}</span>
+          <button class="btn-delete" (click)="$event.stopPropagation(); deleteOptionalGroup(group.id)">&#x2715;</button>
+        </div>
+      </div>
+
+      <div *ngIf="expandedGroupId === group.id" class="sc-accordion-body">
+        <div class="sc-add-row sc-add-sub">
+          <input [(ngModel)]="newOptionalSubjectName[group.id]" placeholder="Subject name"
+            (keyup.enter)="addOptionalSubject(group.id)" />
+          <button class="btn-add" (click)="addOptionalSubject(group.id)">+ Add</button>
+        </div>
+        <ul class="sc-list">
+          <li *ngFor="let subj of group.subjects; trackBy: trackById" class="sc-item">
+            <span>{{ subj.subjectName }}</span>
+            <button class="btn-delete" (click)="deleteOptionalSubject(group.id, subj.id)">&#x2715;</button>
+          </li>
+          <li *ngIf="group.subjects.length === 0" class="sc-empty">No subjects in this group yet.</li>
+        </ul>
+      </div>
+    </div>
+    <p *ngIf="optionalGroups.length === 0" class="sc-empty">No optional groups defined yet.</p>
+  </div>
+</div>

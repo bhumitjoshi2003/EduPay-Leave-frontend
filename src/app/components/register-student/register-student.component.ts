@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
+import { EMPTY, Subject, takeUntil } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { StudentService } from '../../services/student.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -66,30 +67,34 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     if (this.studentForm.valid) {
-      this.studentService.addStudent(this.studentForm.value).subscribe({
-        next: (response: any) => {
+      this.studentService.addStudent(this.studentForm.value).pipe(
+        takeUntil(this.destroy$),
+        switchMap((response: any) => {
           const tempPassword = this.generateTempPassword();
-          this.authService.register({
+          return this.authService.register({
             userId: response.studentId,
             password: tempPassword,
             role: 'STUDENT',
             email: this.studentForm.value.email
-          }).subscribe({
-            next: () => {
-              Swal.fire({
-                icon: 'success',
-                title: 'Student Registered!',
-                html: `Registration complete.<br><br><b>Temporary Password:</b><br><code style="font-size:1.1em;letter-spacing:0.05em">${tempPassword}</code><br><small>Share this with the student. They should change it on first login.</small>`,
-                confirmButtonText: 'Done'
-              });
-              this.studentForm.reset();
-              this.isBusUser = false;
-            },
-            error: (authError) => {
-              Swal.fire('Error', 'Student record created but account setup failed. Please retry.', 'error');
+          }).pipe(
+            map(() => tempPassword),
+            catchError((authError) => {
               this.logger.error('Error registering user in auth service:', authError);
-            }
+              Swal.fire('Error', 'Student record created but account setup failed. Please retry.', 'error');
+              return EMPTY;
+            })
+          );
+        })
+      ).subscribe({
+        next: (tempPassword) => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Student Registered!',
+            html: `Registration complete.<br><br><b>Temporary Password:</b><br><code style="font-size:1.1em;letter-spacing:0.05em">${tempPassword}</code><br><small>Share this with the student. They should change it on first login.</small>`,
+            confirmButtonText: 'Done'
           });
+          this.studentForm.reset();
+          this.isBusUser = false;
         },
         error: (error) => {
           this.logger.error('Error registering student:', error);
@@ -97,11 +102,7 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
           if (error.status === 409) {
             errorMessage = error.error;
           }
-          Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: errorMessage,
-          });
+          Swal.fire({ icon: 'error', title: 'Error!', text: errorMessage });
         }
       });
     } else {

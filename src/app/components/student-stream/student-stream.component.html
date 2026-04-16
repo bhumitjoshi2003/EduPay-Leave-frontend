@@ -1,0 +1,70 @@
+<div class="ss-container">
+  <h2 class="ss-title">Stream Assignment (Class 11–12)</h2>
+
+  <div class="ss-filters">
+    <label>Class</label>
+    <div class="ss-class-toggle">
+      <button [class.active]="selectedClass === '11'" (click)="selectedClass = '11'; loadStudents()">Class 11</button>
+      <button [class.active]="selectedClass === '12'" (click)="selectedClass = '12'; loadStudents()">Class 12</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="ss-loading">Loading students…</div>
+  <div *ngIf="!loading && students.length === 0" class="ss-empty">No students found for Class {{ selectedClass }}.</div>
+
+  <div *ngIf="!loading && students.length > 0" class="ss-table-wrapper">
+    <table class="ss-table">
+      <thead>
+        <tr>
+          <th>Student ID</th>
+          <th>Name</th>
+          <th>Stream</th>
+          <th>Optional Subject</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of students; trackBy: trackByStudentId">
+          <!-- View Row -->
+          <ng-container *ngIf="editingStudentId !== student.studentId">
+            <td>{{ student.studentId }}</td>
+            <td>{{ student.studentName }}</td>
+            <td>
+              <span *ngIf="student.streamName" class="ss-stream-badge">{{ student.streamName }}</span>
+              <span *ngIf="!student.streamName" class="ss-unassigned">Not assigned</span>
+            </td>
+            <td>{{ student.optionalSubjectName || '—' }}</td>
+            <td class="ss-actions">
+              <button class="btn-edit" (click)="startEdit(student.studentId, student)">
+                {{ student.streamName ? 'Edit' : 'Assign' }}
+              </button>
+              <button *ngIf="student.streamName" class="btn-remove" (click)="removeAssignment(student.studentId)">Remove</button>
+            </td>
+          </ng-container>
+
+          <!-- Edit Row -->
+          <ng-container *ngIf="editingStudentId === student.studentId">
+            <td>{{ student.studentId }}</td>
+            <td>{{ student.studentName }}</td>
+            <td>
+              <select [(ngModel)]="editStreamId" class="ss-select">
+                <option [ngValue]="null">— Stream —</option>
+                <option *ngFor="let s of streams; trackBy: trackById" [ngValue]="s.id">{{ s.streamName }}</option>
+              </select>
+            </td>
+            <td>
+              <select [(ngModel)]="editOptionalSubjectId" class="ss-select">
+                <option [ngValue]="null">— Optional —</option>
+                <option *ngFor="let s of allOptionalSubjects; trackBy: trackById" [ngValue]="s.id">{{ s.subjectName }}</option>
+              </select>
+            </td>
+            <td class="ss-actions">
+              <button class="btn-save" (click)="saveAssignment(student)">Save</button>
+              <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
+            </td>
+          </ng-container>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

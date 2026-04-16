@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PaymentData } from '../interfaces/payment-data';
+import { MonthViewModel } from '../components/fees/fees.component';
 
 const PLATFORM_FEE_PERCENTAGE = 0.015;
 const LATE_FEE_PER_DAY = [12, 15, 18, 21];
@@ -63,7 +64,7 @@ export class FeesCalculationService {
 
   recalculateTotals(
     selectedMonthsByYear: { [year: number]: number[] },
-    months: any[],
+    months: MonthViewModel[],
     selectedYear: number,
     totalUnappliedLeaveCharge: number
   ): RecalculateResult {
@@ -111,7 +112,7 @@ export class FeesCalculationService {
     };
   }
 
-  applyMonthToPaymentData(paymentData: PaymentData, month: any, add: boolean, ctx: PaymentContext): PaymentData {
+  applyMonthToPaymentData(paymentData: PaymentData, month: MonthViewModel, add: boolean, ctx: PaymentContext): PaymentData {
     const ms = paymentData.monthSelectionString;
     return {
       ...paymentData,

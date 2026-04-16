@@ -12,7 +12,7 @@
     </div>
     <div class="header">
       <div class="year-select-wrapper">
-        <select [disabled]="lastSelectedMonth" [(ngModel)]="session" (change)="onYearChange($event)">
+        <select [disabled]="!!lastSelectedMonth" [(ngModel)]="session" (change)="onYearChange($event)">
           <option *ngFor="let year of years; trackBy: trackByYear" [value]="year">{{ year }}</option>
         </select>
       </div>

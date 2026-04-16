@@ -29,6 +29,12 @@ import { RegisterAdminComponent } from './components/register-admin/register-adm
 import { BulkImportComponent } from './components/bulk-import/bulk-import.component';
 import { TeacherBulkImportComponent } from './components/teacher-bulk-import/teacher-bulk-import.component';
 import { roleGuard } from './auth/role.guard';
+import { SubjectConfigComponent } from './components/subject-config/subject-config.component';
+import { ExamConfigComponent } from './components/exam-config/exam-config.component';
+import { StudentStreamComponent } from './components/student-stream/student-stream.component';
+import { MarkEntryComponent } from './components/mark-entry/mark-entry.component';
+import { StudentResultsComponent } from './components/student-results/student-results.component';
+import { ClassResultsComponent } from './components/class-results/class-results.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -155,6 +161,32 @@ export const routes: Routes = [
       {
         path: 'bus-fees', component: BusFeesComponent,
         canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUPER_ADMIN'] }
+      },
+
+      // ── Exam / Results ────────────────────────────────────────────────
+      {
+        path: 'subject-config', component: SubjectConfigComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'exam-config', component: ExamConfigComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'student-stream', component: StudentStreamComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'mark-entry', component: MarkEntryComponent,
+        canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN'] }
+      },
+      {
+        path: 'my-results', component: StudentResultsComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT'] }
+      },
+      {
+        path: 'class-results', component: ClassResultsComponent,
+        canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN'] }
       },
 
       // ── Open to all authenticated users ──────────────────────────────

@@ -1,0 +1,142 @@
+<div class="me-container">
+  <h2 class="me-title">Mark Entry</h2>
+
+  <!-- Mode Toggle -->
+  <div class="me-mode-toggle">
+    <button [class.active]="mode === 'subject'" (click)="setMode('subject')">By Subject</button>
+    <button [class.active]="mode === 'student'" (click)="setMode('student')">By Student</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="me-filters">
+    <div class="me-filter-group">
+      <label>Session</label>
+      <select [(ngModel)]="selectedSession" (ngModelChange)="loadExams()">
+        <option *ngFor="let s of sessions; trackBy: trackByIndex" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+    <div class="me-filter-group" *ngIf="role === 'ADMIN'">
+      <label>Class</label>
+      <select [(ngModel)]="selectedClass" (ngModelChange)="loadExams()">
+        <option *ngFor="let c of classOptions; trackBy: trackByIndex" [value]="c">Class {{ c }}</option>
+      </select>
+    </div>
+    <div class="me-filter-group" *ngIf="role === 'TEACHER' && selectedClass">
+      <label>Class</label>
+      <span class="me-class-badge">{{ selectedClass }}</span>
+    </div>
+    <div class="me-filter-group">
+      <label>Exam</label>
+      <select [(ngModel)]="selectedExamId" (ngModelChange)="onExamChange()">
+        <option [ngValue]="null">— Select Exam —</option>
+        <option *ngFor="let e of exams; trackBy: trackById" [ngValue]="e.id">{{ e.examName }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       MODE A — BY SUBJECT
+       ══════════════════════════════════════════════════════════════ -->
+  <ng-container *ngIf="mode === 'subject'">
+    <div class="me-filter-group" *ngIf="selectedExamId">
+      <label>Subject</label>
+      <select [(ngModel)]="selectedSubjectEntryId" (ngModelChange)="onSubjectChange()">
+        <option [ngValue]="null">— Select Subject —</option>
+        <option *ngFor="let s of examSubjects; trackBy: trackById" [ngValue]="s.id">
+          {{ s.subjectName }} (Max: {{ s.maxMarks }})
+        </option>
+      </select>
+    </div>
+
+    <div *ngIf="selectedSubjectEntryId && subjectStudents.length > 0" class="me-table-wrapper">
+      <div class="me-table-header">
+        <span>{{ getSelectedSubject()?.subjectName }} — Max Marks: {{ getSelectedSubject()?.maxMarks }}</span>
+        <button class="btn-save" [disabled]="saving" (click)="saveMarksA()">
+          {{ saving ? 'Saving…' : 'Save Marks' }}
+        </button>
+      </div>
+      <table class="me-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Marks Obtained</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of subjectStudents; let i = index; trackBy: trackByStudentId">
+            <td>{{ i + 1 }}</td>
+            <td>{{ s.studentId }}</td>
+            <td>{{ s.studentName }}</td>
+            <td>
+              <input type="number" class="me-mark-input"
+                [(ngModel)]="marksInputA[s.studentId]"
+                [max]="getSelectedSubject()?.maxMarks ?? null"
+                min="0"
+                placeholder="—" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p *ngIf="selectedSubjectEntryId && subjectStudents.length === 0" class="me-empty">
+      No students found for this subject.
+    </p>
+  </ng-container>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       MODE B — BY STUDENT
+       ══════════════════════════════════════════════════════════════ -->
+  <ng-container *ngIf="mode === 'student'">
+    <div class="me-filter-group" *ngIf="selectedExamId">
+      <label>Student</label>
+      <select [(ngModel)]="selectedStudentId" (ngModelChange)="onStudentChange()">
+        <option value="">— Select Student —</option>
+        <option *ngFor="let s of students; trackBy: trackByStudentId" [value]="s.studentId">
+          {{ s.name }} ({{ s.studentId }})
+        </option>
+      </select>
+    </div>
+
+    <div *ngIf="selectedStudentId && studentSubjects.length > 0" class="me-table-wrapper">
+      <div class="me-table-header">
+        <span>{{ selectedStudentName }}</span>
+        <button class="btn-save" [disabled]="saving" (click)="saveMarksB()">
+          {{ saving ? 'Saving…' : 'Save Marks' }}
+        </button>
+      </div>
+      <table class="me-table">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Exam Date</th>
+            <th>Max Marks</th>
+            <th>Marks Obtained</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of studentSubjects; trackBy: trackByEntryId">
+            <td>{{ s.subjectName }}</td>
+            <td>{{ s.examDate }}</td>
+            <td>{{ s.maxMarks }}</td>
+            <td>
+              <input type="number" class="me-mark-input"
+                [(ngModel)]="marksInputB[s.examSubjectEntryId]"
+                [max]="s.maxMarks"
+                min="0"
+                placeholder="—" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p *ngIf="selectedStudentId && studentSubjects.length === 0" class="me-empty">
+      No subjects found for this student in this exam.
+    </p>
+  </ng-container>
+
+  <p *ngIf="!selectedExamId" class="me-empty">Select a session, class, and exam to begin.</p>
+</div>

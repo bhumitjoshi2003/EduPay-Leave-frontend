@@ -10,6 +10,8 @@ import { LeaveRequest } from '../../interfaces/leave-request';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { PaginatedResponse } from '../../services/payment-history.service';
 import { Subject, takeUntil } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-apply-leave',
@@ -244,10 +246,10 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.studentService.getStudent(this.studentId).subscribe({
-        next: (response) => {
-          this.studentName = response.name;
-
+      this.studentService.getStudent(this.studentId).pipe(
+        takeUntil(this.destroy$),
+        switchMap((student) => {
+          this.studentName = student.name;
           const leaveRequest: LeaveRequest = {
             studentId: this.studentId,
             studentName: this.studentName,
@@ -255,39 +257,31 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
             reason: finalReason,
             className: this.className,
           };
-
-          this.leaveService.applyLeave(leaveRequest).subscribe({
-            next: (response) => {
-              this.leaveForm.reset();
-              this.reasonControl?.setValue('');
-              this.leaveForm.get('leaveDate')?.setValue('');
-              this.showOtherReasonInput = false;
-              Swal.fire({
-                title: 'Leave Applied!',
-                text: response,
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false,
-              });
-              this.ngOnInit();
-            },
-            error: (error) => {
-              this.logger.error('Error applying leave:', error);
-              this.errorMessage = 'Failed to apply leave. Please try again.';
-              Swal.fire({
-                title: 'Error!',
-                text: this.errorMessage,
-                icon: 'error',
-                timer: 2000,
-                showConfirmButton: false,
-              });
-            },
+          return this.leaveService.applyLeave(leaveRequest);
+        })
+      ).subscribe({
+        next: (response) => {
+          this.leaveForm.reset();
+          this.reasonControl?.setValue('');
+          this.leaveForm.get('leaveDate')?.setValue('');
+          this.showOtherReasonInput = false;
+          Swal.fire({
+            title: 'Leave Applied!',
+            text: response,
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false,
           });
+          this.ngOnInit();
         },
         error: (error) => {
+          this.logger.error('Error applying leave:', error);
+          this.errorMessage = error.status === 404
+            ? 'Failed to retrieve student information. Please try again.'
+            : 'Failed to apply leave. Please try again.';
           Swal.fire({
             title: 'Error!',
-            text: 'Failed to retrieve student information. Please try again.',
+            text: this.errorMessage,
             icon: 'error',
             timer: 2000,
             showConfirmButton: false,

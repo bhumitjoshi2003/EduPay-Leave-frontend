@@ -1,0 +1,69 @@
+<div class="sr-container">
+  <div class="sr-header">
+    <h2>My Results</h2>
+    <select [(ngModel)]="selectedSession" (ngModelChange)="loadResults()">
+      <option *ngFor="let s of sessions; trackBy: trackByIndex" [value]="s">{{ s }}</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="sr-loading">Loading results…</div>
+
+  <div *ngIf="!loading && results.length === 0" class="sr-empty">
+    No results found for {{ selectedSession }}.
+  </div>
+
+  <div *ngFor="let exam of results; trackBy: trackById" class="sr-exam-card">
+    <!-- Exam Header -->
+    <div class="sr-exam-header" (click)="toggleExam(exam.examId)">
+      <div class="sr-exam-info">
+        <span class="sr-exam-name">{{ exam.examName }}</span>
+        <div class="sr-exam-summary">
+          <span class="sr-summary-chip">{{ exam.totalMarksObtained }}/{{ exam.totalMaxMarks }}</span>
+          <span class="sr-summary-chip">{{ exam.percentage | number:'1.1-1' }}%</span>
+          <span class="sr-grade-badge" [ngClass]="getGradeClass(exam.percentage)">{{ getGrade(exam.percentage) }}</span>
+          <span class="sr-rank-badge">Rank {{ exam.overallRank }}</span>
+        </div>
+      </div>
+      <span class="sr-chevron">{{ expandedExamId === exam.examId ? '▲' : '▼' }}</span>
+    </div>
+
+    <!-- Expanded Detail -->
+    <div *ngIf="expandedExamId === exam.examId" class="sr-exam-body">
+      <!-- Subject Table -->
+      <table class="sr-table">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Date</th>
+            <th>Marks</th>
+            <th>Max</th>
+            <th>Class Avg</th>
+            <th>Rank</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of exam.subjects; trackBy: trackByIndex"
+              [class.sr-row-absent]="s.marksObtained === null">
+            <td>{{ s.subjectName }}</td>
+            <td>{{ s.examDate }}</td>
+            <td class="sr-marks">
+              <span *ngIf="s.marksObtained !== null">{{ s.marksObtained }}</span>
+              <span *ngIf="s.marksObtained === null" class="sr-not-entered">—</span>
+            </td>
+            <td>{{ s.maxMarks }}</td>
+            <td>{{ s.classAverage !== null ? (s.classAverage | number:'1.1-1') : '—' }}</td>
+            <td>
+              <span *ngIf="s.rank !== null" class="sr-rank">{{ s.rank }}</span>
+              <span *ngIf="s.rank === null">—</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Bar Chart -->
+      <div class="sr-chart-wrapper">
+        <canvas #barCanvas [attr.data-exam-id]="exam.examId"></canvas>
+      </div>
+    </div>
+  </div>
+</div>

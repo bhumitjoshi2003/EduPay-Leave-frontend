@@ -1,0 +1,88 @@
+<div class="ec-container">
+  <h2 class="ec-title">Exam Configuration</h2>
+
+  <!-- Filters -->
+  <div class="ec-filters">
+    <div class="ec-filter-group">
+      <label>Session</label>
+      <select [(ngModel)]="selectedSession" (ngModelChange)="loadExams()">
+        <option *ngFor="let s of sessions; trackBy: trackByIndex" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+    <div class="ec-filter-group">
+      <label>Class</label>
+      <select [(ngModel)]="selectedClass" (ngModelChange)="loadExams()">
+        <option *ngFor="let c of classOptions; trackBy: trackByIndex" [value]="c">Class {{ c }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Add Exam -->
+  <div class="ec-add-row">
+    <input [(ngModel)]="newExamName" placeholder="Exam name (e.g. Half Yearly)" (keyup.enter)="addExam()" />
+    <button class="btn-primary" (click)="addExam()">+ Add Exam</button>
+  </div>
+
+  <!-- Exam List -->
+  <div *ngIf="exams.length === 0" class="ec-empty">No exams configured for Class {{ selectedClass }}, {{ selectedSession }}.</div>
+
+  <div *ngFor="let exam of exams; trackBy: trackById" class="ec-accordion">
+    <div class="ec-accordion-header" (click)="toggleExam(exam)">
+      <span class="ec-exam-name">{{ exam.examName }}</span>
+      <div class="ec-header-actions">
+        <span class="ec-chevron">{{ expandedExamId === exam.id ? '▲' : '▼' }}</span>
+        <button class="btn-delete" (click)="$event.stopPropagation(); deleteExam(exam.id)">&#x2715;</button>
+      </div>
+    </div>
+
+    <div *ngIf="expandedExamId === exam.id" class="ec-accordion-body">
+      <!-- Subject Table -->
+      <table *ngIf="(examSubjects[exam.id] || []).length > 0" class="ec-table">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Max Marks</th>
+            <th>Exam Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entry of examSubjects[exam.id]; trackBy: trackById">
+            <ng-container *ngIf="editingEntry?.id !== entry.id">
+              <td>{{ entry.subjectName }}</td>
+              <td>{{ entry.maxMarks }}</td>
+              <td>{{ entry.examDate }}</td>
+              <td class="ec-actions">
+                <button class="btn-edit" (click)="startEdit(entry)">Edit</button>
+                <button class="btn-delete" (click)="deleteExamSubject(exam.id, entry.id)">&#x2715;</button>
+              </td>
+            </ng-container>
+            <ng-container *ngIf="editingEntry?.id === entry.id">
+              <td>{{ entry.subjectName }}</td>
+              <td><input type="number" [(ngModel)]="editMaxMarks" class="ec-input-sm" min="1" /></td>
+              <td><input type="date" [(ngModel)]="editExamDate" class="ec-input-sm" /></td>
+              <td class="ec-actions">
+                <button class="btn-save" (click)="saveEdit(exam.id)">Save</button>
+                <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
+              </td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="(examSubjects[exam.id] || []).length === 0" class="ec-empty-sub">No subjects added yet.</p>
+
+      <!-- Add Subject Row -->
+      <div class="ec-add-subject" (click)="initNewSubject(exam.id)">
+        <div class="ec-add-subject-row" *ngIf="newSubject[exam.id] !== undefined">
+          <input [(ngModel)]="newSubject[exam.id].subjectName" placeholder="Subject name" class="ec-input" />
+          <input type="number" [(ngModel)]="newSubject[exam.id].maxMarks" placeholder="Max marks" class="ec-input-sm" min="1" />
+          <input type="date" [(ngModel)]="newSubject[exam.id].examDate" class="ec-input-sm" />
+          <button class="btn-primary btn-sm" (click)="addExamSubject(exam.id)">+ Add</button>
+        </div>
+        <button *ngIf="newSubject[exam.id] === undefined" class="btn-outline" (click)="initNewSubject(exam.id)">
+          + Add Subject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

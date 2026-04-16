@@ -9,9 +9,11 @@ import { StudentService } from '../../services/student.service';
 import { BusFeesService } from '../../services/bus-fees.service';
 import Swal from 'sweetalert2';
 import { PaymentData } from '../../interfaces/payment-data';
+import { StudentFee } from '../../interfaces/student-fee';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { ActivatedRoute } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, forkJoin, of, takeUntil } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { AuthService } from '../../auth/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -21,6 +23,36 @@ import { MODULE_MESSAGES } from '../../config/module-messages.config';
 import { FeesCalculationService, PaymentContext } from '../../services/fees-calculation.service';
 import { FeeBreakdownComponent } from './fee-breakdown.component';
 import { LoggerService } from '../../services/logger.service';
+
+export interface MonthViewModel extends StudentFee {
+  monthNumber: number;
+  name: string;
+  fee: number;
+  tuitionFee: number;
+  annualCharges: number;
+  ecaProject: number;
+  examinationFee: number;
+  labCharges: number;
+  busFee: number;
+  unappliedLeaveCharge: number;
+  lateFee: number;
+  selected: boolean;
+}
+
+export interface MonthBreakdownDetails {
+  studentId: string;
+  studentClass: string;
+  studentName: string;
+  tuitionFee: number;
+  annualCharges: number;
+  labCharges: number;
+  ecaProject: number;
+  examinationFee: number;
+  busFee: number;
+  monthName: string;
+  additionalCharges: number;
+  lateFee: number;
+}
 
 @Component({
   selector: 'app-payment-tracker',
@@ -32,6 +64,7 @@ import { LoggerService } from '../../services/logger.service';
 })
 export class PaymentTrackerComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+
   constructor(
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
@@ -52,16 +85,15 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
   unpaidCurrentMonthName: string = '';
   pastUnpaidMonthNames: string[] = [];
   selectedYear: number = new Date().getFullYear();
-  months: any[] = [];
+  months: MonthViewModel[] = [];
   totalAmountToPay: number = 0;
   selectedMonthsByYear: { [year: number]: number[] } = {};
   studentId: string = '';
   className: string = '';
   session: string = '';
   years: string[] = [];
-  newAdmission: boolean = false;
-  selectedMonthDetails: any = null;
-  lastSelectedMonth: any = null;
+  selectedMonthDetails: MonthBreakdownDetails | null = null;
+  lastSelectedMonth: MonthViewModel | null = null;
   studentName: string = '';
   role: string = '';
   manualPaymentAmount: number = 0;
@@ -75,9 +107,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
 
   currentMonth = new Date().getMonth() + 1;
   academicCurrentMonth: number = 0;
-
   currentAcademicYear: string = '';
-
   paymentData!: PaymentData;
 
   ngOnInit() {
@@ -105,124 +135,80 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     this.studentId = this.authStateService.getUserId();
   }
 
-  fetchSessions() {
-    this.feesService.getDistinctYearsByStudentId(this.studentId).subscribe({
-      next: (sessions) => {
-        this.years = sessions;
-        if (this.years.length > 0) {
-          this.session = this.years[this.years.length - 1];
-          this.selectedYear = parseInt(this.session.split('-')[0]);
+  fetchSessions(): void {
+    this.feesService.getDistinctYearsByStudentId(this.studentId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (sessions) => {
+          this.years = sessions;
+          if (this.years.length > 0) {
+            this.session = this.years[this.years.length - 1];
+            this.selectedYear = parseInt(this.session.split('-')[0]);
+          }
+          this.cdr.markForCheck();
+          this.fetchFees();
+        },
+        error: (error) => {
+          this.logger.error('Error fetching sessions:', error);
         }
-        this.cdr.markForCheck();
-        this.fetchFees();
-      },
-      error: (error) => {
-        this.logger.error('Error fetching sessions:', error);
-      }
-    });
+      });
   }
 
-  onYearChange(event: any) {
-    this.selectedYear = parseInt(event.target.value);
+  onYearChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.selectedYear = parseInt(select.value);
     this.session = `${this.selectedYear}-${this.selectedYear + 1}`;
     this.fetchFees();
   }
 
-  fetchBusFees() {
+  fetchBusFees(): void {
     this.months
       .filter(month => month.takesBus)
       .forEach(month => {
-        this.busFeesService.getBusFeesOfDistance(month.distance, this.session).subscribe({
-          next: (busFee) => {
-            month.busFee = busFee;
-            this.cdr.markForCheck();
-          },
-          error: (error) => {
-            this.logger.error('Error fetching bus fee:', error);
-            month.busFee = 0;
-            this.cdr.markForCheck();
-          }
-        });
+        this.busFeesService.getBusFeesOfDistance(month.distance!, this.session)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (busFee) => {
+              month.busFee = busFee;
+              this.cdr.markForCheck();
+            },
+            error: (error) => {
+              this.logger.error('Error fetching bus fee:', error);
+              month.busFee = 0;
+              this.cdr.markForCheck();
+            }
+          });
       });
   }
 
-  fetchFees() {
+  fetchFees(): void {
     this.onPaymentProcessCompleted();
-    this.feesService.getStudentFees(this.studentId, this.session).subscribe({
-      next: (fees) => {
-        this.className = fees[0].className;
-        this.attendanceService.getTotalUnappliedLeaveCount(this.studentId, this.session).subscribe({
-          next: (totalUnappliedLeaves) => {
-            this.totalUnappliedLeaves = totalUnappliedLeaves;
-            this.totalUnappliedLeaveCharge = this.totalUnappliedLeaves * 25;
 
-            this.feeStructureService.getFeeStructure(this.session, this.className).subscribe({
-              next: (feeStructure) => {
-                if (feeStructure) {
-                  this.months = fees.map(fee => ({
-                    ...fee,
-                    name: this.feesCalc.getMonthName(fee.month),
-                    monthNumber: fee.month,
-                    selected: this.isMonthSelected(fee.month, this.selectedYear),
-                    fee: feeStructure.tuitionFee + ((fee.month !== 1) ? 0 : feeStructure.annualCharges + feeStructure.ecaProject + feeStructure.examinationFee + feeStructure.labCharges),
-                    tuitionFee: feeStructure.tuitionFee,
-                    annualCharges: (fee.month !== 1) ? 0 : feeStructure.annualCharges,
-                    ecaProject: (fee.month !== 1) ? 0 : feeStructure.ecaProject,
-                    examinationFee: (fee.month !== 1) ? 0 : feeStructure.examinationFee,
-                    labCharges: (fee.month !== 1) ? 0 : feeStructure.labCharges,
-                    busFee: 0,
-                    unappliedLeaveCharge: 0,
-                    lateFee: this.lateFees = this.feesCalc.calculateLateFees(fee.month, this.session, this.currentAcademicYear)
-                  }));
-                  this.fetchBusFees();
-                  this.checkAndDisplayFeeWarnings();
-                } else {
-                  this.logger.error('Fee structure not found.');
-                  this.months = fees.map(fee => ({
-                    ...fee,
-                    name: this.feesCalc.getMonthName(fee.month),
-                    selected: this.isMonthSelected(fee.month, this.selectedYear),
-                    fee: 0,
-                    busFee: 0,
-                    unappliedLeaveCharge: 0,
-                    lateFee: 0
-                  }));
-                  this.totalAmountToPay = 0;
-                  this.checkAndDisplayFeeWarnings();
-                }
-              },
-              error: (error) => {
-                this.logger.error('Error fetching fee structure:', error);
-                this.months = fees.map(fee => ({
-                  ...fee,
-                  name: this.feesCalc.getMonthName(fee.month),
-                  selected: this.isMonthSelected(fee.month, this.selectedYear),
-                  fee: 0,
-                  busFee: 0,
-                  unappliedLeaveCharge: 0,
-                  lateFee: 0
-                }));
-                this.totalAmountToPay = 0;
-                this.checkAndDisplayFeeWarnings();
-              }
-            });
-          },
-          error: (error) => {
-            this.logger.error('Error fetching total unapplied leave count:', error);
-            this.feeStructureService.getFeeStructure(this.session, this.className).subscribe({
-              next: (feeStructure) => {
-                this.months = fees.map(fee => ({ ...fee, name: this.feesCalc.getMonthName(fee.month), selected: this.isMonthSelected(fee.month, this.selectedYear), fee: 0, busFee: 0, unappliedLeaveCharge: 0, lateFee: 0 }));
-                this.totalAmountToPay = 0;
-                this.checkAndDisplayFeeWarnings();
-              },
-              error: () => {
-                this.months = fees.map(fee => ({ ...fee, name: this.feesCalc.getMonthName(fee.month), selected: this.isMonthSelected(fee.month, this.selectedYear), fee: 0, busFee: 0, unappliedLeaveCharge: 0, lateFee: 0 }));
-                this.totalAmountToPay = 0;
-                this.checkAndDisplayFeeWarnings();
-              }
-            });
-          }
-        });
+    forkJoin([
+      this.feesService.getStudentFees(this.studentId, this.session),
+      this.attendanceService.getTotalUnappliedLeaveCount(this.studentId, this.session)
+        .pipe(catchError(() => of(0)))
+    ]).pipe(
+      takeUntil(this.destroy$),
+      switchMap(([fees, totalUnappliedLeaves]) => {
+        this.className = fees[0].className;
+        this.totalUnappliedLeaves = totalUnappliedLeaves;
+        this.totalUnappliedLeaveCharge = totalUnappliedLeaves * 25;
+        return this.feeStructureService.getFeeStructure(this.session, this.className).pipe(
+          map(feeStructure => ({ fees, feeStructure }))
+        );
+      })
+    ).subscribe({
+      next: ({ fees, feeStructure }) => {
+        if (feeStructure) {
+          this.months = fees.map(fee => this.buildMonthViewModel(fee, feeStructure));
+        } else {
+          this.logger.error('Fee structure not found.');
+          this.months = fees.map(fee => this.buildEmptyMonthViewModel(fee));
+          this.totalAmountToPay = 0;
+        }
+        this.fetchBusFees();
+        this.checkAndDisplayFeeWarnings();
       },
       error: (error) => {
         this.logger.error('Error fetching fees:', error);
@@ -230,7 +216,44 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     });
   }
 
-  checkAndDisplayFeeWarnings() {
+  private buildMonthViewModel(fee: StudentFee, feeStructure: any): MonthViewModel {
+    const isApril = fee.month === 1;
+    return {
+      ...fee,
+      monthNumber: fee.month,
+      name: this.feesCalc.getMonthName(fee.month),
+      selected: this.isMonthSelected(fee.month, this.selectedYear),
+      fee: feeStructure.tuitionFee + (isApril ? feeStructure.annualCharges + feeStructure.ecaProject + feeStructure.examinationFee + feeStructure.labCharges : 0),
+      tuitionFee: feeStructure.tuitionFee,
+      annualCharges: isApril ? feeStructure.annualCharges : 0,
+      ecaProject: isApril ? feeStructure.ecaProject : 0,
+      examinationFee: isApril ? feeStructure.examinationFee : 0,
+      labCharges: isApril ? feeStructure.labCharges : 0,
+      busFee: 0,
+      unappliedLeaveCharge: 0,
+      lateFee: this.feesCalc.calculateLateFees(fee.month, this.session, this.currentAcademicYear),
+    };
+  }
+
+  private buildEmptyMonthViewModel(fee: StudentFee): MonthViewModel {
+    return {
+      ...fee,
+      monthNumber: fee.month,
+      name: this.feesCalc.getMonthName(fee.month),
+      selected: this.isMonthSelected(fee.month, this.selectedYear),
+      fee: 0,
+      tuitionFee: 0,
+      annualCharges: 0,
+      ecaProject: 0,
+      examinationFee: 0,
+      labCharges: 0,
+      busFee: 0,
+      unappliedLeaveCharge: 0,
+      lateFee: 0,
+    };
+  }
+
+  checkAndDisplayFeeWarnings(): void {
     if (this.role === 'STUDENT') {
       const selectedYear = this.feesCalc.getSessionStartYear(this.session);
       const currentYear = this.feesCalc.getSessionStartYear(this.currentAcademicYear);
@@ -241,34 +264,23 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
         return;
       }
 
-      const today = new Date();
-      const currentCalendarMonth = today.getMonth() + 1;
-      const currentAcademicMonth = this.feesCalc.getAcademicMonth(currentCalendarMonth);
+      const currentAcademicMonth = this.feesCalc.getAcademicMonth(new Date().getMonth() + 1);
+      const currentMonthFee = this.months.find(month => month.monthNumber === currentAcademicMonth);
 
-      const currentMonthFee = this.months.find(
-        month => month.monthNumber === currentAcademicMonth
-      );
+      this.unpaidCurrentMonthName = (currentMonthFee && !currentMonthFee.paid)
+        ? this.feesCalc.getMonthName(currentMonthFee.monthNumber)
+        : '';
 
-      if (currentMonthFee && !currentMonthFee.paid) {
-        this.unpaidCurrentMonthName = this.feesCalc.getMonthName(currentMonthFee.monthNumber);
-      } else {
-        this.unpaidCurrentMonthName = '';
-      }
-
-      const pastUnpaid = this.months.filter(month => {
-        return !month.paid && month.monthNumber < currentAcademicMonth && month.lateFee > 0;
-      });
-
-      this.pastUnpaidMonthNames = pastUnpaid.map(m => this.feesCalc.getMonthName(m.monthNumber));
+      this.pastUnpaidMonthNames = this.months
+        .filter(month => !month.paid && month.monthNumber < currentAcademicMonth && month.lateFee > 0)
+        .map(m => this.feesCalc.getMonthName(m.monthNumber));
     }
     this.cdr.markForCheck();
   }
 
-
   isMonthSelected(monthNumber: number, year: number): boolean {
     return this.selectedMonthsByYear[year]?.includes(monthNumber) || false;
   }
-
 
   private recalculateTotals(): void {
     const result = this.feesCalc.recalculateTotals(
@@ -283,119 +295,98 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     this.paymentData.platformFee = this.platformFeeAmount;
   }
 
+  toggleMonthSelection(month: MonthViewModel): void {
+    if (month.paid || this.isLoadingPayment) return;
 
-  toggleMonthSelection(month: any) {
-    if (!month.paid) {
-      if (this.isLoadingPayment) {
-        return;
-      }
-      const year = this.selectedYear;
+    const year = this.selectedYear;
+    if (!this.selectedMonthsByYear[year]) {
+      this.selectedMonthsByYear[year] = [];
+    }
 
-      if (!this.selectedMonthsByYear[year]) {
-        this.selectedMonthsByYear[year] = [];
-      }
+    const index = this.selectedMonthsByYear[year].indexOf(month.month);
+    if (index === -1) {
+      this.selectedMonthsByYear[year].push(month.month);
+      this.cdr.markForCheck();
+      this.lastSelectedMonth = month;
 
-      const index = this.selectedMonthsByYear[year].indexOf(month.month);
-      if (index === -1) {
-        // this.totalAmountToPay += month.fee + (month.busFee || 0) + month.lateFee;
-        // if (this.selectedMonthsByYear[year].length === 0 && this.totalUnappliedLeaveCharge > 0) {
-        //   this.totalAmountToPay += this.totalUnappliedLeaveCharge;
-        // }
-        this.selectedMonthsByYear[year].push(month.month);
-        this.cdr.markForCheck();
-        this.lastSelectedMonth = month;
+      this.populateMonthDetails(month)
+        .then(() => {
+          this.recalculateTotals();
+          this.updatePaymentData(month, true);
+        })
+        .catch((error) => {
+          this.logger.error('Error during populateMonthDetails:', error);
+        });
+    } else {
+      this.selectedMonthsByYear[year].splice(index, 1);
+      this.cdr.markForCheck();
+      this.updatePaymentData(month, false);
+      this.recalculateTotals();
 
-        this.populateMonthDetails(month)
-          .then(() => {
-            this.recalculateTotals();
-            this.updatePaymentData(month, true);
-          })
-          .catch((error) => {
-            this.logger.error('Error during populateMonthDetails:', error);
-          });
-
-      } else {
-        //   this.totalAmountToPay -= month.fee + (month.busFee || 0) + month.lateFee;
-        this.selectedMonthsByYear[year].splice(index, 1);
-        this.cdr.markForCheck();
-        this.updatePaymentData(month, false);
-        this.recalculateTotals();
-
-        if (this.lastSelectedMonth === month) {
-          if (this.selectedMonthsByYear[year].length > 0) {
-            let lastSelectedIndex = this.selectedMonthsByYear[year][this.selectedMonthsByYear[year].length - 1];
-            let lastSelectedMonth = this.months.find(m => m.month === lastSelectedIndex);
-            if (lastSelectedMonth) {
-              this.populateMonthDetails(lastSelectedMonth).then(() => {
-                this.lastSelectedMonth = lastSelectedMonth;
-              });
-            } else {
-              this.selectedMonthDetails = null;
-              this.lastSelectedMonth = null;
-            }
+      if (this.lastSelectedMonth === month) {
+        const remaining = this.selectedMonthsByYear[year];
+        if (remaining.length > 0) {
+          const lastIndex = remaining[remaining.length - 1];
+          const lastMonth = this.months.find(m => m.month === lastIndex);
+          if (lastMonth) {
+            this.populateMonthDetails(lastMonth).then(() => {
+              this.lastSelectedMonth = lastMonth;
+            });
           } else {
             this.selectedMonthDetails = null;
             this.lastSelectedMonth = null;
-            // if (this.totalUnappliedLeaveCharge > 0) {
-            //   this.totalAmountToPay -= this.totalUnappliedLeaveCharge;
-            // }
           }
+        } else {
+          this.selectedMonthDetails = null;
+          this.lastSelectedMonth = null;
         }
       }
-      month.selected = !month.selected;
     }
+    month.selected = !month.selected;
   }
 
-  populateMonthDetails(month: any): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.studentService.getStudent(this.studentId).subscribe({
-        next: (student) => {
-          this.studentName = student.name;
-          this.feeStructureService.getFeeStructure(this.session, this.className).subscribe({
-            next: (feeStructure) => {
-              if (feeStructure) {
-                this.selectedMonthDetails = {
-                  studentId: this.studentId,
-                  studentClass: student.className,
-                  studentName: this.studentName,
-                  tuitionFee: feeStructure.tuitionFee,
-                  annualCharges: (month.month === 1) ? feeStructure.annualCharges : 0,
-                  labCharges: (month.month === 1) ? feeStructure.labCharges : 0,
-                  ecaProject: (month.month === 1) ? feeStructure.ecaProject : 0,
-                  examinationFee: (month.month === 1) ? feeStructure.examinationFee : 0,
-                  busFee: month.busFee,
-                  monthName: month.name,
-                  additionalCharges: this.totalUnappliedLeaveCharge,
-                  lateFee: month.lateFee
-                };
-                this.cdr.markForCheck();
-                resolve();
-              } else {
-                this.logger.error('Fee structure not found.');
-                this.selectedMonthDetails = null;
-                this.cdr.markForCheck();
-                resolve();
-              }
-            },
-            error: (error) => {
-              this.logger.error('Error fetching fee structure:', error);
+  populateMonthDetails(month: MonthViewModel): Promise<void> {
+    return new Promise((resolve) => {
+      forkJoin([
+        this.studentService.getStudent(this.studentId),
+        this.feeStructureService.getFeeStructure(this.session, this.className)
+      ]).pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: ([student, feeStructure]) => {
+            this.studentName = student.name;
+            if (feeStructure) {
+              this.selectedMonthDetails = {
+                studentId: this.studentId,
+                studentClass: student.className,
+                studentName: this.studentName,
+                tuitionFee: feeStructure.tuitionFee,
+                annualCharges: (month.month === 1) ? feeStructure.annualCharges : 0,
+                labCharges: (month.month === 1) ? feeStructure.labCharges : 0,
+                ecaProject: (month.month === 1) ? feeStructure.ecaProject : 0,
+                examinationFee: (month.month === 1) ? feeStructure.examinationFee : 0,
+                busFee: month.busFee,
+                monthName: month.name,
+                additionalCharges: this.totalUnappliedLeaveCharge,
+                lateFee: month.lateFee,
+              };
+            } else {
+              this.logger.error('Fee structure not found.');
               this.selectedMonthDetails = null;
-              this.cdr.markForCheck();
-              resolve();
             }
-          });
-        },
-        error: (error) => {
-          this.logger.error('Error fetching student:', error);
-          this.selectedMonthDetails = null;
-          this.cdr.markForCheck();
-          resolve();
-        }
-      });
+            this.cdr.markForCheck();
+            resolve();
+          },
+          error: (error) => {
+            this.logger.error('Error populating month details:', error);
+            this.selectedMonthDetails = null;
+            this.cdr.markForCheck();
+            resolve();
+          }
+        });
     });
   }
 
-  updatePaymentData(month: any, add: boolean) {
+  updatePaymentData(month: MonthViewModel, add: boolean): void {
     const ctx: PaymentContext = {
       studentId: this.studentId,
       studentName: this.studentName,
@@ -411,9 +402,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
   }
 
   onPaymentProcessingStarted(): void {
-    this.ngZone.run(() => {
-      // this.isLoadingPayment = true;
-    });
+    this.ngZone.run(() => { });
   }
 
   onPaymentProcessCompleted(): void {
@@ -423,10 +412,9 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleSuccessfulPayment() {
+  handleSuccessfulPayment(): void {
     this.ngZone.run(() => {
       this.initPaymentData();
-
       this.fetchFees();
       this.selectedMonthsByYear = {};
       this.totalAmountToPay = 0;
@@ -442,17 +430,17 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
       }).then(() => {
         this.onPaymentProcessCompleted();
       });
-    })
+    });
   }
 
-  initPaymentData() {
+  initPaymentData(): void {
     this.paymentData = this.feesCalc.createEmptyPaymentData();
     this.totalUnappliedLeaves = 0;
     this.totalUnappliedLeaveCharge = 0;
     this.platformFeeAmount = 0;
   }
 
-  markAsManuallyPaid() {
+  markAsManuallyPaid(): void {
     if (this.role !== 'ADMIN' || !this.manualPaymentAmount || !this.selectedMonthsByYear[this.selectedYear]?.length) {
       Swal.fire({ icon: 'warning', title: 'Warning', text: 'Please select months and enter the amount received.' });
       return;
@@ -489,22 +477,17 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     });
   }
 
-  isLate(month: any): boolean {
+  isLate(month: MonthViewModel): boolean {
     const selectedYear = this.feesCalc.getSessionStartYear(this.session);
     const currentYear = this.feesCalc.getSessionStartYear(this.currentAcademicYear);
 
     if (selectedYear > currentYear) return false;
+    if (selectedYear < currentYear) return !month.paid && !month.manuallyPaid;
 
-    if (selectedYear < currentYear) {
-      return !month.paid && !month.manuallyPaid;
-    }
-
-    return !month.paid &&
-      !month.manuallyPaid &&
-      month.month <= this.academicCurrentMonth;
+    return !month.paid && !month.manuallyPaid && month.month <= this.academicCurrentMonth;
   }
 
-  trackByMonth(index: number, month: any): any { return month.month; }
+  trackByMonth(index: number, month: MonthViewModel): number { return month.month; }
   trackByYear(index: number, year: string): string { return year; }
   trackByIndex(index: number): number { return index; }
 }

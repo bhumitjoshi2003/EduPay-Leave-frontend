@@ -59,7 +59,7 @@
             <span *ngIf="getMarks(student, s.subjectName) !== null">{{ getMarks(student, s.subjectName) }}</span>
             <span *ngIf="getMarks(student, s.subjectName) === null" class="cr-absent">—</span>
           </td>
-          <td class="cr-cell-total">{{ student.total }}</td>
+          <td class="cr-cell-total">{{ student.totalMarksObtained }}/{{ student.totalMaxMarks }}</td>
         </tr>
       </tbody>
     </table>

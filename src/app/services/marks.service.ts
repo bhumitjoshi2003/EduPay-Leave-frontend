@@ -50,11 +50,20 @@ export interface MarkBulkResult {
   errors: Array<{ studentId: string; reason: string }>;
 }
 
+export interface ClassStudentSubject {
+  subjectName: string;
+  maxMarks: number;
+  examDate: string;
+  marksObtained: number | null;
+}
+
 export interface ClassStudentResult {
   studentId: string;
   studentName: string;
-  marks: Record<string, number | null>;
-  total: number;
+  subjects: ClassStudentSubject[];
+  totalMarksObtained: number;
+  totalMaxMarks: number;
+  percentage: number;
   rank: number;
 }
 

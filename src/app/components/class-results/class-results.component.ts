@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnIni
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
-import { MarksService, ClassStudentResult } from '../../services/marks.service';
+import { MarksService, ClassStudentResult, ClassStudentSubject } from '../../services/marks.service';
 import { ExamConfigService, ExamConfig, ExamSubjectEntry } from '../../services/exam-config.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { TeacherService } from '../../services/teacher.service';
@@ -125,7 +125,7 @@ export class ClassResultsComponent implements OnInit, OnDestroy {
   }
 
   getMarks(student: ClassStudentResult, subjectName: string): number | null {
-    return student.marks[subjectName] ?? null;
+    return student.subjects.find(s => s.subjectName === subjectName)?.marksObtained ?? null;
   }
 
   trackById(index: number, item: { id: number }): number { return item.id; }

@@ -97,7 +97,8 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
 
   setMode(m: 'subject' | 'student'): void {
     this.mode = m;
-    this.resetSelections();
+    this.resetSubjectSelection();
+    this.resetStudentSelection();
   }
 
   loadExams(): void {

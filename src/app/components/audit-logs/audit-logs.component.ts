@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AuditLog, AuditService } from '../../services/audit.service';
+import { AuditLog, AuditFilters, AuditService } from '../../services/audit.service';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,7 +18,7 @@ export class AuditLogsComponent implements OnInit, OnDestroy {
   size = 20;
   totalPages = 0;
 
-  filters: any = {
+  filters: AuditFilters = {
     username: '',
     action: '',
     entityName: '',

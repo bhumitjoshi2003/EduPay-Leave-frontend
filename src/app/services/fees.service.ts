@@ -14,8 +14,8 @@ export class FeesService {
 
   constructor(private http: HttpClient) { }
 
-  getStudentFees(studentId: string, year: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/${studentId}/${year}`);
+  getStudentFees(studentId: string, year: string): Observable<StudentFee[]> {
+    return this.http.get<StudentFee[]>(`${this.baseUrl}/${studentId}/${year}`);
   }
 
   getStudentFee(studentId: string, year: string, month: number): Observable<StudentFee> {

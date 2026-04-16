@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, NgZone } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
-import { RazorpayService } from '../../services/razorpay.service';
+import { RazorpayService, RazorpayOrderResponse, RazorpayPaymentResponse } from '../../services/razorpay.service';
 import { PaymentData } from '../../interfaces/payment-data';
 import Swal from 'sweetalert2';
 import { StudentService } from '../../services/student.service';
@@ -81,7 +81,7 @@ export class PaymentComponent {
         }
 
         this.paymentData.totalAmount *= 100;
-        this.razorpayService.createOrder(this.paymentData).subscribe((response: any) => {
+        this.razorpayService.createOrder(this.paymentData).subscribe((response: RazorpayOrderResponse) => {
 
           const options = {
             key: response.razorpayKey,
@@ -104,7 +104,7 @@ export class PaymentComponent {
               upi: true,
               wallet: false
             },
-            handler: (paymentResponse: any) => {
+            handler: (paymentResponse: RazorpayPaymentResponse) => {
               this.verifyPayment(paymentResponse, response);
             },
             modal: {
@@ -144,9 +144,9 @@ export class PaymentComponent {
     });
   }
 
-  verifyPayment(paymentResponse: any, orderDetails: any) {
+  verifyPayment(paymentResponse: RazorpayPaymentResponse, orderDetails: RazorpayOrderResponse) {
     this.razorpayService.verifyPayment(paymentResponse, orderDetails).subscribe({
-      next: (result: any) => {
+      next: (result) => {
         if (result.success) {
           this.paymentSuccess.emit(paymentResponse);
         } else {

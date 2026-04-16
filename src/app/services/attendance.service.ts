@@ -37,8 +37,8 @@ export class AttendanceService {
     );
   }
 
-  getMonthlyAttendance(studentId: string, className: string, year: number, month: number): Observable<any[]> {
-    return this.http.get<any[]>(
+  getMonthlyAttendance(studentId: string, className: string, year: number, month: number): Observable<AttendanceData[]> {
+    return this.http.get<AttendanceData[]>(
       `${this.apiUrl}/student/${studentId}/month/${month}/year/${year}`,
       { params: { className } }
     );

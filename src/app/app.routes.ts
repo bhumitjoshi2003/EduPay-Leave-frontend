@@ -28,51 +28,144 @@ import { AdminDetailsComponent } from './components/admin-details/admin-details.
 import { RegisterAdminComponent } from './components/register-admin/register-admin.component';
 import { BulkImportComponent } from './components/bulk-import/bulk-import.component';
 import { TeacherBulkImportComponent } from './components/teacher-bulk-import/teacher-bulk-import.component';
+import { roleGuard } from './auth/role.guard';
 
 export const routes: Routes = [
-    { path: '', redirectTo: '/home', pathMatch: 'full' },
-    { path: 'home', component: HomeComponent },
-    { path: 'reset-password', component: ResetPasswordComponent },
-    {
-        path: 'dashboard',
-        component: DashboardComponent,
-        canActivate: [AuthGuard],
-        children: [
-            { path: 'fees', component: PaymentTrackerComponent },
-            { path: 'fee-structure', component: FeeStructureComponent },
-            { path: 'payment', component: PaymentComponent },
-            { path: 'bus-fees', component: BusFeesComponent },
-            { path: 'payment-history', component: PaymentHistoryComponent },
-            { path: 'payment-history-details/:paymentId', component: PaymentDetailsComponent },
-            { path: 'apply-leave', component: ApplyLeaveComponent },
-            { path: 'teacher-attendance', component: TeacherAttendanceComponent },
-            { path: 'student-attendance', component: StudentAttendanceComponent },
-            { path: 'student-attendance/:studentId', component: StudentAttendanceComponent },
-            { path: 'student-list', component: StudentListComponent },
-            { path: 'student-details/:studentId', component: StudentDetailsComponent },
-            { path: 'view-leaves', component: ViewLeavesComponent },
-            { path: 'payment-history/:studentId', component: PaymentHistoryComponent },
-            { path: 'view-leaves/:studentId', component: ViewLeavesComponent },
-            { path: 'fees/:studentId', component: PaymentTrackerComponent },
-            { path: 'payment-history-admin', component: PaymentHistoryAdminComponent },
-            { path: 'teacher-list', component: TeacherListComponent },
-            { path: 'teacher-details/:teacherId', component: TeacherDetailsComponent },
-            { path: 'notice', component: NoticeComponent },
-            { path: 'register', component: RegisterComponent },
-            { path: 'event-calendar', component: EventCalendarComponent },
-            { path: 'event-new', component: EventFormComponent },
-            { path: 'event-edit/:id', component: EventFormComponent },
-            { path: 'audit-logs', component: AuditLogsComponent },
-            { path: 'admin-list', component: AdminListComponent },
-            { path: 'admin-details/:adminId', component: AdminDetailsComponent },
-            { path: 'register-admin', component: RegisterAdminComponent },
-            { path: 'student-bulk-import', component: BulkImportComponent },
-            { path: 'teacher-bulk-import', component: TeacherBulkImportComponent }
-        ],
-    },
-    { path: '**', redirectTo: '/home', pathMatch: 'full' },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'home', component: HomeComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    canActivate: [AuthGuard],
+    children: [
+      // ── Student routes ────────────────────────────────────────────────
+      {
+        path: 'fees', component: PaymentTrackerComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'ADMIN'] }
+      },
+      {
+        path: 'fees/:studentId', component: PaymentTrackerComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'payment-history', component: PaymentHistoryComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'ADMIN'] }
+      },
+      {
+        path: 'payment-history/:studentId', component: PaymentHistoryComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'payment-history-details/:paymentId', component: PaymentDetailsComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'ADMIN'] }
+      },
+      {
+        path: 'apply-leave', component: ApplyLeaveComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT'] }
+      },
+      {
+        path: 'student-attendance', component: StudentAttendanceComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'ADMIN'] }
+      },
+      {
+        path: 'student-attendance/:studentId', component: StudentAttendanceComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+
+      // ── Teacher routes ────────────────────────────────────────────────
+      {
+        path: 'teacher-attendance', component: TeacherAttendanceComponent,
+        canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN'] }
+      },
+
+      // ── Shared list / detail routes (Teacher + Admin) ─────────────────
+      {
+        path: 'student-list', component: StudentListComponent,
+        canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN'] }
+      },
+      {
+        path: 'student-details/:studentId', component: StudentDetailsComponent,
+        canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN', 'STUDENT'] }
+      },
+      {
+        path: 'view-leaves', component: ViewLeavesComponent,
+        canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN'] }
+      },
+      {
+        path: 'view-leaves/:studentId', component: ViewLeavesComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'event-new', component: EventFormComponent,
+        canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN'] }
+      },
+      {
+        path: 'event-edit/:id', component: EventFormComponent,
+        canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN'] }
+      },
+
+      // ── Admin-only routes ─────────────────────────────────────────────
+      {
+        path: 'payment-history-admin', component: PaymentHistoryAdminComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'teacher-list', component: TeacherListComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'teacher-details/:teacherId', component: TeacherDetailsComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'TEACHER'] }
+      },
+      {
+        path: 'register', component: RegisterComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'student-bulk-import', component: BulkImportComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'teacher-bulk-import', component: TeacherBulkImportComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+
+      // ── Admin + Super Admin routes ─────────────────────────────────────
+      {
+        path: 'admin-list', component: AdminListComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUPER_ADMIN'] }
+      },
+      {
+        path: 'admin-details/:adminId', component: AdminDetailsComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUPER_ADMIN'] }
+      },
+      {
+        path: 'register-admin', component: RegisterAdminComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUPER_ADMIN'] }
+      },
+      {
+        path: 'audit-logs', component: AuditLogsComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUPER_ADMIN'] }
+      },
+      {
+        path: 'fee-structure', component: FeeStructureComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUPER_ADMIN'] }
+      },
+      {
+        path: 'bus-fees', component: BusFeesComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUPER_ADMIN'] }
+      },
+
+      // ── Open to all authenticated users ──────────────────────────────
+      { path: 'notice', component: NoticeComponent },
+      { path: 'event-calendar', component: EventCalendarComponent },
+      { path: 'payment', component: PaymentComponent },
+    ],
+  },
+  { path: '**', redirectTo: '/home', pathMatch: 'full' },
 ];
 
 export const AppRoutingModule = {
-    provideRouter: () => provideRouter(routes),
+  provideRouter: () => provideRouter(routes),
 };

@@ -553,7 +553,7 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
     const workingDays$ = this.attendanceService.getMonthlyAttendance('X', this.currentUserClass, year, month);
 
     forkJoin([absent$, workingDays$]).pipe(takeUntil(this.destroy$)).subscribe({
-      next: ([absentData, workingDaysData]: [any[], any[]]) => {
+      next: ([absentData, workingDaysData]) => {
 
         const absentSet = new Set(absentData.map(a => a.date));
         const workingSet = new Set(workingDaysData.map(w => w.date));

@@ -15,6 +15,20 @@ export interface AuditLog {
     ipAddress: string;
 }
 
+export interface AuditFilters {
+    username?: string;
+    action?: string;
+    entityName?: string;
+    startDate?: string;
+    endDate?: string;
+}
+
+export interface AuditLogPage {
+    content: AuditLog[];
+    totalElements: number;
+    totalPages: number;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -24,7 +38,7 @@ export class AuditService {
 
     constructor(private http: HttpClient) { }
 
-    getAuditLogs(page: number, size: number, filters: any): Observable<{ content: AuditLog[]; totalElements: number; totalPages: number }> {
+    getAuditLogs(page: number, size: number, filters: AuditFilters): Observable<AuditLogPage> {
 
         let params = new HttpParams()
             .set('page', page)
@@ -45,6 +59,6 @@ export class AuditService {
         if (filters.endDate)
             params = params.set('endDate', filters.endDate);
 
-        return this.http.get<any>(this.apiUrl, { params });
+        return this.http.get<AuditLogPage>(this.apiUrl, { params });
     }
 }

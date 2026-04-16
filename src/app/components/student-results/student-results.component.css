@@ -1,3 +1,4 @@
+/* ── Base ─────────────────────────────────────────────────────────── */
 .sr-container {
   width: 95%;
   margin: auto;
@@ -5,6 +6,7 @@
   animation: fadeIn 0.5s ease-in-out;
 }
 
+/* ── Header ──────────────────────────────────────────────────────── */
 .sr-header {
   display: flex;
   justify-content: space-between;
@@ -14,6 +16,7 @@
   border-radius: 12px;
   padding: 20px 24px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+  gap: 16px;
 }
 
 .sr-header h2 {
@@ -22,6 +25,7 @@
   text-transform: uppercase;
   letter-spacing: 0.8px;
   font-size: 1.3rem;
+  white-space: nowrap;
 }
 
 .sr-header select {
@@ -32,6 +36,8 @@
   outline: none;
   color: #1f6f8b;
   font-weight: 600;
+  background: #fff;
+  min-width: 120px;
 }
 
 .sr-loading, .sr-empty {
@@ -41,6 +47,7 @@
   font-style: italic;
 }
 
+/* ── Exam Card ───────────────────────────────────────────────────── */
 .sr-exam-card {
   background: #fff;
   border-radius: 12px;
@@ -61,6 +68,7 @@
   user-select: none;
   background: #f8fdfd;
   transition: background 0.2s;
+  gap: 12px;
 }
 .sr-exam-header:hover { background: #eaf6f6; }
 
@@ -68,6 +76,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
 }
 
 .sr-exam-name {
@@ -78,7 +88,7 @@
 
 .sr-exam-summary {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
   align-items: center;
 }
@@ -112,10 +122,12 @@
   font-weight: 700;
 }
 
-.sr-chevron { font-size: 0.8rem; color: #4fbdbd; }
+.sr-chevron { font-size: 0.8rem; color: #4fbdbd; flex-shrink: 0; }
 
+/* ── Exam Body ───────────────────────────────────────────────────── */
 .sr-exam-body { padding: 20px; }
 
+/* ── Subject Table ───────────────────────────────────────────────── */
 .sr-table {
   width: 100%;
   border-collapse: collapse;
@@ -130,6 +142,7 @@
   text-align: left;
   font-weight: 700;
   border-bottom: 2px solid #4fbdbd;
+  white-space: nowrap;
 }
 
 .sr-table td {
@@ -155,6 +168,7 @@
   font-size: 0.85rem;
 }
 
+/* ── Chart ───────────────────────────────────────────────────────── */
 .sr-chart-wrapper {
   background: #fafafa;
   border-radius: 10px;
@@ -162,7 +176,6 @@
   border: 1px solid #eee;
   max-height: 320px;
 }
-
 .sr-chart-wrapper canvas { max-height: 290px; }
 
 @keyframes fadeIn {
@@ -170,8 +183,94 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 767px) {
-  .sr-header { flex-direction: column; gap: 12px; align-items: flex-start; }
-  .sr-table { font-size: 0.8rem; }
-  .sr-table th, .sr-table td { padding: 7px 8px; }
+/* ── Tablet (≤ 768px) ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sr-container { width: 100%; }
+  .sr-header { padding: 16px 18px; border-radius: 10px; }
+  .sr-header h2 { font-size: 1.1rem; }
+  .sr-exam-header { padding: 14px 16px; }
+  .sr-exam-body { padding: 14px; }
+  .sr-table { font-size: 0.85rem; }
+  .sr-table th, .sr-table td { padding: 8px 10px; }
+}
+
+/* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .sr-container { width: 100%; }
+
+  .sr-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    border-radius: 0;
+    margin-bottom: 12px;
+    padding: 16px;
+  }
+
+  .sr-header h2 { font-size: 1rem; }
+
+  .sr-header select {
+    width: 100%;
+    font-size: 1rem;
+    padding: 10px 12px;
+  }
+
+  .sr-exam-card {
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border-left-width: 4px;
+  }
+
+  .sr-exam-header { padding: 14px 14px; }
+  .sr-exam-name   { font-size: 0.95rem; }
+
+  .sr-summary-chip, .sr-grade-badge, .sr-rank-badge {
+    font-size: 0.78rem;
+    padding: 3px 8px;
+  }
+
+  .sr-exam-body { padding: 0 0 4px; }
+
+  /* Card layout for subject table */
+  .sr-table thead { display: none; }
+
+  .sr-table tbody tr {
+    display: block;
+    border-bottom: 1px solid #e0f0f5;
+    padding: 4px 0;
+  }
+
+  .sr-table tbody tr:last-child { border-bottom: none; }
+  .sr-table tbody tr:hover td { background: transparent; }
+
+  .sr-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 14px;
+    border: none;
+    border-bottom: 1px solid #f5fbff;
+    font-size: 0.88rem;
+  }
+
+  .sr-table tbody td:last-child { border-bottom: none; }
+
+  .sr-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #1f6f8b;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex-shrink: 0;
+    margin-right: 10px;
+    min-width: 80px;
+  }
+
+  .sr-chart-wrapper {
+    margin: 10px 14px;
+    max-height: 240px;
+    padding: 10px;
+  }
+  .sr-chart-wrapper canvas { max-height: 210px; }
 }

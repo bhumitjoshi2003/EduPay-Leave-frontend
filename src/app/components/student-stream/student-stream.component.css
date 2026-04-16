@@ -1,3 +1,4 @@
+/* ── Base ─────────────────────────────────────────────────────────── */
 .ss-container {
   width: 95%;
   margin: auto;
@@ -16,6 +17,7 @@
   border-bottom: 2px solid #4fbdbd;
   padding-bottom: 10px;
   margin-bottom: 20px;
+  font-size: 1.2rem;
 }
 
 .ss-filters {
@@ -23,6 +25,7 @@
   align-items: center;
   gap: 14px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .ss-filters label {
@@ -61,6 +64,7 @@
   font-style: italic;
 }
 
+/* ── Table ───────────────────────────────────────────────────────── */
 .ss-table-wrapper {
   background: rgba(255,255,255,0.95);
   border-radius: 10px;
@@ -80,6 +84,7 @@
   text-align: left;
   font-weight: 700;
   border-bottom: 2px solid #4fbdbd;
+  white-space: nowrap;
 }
 
 .ss-table td {
@@ -91,6 +96,7 @@
 .ss-table tbody tr:last-child td { border-bottom: none; }
 .ss-table tbody tr:hover td { background: #f5fbff; }
 
+/* ── Badges & Controls ───────────────────────────────────────────── */
 .ss-stream-badge {
   background: linear-gradient(135deg, #1f6f8b, #14505d);
   color: #fff;
@@ -113,20 +119,22 @@
   font-size: 0.88rem;
   outline: none;
   min-width: 120px;
+  background: #fff;
 }
 
-.ss-actions { display: flex; gap: 8px; align-items: center; }
+.ss-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
 .btn-edit {
   background: #e8f4f8;
   border: 1px solid #4fbdbd;
   color: #1f6f8b;
   border-radius: 5px;
-  padding: 4px 12px;
+  padding: 5px 14px;
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 600;
   transition: background 0.15s;
+  white-space: nowrap;
 }
 .btn-edit:hover { background: #d0eaf0; }
 
@@ -135,10 +143,11 @@
   border: 1px solid #d33;
   color: #d33;
   border-radius: 5px;
-  padding: 4px 10px;
+  padding: 5px 12px;
   cursor: pointer;
   font-size: 0.82rem;
   transition: all 0.15s;
+  white-space: nowrap;
 }
 .btn-remove:hover { background: #fde8e8; }
 
@@ -147,10 +156,11 @@
   border: 1px solid #28a745;
   color: #155724;
   border-radius: 5px;
-  padding: 4px 12px;
+  padding: 5px 14px;
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .btn-cancel {
@@ -158,9 +168,10 @@
   border: 1px solid #dc3545;
   color: #721c24;
   border-radius: 5px;
-  padding: 4px 10px;
+  padding: 5px 12px;
   cursor: pointer;
   font-size: 0.82rem;
+  white-space: nowrap;
 }
 
 @keyframes fadeIn {
@@ -168,8 +179,114 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 767px) {
-  .ss-container { padding: 14px; }
-  .ss-table { font-size: 0.8rem; }
-  .ss-table th, .ss-table td { padding: 8px; }
+/* ── Tablet (≤ 768px) ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .ss-container { padding: 18px; border-radius: 10px; }
+  .ss-table { font-size: 0.85rem; }
+  .ss-table th, .ss-table td { padding: 8px 10px; }
+  .ss-select { min-width: 100px; }
+}
+
+/* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .ss-container {
+    width: 100%;
+    border-radius: 0;
+    padding: 16px;
+    box-shadow: none;
+  }
+
+  .ss-title { font-size: 1rem; }
+
+  .ss-filters {
+    gap: 10px;
+  }
+
+  .ss-class-toggle button {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .ss-table-wrapper {
+    background: transparent;
+    border-radius: 0;
+  }
+
+  /* Card layout */
+  .ss-table thead { display: none; }
+
+  .ss-table tbody tr {
+    display: block;
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #d0eaf0;
+    overflow: hidden;
+  }
+
+  .ss-table tbody tr:hover td { background: transparent; }
+
+  .ss-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 14px;
+    border: none;
+    border-bottom: 1px solid #f0f8ff;
+    font-size: 0.9rem;
+    gap: 8px;
+  }
+
+  .ss-table tbody td:last-child { border-bottom: none; }
+
+  .ss-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #1f6f8b;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex-shrink: 0;
+    min-width: 90px;
+  }
+
+  .ss-select {
+    min-width: unset;
+    width: 100%;
+    font-size: 1rem;
+    padding: 8px 10px;
+  }
+
+  /* Actions cell: full-width button row */
+  .ss-table tbody td[data-label="Actions"] {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .ss-table tbody td[data-label="Actions"]::before { display: none; }
+
+  .ss-actions {
+    justify-content: stretch;
+    width: 100%;
+  }
+
+  .ss-actions .btn-edit,
+  .ss-actions .btn-save {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .ss-actions .btn-remove,
+  .ss-actions .btn-cancel {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
 }

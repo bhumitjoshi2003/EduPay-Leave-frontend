@@ -49,19 +49,23 @@
         <tbody>
           <tr *ngFor="let entry of examSubjects[exam.id]; trackBy: trackById">
             <ng-container *ngIf="editingEntry?.id !== entry.id">
-              <td>{{ entry.subjectName }}</td>
-              <td>{{ entry.maxMarks }}</td>
-              <td>{{ entry.examDate }}</td>
-              <td class="ec-actions">
+              <td data-label="Subject">{{ entry.subjectName }}</td>
+              <td data-label="Max Marks">{{ entry.maxMarks }}</td>
+              <td data-label="Exam Date">{{ entry.examDate }}</td>
+              <td data-label="Actions" class="ec-actions">
                 <button class="btn-edit" (click)="startEdit(entry)">Edit</button>
                 <button class="btn-delete" (click)="deleteExamSubject(exam.id, entry.id)">&#x2715;</button>
               </td>
             </ng-container>
             <ng-container *ngIf="editingEntry?.id === entry.id">
-              <td>{{ entry.subjectName }}</td>
-              <td><input type="number" [(ngModel)]="editMaxMarks" class="ec-input-sm" min="1" /></td>
-              <td><input type="date" [(ngModel)]="editExamDate" class="ec-input-sm" /></td>
-              <td class="ec-actions">
+              <td data-label="Subject">{{ entry.subjectName }}</td>
+              <td data-label="Max Marks">
+                <input type="number" [(ngModel)]="editMaxMarks" class="ec-input-sm" min="1" />
+              </td>
+              <td data-label="Exam Date">
+                <input type="date" [(ngModel)]="editExamDate" class="ec-input-sm" />
+              </td>
+              <td data-label="Actions" class="ec-actions">
                 <button class="btn-save" (click)="saveEdit(exam.id)">Save</button>
                 <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
               </td>

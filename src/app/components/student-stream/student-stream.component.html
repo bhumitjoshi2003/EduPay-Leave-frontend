@@ -12,6 +12,7 @@
   <div *ngIf="loading" class="ss-loading">Loading students…</div>
   <div *ngIf="!loading && students.length === 0" class="ss-empty">No students found for Class {{ selectedClass }}.</div>
 
+  <!-- Desktop / Tablet Table -->
   <div *ngIf="!loading && students.length > 0" class="ss-table-wrapper">
     <table class="ss-table">
       <thead>
@@ -27,14 +28,14 @@
         <tr *ngFor="let student of students; trackBy: trackByStudentId">
           <!-- View Row -->
           <ng-container *ngIf="editingStudentId !== student.studentId">
-            <td>{{ student.studentId }}</td>
-            <td>{{ student.studentName }}</td>
-            <td>
+            <td data-label="Student ID">{{ student.studentId }}</td>
+            <td data-label="Name">{{ student.studentName }}</td>
+            <td data-label="Stream">
               <span *ngIf="student.streamName" class="ss-stream-badge">{{ student.streamName }}</span>
               <span *ngIf="!student.streamName" class="ss-unassigned">Not assigned</span>
             </td>
-            <td>{{ student.optionalSubjectName || '—' }}</td>
-            <td class="ss-actions">
+            <td data-label="Optional">{{ student.optionalSubjectName || '—' }}</td>
+            <td data-label="Actions" class="ss-actions">
               <button class="btn-edit" (click)="startEdit(student.studentId, student)">
                 {{ student.streamName ? 'Edit' : 'Assign' }}
               </button>
@@ -44,21 +45,21 @@
 
           <!-- Edit Row -->
           <ng-container *ngIf="editingStudentId === student.studentId">
-            <td>{{ student.studentId }}</td>
-            <td>{{ student.studentName }}</td>
-            <td>
+            <td data-label="Student ID">{{ student.studentId }}</td>
+            <td data-label="Name">{{ student.studentName }}</td>
+            <td data-label="Stream">
               <select [(ngModel)]="editStreamId" class="ss-select">
                 <option [ngValue]="null">— Stream —</option>
                 <option *ngFor="let s of streams; trackBy: trackById" [ngValue]="s.id">{{ s.streamName }}</option>
               </select>
             </td>
-            <td>
+            <td data-label="Optional">
               <select [(ngModel)]="editOptionalSubjectId" class="ss-select">
                 <option [ngValue]="null">— Optional —</option>
                 <option *ngFor="let s of allOptionalSubjects; trackBy: trackById" [ngValue]="s.id">{{ s.subjectName }}</option>
               </select>
             </td>
-            <td class="ss-actions">
+            <td data-label="Actions" class="ss-actions">
               <button class="btn-save" (click)="saveAssignment(student)">Save</button>
               <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
             </td>

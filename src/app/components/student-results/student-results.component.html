@@ -44,15 +44,15 @@
         <tbody>
           <tr *ngFor="let s of exam.subjects; trackBy: trackByIndex"
               [class.sr-row-absent]="s.marksObtained === null">
-            <td>{{ s.subjectName }}</td>
-            <td>{{ s.examDate }}</td>
-            <td class="sr-marks">
+            <td data-label="Subject">{{ s.subjectName }}</td>
+            <td data-label="Date">{{ s.examDate }}</td>
+            <td data-label="Marks" class="sr-marks">
               <span *ngIf="s.marksObtained !== null">{{ s.marksObtained }}</span>
               <span *ngIf="s.marksObtained === null" class="sr-not-entered">—</span>
             </td>
-            <td>{{ s.maxMarks }}</td>
-            <td>{{ s.classAverage !== null ? (s.classAverage | number:'1.1-1') : '—' }}</td>
-            <td>
+            <td data-label="Max">{{ s.maxMarks }}</td>
+            <td data-label="Class Avg">{{ s.classAverage !== null ? (s.classAverage | number:'1.1-1') : '—' }}</td>
+            <td data-label="Rank">
               <span *ngIf="s.rank !== null" class="sr-rank">{{ s.rank }}</span>
               <span *ngIf="s.rank === null">—</span>
             </td>

@@ -1,3 +1,4 @@
+/* ── Base ─────────────────────────────────────────────────────────── */
 .me-container {
   width: 95%;
   margin: auto;
@@ -16,8 +17,10 @@
   border-bottom: 2px solid #4fbdbd;
   padding-bottom: 10px;
   margin-bottom: 20px;
+  font-size: 1.2rem;
 }
 
+/* ── Mode Toggle ─────────────────────────────────────────────────── */
 .me-mode-toggle {
   display: flex;
   gap: 0;
@@ -26,6 +29,7 @@
   border-radius: 8px;
   overflow: hidden;
   width: fit-content;
+  max-width: 100%;
 }
 
 .me-mode-toggle button {
@@ -37,6 +41,7 @@
   cursor: pointer;
   font-size: 0.88rem;
   transition: all 0.2s;
+  flex: 1;
 }
 
 .me-mode-toggle button.active {
@@ -44,6 +49,7 @@
   color: #fff;
 }
 
+/* ── Filters ─────────────────────────────────────────────────────── */
 .me-filters {
   display: flex;
   gap: 16px;
@@ -56,6 +62,10 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.me-subject-filter {
+  margin-bottom: 16px;
 }
 
 .me-filter-group label {
@@ -73,6 +83,7 @@
   font-size: 0.9rem;
   outline: none;
   min-width: 160px;
+  background: #fff;
 }
 
 .me-class-badge {
@@ -85,6 +96,7 @@
   border: 1px solid #4fbdbd;
 }
 
+/* ── Table Wrapper ───────────────────────────────────────────────── */
 .me-table-wrapper {
   background: rgba(255,255,255,0.95);
   border-radius: 10px;
@@ -100,8 +112,11 @@
   font-weight: 700;
   color: #1f6f8b;
   font-size: 0.95rem;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
+/* ── Buttons ─────────────────────────────────────────────────────── */
 .btn-save {
   background: linear-gradient(135deg, #28a745, #1e7e34);
   color: #fff;
@@ -112,10 +127,12 @@
   cursor: pointer;
   transition: opacity 0.15s;
   font-size: 0.88rem;
+  white-space: nowrap;
 }
 .btn-save:hover { opacity: 0.88; }
 .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* ── Table ───────────────────────────────────────────────────────── */
 .me-table {
   width: 100%;
   border-collapse: collapse;
@@ -164,9 +181,112 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 767px) {
-  .me-container { padding: 14px; }
+/* ── Tablet (≤ 768px) ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .me-container { padding: 18px; border-radius: 10px; }
   .me-filters { gap: 10px; }
   .me-filter-group select { min-width: 130px; }
-  .me-mark-input { width: 70px; }
+  .me-mark-input { width: 80px; }
+  .me-table-wrapper { padding: 14px; }
+}
+
+/* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .me-container {
+    width: 100%;
+    border-radius: 0;
+    padding: 16px;
+    box-shadow: none;
+  }
+
+  .me-mode-toggle {
+    width: 100%;
+  }
+
+  .me-mode-toggle button {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .me-filters {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .me-filter-group {
+    width: 100%;
+  }
+
+  .me-filter-group select {
+    width: 100%;
+    min-width: unset;
+    font-size: 1rem;
+    padding: 10px 12px;
+  }
+
+  .me-subject-filter {
+    width: 100%;
+  }
+
+  .me-table-wrapper {
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .me-table-header {
+    background: #e8f4f8;
+    padding: 12px 14px;
+    border-radius: 8px 8px 0 0;
+    font-size: 0.88rem;
+  }
+
+  .btn-save {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  /* Card layout for table rows */
+  .me-table thead { display: none; }
+
+  .me-table tbody tr {
+    display: block;
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border: 1px solid #d0eaf0;
+    overflow: hidden;
+  }
+
+  .me-table tbody tr:hover td { background: transparent; }
+
+  .me-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border: none;
+    border-bottom: 1px solid #f0f8ff;
+    font-size: 0.9rem;
+  }
+
+  .me-table tbody td:last-child { border-bottom: none; }
+
+  .me-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #1f6f8b;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex-shrink: 0;
+    margin-right: 10px;
+  }
+
+  .me-mark-input {
+    width: 80px;
+    font-size: 1rem;
+    padding: 7px 10px;
+  }
 }

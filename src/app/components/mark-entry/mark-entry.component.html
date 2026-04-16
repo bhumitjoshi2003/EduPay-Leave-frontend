@@ -34,11 +34,9 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════════════
-       MODE A — BY SUBJECT
-       ══════════════════════════════════════════════════════════════ -->
+  <!-- MODE A — BY SUBJECT -->
   <ng-container *ngIf="mode === 'subject'">
-    <div class="me-filter-group" *ngIf="selectedExamId">
+    <div class="me-filter-group me-subject-filter" *ngIf="selectedExamId">
       <label>Subject</label>
       <select [(ngModel)]="selectedSubjectEntryId" (ngModelChange)="onSubjectChange()">
         <option [ngValue]="null">— Select Subject —</option>
@@ -50,7 +48,7 @@
 
     <div *ngIf="selectedSubjectEntryId && subjectStudents.length > 0" class="me-table-wrapper">
       <div class="me-table-header">
-        <span>{{ getSelectedSubject()?.subjectName }} — Max Marks: {{ getSelectedSubject()?.maxMarks }}</span>
+        <span>{{ getSelectedSubject()?.subjectName }} — Max: {{ getSelectedSubject()?.maxMarks }}</span>
         <button class="btn-save" [disabled]="saving" (click)="saveMarksA()">
           {{ saving ? 'Saving…' : 'Save Marks' }}
         </button>
@@ -66,10 +64,10 @@
         </thead>
         <tbody>
           <tr *ngFor="let s of subjectStudents; let i = index; trackBy: trackByStudentId">
-            <td>{{ i + 1 }}</td>
-            <td>{{ s.studentId }}</td>
-            <td>{{ s.studentName }}</td>
-            <td>
+            <td data-label="#">{{ i + 1 }}</td>
+            <td data-label="Student ID">{{ s.studentId }}</td>
+            <td data-label="Name">{{ s.studentName }}</td>
+            <td data-label="Marks Obtained">
               <input type="number" class="me-mark-input"
                 [(ngModel)]="marksInputA[s.studentId]"
                 [max]="getSelectedSubject()?.maxMarks ?? null"
@@ -86,11 +84,9 @@
     </p>
   </ng-container>
 
-  <!-- ══════════════════════════════════════════════════════════════
-       MODE B — BY STUDENT
-       ══════════════════════════════════════════════════════════════ -->
+  <!-- MODE B — BY STUDENT -->
   <ng-container *ngIf="mode === 'student'">
-    <div class="me-filter-group" *ngIf="selectedExamId">
+    <div class="me-filter-group me-subject-filter" *ngIf="selectedExamId">
       <label>Student</label>
       <select [(ngModel)]="selectedStudentId" (ngModelChange)="onStudentChange()">
         <option value="">— Select Student —</option>
@@ -118,10 +114,10 @@
         </thead>
         <tbody>
           <tr *ngFor="let s of studentSubjects; trackBy: trackByEntryId">
-            <td>{{ s.subjectName }}</td>
-            <td>{{ s.examDate }}</td>
-            <td>{{ s.maxMarks }}</td>
-            <td>
+            <td data-label="Subject">{{ s.subjectName }}</td>
+            <td data-label="Exam Date">{{ s.examDate }}</td>
+            <td data-label="Max Marks">{{ s.maxMarks }}</td>
+            <td data-label="Marks Obtained">
               <input type="number" class="me-mark-input"
                 [(ngModel)]="marksInputB[s.examSubjectEntryId]"
                 [max]="s.maxMarks"

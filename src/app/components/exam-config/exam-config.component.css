@@ -1,3 +1,4 @@
+/* ── Base ─────────────────────────────────────────────────────────── */
 .ec-container {
   width: 95%;
   margin: auto;
@@ -16,44 +17,54 @@
   border-bottom: 2px solid #4fbdbd;
   padding-bottom: 10px;
   margin-bottom: 20px;
+  font-size: 1.2rem;
 }
 
+/* ── Filters ─────────────────────────────────────────────────────── */
 .ec-filters {
   display: flex;
   gap: 20px;
   margin-bottom: 20px;
   flex-wrap: wrap;
+  align-items: flex-end;
 }
 
 .ec-filter-group {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .ec-filter-group label {
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 700;
   color: #1f6f8b;
-  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .ec-filter-group select {
-  padding: 7px 12px;
+  padding: 8px 12px;
   border: 1px solid #4fbdbd;
   border-radius: 6px;
   font-size: 0.9rem;
   outline: none;
+  background: #fff;
+  min-width: 130px;
 }
 
+/* ── Add Row ─────────────────────────────────────────────────────── */
 .ec-add-row {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .ec-add-row input {
   flex: 1;
+  min-width: 180px;
   max-width: 320px;
   padding: 8px 12px;
   border: 1px solid #4fbdbd;
@@ -62,6 +73,7 @@
   outline: none;
 }
 
+/* ── Buttons ─────────────────────────────────────────────────────── */
 .btn-primary {
   background: linear-gradient(135deg, #1f6f8b, #14505d);
   color: #fff;
@@ -96,10 +108,11 @@
   border: none;
   color: #d33;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 5px 8px;
   border-radius: 4px;
   font-size: 0.95rem;
   transition: background 0.15s;
+  white-space: nowrap;
 }
 .btn-delete:hover { background: #fde8e8; }
 
@@ -108,31 +121,35 @@
   border: 1px solid #4fbdbd;
   color: #1f6f8b;
   border-radius: 4px;
-  padding: 3px 10px;
+  padding: 4px 10px;
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 .btn-save {
   background: #d4edda;
   border: 1px solid #28a745;
   color: #155724;
   border-radius: 4px;
-  padding: 3px 10px;
+  padding: 4px 10px;
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 .btn-cancel {
   background: #f8d7da;
   border: 1px solid #dc3545;
   color: #721c24;
   border-radius: 4px;
-  padding: 3px 10px;
+  padding: 4px 10px;
   cursor: pointer;
   font-size: 0.82rem;
+  white-space: nowrap;
 }
 
+/* ── Accordion ───────────────────────────────────────────────────── */
 .ec-accordion {
   margin-bottom: 12px;
   border: 1px solid #d0eaf0;
@@ -150,6 +167,7 @@
   cursor: pointer;
   user-select: none;
   transition: background 0.2s;
+  gap: 10px;
 }
 .ec-accordion-header:hover { background: #d0eaf0; }
 
@@ -157,20 +175,22 @@
   font-weight: 700;
   color: #1f6f8b;
   font-size: 1rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .ec-header-actions {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .ec-chevron { font-size: 0.75rem; color: #1f6f8b; }
 
-.ec-accordion-body {
-  padding: 16px 18px 18px;
-}
+.ec-accordion-body { padding: 16px 18px 18px; }
 
+/* ── Subject Table ───────────────────────────────────────────────── */
 .ec-table {
   width: 100%;
   border-collapse: collapse;
@@ -185,6 +205,7 @@
   text-align: left;
   font-weight: 700;
   border-bottom: 2px solid #4fbdbd;
+  white-space: nowrap;
 }
 
 .ec-table td {
@@ -196,7 +217,7 @@
 .ec-table tbody tr:last-child td { border-bottom: none; }
 .ec-table tbody tr:hover td { background: #f5fbff; }
 
-.ec-actions { display: flex; gap: 6px; align-items: center; }
+.ec-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
 .ec-input {
   width: 160px;
@@ -222,7 +243,7 @@
   padding-top: 8px;
 }
 
-.ec-empty { color: #888; font-style: italic; padding: 12px 0; }
+.ec-empty     { color: #888; font-style: italic; padding: 12px 0; }
 .ec-empty-sub { color: #aaa; font-style: italic; font-size: 0.88rem; margin: 0 0 8px; }
 
 @keyframes fadeIn {
@@ -230,9 +251,129 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 767px) {
-  .ec-container { padding: 14px; }
-  .ec-table { font-size: 0.8rem; }
-  .ec-input, .ec-input-sm { width: 90px; }
-  .ec-add-subject-row { gap: 6px; }
+/* ── Tablet (≤ 768px) ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .ec-container { padding: 18px; border-radius: 10px; }
+  .ec-table { font-size: 0.85rem; }
+  .ec-input { width: 130px; }
+  .ec-input-sm { width: 90px; }
+  .ec-accordion-body { padding: 12px 14px 14px; }
+}
+
+/* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .ec-container {
+    width: 100%;
+    border-radius: 0;
+    padding: 16px;
+    box-shadow: none;
+  }
+
+  .ec-title { font-size: 1rem; }
+
+  .ec-filters {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ec-filter-group {
+    width: 100%;
+  }
+
+  .ec-filter-group select {
+    width: 100%;
+    min-width: unset;
+    font-size: 1rem;
+    padding: 10px 12px;
+  }
+
+  .ec-add-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ec-add-row input {
+    max-width: 100%;
+    width: 100%;
+    font-size: 1rem;
+    padding: 10px 12px;
+  }
+
+  .ec-add-row .btn-primary {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.95rem;
+    text-align: center;
+  }
+
+  .ec-accordion-header { padding: 12px 14px; }
+  .ec-exam-name { font-size: 0.95rem; }
+  .ec-accordion-body { padding: 10px 12px 14px; }
+
+  /* Card layout for subject table */
+  .ec-table thead { display: none; }
+
+  .ec-table tbody tr {
+    display: block;
+    border: 1px solid #d0eaf0;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: #f8fdfd;
+    overflow: hidden;
+  }
+
+  .ec-table tbody tr:hover td { background: transparent; }
+
+  .ec-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 12px;
+    border: none;
+    border-bottom: 1px solid #eef8f8;
+    font-size: 0.88rem;
+    gap: 8px;
+  }
+
+  .ec-table tbody td:last-child { border-bottom: none; }
+
+  .ec-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #1f6f8b;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex-shrink: 0;
+    min-width: 80px;
+  }
+
+  .ec-input, .ec-input-sm {
+    width: 100%;
+    font-size: 1rem;
+    padding: 8px 10px;
+  }
+
+  /* Stack the add-subject inputs vertically */
+  .ec-add-subject-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .ec-add-subject-row .btn-primary {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .ec-actions {
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .btn-edit, .btn-save, .btn-cancel {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+  }
 }

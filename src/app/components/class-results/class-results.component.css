@@ -1,3 +1,4 @@
+/* ── Base ─────────────────────────────────────────────────────────── */
 .cr-container {
   width: 95%;
   margin: auto;
@@ -16,8 +17,10 @@
   border-bottom: 2px solid #4fbdbd;
   padding-bottom: 10px;
   margin-bottom: 20px;
+  font-size: 1.2rem;
 }
 
+/* ── Filters ─────────────────────────────────────────────────────── */
 .cr-filters {
   display: flex;
   gap: 16px;
@@ -47,6 +50,7 @@
   font-size: 0.9rem;
   outline: none;
   min-width: 150px;
+  background: #fff;
 }
 
 .cr-class-badge {
@@ -66,17 +70,32 @@
   font-style: italic;
 }
 
+/* ── Table ───────────────────────────────────────────────────────── */
 .cr-table-wrapper {
   background: rgba(255,255,255,0.95);
   border-radius: 10px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Scroll hint on mobile */
+.cr-table-wrapper::after {
+  display: none;
+  content: '← Scroll to see all subjects →';
+  text-align: center;
+  font-size: 0.72rem;
+  color: #4fbdbd;
+  padding: 6px;
+  background: #f0f8ff;
+  border-radius: 0 0 10px 10px;
+  font-style: italic;
 }
 
 .cr-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.88rem;
-  min-width: 600px;
+  min-width: 500px;
 }
 
 .cr-table thead tr {
@@ -92,8 +111,8 @@
   white-space: nowrap;
 }
 
-.cr-th-rank { width: 60px; }
-.cr-th-student { text-align: left; min-width: 160px; }
+.cr-th-rank  { width: 60px; }
+.cr-th-student { text-align: left; min-width: 140px; }
 
 .cr-table td {
   padding: 9px 12px;
@@ -106,12 +125,13 @@
 .cr-table tbody tr:hover td { background: #f5fbff; }
 .cr-row-top td { background: #fffde7; }
 
-.cr-cell-rank { text-align: center; }
-.cr-cell-name { text-align: left; }
-.cr-cell-marks { font-weight: 600; color: #1f6f8b; }
-.cr-th-max { font-weight: 400; color: #a0b8c0; font-size: 0.75em; margin-top: 2px; }
-.cr-cell-total { font-weight: 700; color: #14505d; }
+.cr-cell-rank   { text-align: center; }
+.cr-cell-name   { text-align: left; }
+.cr-cell-marks  { font-weight: 600; color: #1f6f8b; }
+.cr-th-max      { font-weight: 400; color: #a0b8c0; font-size: 0.75em; margin-top: 2px; }
+.cr-cell-total  { font-weight: 700; color: #14505d; white-space: nowrap; }
 
+/* Rank badge */
 .cr-rank-badge {
   display: inline-flex;
   align-items: center;
@@ -128,8 +148,8 @@
 .cr-rank-badge.silver { background: #c0c0c0; color: #333; }
 .cr-rank-badge.bronze { background: #cd7f32; color: #fff; }
 
-.cr-student-name { font-weight: 600; color: #1f6f8b; }
-.cr-student-id   { font-size: 0.78rem; color: #888; }
+.cr-student-name { font-weight: 600; color: #1f6f8b; font-size: 0.9rem; }
+.cr-student-id   { font-size: 0.75rem; color: #888; }
 
 .cr-absent { color: #ccc; }
 
@@ -138,8 +158,51 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 767px) {
-  .cr-container { padding: 14px; }
+/* ── Tablet (≤ 768px) ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .cr-container { padding: 18px; border-radius: 10px; }
+  .cr-table { font-size: 0.82rem; }
+  .cr-table th, .cr-table td { padding: 8px 9px; }
+  .cr-filter-group select { min-width: 120px; }
+  .cr-rank-badge { width: 28px; height: 28px; font-size: 0.82rem; }
+}
+
+/* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .cr-container {
+    width: 100%;
+    border-radius: 0;
+    padding: 14px;
+    box-shadow: none;
+  }
+
+  .cr-title { font-size: 1rem; }
+
+  .cr-filters {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .cr-filter-group {
+    width: 100%;
+  }
+
+  .cr-filter-group select {
+    width: 100%;
+    min-width: unset;
+    font-size: 1rem;
+    padding: 10px 12px;
+  }
+
+  /* Show scroll hint */
+  .cr-table-wrapper::after { display: block; }
+
   .cr-table { font-size: 0.78rem; }
   .cr-table th, .cr-table td { padding: 7px 8px; }
+  .cr-th-student { min-width: 110px; }
+
+  .cr-student-name { font-size: 0.82rem; }
+  .cr-student-id   { font-size: 0.68rem; }
+
+  .cr-rank-badge { width: 26px; height: 26px; font-size: 0.78rem; }
 }

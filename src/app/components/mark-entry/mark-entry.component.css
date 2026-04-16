@@ -1,6 +1,7 @@
 /* ── Base ─────────────────────────────────────────────────────────── */
 .me-container {
   width: 95%;
+  max-width: 100%;
   margin: auto;
   background: linear-gradient(135deg, #eaf6f6, #f0f8ff);
   border-radius: 15px;
@@ -8,6 +9,7 @@
   padding: 30px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   animation: fadeIn 0.5s ease-in-out;
+  box-sizing: border-box;
 }
 
 .me-title {
@@ -193,10 +195,8 @@
 /* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .me-container {
-    width: 100%;
-    border-radius: 0;
-    padding: 16px;
-    box-shadow: none;
+    width: 98%;
+    padding: 14px;
   }
 
   .me-mode-toggle {
@@ -229,9 +229,7 @@
   }
 
   .me-table-wrapper {
-    padding: 0;
-    background: transparent;
-    border-radius: 0;
+    overflow-x: hidden;
   }
 
   .me-table-header {
@@ -242,11 +240,15 @@
   }
 
   .btn-save {
-    padding: 8px 16px;
-    font-size: 0.85rem;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
   }
 
-  /* Card layout for table rows */
+  /* Card layout — make table a proper block so it respects parent padding */
+  .me-table,
+  .me-table tbody { display: block; width: 100%; }
+
   .me-table thead { display: none; }
 
   .me-table tbody tr {

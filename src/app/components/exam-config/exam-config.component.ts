@@ -198,15 +198,25 @@ export class ExamConfigComponent implements OnInit, OnDestroy {
   }
 
   deleteExamSubject(examId: number, entryId: number): void {
-    this.examService.deleteExamSubject(entryId).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
-        this.examSubjects[examId] = this.examSubjects[examId].filter(e => e.id !== entryId);
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        this.logger.error('Error deleting exam subject:', e);
-        Swal.fire('Error', 'Could not delete subject entry.', 'error');
-      },
+    Swal.fire({
+      title: 'Remove subject?',
+      text: 'This will delete the subject entry and all marks recorded for it.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Delete',
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.examService.deleteExamSubject(entryId).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.examSubjects[examId] = this.examSubjects[examId].filter(e => e.id !== entryId);
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          this.logger.error('Error deleting exam subject:', e);
+          Swal.fire('Error', 'Could not delete subject entry.', 'error');
+        },
+      });
     });
   }
 

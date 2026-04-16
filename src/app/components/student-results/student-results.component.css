@@ -1,9 +1,11 @@
 /* ── Base ─────────────────────────────────────────────────────────── */
 .sr-container {
   width: 95%;
+  max-width: 100%;
   margin: auto;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   animation: fadeIn 0.5s ease-in-out;
+  box-sizing: border-box;
 }
 
 /* ── Header ──────────────────────────────────────────────────────── */
@@ -174,9 +176,10 @@
   border-radius: 10px;
   padding: 16px;
   border: 1px solid #eee;
-  max-height: 320px;
+  height: 320px;
+  position: relative;
 }
-.sr-chart-wrapper canvas { max-height: 290px; }
+.sr-chart-wrapper canvas { position: absolute; inset: 16px; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-8px); }
@@ -196,15 +199,16 @@
 
 /* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .sr-container { width: 100%; }
+  .sr-container {
+    width: 98%;
+  }
 
   .sr-header {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
-    border-radius: 0;
     margin-bottom: 12px;
-    padding: 16px;
+    padding: 14px 16px;
   }
 
   .sr-header h2 { font-size: 1rem; }
@@ -231,7 +235,10 @@
 
   .sr-exam-body { padding: 0 0 4px; }
 
-  /* Card layout for subject table */
+  /* Card layout — make table a proper block so it respects parent padding */
+  .sr-table,
+  .sr-table tbody { display: block; width: 100%; }
+
   .sr-table thead { display: none; }
 
   .sr-table tbody tr {
@@ -269,8 +276,8 @@
 
   .sr-chart-wrapper {
     margin: 10px 14px;
-    max-height: 240px;
+    height: 280px;
     padding: 10px;
   }
-  .sr-chart-wrapper canvas { max-height: 210px; }
+  .sr-chart-wrapper canvas { inset: 10px; }
 }

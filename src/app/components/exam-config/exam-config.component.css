@@ -1,13 +1,15 @@
 /* ── Base ─────────────────────────────────────────────────────────── */
 .ec-container {
   width: 95%;
+  max-width: 100%;
   margin: auto;
   background: linear-gradient(135deg, #eaf6f6, #f0f8ff);
   border-radius: 15px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
   padding: 30px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   animation: fadeIn 0.5s ease-in-out;
+  box-sizing: border-box;
 }
 
 .ec-title {
@@ -86,8 +88,14 @@
   font-size: 0.85rem;
   white-space: nowrap;
 }
-.btn-primary:hover { opacity: 0.85; }
-.btn-primary.btn-sm { padding: 6px 12px; }
+
+.btn-primary:hover {
+  opacity: 0.85;
+}
+
+.btn-primary.btn-sm {
+  padding: 6px 12px;
+}
 
 .btn-outline {
   background: transparent;
@@ -101,7 +109,10 @@
   transition: all 0.2s;
   margin-top: 10px;
 }
-.btn-outline:hover { background: #eaf6f6; }
+
+.btn-outline:hover {
+  background: #eaf6f6;
+}
 
 .btn-delete {
   background: none;
@@ -114,7 +125,10 @@
   transition: background 0.15s;
   white-space: nowrap;
 }
-.btn-delete:hover { background: #fde8e8; }
+
+.btn-delete:hover {
+  background: #fde8e8;
+}
 
 .btn-edit {
   background: #e8f4f8;
@@ -127,6 +141,7 @@
   font-weight: 600;
   white-space: nowrap;
 }
+
 .btn-save {
   background: #d4edda;
   border: 1px solid #28a745;
@@ -138,6 +153,7 @@
   font-weight: 600;
   white-space: nowrap;
 }
+
 .btn-cancel {
   background: #f8d7da;
   border: 1px solid #dc3545;
@@ -169,7 +185,10 @@
   transition: background 0.2s;
   gap: 10px;
 }
-.ec-accordion-header:hover { background: #d0eaf0; }
+
+.ec-accordion-header:hover {
+  background: #d0eaf0;
+}
 
 .ec-exam-name {
   font-weight: 700;
@@ -186,9 +205,14 @@
   flex-shrink: 0;
 }
 
-.ec-chevron { font-size: 0.75rem; color: #1f6f8b; }
+.ec-chevron {
+  font-size: 0.75rem;
+  color: #1f6f8b;
+}
 
-.ec-accordion-body { padding: 16px 18px 18px; }
+.ec-accordion-body {
+  padding: 16px 18px 18px;
+}
 
 /* ── Subject Table ───────────────────────────────────────────────── */
 .ec-table {
@@ -214,10 +238,20 @@
   color: #333;
 }
 
-.ec-table tbody tr:last-child td { border-bottom: none; }
-.ec-table tbody tr:hover td { background: #f5fbff; }
+.ec-table tbody tr:last-child td {
+  border-bottom: none;
+}
 
-.ec-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.ec-table tbody tr:hover td {
+  background: #f5fbff;
+}
+
+.ec-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
 .ec-input {
   width: 160px;
@@ -243,33 +277,65 @@
   padding-top: 8px;
 }
 
-.ec-empty     { color: #888; font-style: italic; padding: 12px 0; }
-.ec-empty-sub { color: #aaa; font-style: italic; font-size: 0.88rem; margin: 0 0 8px; }
+.ec-empty {
+  color: #888;
+  font-style: italic;
+  padding: 12px 0;
+}
+
+.ec-empty-sub {
+  color: #aaa;
+  font-style: italic;
+  font-size: 0.88rem;
+  margin: 0 0 8px;
+}
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Tablet (≤ 768px) ────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .ec-container { padding: 18px; border-radius: 10px; }
-  .ec-table { font-size: 0.85rem; }
-  .ec-input { width: 130px; }
-  .ec-input-sm { width: 90px; }
-  .ec-accordion-body { padding: 12px 14px 14px; }
+  .ec-container {
+    padding: 18px;
+    border-radius: 10px;
+  }
+
+  .ec-table {
+    font-size: 0.85rem;
+  }
+
+  .ec-input {
+    width: 130px;
+  }
+
+  .ec-input-sm {
+    width: 90px;
+  }
+
+  .ec-accordion-body {
+    padding: 12px 14px 14px;
+  }
 }
 
 /* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .ec-container {
-    width: 100%;
-    border-radius: 0;
-    padding: 16px;
-    box-shadow: none;
+    width: 98%;
+    padding: 14px;
   }
 
-  .ec-title { font-size: 1rem; }
+  .ec-title {
+    font-size: 1rem;
+  }
 
   .ec-filters {
     flex-direction: column;
@@ -285,6 +351,7 @@
     min-width: unset;
     font-size: 1rem;
     padding: 10px 12px;
+    box-sizing: border-box;
   }
 
   .ec-add-row {
@@ -293,10 +360,11 @@
   }
 
   .ec-add-row input {
-    max-width: 100%;
     width: 100%;
+    max-width: 100%;
     font-size: 1rem;
     padding: 10px 12px;
+    box-sizing: border-box;
   }
 
   .ec-add-row .btn-primary {
@@ -304,13 +372,25 @@
     padding: 12px;
     font-size: 0.95rem;
     text-align: center;
+    box-sizing: border-box;
   }
 
-  .ec-accordion-header { padding: 12px 14px; }
-  .ec-exam-name { font-size: 0.95rem; }
-  .ec-accordion-body { padding: 10px 12px 14px; }
+  .ec-accordion-header {
+    padding: 12px 14px;
+  }
 
-  /* Card layout for subject table */
+  .ec-exam-name {
+    font-size: 0.95rem;
+  }
+
+  .ec-accordion-body {
+    padding: 10px 12px 14px;
+  }
+
+  /* Card layout — make table a proper block so it respects parent padding */
+  .ec-table,
+  .ec-table tbody { display: block; width: 100%; }
+
   .ec-table thead { display: none; }
 
   .ec-table tbody tr {
@@ -322,7 +402,9 @@
     overflow: hidden;
   }
 
-  .ec-table tbody tr:hover td { background: transparent; }
+  .ec-table tbody tr:hover td {
+    background: transparent;
+  }
 
   .ec-table tbody td {
     display: flex;
@@ -335,7 +417,9 @@
     gap: 8px;
   }
 
-  .ec-table tbody td:last-child { border-bottom: none; }
+  .ec-table tbody td:last-child {
+    border-bottom: none;
+  }
 
   .ec-table tbody td::before {
     content: attr(data-label);
@@ -348,10 +432,12 @@
     min-width: 80px;
   }
 
-  .ec-input, .ec-input-sm {
+  .ec-input,
+  .ec-input-sm {
     width: 100%;
     font-size: 1rem;
     padding: 8px 10px;
+    box-sizing: border-box;
   }
 
   /* Stack the add-subject inputs vertically */
@@ -365,6 +451,7 @@
     width: 100%;
     padding: 10px;
     text-align: center;
+    box-sizing: border-box;
   }
 
   .ec-actions {
@@ -372,8 +459,11 @@
     gap: 8px;
   }
 
-  .btn-edit, .btn-save, .btn-cancel {
-    padding: 6px 14px;
+  .ec-table .btn-edit,
+  .ec-table .btn-save,
+  .ec-table .btn-cancel {
+    box-sizing: border-box;
+    padding: 8px 16px;
     font-size: 0.85rem;
   }
 }

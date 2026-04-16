@@ -1,6 +1,7 @@
 /* ── Base ─────────────────────────────────────────────────────────── */
 .ss-container {
   width: 95%;
+  max-width: 100%;
   margin: auto;
   background: linear-gradient(135deg, #eaf6f6, #f0f8ff);
   border-radius: 15px;
@@ -8,6 +9,7 @@
   padding: 30px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   animation: fadeIn 0.5s ease-in-out;
+  box-sizing: border-box;
 }
 
 .ss-title {
@@ -190,10 +192,8 @@
 /* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .ss-container {
-    width: 100%;
-    border-radius: 0;
-    padding: 16px;
-    box-shadow: none;
+    width: 98%;
+    padding: 14px;
   }
 
   .ss-title { font-size: 1rem; }
@@ -208,11 +208,13 @@
   }
 
   .ss-table-wrapper {
-    background: transparent;
-    border-radius: 0;
+    overflow-x: hidden;
   }
 
-  /* Card layout */
+  /* Card layout — make table a proper block so it respects parent padding */
+  .ss-table,
+  .ss-table tbody { display: block; width: 100%; }
+
   .ss-table thead { display: none; }
 
   .ss-table tbody tr {
@@ -236,6 +238,7 @@
     border-bottom: 1px solid #f0f8ff;
     font-size: 0.9rem;
     gap: 8px;
+    box-sizing: border-box;
   }
 
   .ss-table tbody td:last-child { border-bottom: none; }
@@ -263,30 +266,30 @@
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding: 12px 14px;
   }
 
   .ss-table tbody td[data-label="Actions"]::before { display: none; }
 
   .ss-actions {
-    justify-content: stretch;
+    flex-direction: column;
     width: 100%;
+    gap: 8px;
   }
 
   .ss-actions .btn-edit,
-  .ss-actions .btn-save {
-    flex: 1;
-    text-align: center;
-    padding: 10px;
-    font-size: 0.9rem;
-  }
-
+  .ss-actions .btn-save,
   .ss-actions .btn-remove,
   .ss-actions .btn-cancel {
-    flex: 1;
+    width: 100%;
+    box-sizing: border-box;
     text-align: center;
-    padding: 10px;
+    padding: 12px;
     font-size: 0.9rem;
+    border-radius: 8px;
+  }
+
+  .ss-select {
+    box-sizing: border-box;
   }
 }

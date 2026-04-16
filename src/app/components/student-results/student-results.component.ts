@@ -118,6 +118,8 @@ export class StudentResultsComponent implements OnInit, OnDestroy, AfterViewChec
     const existing = this.charts.get(exam.examId);
     if (existing) existing.destroy();
 
+    const isMobile = window.innerWidth <= 600;
+
     const labels = exam.subjects.map(s => s.subjectName);
     const studentData = exam.subjects.map(s => s.marksObtained ?? 0);
     const avgData = exam.subjects.map(s => s.classAverage ?? 0);
@@ -134,39 +136,59 @@ export class StudentResultsComponent implements OnInit, OnDestroy, AfterViewChec
             backgroundColor: 'rgba(31, 111, 139, 0.75)',
             borderColor: '#1f6f8b',
             borderWidth: 2,
-            borderRadius: 5,
+            borderRadius: 4,
+            ...(isMobile ? { barThickness: 18 } : {}),
           },
           {
-            label: 'Class Average',
+            label: 'Class Avg',
             data: avgData,
             backgroundColor: 'rgba(79, 189, 189, 0.55)',
             borderColor: '#4fbdbd',
             borderWidth: 2,
-            borderRadius: 5,
+            borderRadius: 4,
+            ...(isMobile ? { barThickness: 18 } : {}),
           },
           {
-            label: 'Max Marks',
+            label: 'Max',
             data: maxData,
             backgroundColor: 'rgba(200, 200, 200, 0.3)',
             borderColor: '#bbb',
             borderWidth: 1,
-            borderRadius: 5,
+            borderRadius: 4,
+            ...(isMobile ? { barThickness: 18 } : {}),
           },
         ],
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'top' },
+          legend: {
+            position: isMobile ? 'bottom' : 'top',
+            labels: {
+              boxWidth: isMobile ? 10 : 14,
+              font: { size: isMobile ? 10 : 12 },
+              padding: isMobile ? 8 : 12,
+            },
+          },
           title: { display: false },
+          tooltip: {
+            titleFont: { size: isMobile ? 11 : 13 },
+            bodyFont: { size: isMobile ? 11 : 12 },
+          },
         },
         scales: {
           y: {
             beginAtZero: true,
             grid: { color: 'rgba(0,0,0,0.06)' },
+            ticks: { font: { size: isMobile ? 10 : 12 } },
           },
           x: {
             grid: { display: false },
+            ticks: {
+              font: { size: isMobile ? 9 : 12 },
+              maxRotation: isMobile ? 30 : 0,
+            },
           },
         },
       },

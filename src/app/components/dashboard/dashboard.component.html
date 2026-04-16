@@ -41,16 +41,16 @@
         #rla16="routerLinkActive" [active]="rla16.isActive">Audit Logs</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/subject-config" routerLinkActive
         #rla17="routerLinkActive" [active]="rla17.isActive">Subjects</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/exam-config" routerLinkActive
-        #rla18="routerLinkActive" [active]="rla18.isActive">Exams</a>
+      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/exam-config" routerLinkActive #rla18="routerLinkActive"
+        [active]="rla18.isActive">Exams</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/student-stream" routerLinkActive
         #rla19="routerLinkActive" [active]="rla19.isActive">Streams</a>
       <a *ngIf="isAdmin() || isTeacher()" mat-tab-link routerLink="/dashboard/mark-entry" routerLinkActive
         #rla20="routerLinkActive" [active]="rla20.isActive">Mark Entry</a>
       <a *ngIf="isAdmin() || isTeacher()" mat-tab-link routerLink="/dashboard/class-results" routerLinkActive
         #rla21="routerLinkActive" [active]="rla21.isActive">Class Results</a>
-      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/my-results" routerLinkActive
-        #rla22="routerLinkActive" [active]="rla22.isActive">My Results</a>
+      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/my-results" routerLinkActive #rla22="routerLinkActive"
+        [active]="rla22.isActive">My Results</a>
     </nav>
 
     <div class="profile-area">

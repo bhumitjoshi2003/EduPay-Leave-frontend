@@ -28,12 +28,12 @@ export class StudentStreamService {
     return this.http.get<StudentStreamSelection>(`${this.base}/${studentId}`);
   }
 
-  assignStream(studentId: string, streamId: number, optionalSubjectId: number): Observable<StudentStreamSelection> {
-    return this.http.post<StudentStreamSelection>(this.base, { studentId, streamId, optionalSubjectId });
+  assignStream(studentId: string, streamId: number, optionalSubjectIds: number[]): Observable<StudentStreamSelection> {
+    return this.http.post<StudentStreamSelection>(this.base, { studentId, streamId, optionalSubjectIds });
   }
 
-  updateStream(studentId: string, streamId: number, optionalSubjectId: number): Observable<StudentStreamSelection> {
-    return this.http.put<StudentStreamSelection>(`${this.base}/${studentId}`, { studentId, streamId, optionalSubjectId });
+  updateStream(studentId: string, streamId: number, optionalSubjectIds: number[]): Observable<StudentStreamSelection> {
+    return this.http.put<StudentStreamSelection>(`${this.base}/${studentId}`, { studentId, streamId, optionalSubjectIds });
   }
 
   deleteStream(studentId: string): Observable<void> {

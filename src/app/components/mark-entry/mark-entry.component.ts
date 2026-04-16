@@ -96,9 +96,14 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
   }
 
   setMode(m: 'subject' | 'student'): void {
+    if (this.mode === m) return;
     this.mode = m;
     this.resetSubjectSelection();
     this.resetStudentSelection();
+    // If an exam is already selected, trigger the appropriate data load for the new mode
+    if (this.selectedExamId) {
+      this.onExamChange();
+    }
   }
 
   loadExams(): void {

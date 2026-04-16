@@ -53,13 +53,10 @@
               </select>
             </td>
             <td>
-              <div *ngFor="let group of optionalGroups; trackBy: trackById" class="ss-group-select">
-                <label class="ss-group-label">{{ group.groupName }}</label>
-                <select [(ngModel)]="editOptionalSubjectIds[group.id]" class="ss-select">
-                  <option [ngValue]="null">— Select —</option>
-                  <option *ngFor="let s of group.subjects; trackBy: trackById" [ngValue]="s.id">{{ s.subjectName }}</option>
-                </select>
-              </div>
+              <select [(ngModel)]="editOptionalSubjectId" class="ss-select">
+                <option [ngValue]="null">— Optional —</option>
+                <option *ngFor="let s of allOptionalSubjects; trackBy: trackById" [ngValue]="s.id">{{ s.subjectName }}</option>
+              </select>
             </td>
             <td class="ss-actions">
               <button class="btn-save" (click)="saveAssignment(student)">Save</button>

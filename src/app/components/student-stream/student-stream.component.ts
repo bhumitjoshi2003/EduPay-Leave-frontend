@@ -28,8 +28,7 @@ export class StudentStreamComponent implements OnInit, OnDestroy {
 
   editingStudentId: string | null = null;
   editStreamId: number | null = null;
-  // One selection per optional group, keyed by group id
-  editOptionalSubjectIds: Record<number, number | null> = {};
+  editOptionalSubjectId: number | null = null;
 
   constructor(
     private streamService: StudentStreamService,
@@ -80,54 +79,37 @@ export class StudentStreamComponent implements OnInit, OnDestroy {
   startEdit(studentId: string, current: StudentStreamOverview): void {
     this.editingStudentId = studentId;
     this.editStreamId = this.streams.find(s => s.streamName === current.streamName)?.id ?? null;
-
-    // Initialize one slot per group; try to match the existing optional subject name
-    this.editOptionalSubjectIds = {};
-    const currentName = current.optionalSubjectName;
-    for (const group of this.optionalGroups) {
-      const match = currentName
-        ? group.subjects.find(s => s.subjectName === currentName)?.id ?? null
-        : null;
-      this.editOptionalSubjectIds[group.id] = match;
-    }
+    this.editOptionalSubjectId = this.allOptionalSubjects.find(s => s.subjectName === current.optionalSubjectName)?.id ?? null;
     this.cdr.markForCheck();
   }
 
   cancelEdit(): void {
     this.editingStudentId = null;
     this.editStreamId = null;
-    this.editOptionalSubjectIds = {};
+    this.editOptionalSubjectId = null;
     this.cdr.markForCheck();
   }
 
   saveAssignment(student: StudentStreamOverview): void {
-    if (!this.editStreamId) {
-      Swal.fire('Incomplete', 'Please select a stream.', 'warning');
+    if (!this.editStreamId || !this.editOptionalSubjectId) {
+      Swal.fire('Incomplete', 'Please select both a stream and an optional subject.', 'warning');
       return;
-    }
-
-    // Collect one selection per group; all groups must have a selection
-    const selectedIds: number[] = [];
-    for (const group of this.optionalGroups) {
-      const chosen = this.editOptionalSubjectIds[group.id];
-      if (!chosen) {
-        Swal.fire('Incomplete', `Please select an optional subject for group "${group.groupName}".`, 'warning');
-        return;
-      }
-      selectedIds.push(chosen);
     }
 
     const isNew = !student.streamName;
     const op = isNew
-      ? this.streamService.assignStream(student.studentId, this.editStreamId, selectedIds)
-      : this.streamService.updateStream(student.studentId, this.editStreamId, selectedIds);
+      ? this.streamService.assignStream(student.studentId, this.editStreamId, this.editOptionalSubjectId)
+      : this.streamService.updateStream(student.studentId, this.editStreamId, this.editOptionalSubjectId);
+
+    // Capture display values from local data before cancelEdit() clears the selections
+    const savedStreamName = this.streams.find(s => s.id === this.editStreamId)?.streamName ?? null;
+    const savedOptionalName = this.allOptionalSubjects.find(s => s.id === this.editOptionalSubjectId)?.subjectName ?? null;
 
     op.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (result) => {
-        // Immutable update so OnPush detects the change
+      next: () => {
         this.students = this.students.map(st =>
           st.studentId === student.studentId
-            ? { ...st, streamName: result.streamName, optionalSubjectName: result.optionalSubjectName }
+            ? { ...st, streamName: savedStreamName, optionalSubjectName: savedOptionalName }
             : st
         );
         this.cancelEdit();
@@ -166,6 +148,10 @@ export class StudentStreamComponent implements OnInit, OnDestroy {
         },
       });
     });
+  }
+
+  get allOptionalSubjects() {
+    return this.optionalGroups.flatMap(g => g.subjects);
   }
 
   trackByStudentId(index: number, s: StudentStreamOverview): string { return s.studentId; }

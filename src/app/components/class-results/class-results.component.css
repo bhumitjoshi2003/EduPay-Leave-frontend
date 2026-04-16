@@ -109,6 +109,7 @@
 .cr-cell-rank { text-align: center; }
 .cr-cell-name { text-align: left; }
 .cr-cell-marks { font-weight: 600; color: #1f6f8b; }
+.cr-th-max { font-weight: 400; color: #a0b8c0; font-size: 0.75em; margin-top: 2px; }
 .cr-cell-total { font-weight: 700; color: #14505d; }
 
 .cr-rank-badge {

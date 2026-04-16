@@ -177,8 +177,10 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
     if (!name) return;
     this.service.addCoreSubject(streamId, name).pipe(takeUntil(this.destroy$)).subscribe({
       next: (subj) => {
-        const stream = this.streams.find(s => s.id === streamId);
-        if (stream) stream.coreSubjects = [...stream.coreSubjects, subj];
+        // Immutable update — replace the stream object so OnPush detects the change
+        this.streams = this.streams.map(s =>
+          s.id === streamId ? { ...s, coreSubjects: [...s.coreSubjects, subj] } : s
+        );
         this.newCoreSubjectName[streamId] = '';
         this.cdr.markForCheck();
       },
@@ -190,13 +192,27 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
   }
 
   deleteCoreSubject(streamId: number, subjectId: number): void {
-    this.service.deleteCoreSubject(subjectId).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
-        const stream = this.streams.find(s => s.id === streamId);
-        if (stream) stream.coreSubjects = stream.coreSubjects.filter(s => s.id !== subjectId);
-        this.cdr.markForCheck();
-      },
-      error: (e) => this.logger.error('Error deleting core subject:', e),
+    Swal.fire({
+      title: 'Delete subject?',
+      text: 'This will remove the core subject from the stream.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Delete',
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.service.deleteCoreSubject(subjectId).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.streams = this.streams.map(s =>
+            s.id === streamId ? { ...s, coreSubjects: s.coreSubjects.filter(c => c.id !== subjectId) } : s
+          );
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          this.logger.error('Error deleting core subject:', e);
+          Swal.fire('Error', 'Could not delete subject.', 'error');
+        },
+      });
     });
   }
 
@@ -256,8 +272,10 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
     if (!name) return;
     this.service.addOptionalSubject(groupId, name).pipe(takeUntil(this.destroy$)).subscribe({
       next: (subj) => {
-        const group = this.optionalGroups.find(g => g.id === groupId);
-        if (group) group.subjects = [...group.subjects, subj];
+        // Immutable update — replace the group object so OnPush detects the change
+        this.optionalGroups = this.optionalGroups.map(g =>
+          g.id === groupId ? { ...g, subjects: [...g.subjects, subj] } : g
+        );
         this.newOptionalSubjectName[groupId] = '';
         this.cdr.markForCheck();
       },
@@ -269,13 +287,27 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
   }
 
   deleteOptionalSubject(groupId: number, subjectId: number): void {
-    this.service.deleteOptionalSubject(subjectId).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
-        const group = this.optionalGroups.find(g => g.id === groupId);
-        if (group) group.subjects = group.subjects.filter(s => s.id !== subjectId);
-        this.cdr.markForCheck();
-      },
-      error: (e) => this.logger.error('Error deleting optional subject:', e),
+    Swal.fire({
+      title: 'Delete subject?',
+      text: 'This will remove the subject from the group.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Delete',
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.service.deleteOptionalSubject(subjectId).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.optionalGroups = this.optionalGroups.map(g =>
+            g.id === groupId ? { ...g, subjects: g.subjects.filter(s => s.id !== subjectId) } : g
+          );
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          this.logger.error('Error deleting optional subject:', e);
+          Swal.fire('Error', 'Could not delete subject.', 'error');
+        },
+      });
     });
   }
 

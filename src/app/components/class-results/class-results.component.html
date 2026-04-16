@@ -39,7 +39,10 @@
         <tr>
           <th class="cr-th-rank">Rank</th>
           <th class="cr-th-student">Student</th>
-          <th *ngFor="let s of examSubjects; trackBy: trackById">{{ s.subjectName }}</th>
+          <th *ngFor="let s of examSubjects; trackBy: trackById">
+            {{ s.subjectName }}
+            <div class="cr-th-max">(Max: {{ s.maxMarks }})</div>
+          </th>
           <th>Total</th>
         </tr>
       </thead>
@@ -56,8 +59,10 @@
             <div class="cr-student-id">{{ student.studentId }}</div>
           </td>
           <td *ngFor="let s of examSubjects; trackBy: trackById" class="cr-cell-marks">
-            <span *ngIf="getMarks(student, s.subjectName) !== null">{{ getMarks(student, s.subjectName) }}</span>
-            <span *ngIf="getMarks(student, s.subjectName) === null" class="cr-absent">—</span>
+            <ng-container *ngIf="getMarks(student, s.subjectName) !== null; else absent">
+              {{ getMarks(student, s.subjectName) }}
+            </ng-container>
+            <ng-template #absent><span class="cr-absent">—</span></ng-template>
           </td>
           <td class="cr-cell-total">{{ student.totalMarksObtained }}/{{ student.totalMaxMarks }}</td>
         </tr>

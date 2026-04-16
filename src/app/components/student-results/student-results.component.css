@@ -30,6 +30,13 @@
   white-space: nowrap;
 }
 
+.sr-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .sr-header select {
   padding: 8px 14px;
   border: 1px solid #4fbdbd;
@@ -41,6 +48,41 @@
   background: #fff;
   min-width: 120px;
 }
+
+.sr-btn-report {
+  background: linear-gradient(135deg, #1f6f8b, #14505d);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.sr-btn-report:hover { opacity: 0.88; }
+
+/* Per-exam print icon on exam header */
+.sr-exam-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.sr-btn-report-sm {
+  background: #e8f4f8;
+  border: 1px solid #4fbdbd;
+  color: #1f6f8b;
+  border-radius: 5px;
+  padding: 4px 9px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s;
+}
+.sr-btn-report-sm:hover { background: #d0eaf0; }
 
 .sr-loading, .sr-empty {
   text-align: center;
@@ -213,10 +255,25 @@
 
   .sr-header h2 { font-size: 1rem; }
 
+  .sr-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
   .sr-header select {
     width: 100%;
     font-size: 1rem;
     padding: 10px 12px;
+    box-sizing: border-box;
+  }
+
+  .sr-btn-report {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+    box-sizing: border-box;
   }
 
   .sr-exam-card {

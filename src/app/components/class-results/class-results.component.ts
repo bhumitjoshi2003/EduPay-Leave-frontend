@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { MarksService, ClassStudentResult, ClassStudentSubject } from '../../services/marks.service';
 import { ExamConfigService, ExamConfig, ExamSubjectEntry } from '../../services/exam-config.service';
@@ -41,6 +42,7 @@ export class ClassResultsComponent implements OnInit, OnDestroy {
     private authState: AuthStateService,
     private teacherService: TeacherService,
     private feesCalc: FeesCalculationService,
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService
   ) { }
@@ -126,6 +128,15 @@ export class ClassResultsComponent implements OnInit, OnDestroy {
 
   getMarks(student: ClassStudentResult, subjectName: string): number | null {
     return student.subjects.find(s => s.subjectName === subjectName)?.marksObtained ?? null;
+  }
+
+  openReportCard(studentId: string, examId: number | null): void {
+    const queryParams: Record<string, string> = {
+      studentId,
+      session: this.selectedSession,
+    };
+    if (examId !== null) queryParams['examId'] = String(examId);
+    this.router.navigate(['/dashboard/report-card'], { queryParams });
   }
 
   trackById(index: number, item: { id: number }): number { return item.id; }

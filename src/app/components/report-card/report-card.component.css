@@ -1,0 +1,349 @@
+/* ── Page wrapper ────────────────────────────────────────────────── */
+.rc-page {
+  min-height: 100vh;
+  background: #eaf6f6;
+  padding: 20px 16px 40px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────── */
+.rc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 860px;
+  margin: 0 auto 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rc-btn-back {
+  background: #fff;
+  border: 2px solid #4fbdbd;
+  color: #1f6f8b;
+  border-radius: 8px;
+  padding: 9px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+.rc-btn-back:hover { background: #eaf6f6; }
+
+.rc-btn-print {
+  background: linear-gradient(135deg, #1f6f8b, #14505d);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 22px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: opacity 0.15s;
+}
+.rc-btn-print:hover { opacity: 0.88; }
+
+/* ── Loading / Empty ─────────────────────────────────────────────── */
+.rc-loading, .rc-empty {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  padding: 40px;
+}
+
+/* ── Card (the printable area) ───────────────────────────────────── */
+.rc-card {
+  max-width: 860px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  padding: 32px 36px 28px;
+  box-sizing: border-box;
+}
+
+/* ── School Header ───────────────────────────────────────────────── */
+.rc-school-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.rc-header-img {
+  width: 100%;
+  max-width: 780px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* ── Card Title row ──────────────────────────────────────────────── */
+.rc-card-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 3px solid #4fbdbd;
+  border-bottom: 3px solid #4fbdbd;
+  padding: 10px 0;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rc-card-title {
+  margin: 0;
+  color: #1f6f8b;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.rc-session-badge {
+  background: #e8f4f8;
+  color: #1f6f8b;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 5px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* ── Student Info ────────────────────────────────────────────────── */
+.rc-student-info {
+  display: flex;
+  gap: 0;
+  border: 1px solid #d0eaf0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.rc-info-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  border-right: 1px solid #d0eaf0;
+}
+
+.rc-info-item:last-child { border-right: none; }
+
+.rc-info-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #4fbdbd;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.rc-info-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1f6f8b;
+}
+
+/* ── Exam Section ────────────────────────────────────────────────── */
+.rc-exam-section {
+  margin-bottom: 28px;
+}
+
+.rc-exam-heading {
+  color: #1f6f8b;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+  padding: 8px 14px;
+  background: #e8f4f8;
+  border-left: 5px solid #4fbdbd;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Table ───────────────────────────────────────────────────────── */
+.rc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.rc-table th {
+  background: #1f6f8b;
+  color: #fff;
+  padding: 10px 12px;
+  font-weight: 700;
+  border: 1px solid #1f6f8b;
+}
+
+.rc-th-subject { text-align: left; }
+.rc-th-num     { text-align: center; width: 110px; }
+
+.rc-table td {
+  padding: 9px 12px;
+  border: 1px solid #d0eaf0;
+  color: #333;
+}
+
+.rc-td-subject { color: #222; font-weight: 500; }
+.rc-td-num     { text-align: center; }
+
+.rc-table tbody tr:nth-child(even) td { background: #f8fdfd; }
+.rc-row-absent td { opacity: 0.6; }
+
+.rc-absent-text { color: #bbb; font-style: italic; }
+
+/* ── Grade chips ─────────────────────────────────────────────────── */
+.rc-grade-chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+.grade-a      { background: #d4edda; color: #155724; }
+.grade-b      { background: #d1ecf1; color: #0c5460; }
+.grade-c      { background: #fff3cd; color: #856404; }
+.grade-fail   { background: #f8d7da; color: #721c24; }
+.grade-absent { background: #f0f0f0; color: #999; }
+
+/* ── Table footer ────────────────────────────────────────────────── */
+.rc-tfoot-row td {
+  background: #e8f4f8;
+  font-weight: 700;
+  border: 1px solid #4fbdbd;
+  color: #1f6f8b;
+}
+
+.rc-tfoot-label {
+  text-align: left;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  letter-spacing: 0.4px;
+}
+
+.rc-tfoot-summary td {
+  background: #f0f9f9;
+  border: 1px solid #d0eaf0;
+  text-align: center;
+  padding: 8px 12px;
+  color: #333;
+  font-size: 0.88rem;
+}
+
+.rc-summary-item { color: #333; }
+.rc-summary-divider { margin: 0 12px; color: #bbb; }
+
+/* ── Signatures ──────────────────────────────────────────────────── */
+.rc-signatures {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px dashed #c0dde8;
+}
+
+.rc-sign-block {
+  text-align: center;
+  min-width: 160px;
+}
+
+.rc-sign-line {
+  width: 180px;
+  height: 1px;
+  background: #333;
+  margin: 0 auto 8px;
+}
+
+.rc-sign-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+
+/* ── Print styles ────────────────────────────────────────────────── */
+@media print {
+  .no-print { display: none !important; }
+
+  .rc-page {
+    background: #fff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  .rc-card {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 14mm 16mm !important;
+    margin: 0 !important;
+  }
+
+  .rc-school-header { margin-bottom: 16px; }
+
+  .rc-card-title-row { padding: 8px 0; margin-bottom: 14px; }
+
+  .rc-student-info { margin-bottom: 16px; }
+
+  .rc-exam-section { page-break-inside: avoid; margin-bottom: 20px; }
+
+  .rc-signatures { page-break-inside: avoid; margin-top: 30px; }
+
+  /* Ensure table borders print */
+  .rc-table th,
+  .rc-table td {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Grade chip backgrounds */
+  .rc-grade-chip,
+  .rc-tfoot-row td,
+  .rc-tfoot-summary td,
+  .rc-exam-heading {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .rc-page { padding: 12px 8px 32px; }
+
+  .rc-card {
+    padding: 18px 16px 20px;
+    border-radius: 8px;
+  }
+
+  .rc-card-title { font-size: 1rem; }
+
+  .rc-student-info {
+    flex-direction: column;
+    border-radius: 6px;
+  }
+
+  .rc-info-item {
+    border-right: none;
+    border-bottom: 1px solid #d0eaf0;
+    padding: 10px 14px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .rc-info-item:last-child { border-bottom: none; }
+  .rc-info-label { margin-bottom: 0; }
+
+  .rc-table { font-size: 0.82rem; }
+  .rc-table th, .rc-table td { padding: 7px 8px; }
+  .rc-th-num { width: 70px; }
+
+  .rc-signatures { gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .rc-sign-line  { width: 130px; }
+}

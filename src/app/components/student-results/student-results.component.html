@@ -1,9 +1,14 @@
 <div class="sr-container">
   <div class="sr-header">
     <h2>My Results</h2>
-    <select [(ngModel)]="selectedSession" (ngModelChange)="loadResults()">
-      <option *ngFor="let s of sessions; trackBy: trackByIndex" [value]="s">{{ s }}</option>
-    </select>
+    <div class="sr-header-actions">
+      <select [(ngModel)]="selectedSession" (ngModelChange)="loadResults()">
+        <option *ngFor="let s of sessions; trackBy: trackByIndex" [value]="s">{{ s }}</option>
+      </select>
+      <button *ngIf="results.length > 0" class="sr-btn-report" (click)="openReportCard(null)">
+        &#128438; Full Report Card
+      </button>
+    </div>
   </div>
 
   <div *ngIf="loading" class="sr-loading">Loading results…</div>
@@ -24,7 +29,10 @@
           <span class="sr-rank-badge">Rank {{ exam.overallRank }}</span>
         </div>
       </div>
-      <span class="sr-chevron">{{ expandedExamId === exam.examId ? '▲' : '▼' }}</span>
+      <div class="sr-exam-actions" (click)="$event.stopPropagation()">
+        <button class="sr-btn-report-sm" (click)="openReportCard(exam.examId)" title="Report Card">&#128438;</button>
+        <span class="sr-chevron">{{ expandedExamId === exam.examId ? '▲' : '▼' }}</span>
+      </div>
     </div>
 
     <!-- Expanded Detail -->

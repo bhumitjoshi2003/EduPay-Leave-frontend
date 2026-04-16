@@ -11,3 +11,26 @@ body {
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* ── Print: hide dashboard shell, show only the report card ── */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  .header-area,
+  .profile-area {
+    display: none !important;
+  }
+
+  .dashboard-container,
+  .content-area,
+  mat-tab-nav-panel {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+}

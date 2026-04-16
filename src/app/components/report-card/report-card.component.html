@@ -1,0 +1,115 @@
+<div class="rc-page">
+
+  <!-- ── Toolbar (hidden on print) ─────────────────────────────────── -->
+  <div class="rc-toolbar no-print">
+    <button class="rc-btn-back" (click)="goBack()">&#8592; Back</button>
+    <button class="rc-btn-print" (click)="print()">&#128438; Print / Save as PDF</button>
+  </div>
+
+  <!-- ── Loading ────────────────────────────────────────────────────── -->
+  <div *ngIf="loading" class="rc-loading no-print">Loading report card…</div>
+
+  <!-- ── Empty ──────────────────────────────────────────────────────── -->
+  <div *ngIf="!loading && displayResults.length === 0" class="rc-empty no-print">
+    No results found for this selection.
+  </div>
+
+  <!-- ── Report Card ────────────────────────────────────────────────── -->
+  <div *ngIf="!loading && displayResults.length > 0" class="rc-card">
+
+    <!-- School Header -->
+    <div class="rc-school-header">
+      <img src="IASName1.png" alt="Indra Academy Senior Secondary School" class="rc-header-img" />
+    </div>
+
+    <!-- Card Title -->
+    <div class="rc-card-title-row">
+      <h2 class="rc-card-title">{{ cardTitle }}</h2>
+      <span class="rc-session-badge">Session: {{ session }}</span>
+    </div>
+
+    <!-- Student Info -->
+    <div class="rc-student-info">
+      <div class="rc-info-item">
+        <span class="rc-info-label">Student Name</span>
+        <span class="rc-info-value">{{ studentName }}</span>
+      </div>
+      <div class="rc-info-item">
+        <span class="rc-info-label">Student ID</span>
+        <span class="rc-info-value">{{ studentId }}</span>
+      </div>
+      <div class="rc-info-item">
+        <span class="rc-info-label">Class</span>
+        <span class="rc-info-value">Class {{ className }}</span>
+      </div>
+    </div>
+
+    <!-- ── Exam Sections ─────────────────────────────────────────────── -->
+    <div *ngFor="let exam of displayResults; trackBy: trackByExamId" class="rc-exam-section">
+
+      <h3 class="rc-exam-heading">{{ exam.examName }}</h3>
+
+      <table class="rc-table">
+        <thead>
+          <tr>
+            <th class="rc-th-subject">Subject</th>
+            <th class="rc-th-num">Max Marks</th>
+            <th class="rc-th-num">Marks Obtained</th>
+            <th class="rc-th-num">Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let subj of exam.subjects; trackBy: trackByIndex"
+              [class.rc-row-absent]="subj.marksObtained === null">
+            <td class="rc-td-subject">{{ subj.subjectName }}</td>
+            <td class="rc-td-num">{{ subj.maxMarks }}</td>
+            <td class="rc-td-num">
+              <span *ngIf="subj.marksObtained !== null">{{ subj.marksObtained }}</span>
+              <span *ngIf="subj.marksObtained === null" class="rc-absent-text">Absent</span>
+            </td>
+            <td class="rc-td-num">
+              <span class="rc-grade-chip" [ngClass]="getGradeClass(subj.marksObtained, subj.maxMarks)">
+                {{ getGrade(subj.marksObtained, subj.maxMarks) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="rc-tfoot-row">
+            <td class="rc-tfoot-label">Total</td>
+            <td class="rc-td-num">{{ exam.totalMaxMarks }}</td>
+            <td class="rc-td-num"><strong>{{ exam.totalMarksObtained }}</strong></td>
+            <td class="rc-td-num">
+              <span class="rc-grade-chip" [ngClass]="getGradeClass(exam.totalMarksObtained, exam.totalMaxMarks)">
+                {{ getOverallGrade(exam.percentage) }}
+              </span>
+            </td>
+          </tr>
+          <tr class="rc-tfoot-summary">
+            <td colspan="4">
+              <span class="rc-summary-item">Percentage: <strong>{{ exam.percentage | number:'1.1-1' }}%</strong></span>
+              <span class="rc-summary-divider">|</span>
+              <span class="rc-summary-item">Overall Rank: <strong>{{ exam.overallRank }}</strong></span>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+    </div>
+    <!-- end exam loop -->
+
+    <!-- ── Signature Section ─────────────────────────────────────────── -->
+    <div class="rc-signatures">
+      <div class="rc-sign-block">
+        <div class="rc-sign-line"></div>
+        <div class="rc-sign-label">Class Teacher</div>
+      </div>
+      <div class="rc-sign-block">
+        <div class="rc-sign-line"></div>
+        <div class="rc-sign-label">Principal</div>
+      </div>
+    </div>
+
+  </div><!-- end rc-card -->
+
+</div><!-- end rc-page -->

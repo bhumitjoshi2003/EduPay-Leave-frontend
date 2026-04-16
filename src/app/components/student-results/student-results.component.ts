@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import Chart from 'chart.js/auto';
 import { MarksService, ExamResult } from '../../services/marks.service';
@@ -37,6 +38,7 @@ export class StudentResultsComponent implements OnInit, OnDestroy, AfterViewChec
     private marksService: MarksService,
     private authState: AuthStateService,
     private feesCalc: FeesCalculationService,
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
     @Inject(PLATFORM_ID) private platformId: object
@@ -211,6 +213,15 @@ export class StudentResultsComponent implements OnInit, OnDestroy, AfterViewChec
     if (percentage >= 60) return 'grade-b';
     if (percentage >= 40) return 'grade-c';
     return 'grade-f';
+  }
+
+  openReportCard(examId: number | null): void {
+    const queryParams: Record<string, string> = {
+      studentId: this.studentId,
+      session: this.selectedSession,
+    };
+    if (examId !== null) queryParams['examId'] = String(examId);
+    this.router.navigate(['/dashboard/report-card'], { queryParams });
   }
 
   trackById(index: number, item: { examId: number }): number { return item.examId; }

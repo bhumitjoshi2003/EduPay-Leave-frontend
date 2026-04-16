@@ -35,6 +35,7 @@ import { StudentStreamComponent } from './components/student-stream/student-stre
 import { MarkEntryComponent } from './components/mark-entry/mark-entry.component';
 import { StudentResultsComponent } from './components/student-results/student-results.component';
 import { ClassResultsComponent } from './components/class-results/class-results.component';
+import { ReportCardComponent } from './components/report-card/report-card.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -187,6 +188,10 @@ export const routes: Routes = [
       {
         path: 'class-results', component: ClassResultsComponent,
         canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN'] }
+      },
+      {
+        path: 'report-card', component: ReportCardComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN'] }
       },
 
       // ── Open to all authenticated users ──────────────────────────────

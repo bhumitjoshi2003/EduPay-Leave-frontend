@@ -31,6 +31,7 @@ export interface ExamResult {
   examName: string;
   className: string;
   session: string;
+  studentName: string;
   subjects: SubjectResult[];
   totalMarksObtained: number;
   totalMaxMarks: number;

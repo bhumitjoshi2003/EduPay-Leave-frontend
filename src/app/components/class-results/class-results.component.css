@@ -114,8 +114,9 @@
   white-space: nowrap;
 }
 
-.cr-th-rank  { width: 60px; }
+.cr-th-rank   { width: 60px; }
 .cr-th-student { text-align: left; min-width: 140px; }
+.cr-th-action  { width: 80px; }
 
 .cr-table td {
   padding: 9px 12px;
@@ -133,6 +134,22 @@
 .cr-cell-marks  { font-weight: 600; color: #1f6f8b; }
 .cr-th-max      { font-weight: 400; color: #a0b8c0; font-size: 0.75em; margin-top: 2px; }
 .cr-cell-total  { font-weight: 700; color: #14505d; white-space: nowrap; }
+.cr-cell-action { text-align: center; white-space: nowrap; }
+
+/* Report card buttons in class results */
+.cr-btn-report {
+  background: #e8f4f8;
+  border: 1px solid #4fbdbd;
+  color: #1f6f8b;
+  border-radius: 5px;
+  padding: 4px 7px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  line-height: 1;
+}
+.cr-btn-report:hover { background: #d0eaf0; }
+.cr-btn-report-exam { margin-left: 4px; }
 
 /* Rank badge */
 .cr-rank-badge {

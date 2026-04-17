@@ -109,6 +109,35 @@
     gap: 10px;
 }
 
+/* ── Notification bell ───────────────────────────────────────────── */
+.nb-bell-btn {
+    background: linear-gradient(135deg, #1f6f8b, #4fbdbd);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 6px;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.nb-bell-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.nb-bell-btn mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
 .profile-area button {
     background: linear-gradient(135deg, #6ab545, #b5d54b);
     color: white;
@@ -385,13 +414,15 @@
         order: 2;
     }
 
-    .profile-area button {
+    .profile-area button,
+    .nb-bell-btn {
         width: 28px;
         height: 28px;
         padding: 5px;
     }
 
-    .profile-area button mat-icon {
+    .profile-area button mat-icon,
+    .nb-bell-btn mat-icon {
         font-size: 16px;
         width: 16px;
         height: 16px;

@@ -4,4 +4,6 @@ export interface Notification {
     message: string;
     type: string;
     audience?: string;
+    createdAt?: string;
+    createdBy?: string;
 }

@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { StudentService } from '../../services/student.service';
 import { TeacherService } from '../../services/teacher.service';
 import { AdminService } from '../../services/admin.service';
+import { NotificationService } from '../../services/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { WelcomeDialogComponent } from '../welcome-dialog/welcome-dialog.component';
 import { Subject, takeUntil, interval, Subscription } from 'rxjs';
@@ -41,9 +42,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   Class: string = '';
   ClassTeacher: string = '';
   hasShownWelcomeMessage: boolean = false;
+  unreadNotificationCount: number = 0;
   private ngUnsubscribe = new Subject<void>();
   private welcomeMessageKey = 'hasShownWelcome';
-  private pollingIntervalSubscription: Subscription | undefined; // Changed type to Subscription
+  private pollingIntervalSubscription: Subscription | undefined;
 
   constructor(
     private router: Router,
@@ -52,6 +54,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private teacherService: TeacherService,
     private adminService: AdminService,
+    private notificationService: NotificationService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService
@@ -61,6 +64,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadWelcomeMessageState();
     this.getDetails();
     this.handleInitialNavigation();
+    this.fetchUnreadCount();
+    // Poll unread count every 60 seconds
+    this.pollingIntervalSubscription = interval(60000)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(() => this.fetchUnreadCount());
   }
 
   ngOnDestroy(): void {
@@ -191,6 +199,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: () => this.router.navigate(['/home']),
       error: () => this.router.navigate(['/home'])
     });
+  }
+
+  fetchUnreadCount(): void {
+    this.notificationService.getUnreadNotificationCount()
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe({
+        next: (count) => { this.unreadNotificationCount = count; this.cdr.markForCheck(); },
+        error: (e) => this.logger.error('Error fetching unread count:', e),
+      });
+  }
+
+  navigateToNoticeBoard(): void {
+    this.router.navigate(['/dashboard/notice']);
   }
 
   navigateToMyProfile(): void {

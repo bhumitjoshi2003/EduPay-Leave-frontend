@@ -1,78 +1,143 @@
-<div class="container mt-5">
-    <div *ngIf="isAdmin; else notAdmin">
-      <h2>Notice to Students</h2>
-      <form [formGroup]="emailForm" (ngSubmit)="sendEmail()" class="card p-4">
-        
-        <div class="form-group">
-          <label for="targetClass">Select Class:</label>
-          <select
-            id="targetClass"
-            formControlName="targetClass"
-            class="form-control"
-            [ngClass]="{ 'is-invalid': f['targetClass'].invalid && (f['targetClass'].dirty || f['targetClass'].touched) }"
-          >
-            <option value="" disabled selected>Select a class</option>
-            <option *ngFor="let className of classList" [value]="className">{{ className }}</option>
-          </select>
-          <div *ngIf="f['targetClass'].invalid && (f['targetClass'].dirty || f['targetClass'].touched)" class="invalid-feedback">
-            Please select a class.
-          </div>
-        </div>
-  
-        <div class="form-group">
-          <label for="title">Title:</label>
-          <input
-            type="text"
-            id="title"
-            formControlName="title"
-            class="form-control"
-            [ngClass]="{ 'is-invalid': f['title'].invalid && (f['title'].dirty || f['title'].touched) }"
-          />
-          <div *ngIf="f['title'].invalid && (f['title'].dirty || f['title'].touched)" class="invalid-feedback">
-            Title is required.
-          </div>
-        </div>
-  
-        <div class="form-group">
-          <label for="subject">Subject:</label>
-          <input
-            type="text"
-            id="subject"
-            formControlName="subject"
-            class="form-control"
-            [ngClass]="{ 'is-invalid': f['subject'].invalid && (f['subject'].dirty || f['subject'].touched) }"
-          />
-          <div *ngIf="f['subject'].invalid && (f['subject'].dirty || f['subject'].touched)" class="invalid-feedback">
-            Subject is required.
-          </div>
-        </div>
-  
-        <div class="form-group">
-          <label for="body">Body:</label>
-          <textarea
-            id="body"
-            formControlName="body"
-            class="form-control"
-            rows="5"
-            [ngClass]="{ 'is-invalid': f['body'].invalid && (f['body'].dirty || f['body'].touched) }"
-          ></textarea>
-          <div *ngIf="f['body'].invalid && (f['body'].dirty || f['body'].touched)" class="invalid-feedback">
-            Body is required.
-          </div>
-        </div>
-  
-        <button type="submit" class="btn btn-primary" [disabled]="loading">
-          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
-          Send Email
-        </button>
-  
-      </form>
+<div class="nb-page">
+
+  <!-- ══════════════════════ ADMIN VIEW ══════════════════════════════════ -->
+  <ng-container *ngIf="isAdmin">
+    <div class="nb-admin-header">
+      <h2 class="nb-page-title">Notice Board</h2>
+      <span class="nb-role-badge">Admin Panel</span>
     </div>
-  
-    <ng-template #notAdmin>
-      <div class="alert alert-danger" role="alert">
-        You do not have permission to access this page.
+
+    <div class="nb-admin-layout">
+
+      <!-- ── Compose Form ─────────────────────────────────────────────── -->
+      <div class="nb-compose-card">
+        <h3 class="nb-card-title">Post a Notice</h3>
+
+        <!-- Title -->
+        <div class="nb-field">
+          <label class="nb-label">Title <span class="nb-required">*</span></label>
+          <input class="nb-input" type="text" [(ngModel)]="form.title" placeholder="Notice title" maxlength="120">
+        </div>
+
+        <!-- Target Audience -->
+        <div class="nb-field">
+          <label class="nb-label">Target Audience <span class="nb-required">*</span></label>
+          <select class="nb-select" [(ngModel)]="form.targetAudience">
+            <option value="" disabled>Select audience</option>
+            <optgroup label="Broad">
+              <option value="All">All Students</option>
+              <option value="ALL_TEACHERS">All Teachers</option>
+            </optgroup>
+            <optgroup label="By Class — Students Only">
+              <option *ngFor="let c of classList" [value]="c">Class {{ c }} — Students</option>
+            </optgroup>
+            <optgroup label="By Class — Students + Class Teacher">
+              <option *ngFor="let c of classList" [value]="'CLASS_WITH_TEACHER:' + c">Class {{ c }} + Class Teacher</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- Delivery Mode -->
+        <div class="nb-field">
+          <label class="nb-label">Delivery Mode <span class="nb-required">*</span></label>
+          <div class="nb-mode-group">
+            <button type="button" class="nb-mode-btn" [class.active]="form.deliveryMode === 'IN_APP'"
+              (click)="form.deliveryMode = 'IN_APP'">In-App Only</button>
+            <button type="button" class="nb-mode-btn" [class.active]="form.deliveryMode === 'EMAIL'"
+              (click)="form.deliveryMode = 'EMAIL'">Email Only</button>
+            <button type="button" class="nb-mode-btn" [class.active]="form.deliveryMode === 'BOTH'"
+              (click)="form.deliveryMode = 'BOTH'">Both</button>
+          </div>
+        </div>
+
+        <!-- Subject (email only) -->
+        <div class="nb-field" *ngIf="requiresSubject">
+          <label class="nb-label">Email Subject <span class="nb-required">*</span></label>
+          <input class="nb-input" type="text" [(ngModel)]="form.subject" placeholder="Subject line for the email">
+        </div>
+
+        <!-- Body -->
+        <div class="nb-field">
+          <label class="nb-label">Message <span class="nb-required">*</span></label>
+          <textarea class="nb-textarea" [(ngModel)]="form.body" placeholder="Write the notice here…" rows="5"></textarea>
+        </div>
+
+        <button class="nb-btn-post" (click)="postNotice()" [disabled]="submitting">
+          <span *ngIf="!submitting">Post Notice</span>
+          <span *ngIf="submitting">Posting…</span>
+        </button>
       </div>
-    </ng-template>
-  </div>
-  
+
+      <!-- ── Posted Notices List ──────────────────────────────────────── -->
+      <div class="nb-list-card">
+        <h3 class="nb-card-title">Posted Notices <span class="nb-count-badge">{{ allNotices.length }}</span></h3>
+
+        <div *ngIf="allNotices.length === 0" class="nb-empty">No notices posted yet.</div>
+
+        <div class="nb-notice-list">
+          <div *ngFor="let notice of allNotices; trackBy: trackById" class="nb-notice-item">
+
+            <!-- View mode -->
+            <ng-container *ngIf="editingId !== notice.id">
+              <div class="nb-notice-meta">
+                <span class="nb-audience-tag">{{ formatAudience(notice.audience) }}</span>
+                <span class="nb-date">{{ formatDate(notice.createdAt!) }}</span>
+              </div>
+              <h4 class="nb-notice-title">{{ notice.title }}</h4>
+              <p class="nb-notice-body">{{ notice.message }}</p>
+              <div *ngIf="notice.createdBy" class="nb-posted-by">Posted by: {{ notice.createdBy }}</div>
+              <div class="nb-notice-actions">
+                <button class="nb-btn-edit" (click)="startEdit(notice)">Edit</button>
+                <button class="nb-btn-delete" (click)="deleteNotice(notice.id!)">Delete</button>
+              </div>
+            </ng-container>
+
+            <!-- Edit mode -->
+            <ng-container *ngIf="editingId === notice.id">
+              <div class="nb-edit-form">
+                <input class="nb-input" type="text" [(ngModel)]="editForm.title" placeholder="Title">
+                <textarea class="nb-textarea" [(ngModel)]="editForm.message" rows="3" placeholder="Message"></textarea>
+                <div class="nb-edit-actions">
+                  <button class="nb-btn-save" (click)="saveEdit()">Save</button>
+                  <button class="nb-btn-cancel" (click)="cancelEdit()">Cancel</button>
+                </div>
+              </div>
+            </ng-container>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <!-- ══════════════════════ STUDENT / TEACHER VIEW ══════════════════════ -->
+  <ng-container *ngIf="!isAdmin">
+    <div class="nb-user-header">
+      <h2 class="nb-page-title">Notice Board</h2>
+      <button class="nb-btn-mark-read" *ngIf="unreadCount > 0" (click)="markAllRead()">
+        Mark all as read ({{ unreadCount }})
+      </button>
+    </div>
+
+    <div *ngIf="userNotifications.length === 0" class="nb-empty-user">
+      No notices for you yet.
+    </div>
+
+    <div class="nb-user-list">
+      <div *ngFor="let n of userNotifications; trackBy: trackById"
+        class="nb-user-item" [class.nb-unread]="!n.isRead">
+        <div class="nb-user-item-bar"></div>
+        <div class="nb-user-item-body">
+          <div class="nb-user-item-top">
+            <h4 class="nb-user-title">{{ n.title }}</h4>
+            <span class="nb-user-date">{{ formatDate(n.createdAt) }}</span>
+          </div>
+          <p class="nb-user-message">{{ n.message }}</p>
+          <span *ngIf="!n.isRead" class="nb-unread-dot">New</span>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

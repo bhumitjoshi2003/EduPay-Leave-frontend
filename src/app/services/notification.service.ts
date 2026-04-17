@@ -1,9 +1,17 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Notification } from '../interfaces/notification';
 import { environment } from '../../environments/environment';
 import { UserNotification } from '../interfaces/user-notification';
+
+export interface NoticePayload {
+  title: string;
+  subject: string;
+  body: string;
+  targetClass: string;
+  deliveryMode: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -39,5 +47,9 @@ export class NotificationService {
 
   markAllNotificationsAsRead(): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/user/read-all`, {});
+  }
+
+  sendNotice(payload: NoticePayload): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/admin/notice`, payload);
   }
 }

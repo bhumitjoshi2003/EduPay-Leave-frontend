@@ -195,7 +195,10 @@ export const routes: Routes = [
       },
 
       // ── Open to all authenticated users ──────────────────────────────
-      { path: 'notice', component: NoticeComponent },
+      {
+        path: 'notice', component: NoticeComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUPER_ADMIN'] }
+      },
       { path: 'event-calendar', component: EventCalendarComponent },
       { path: 'payment', component: PaymentComponent },
     ],

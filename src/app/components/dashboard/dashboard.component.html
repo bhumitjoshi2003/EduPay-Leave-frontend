@@ -25,8 +25,8 @@
         [active]="rla12.isActive">Teachers</a>
       <a *ngIf="isAdmin() || isSuperAdmin()" mat-tab-link routerLink="/dashboard/admin-list" routerLinkActive
         #rla12="routerLinkActive" [active]="rla12.isActive">Admins</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/notice" routerLinkActive #rla13="routerLinkActive"
-        [active]="rla13.isActive">Notice</a>
+      <a mat-tab-link routerLink="/dashboard/notice" routerLinkActive #rla13="routerLinkActive"
+        [active]="rla13.isActive">Notice Board</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/register" routerLinkActive #rla13="routerLinkActive"
         [active]="rla13.isActive">Register</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/event-new" routerLinkActive #rla15="routerLinkActive"
@@ -54,6 +54,13 @@
     </nav>
 
     <div class="profile-area">
+
+      <!-- Notification bell -->
+      <button class="nb-bell-btn" (click)="navigateToNoticeBoard()" title="Notice Board"
+        [matBadge]="unreadNotificationCount > 0 ? unreadNotificationCount : null"
+        matBadgeColor="warn" matBadgeSize="small">
+        <mat-icon>notifications</mat-icon>
+      </button>
 
       <button mat-icon-button [matMenuTriggerFor]="profileMenu">
         <mat-icon>account_circle</mat-icon>

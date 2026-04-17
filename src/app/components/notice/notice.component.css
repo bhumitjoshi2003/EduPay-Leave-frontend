@@ -1,353 +1,549 @@
-.container {
-  /* max-width: 700px; */
-  width: 90%;
-  margin: 0 auto;
-  padding: 40px 20px;
+/* ── Page wrapper ────────────────────────────────────────────────── */
+.nb-page {
+  min-height: 100vh;
+  padding: 24px 20px 48px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #ffffff;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  border-radius: 15px;
-  animation: fadeIn 0.4s ease-in, slideIn 0.3s ease-out;
-  transition: transform 0.2s ease;
+  box-sizing: border-box;
 }
 
-.container:hover {
-  transform: translateY(-4px);
-  /* Slight lift on hover */
+/* ── Page headers ────────────────────────────────────────────────── */
+.nb-admin-header,
+.nb-user-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
-
-/* Keyframes for animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.nb-page-title {
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #1f6f8b;
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateX(-50px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+.nb-role-badge {
+  background: #e8f4f8;
+  color: #1f6f8b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
 }
 
-
-h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 28px;
-  color: #2c3e50;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
-  /* Subtle text shadow */
-  letter-spacing: -0.02em;
+/* ── Admin two-column layout ─────────────────────────────────────── */
+.nb-admin-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  align-items: start;
 }
 
-
-form.card {
-  background-color: #f9f9f9;
-  padding: 30px;
-  border-radius: 15px;
-  border: 1px solid #ddd;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s ease, transform 0.2s ease;
-  backdrop-filter: blur(5px);
-  /* Note: backdrop-filter has limited browser support */
-  background-color: rgba(249, 249, 249, 0.8);
+/* ── Shared card ─────────────────────────────────────────────────── */
+.nb-compose-card,
+.nb-list-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 24px 22px;
 }
 
-form.card:hover {
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-  transform: translateY(-4px);
+.nb-card-title {
+  margin: 0 0 20px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1f6f8b;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid #e8f4f8;
+  padding-bottom: 12px;
 }
 
-
-.form-group {
-  margin-bottom: 25px;
+.nb-count-badge {
+  background: #1f6f8b;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 12px;
 }
 
-
-label {
-  display: block;
-  margin-bottom: 12px;
-  font-size: 18px;
-  color: #34495e;
-  font-weight: 500;
-  transition: color 0.3s ease, transform 0.2s ease;
+/* ── Form fields ─────────────────────────────────────────────────── */
+.nb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
 }
 
-label:hover {
-  transform: translateX(4px);
-  color: #2c3e50;
+.nb-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
+.nb-required { color: #d33; }
 
-input.form-control,
-textarea.form-control,
-select.form-control {
-  /* Combined for consistency */
-  border: 1px solid #ccc;
+.nb-input,
+.nb-select,
+.nb-textarea {
+  border: 1px solid #d0dfe8;
   border-radius: 8px;
-  padding: 12px;
-  font-size: 16px;
-  transition: border 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-  width: calc(100% - 24px);
-  /* Account for padding */
-  appearance: none;
-  /* For select, removes default arrow on some browsers */
-  background-color: #fff;
+  padding: 10px 12px;
+  font-size: 0.93rem;
+  font-family: inherit;
+  color: #222;
+  background: #fafcfe;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  width: 100%;
 }
 
-input.form-control:focus,
-textarea.form-control:focus,
-select.form-control:focus {
-  /* Combined for consistency */
-  border-color: #4a90e2;
-  box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+.nb-input:focus,
+.nb-select:focus,
+.nb-textarea:focus {
   outline: none;
-  background-color: #f5f5f5;
+  border-color: #4fbdbd;
+  box-shadow: 0 0 0 3px rgba(79, 189, 189, 0.15);
 }
 
-/* Placeholder styling */
-input.form-control::placeholder,
-textarea.form-control::placeholder {
+.nb-textarea { resize: vertical; }
+
+/* ── Delivery mode buttons ───────────────────────────────────────── */
+.nb-mode-group {
+  display: flex;
+  gap: 0;
+  border: 1px solid #d0dfe8;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.nb-mode-btn {
+  flex: 1;
+  padding: 9px 0;
+  border: none;
+  background: #fafcfe;
+  color: #555;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  border-right: 1px solid #d0dfe8;
+}
+
+.nb-mode-btn:last-child { border-right: none; }
+
+.nb-mode-btn.active {
+  background: #1f6f8b;
+  color: #fff;
+}
+
+.nb-mode-btn:hover:not(.active) { background: #e8f4f8; }
+
+/* ── Post button ─────────────────────────────────────────────────── */
+.nb-btn-post {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #1f6f8b, #4fbdbd);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  margin-top: 4px;
+}
+
+.nb-btn-post:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+.nb-btn-post:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ── Posted notices list ─────────────────────────────────────────── */
+.nb-notice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 640px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.nb-notice-item {
+  border: 1px solid #e0eef5;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: #fafcfe;
+  transition: box-shadow 0.15s;
+}
+
+.nb-notice-item:hover { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07); }
+
+.nb-notice-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.nb-audience-tag {
+  background: #e8f4f8;
+  color: #1f6f8b;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.nb-date {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.nb-notice-title {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a3a47;
+}
+
+.nb-notice-body {
+  margin: 0 0 8px;
+  font-size: 0.88rem;
+  color: #444;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nb-posted-by {
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-bottom: 10px;
+}
+
+.nb-notice-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.nb-btn-edit,
+.nb-btn-delete,
+.nb-btn-save,
+.nb-btn-cancel {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.nb-btn-edit  { background: #e8f4f8; color: #1f6f8b; }
+.nb-btn-edit:hover  { background: #d0eaf5; }
+
+.nb-btn-delete { background: #fde8e8; color: #c0392b; }
+.nb-btn-delete:hover { background: #fbd1d1; }
+
+.nb-btn-save { background: #1f6f8b; color: #fff; }
+.nb-btn-save:hover { opacity: 0.85; }
+
+.nb-btn-cancel { background: #f0f0f0; color: #555; }
+.nb-btn-cancel:hover { background: #e0e0e0; }
+
+/* ── Inline edit form ────────────────────────────────────────────── */
+.nb-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nb-edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Empty states ────────────────────────────────────────────────── */
+.nb-empty {
+  text-align: center;
   color: #aaa;
   font-style: italic;
-  font-size: 0.95rem;
+  padding: 32px 0;
+  font-size: 0.9rem;
 }
 
-
-textarea.form-control {
-  min-height: 150px;
-  resize: vertical;
+.nb-empty-user {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 60px 0;
+  font-size: 1rem;
 }
 
-
-.is-invalid {
-  border-color: #e74c3c !important;
-  background-color: #fff6f6;
-  animation: shake 0.3s ease-in-out;
-}
-
-
-@keyframes shake {
-
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  25% {
-    transform: translateX(-5px);
-  }
-
-  75% {
-    transform: translateX(5px);
-  }
-}
-
-
-.invalid-feedback {
-  color: #e74c3c;
-  font-size: 13px;
-  margin-top: 5px;
-  animation: fadeIn 0.3s ease;
-}
-
-button.btn-primary {
-  background: linear-gradient(to right, #4a90e2, #007bff);
-  border: none;
-  padding: 14px;
-  font-size: 17px;
-  font-weight: 600;
-  color: white;
-  border-radius: 10px;
-  cursor: pointer;
-  width: 100%;
-  transition: all 0.3s ease;
-  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
-}
-
-button.btn-primary:hover {
-  background: linear-gradient(to right, #3c7ddf, #006fe6);
-  transform: scale(1.03);
-  box-shadow: 0 7px 20px rgba(0, 123, 255, 0.5);
-}
-
-button.btn-primary:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-
-.spinner-border {
-  vertical-align: middle;
-  margin-right: 8px;
-  /* Adjusted margin for better alignment within button */
-  display: inline-block;
-  /* Ensure it stays in line */
-  width: 1em;
-  /* Make spinner size relative to font size */
-  height: 1em;
-  border: 0.1em solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.75s linear infinite;
-  /* Faster spin */
-}
-
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-
-.alert {
-  margin-top: 20px;
-  padding: 15px;
+/* ── Student/Teacher: mark all read button ───────────────────────── */
+.nb-btn-mark-read {
+  padding: 8px 20px;
+  background: #e8f4f8;
+  color: #1f6f8b;
+  border: 2px solid #4fbdbd;
   border-radius: 8px;
-  font-size: 16px;
-  animation: fadeIn 0.3s ease, alertSlide 0.3s ease-out;
-  border: 1px solid transparent;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
 }
 
-@keyframes alertSlide {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
+.nb-btn-mark-read:hover { background: #d0eaf5; }
 
-  to {
-    transform: translateY(0);
-    opacity: 1;
+/* ── Student/Teacher: notifications list ────────────────────────── */
+.nb-user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.nb-user-item {
+  display: flex;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: box-shadow 0.15s;
+}
+
+.nb-user-item:hover { box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1); }
+
+.nb-user-item-bar {
+  width: 5px;
+  flex-shrink: 0;
+  background: #d0eaf5;
+}
+
+.nb-unread .nb-user-item-bar {
+  background: linear-gradient(to bottom, #1f6f8b, #4fbdbd);
+}
+
+.nb-user-item-body {
+  padding: 16px 18px;
+  flex: 1;
+}
+
+.nb-user-item-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.nb-user-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a3a47;
+}
+
+.nb-unread .nb-user-title { color: #1f6f8b; }
+
+.nb-user-date {
+  font-size: 0.75rem;
+  color: #aaa;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nb-user-message {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: #444;
+  line-height: 1.55;
+}
+
+.nb-unread-dot {
+  display: inline-block;
+  background: #1f6f8b;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* ── Tablet (≤ 900px) ────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .nb-admin-layout {
+    grid-template-columns: 1fr;
   }
 }
 
+/* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
+@media (max-width: 600px) {
 
-.alert-danger {
-  background-color: #fce4e4;
-  color: #c0392b;
-  border-color: #fcc2c3;
-}
-
-/* Specific styling for select dropdown arrow */
-select.form-control {
-  /* Custom arrow for select (SVG based) */
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%22292%22%20height%3D%22292%22%20viewBox%3D%220%200%20292%20292%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4l-14.2-14.3L146%20182.8%2019.2%2055.1%205%2069.4%20146%20210.6z%22/%3E%3C/svg%3E"),
-    linear-gradient(to bottom, #ffffff 0%, #f9f9f9 100%);
-  background-repeat: no-repeat, repeat;
-  background-position: right 0.7em top 50%, 0 0;
-  background-size: 1.2em auto, 100%;
-  padding-right: 2.5em;
-  /* Make space for the custom arrow */
-}
-
-select.form-control:hover {
-  border-color: #007bff;
-}
-
-
-/* Media Queries for Responsiveness */
-@media (max-width: 768px) {
-  .container {
-    padding: 20px 15px;
-    /* Slightly more padding on smaller screens */
+  /* Page */
+  .nb-page {
+    padding: 12px 10px 40px;
   }
 
-  h2 {
-    font-size: 24px;
-    margin-bottom: 25px;
+  /* Headers */
+  .nb-admin-header,
+  .nb-user-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 16px;
   }
 
-  .form-group {
-    margin-bottom: 20px;
-  }
+  .nb-page-title { font-size: 1.2rem; }
 
-  label {
-    font-size: 17px;
-    margin-bottom: 10px;
-  }
+  .nb-role-badge { font-size: 0.72rem; padding: 3px 10px; }
 
-  input.form-control,
-  textarea.form-control,
-  select.form-control {
-    padding: 10px;
-    font-size: 15px;
-    width: calc(100% - 20px);
-    /* Adjust for new padding */
-  }
-
-  select.form-control {
-    padding-right: 2em;
-    /* Adjust arrow space */
-    background-position: right 0.5em top 50%, 0 0;
-    background-size: 1em auto, 100%;
-  }
-
-  button.btn-primary {
-    font-size: 16px;
-    padding: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 15px 10px;
-    /* Further reduced padding for very small screens */
+  /* Cards */
+  .nb-compose-card,
+  .nb-list-card {
+    padding: 16px 14px;
     border-radius: 10px;
-    /* Slightly smaller border-radius */
   }
 
-  h2 {
-    font-size: 22px;
-    margin-bottom: 20px;
+  .nb-card-title {
+    font-size: 0.95rem;
+    margin-bottom: 14px;
   }
 
-  form.card {
-    padding: 20px;
+  /* Form inputs */
+  .nb-input,
+  .nb-select,
+  .nb-textarea {
+    font-size: 0.88rem;
+    padding: 9px 10px;
+  }
+
+  .nb-label { font-size: 0.75rem; }
+
+  /* Delivery mode — stack labels vertically on very small screens */
+  .nb-mode-group {
+    border-radius: 8px;
+  }
+
+  .nb-mode-btn {
+    font-size: 0.75rem;
+    padding: 10px 0;
+  }
+
+  /* Post button */
+  .nb-btn-post {
+    font-size: 0.92rem;
+    padding: 13px;
+  }
+
+  /* Posted notice items */
+  .nb-notice-list {
+    max-height: none;
+    gap: 12px;
+  }
+
+  .nb-notice-item {
+    padding: 12px 12px;
+  }
+
+  .nb-notice-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .nb-audience-tag { font-size: 0.68rem; }
+
+  .nb-notice-title { font-size: 0.9rem; }
+
+  .nb-notice-body {
+    font-size: 0.83rem;
+    -webkit-line-clamp: 4;
+  }
+
+  /* Edit / Delete buttons — full width on mobile */
+  .nb-notice-actions {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .nb-btn-edit,
+  .nb-btn-delete,
+  .nb-btn-save,
+  .nb-btn-cancel {
+    flex: 1;
+    text-align: center;
+    padding: 9px 0;
+    font-size: 0.8rem;
+  }
+
+  /* Inline edit form */
+  .nb-edit-actions {
+    gap: 8px;
+  }
+
+  /* Mark all read button */
+  .nb-btn-mark-read {
+    width: 100%;
+    text-align: center;
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+
+  /* User notification list */
+  .nb-user-list {
+    max-width: 100%;
+    gap: 10px;
+  }
+
+  .nb-user-item {
     border-radius: 10px;
   }
 
-  label {
-    font-size: 16px;
-    margin-bottom: 8px;
+  .nb-user-item-body {
+    padding: 13px 14px;
   }
 
-  input.form-control,
-  textarea.form-control,
-  select.form-control {
-    padding: 8px;
-    font-size: 14px;
-    width: calc(100% - 16px);
-    /* Adjust for new padding */
+  .nb-user-item-top {
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 6px;
   }
 
-  button.btn-primary {
-    padding: 10px;
-    font-size: 15px;
+  .nb-user-title { font-size: 0.95rem; }
+
+  .nb-user-date {
+    font-size: 0.7rem;
+    white-space: normal;
   }
 
-  .alert {
-    font-size: 14px;
-    padding: 12px;
+  .nb-user-message {
+    font-size: 0.85rem;
+    line-height: 1.5;
   }
+
+  .nb-unread-dot {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+  }
+
+  /* Empty states */
+  .nb-empty { padding: 24px 0; font-size: 0.85rem; }
+  .nb-empty-user { padding: 40px 0; font-size: 0.9rem; }
 }

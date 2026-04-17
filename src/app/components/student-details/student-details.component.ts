@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { StudentService } from '../../services/student.service';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth.service';
-import { FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Subject, takeUntil } from 'rxjs';
 import { Location } from '@angular/common';
@@ -39,15 +39,21 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
   role: string = '';
   isEditing: boolean = false;
   updatedDetails: StudentDetails | null = null;
-  changePasswordForm: FormGroup;
   private ngUnsubscribe = new Subject<void>();
-  showOldPassword = false;
-  showNewPassword = false;
-  showConfirmNewPassword = false;
   effectiveFromMonth: number | null = null;
 
   // Track validation errors for CSS classes
   validationErrors: { [key: string]: boolean } = {};
+
+  // Change-password modal state
+  showPasswordModal = false;
+  cpOldPw = '';
+  cpNewPw = '';
+  cpConfirmPw = '';
+  cpShowOld = false;
+  cpShowNew = false;
+  cpShowConfirm = false;
+  cpShowOldField = false;
 
   academicMonths = [
     { value: 0, label: 'New Academic Year' },
@@ -56,8 +62,6 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     { value: 7, label: 'October' }, { value: 8, label: 'November' }, { value: 9, label: 'December' },
     { value: 10, label: 'January' }, { value: 11, label: 'February' }, { value: 12, label: 'March' }
   ];
-  private readonly eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
-  private readonly eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off"><path d="M17.94 17.94A10.01 10.01 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M15 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/><path d="M3 3l18 18"/></svg>`;
   classList: string[] = [
     'Play group', 'Nursery', 'LKG', 'UKG',
     '1', '2', '3', '4', '5', '6', '7',
@@ -69,18 +73,9 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     public router: Router,
     private studentService: StudentService,
     private authService: AuthService,
-    private fb: FormBuilder,
     private location: Location,
     private logger: LoggerService
-  ) {
-    this.changePasswordForm = this.fb.group({
-      oldPassword: [''],
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
-      confirmNewPassword: ['', Validators.required]
-    }, {
-      validators: this.passwordMatchValidator
-    });
-  }
+  ) { }
 
   ngOnInit(): void {
     this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params) => {
@@ -319,124 +314,49 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/dashboard/fees', this.studentId]);
   }
 
-  changePassword(): void {
-    const showOldPassword = (this.role !== 'ADMIN');
+  openPasswordModal(): void {
+    this.cpOldPw = '';
+    this.cpNewPw = '';
+    this.cpConfirmPw = '';
+    this.cpShowOld = false;
+    this.cpShowNew = false;
+    this.cpShowConfirm = false;
+    this.cpShowOldField = (this.role !== 'ADMIN');
+    this.showPasswordModal = true;
+  }
 
-    this.showOldPassword = false;
-    this.showNewPassword = false;
-    this.showConfirmNewPassword = false;
+  closePasswordModal(): void {
+    this.showPasswordModal = false;
+  }
 
-    Swal.fire({
-      title: 'Change Password',
-      html:
-        `<div class="change-password-form">
-          ${showOldPassword ? `<input id="oldPassword" type="password" class="swal2-input" placeholder="Current Password">
-          <span id="showOldPassword" class="password-toggle"><span style="display:none">${this.eyeIcon}</span><span>${this.eyeOffIcon}</span></span><br>` : ''}
-          <input id="newPassword" type="password" class="swal2-input" placeholder="New Password">
-          <span id="showNewPassword" class="password-toggle"><span style="display:none">${this.eyeIcon}</span><span>${this.eyeOffIcon}</span></span><br>
-          <input id="confirmNewPassword" type="password" class="swal2-input" placeholder="Confirm New Password">
-          <span id="showConfirmNewPassword" class="password-toggle"><span style="display:none">${this.eyeIcon}</span><span>${this.eyeOffIcon}</span></span>
-        </div>`,
-      focusConfirm: false,
-      preConfirm: () => {
-        const oldPassword = showOldPassword ? (document.getElementById('oldPassword') as HTMLInputElement).value : '';
-        const newPassword = (document.getElementById('newPassword') as HTMLInputElement).value;
-        const confirmNewPassword = (document.getElementById('confirmNewPassword') as HTMLInputElement).value;
-        return { oldPassword, newPassword, confirmNewPassword };
+  submitPasswordChange(): void {
+    if (this.cpShowOldField && !this.cpOldPw) {
+      Swal.fire('Error', 'Current password is required', 'error');
+      return;
+    }
+    if (!this.cpNewPw || !this.cpConfirmPw) {
+      Swal.fire('Error', 'New password and confirmation are required', 'error');
+      return;
+    }
+    if (this.cpNewPw.length < 6) {
+      Swal.fire('Error', 'New password must be at least 6 characters', 'error');
+      return;
+    }
+    if (this.cpNewPw !== this.cpConfirmPw) {
+      Swal.fire('Error', 'New passwords do not match', 'error');
+      return;
+    }
+    const payload = { userId: this.studentId, oldPassword: this.cpOldPw, newPassword: this.cpNewPw };
+    this.authService.changePassword(payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: () => {
+        this.closePasswordModal();
+        Swal.fire('Success', 'Password changed successfully!', 'success');
       },
-      showCancelButton: true,
-      confirmButtonText: 'Change Password',
-      cancelButtonText: 'Cancel',
-      customClass: {
-        input: 'change-password-input',
-      },
-      didRender: () => {
-        if (showOldPassword) {
-          const showOldPasswordSpan = document.getElementById('showOldPassword');
-          if (showOldPasswordSpan) {
-            showOldPasswordSpan.addEventListener('click', () => {
-              this.showOldPassword = !this.showOldPassword;
-              (document.getElementById('oldPassword') as HTMLInputElement).type = this.showOldPassword ? 'text' : 'password';
-              this.toggleEyeIcon(showOldPasswordSpan, this.showOldPassword);
-            });
-          }
-        }
-
-        const showNewPasswordSpan = document.getElementById('showNewPassword');
-        if (showNewPasswordSpan) {
-          showNewPasswordSpan.addEventListener('click', () => {
-            this.showNewPassword = !this.showNewPassword;
-            (document.getElementById('newPassword') as HTMLInputElement).type = this.showNewPassword ? 'text' : 'password';
-            this.toggleEyeIcon(showNewPasswordSpan, this.showNewPassword);
-          });
-        }
-
-        const showConfirmNewPasswordSpan = document.getElementById('showConfirmNewPassword');
-        if (showConfirmNewPasswordSpan) {
-          showConfirmNewPasswordSpan.addEventListener('click', () => {
-            this.showConfirmNewPassword = !this.showConfirmNewPassword;
-            (document.getElementById('confirmNewPassword') as HTMLInputElement).type = this.showConfirmNewPassword ? 'text' : 'password';
-            this.toggleEyeIcon(showConfirmNewPasswordSpan, this.showConfirmNewPassword);
-          });
-        }
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const { oldPassword, newPassword, confirmNewPassword } = result.value as any;
-
-        if (newPassword.length < 6) {
-          Swal.fire('Error', 'New password must be at least 6 characters', 'error');
-          return;
-        }
-
-        if (showOldPassword && !oldPassword) {
-          Swal.fire('Error', 'Current Password is required', 'error');
-          return;
-        }
-
-        if (!newPassword || !confirmNewPassword) {
-          Swal.fire('Error', 'New Password and Confirm New Password are required', 'error');
-          return;
-        }
-
-        if (newPassword !== confirmNewPassword) {
-          Swal.fire('Error', 'New passwords do not match', 'error');
-          return;
-        }
-
-        const payload = {
-          userId: this.studentId,
-          oldPassword: oldPassword,
-          newPassword: newPassword
-        };
-
-        this.authService.changePassword(payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
-          next: (response) => {
-            Swal.fire('Success', 'Password changed successfully!', 'success');
-          },
-          error: (error) => {
-            this.logger.error('Error changing password', error);
-            Swal.fire('Error', error.error || 'Failed to change password', 'error');
-          }
-        });
+      error: (error) => {
+        this.logger.error('Error changing password', error);
+        Swal.fire('Error', error.error || 'Failed to change password', 'error');
       }
     });
-  }
-
-  passwordMatchValidator(formGroup: FormGroup) {
-    const newPassword = formGroup.get('newPassword')?.value;
-    const confirmNewPassword = formGroup.get('confirmNewPassword')?.value;
-
-    if (newPassword === confirmNewPassword) {
-      return null;
-    } else {
-      return { passwordMismatch: true };
-    }
-  }
-
-  private toggleEyeIcon(span: HTMLElement, showing: boolean): void {
-    (span.children[0] as HTMLElement).style.display = showing ? '' : 'none';
-    (span.children[1] as HTMLElement).style.display = showing ? 'none' : '';
   }
 
   goBack(): void {

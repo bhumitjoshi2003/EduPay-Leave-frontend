@@ -34,8 +34,15 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
   isEditing: boolean = false;
   isNewAdmin: boolean = false;
 
-  private readonly eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
-  private readonly eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.01 10.01 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M15 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/><path d="M3 3l18 18"/></svg>`;
+  // Change-password modal state
+  showPasswordModal = false;
+  cpOldPw = '';
+  cpNewPw = '';
+  cpConfirmPw = '';
+  cpShowOld = false;
+  cpShowNew = false;
+  cpShowConfirm = false;
+  cpShowOldField = false;
 
   private ngUnsubscribe = new Subject<void>();
 
@@ -137,83 +144,51 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  changePassword(): void {
-    const isOwnAccount = (this.loggedInUserId === this.adminId);
-    const isSuperAdminResettingOther = (this.loggedInUserRole === 'SUPER_ADMIN' && !isOwnAccount);
+  openPasswordModal(): void {
+    this.cpOldPw = '';
+    this.cpNewPw = '';
+    this.cpConfirmPw = '';
+    this.cpShowOld = false;
+    this.cpShowNew = false;
+    this.cpShowConfirm = false;
+    this.cpShowOldField = (this.loggedInUserId === this.adminId);
+    this.showPasswordModal = true;
+  }
 
-    const showOldPasswordField = isOwnAccount;
+  closePasswordModal(): void {
+    this.showPasswordModal = false;
+  }
 
-    Swal.fire({
-      title: isOwnAccount ? 'Change Your Password' : 'Reset Admin Password',
-      html: `
-        <div class="swal-password-container">
-          ${showOldPasswordField ? `
-            <div class="pw-wrapper">
-              <input id="oldPw" type="password" class="swal2-input" placeholder="Current Password">
-              <span id="toggleOld" class="pw-toggle"><span style="display:none">${this.eyeIcon}</span><span>${this.eyeOffIcon}</span></span>
-            </div>` : ''}
-          <div class="pw-wrapper">
-            <input id="newPw" type="password" class="swal2-input" placeholder="New Password">
-            <span id="toggleNew" class="pw-toggle"><span style="display:none">${this.eyeIcon}</span><span>${this.eyeOffIcon}</span></span>
-          </div>
-          <div class="pw-wrapper">
-            <input id="confirmPw" type="password" class="swal2-input" placeholder="Confirm New Password">
-            <span id="toggleConfirm" class="pw-toggle"><span style="display:none">${this.eyeIcon}</span><span>${this.eyeOffIcon}</span></span>
-          </div>
-        </div>`,
-      showCancelButton: true,
-      confirmButtonText: 'Update Password',
-      preConfirm: () => {
-        const oldP = showOldPasswordField ? (document.getElementById('oldPw') as HTMLInputElement).value : '';
-        const newP = (document.getElementById('newPw') as HTMLInputElement).value;
-        const confP = (document.getElementById('confirmPw') as HTMLInputElement).value;
-        return { oldP, newP, confP };
+  submitPasswordChange(): void {
+    if (this.cpShowOldField && !this.cpOldPw) {
+      Swal.fire('Error', 'Current password is required to verify identity.', 'error');
+      return;
+    }
+    if (!this.cpNewPw || !this.cpConfirmPw) {
+      Swal.fire('Error', 'New password and confirmation are required.', 'error');
+      return;
+    }
+    if (this.cpNewPw.length < 6) {
+      Swal.fire('Error', 'New password must be at least 6 characters.', 'error');
+      return;
+    }
+    if (this.cpNewPw !== this.cpConfirmPw) {
+      Swal.fire('Error', 'New passwords do not match.', 'error');
+      return;
+    }
+    const isSuperAdminResettingOther = (this.loggedInUserRole === 'SUPER_ADMIN' && this.loggedInUserId !== this.adminId);
+    const payload = {
+      userId: this.adminId,
+      oldPassword: this.cpOldPw,
+      newPassword: this.cpNewPw,
+      isAdministrativeReset: isSuperAdminResettingOther
+    };
+    this.authService.changePassword(payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: () => {
+        this.closePasswordModal();
+        Swal.fire('Success', 'Password updated successfully', 'success');
       },
-      didRender: () => {
-        const setup = (btnId: string, inputId: string) => {
-          const btn = document.getElementById(btnId);
-          if (!btn) return;
-          btn.addEventListener('click', () => {
-            const input = document.getElementById(inputId) as HTMLInputElement;
-            const isShowing = input.type === 'text';
-            input.type = isShowing ? 'password' : 'text';
-            (btn.children[0] as HTMLElement).style.display = isShowing ? 'none' : '';
-            (btn.children[1] as HTMLElement).style.display = isShowing ? '' : 'none';
-          });
-        };
-        if (showOldPasswordField) setup('toggleOld', 'oldPw');
-        setup('toggleNew', 'newPw');
-        setup('toggleConfirm', 'confirmPw');
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const { oldP, newP, confP } = result.value as any;
-
-        if (showOldPasswordField && !oldP) {
-          Swal.fire('Error', 'Current password is required to verify identity.', 'error');
-          return;
-        }
-        if (newP.length < 6) {
-          Swal.fire('Error', 'New password must be at least 6 characters.', 'error');
-          return;
-        }
-        if (newP !== confP) {
-          Swal.fire('Error', 'New passwords do not match.', 'error');
-          return;
-        }
-
-        const payload = {
-          userId: this.adminId,
-          oldPassword: oldP,
-          newPassword: newP,
-          isAdministrativeReset: isSuperAdminResettingOther
-        };
-
-        this.authService.changePassword(payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
-          next: () => Swal.fire('Success', 'Password updated successfully', 'success'),
-          error: (err) => Swal.fire('Error', err.error || 'Failed to update password', 'error')
-        });
-      }
+      error: (err) => Swal.fire('Error', err.error || 'Failed to update password', 'error')
     });
   }
 

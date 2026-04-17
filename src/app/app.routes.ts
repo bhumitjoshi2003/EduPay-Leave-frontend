@@ -157,7 +157,7 @@ export const routes: Routes = [
       },
       {
         path: 'fee-structure', component: FeeStructureComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUPER_ADMIN'] }
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'ADMIN', 'SUPER_ADMIN'] }
       },
       {
         path: 'bus-fees', component: BusFeesComponent,

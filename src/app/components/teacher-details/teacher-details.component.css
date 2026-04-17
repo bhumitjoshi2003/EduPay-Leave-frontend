@@ -345,3 +345,121 @@ input.ng-invalid.ng-touched {
   margin-top: 10px;
   color: #545454;
 }
+
+/* ── Change Password Modal ─────────────────────────────────────────── */
+.cp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.cp-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px 28px 24px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cp-title {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #222;
+  text-align: center;
+  border-bottom: 3px solid #3498db;
+  padding-bottom: 12px;
+}
+
+.cp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cp-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.cp-input-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.cp-input-wrap:focus-within {
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}
+
+.cp-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  background: transparent;
+}
+
+.cp-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 10px;
+  color: #888;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.cp-toggle:hover { color: #3498db; }
+
+.cp-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.cp-btn-cancel,
+.cp-btn-submit {
+  flex: 1;
+  padding: 11px 0;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.cp-btn-cancel {
+  background: #f0f0f0;
+  color: #555;
+}
+
+.cp-btn-cancel:hover { background: #e0e0e0; }
+
+.cp-btn-submit {
+  background: linear-gradient(135deg, #3498db, #1abc9c);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.cp-btn-submit:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}

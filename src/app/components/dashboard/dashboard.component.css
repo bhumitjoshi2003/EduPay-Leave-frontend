@@ -99,235 +99,207 @@
     }
 }
 
-.profile-area {
+/* ── Header controls (bell + profile pill) ───────────────────────── */
+.hdr-controls {
     position: absolute;
-    top: 10px;
+    top: 8px;
     right: 20px;
+    transform: none;
     display: flex;
     align-items: center;
+    gap: 8px;
     z-index: 10;
+}
+
+/* ── Bell button ─────────────────────────────────────────────────── */
+.hdr-bell {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #1f6f8b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+}
+
+.hdr-bell:hover {
+    background: rgba(31, 111, 139, 0.1);
+}
+
+.hdr-bell mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+}
+
+/* ── Profile pill ────────────────────────────────────────────────── */
+.hdr-profile-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px 4px 4px;
+    background: #fff;
+    border: 1.5px solid #d0e8f0;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    font-family: inherit;
+    white-space: nowrap;
+    max-width: 220px;
+}
+
+.hdr-profile-pill:hover {
+    background: #f0f9fc;
+    border-color: #4fbdbd;
+    box-shadow: 0 2px 10px rgba(31, 111, 139, 0.15);
+}
+
+.hdr-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1f6f8b, #4fbdbd);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+}
+
+.hdr-pill-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1a3a47;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hdr-chevron {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    color: #1f6f8b;
+    flex-shrink: 0;
+}
+
+/* ── Profile dropdown menu ───────────────────────────────────────── */
+.hdr-menu-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px 14px;
+    cursor: default;
+}
+
+.hdr-menu-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1f6f8b, #4fbdbd);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+}
+
+.hdr-menu-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.hdr-menu-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1a3a47;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hdr-menu-role {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #1f6f8b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hdr-menu-id {
+    font-size: 0.72rem;
+    color: #999;
+}
+
+.hdr-menu-class {
+    font-size: 0.72rem;
+    color: #4fbdbd;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.hdr-menu-divider {
+    height: 1px;
+    background: #eef3f6;
+    margin: 0 12px 4px;
+}
+
+.hdr-menu-item {
+    font-size: 0.88rem !important;
+    color: #333 !important;
+    font-weight: 500 !important;
+    padding: 10px 18px !important;
+    display: flex;
+    align-items: center;
     gap: 10px;
 }
 
-/* ── Notification bell ───────────────────────────────────────────── */
-.nb-bell-btn {
-    background: linear-gradient(135deg, #1f6f8b, #4fbdbd);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    padding: 6px;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-}
-
-.nb-bell-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-.nb-bell-btn mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-}
-
-.profile-area button {
-    background: linear-gradient(135deg, #6ab545, #b5d54b);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    padding: 6px;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.profile-area button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-.profile-area button mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-}
-
-.profile-details {
-    padding: 12px 16px;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-    width: 200px;
-    /* Increased width for desktop */
-    font-family: 'Segoe UI', sans-serif;
-    color: #2c3e50;
-    /* Base text color for profile details */
-    display: flex;
-    flex-direction: column;
-    animation: slideUp 0.3s ease-in-out;
-    border: none;
-}
-
-.profile-overview {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    padding-bottom: 8px;
-}
-
-.user-initials {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background-color: #e8f0fe;
-    color: #1a73e8;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    font-size: 18px;
-    margin-right: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.user-main-info {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    /* Ensure default text color for all child elements if not explicitly set */
-    color: #555;
-    font-size: 12px;
-}
-
-/* NEW: Styles for the new structure for ID, Role, Class Teacher */
-.profile-detail-row {
-    display: flex;
-    /* Aligns label, colon, and value horizontally */
-    align-items: baseline;
-    /* Aligns content based on text baseline for better vertical alignment */
-    margin-bottom: 2px;
-    /* Small space between rows */
-    white-space: nowrap;
-    /* Prevents text from wrapping if too long */
-    overflow: hidden;
-    /* Hides content that overflows */
-    text-overflow: ellipsis;
-    /* Adds "..." if content overflows */
-}
-
-.detail-label {
-    min-width: 60px;
-    /* Adjust this value as needed to align your text perfectly */
-    text-align: left;
-    /* Aligns label text to the left within its allocated width */
-    font-weight: bold;
-    /* Keeps the label text bold */
-    font-size: inherit;
-    /* Inherit from .user-main-info */
-    color: inherit;
-    /* Inherit from .user-main-info */
-}
-
-.detail-colon {
-    margin-right: 5px;
-    /* Adds space after the colon */
-    font-weight: bold;
-    /* Keeps the colon bold */
-    font-size: inherit;
-    /* Inherit from .user-main-info */
-    color: inherit;
-    /* Inherit from .user-main-info */
-}
-
-.detail-value {
-    flex-grow: 1;
-    font-weight: bold;
-    text-transform: capitalize;
-    font-size: inherit;
-    color: inherit;
-}
-
-.profile-separator {
-    border: none;
-    border-top: 1px solid #e0e0e0;
-    margin: 10px 0;
-}
-
-.profile-details button {
-    margin-top: 8px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.4s ease, color 0.4s ease, transform 0.3s ease;
-    padding: 6px 10px;
-    border: 1px solid;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-}
-
-.profile-details button .button-icon {
-    margin-right: 8px;
+.hdr-menu-item mat-icon {
+    color: #666;
     font-size: 18px;
     width: 18px;
     height: 18px;
-    color: inherit;
 }
 
-.profile-details button.profile-btn {
-    background-color: transparent;
-    color: #42a247;
-    font-weight: bold;
-    border-color: #4a9a4e;
+.hdr-menu-item:hover {
+    background: #f0f9fc !important;
 }
 
-.profile-details button.profile-btn:hover {
-    background-color: #45bc4b;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-    transform: translateY(-1px);
+.hdr-menu-logout {
+    color: #c0392b !important;
+    margin-bottom: 4px;
 }
 
-.profile-details button.logout-btn {
-    margin-top: 8px;
-    background-color: transparent;
-    font-weight: bold;
-    color: #e53935;
-    border: 1px solid #e53935;
+.hdr-menu-logout mat-icon {
+    color: #c0392b;
 }
 
-.profile-details button.logout-btn:hover {
-    background-color: #e53935;
-    color: white;
-    border-color: #c62828;
-    transform: translateY(-1px);
+.hdr-menu-logout:hover {
+    background: #fdf0ef !important;
 }
 
-@keyframes slideUp {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Override Material menu panel width */
+::ng-deep .hdr-profile-menu .mat-mdc-menu-panel,
+::ng-deep .hdr-profile-menu .mat-menu-panel {
+    min-width: 240px !important;
+    max-width: 280px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.14) !important;
+    overflow: hidden;
+    border: 1px solid #e8f0f5 !important;
 }
 
 ::ng-deep .welcome-snackbar {
@@ -355,6 +327,7 @@
 }
 
 
+/* ── Tablet (≤ 1023px) — controls stay top-right, logo gets right padding ── */
 @media (max-width: 1023px) {
     .header-area {
         padding: 10px 15px;
@@ -370,8 +343,8 @@
     }
 
     .logo {
-        width: 90%;
-        max-width: 380px;
+        width: 100%;
+        max-width: 340px;
         height: auto;
     }
 
@@ -386,184 +359,122 @@
         margin-top: 10px;
     }
 
-    .custom-tab-nav::-webkit-scrollbar {
-        height: 5px;
-    }
-
+    .custom-tab-nav::-webkit-scrollbar { height: 5px; }
     .custom-tab-nav::-webkit-scrollbar-thumb {
         background-color: rgba(0, 0, 0, 0.4);
-        /* Made scrollbar thumb slightly more visible */
         border-radius: 10px;
     }
-
-    .custom-tab-nav::-webkit-scrollbar-track {
-        background-color: transparent;
-    }
+    .custom-tab-nav::-webkit-scrollbar-track { background-color: transparent; }
 
     .custom-tab-nav a {
         font-size: 14px;
         padding: 3px 10px;
-        /* Decreased vertical padding for tablet */
         min-width: unset;
     }
 
-    .profile-area {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        order: 2;
+    /* Controls stay absolute top-right */
+    .hdr-controls {
+        top: 12px;
+        right: 14px;
+        transform: none;
+        gap: 6px;
     }
 
-    .profile-area button,
-    .nb-bell-btn {
-        width: 28px;
-        height: 28px;
-        padding: 5px;
+    /* Hide name text on tablet */
+    .hdr-pill-name { display: none; }
+
+    .hdr-profile-pill {
+        padding: 4px 8px 4px 4px;
+        gap: 4px;
+        max-width: unset;
     }
 
-    .profile-area button mat-icon,
-    .nb-bell-btn mat-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-    }
+    .hdr-bell { width: 36px; height: 36px; }
+    .hdr-bell mat-icon { font-size: 20px; width: 20px; height: 20px; }
 
-    .content-area {
-        padding: 20px;
-    }
-
-    .profile-details {
-        width: 180px;
-        /* Increased width for tablet */
-    }
-
-    /* NEW: Adjust font sizes for new classes in media queries */
-    .profile-detail-row {
-        margin-bottom: 1px;
-    }
-
-    .detail-label,
-    .detail-colon,
-    .detail-value {
-        font-size: 12px;
-        /* Adjust font size for tablet */
-    }
-
-    .detail-label {
-        min-width: 55px;
-        /* Adjust min-width for tablet */
-    }
-
-    .detail-colon {
-        margin-right: 3px;
-    }
-
+    .content-area { padding: 20px; }
 }
 
-@media (max-width: 767px) {
+/* ── Mobile (≤ 600px) — logo + controls on one row, tabs below ───── */
+@media (max-width: 600px) {
     .header-area {
-        padding: 10px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto auto;
+        grid-template-areas:
+            "logo  controls"
+            "nav   nav";
+        align-items: center;
+        padding: 10px 12px 6px;
+        gap: 8px 10px;
+        /* override tablet column flex */
+        flex-direction: unset;
+    }
+
+    .logo-container {
+        grid-area: logo;
+        order: unset;
+        margin-bottom: 0;
+        padding-right: 0;       /* no longer needed — grid handles layout */
+        width: auto;
+        justify-content: flex-start;
     }
 
     .logo {
-        width: 95%;
-        max-width: 300px;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
     }
 
     .custom-tab-nav {
+        grid-area: nav;
+        order: unset;
+        margin-top: 0;
         gap: 5px;
-        justify-content: flex-start;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 5px;
     }
 
     .custom-tab-nav a {
         font-size: 12px;
         padding: 2px 8px;
-        /* Decreased vertical padding for mobile */
     }
 
-    .profile-area {
-        top: 5px;
-        right: 5px;
-        margin-right: 20px;
+    /* Controls flow in the grid — no longer absolutely positioned */
+    .hdr-controls {
+        grid-area: controls;
+        position: static;
+        top: unset;
+        right: unset;
+        transform: none;
+        gap: 4px;
+        justify-self: end;
+        align-self: center;
     }
 
-    .profile-area button {
-        margin: 2px -2px;
-        width: 28px;
-        height: 28px;
-        padding: 4px;
+    .hdr-pill-name { display: none; }
+
+    .hdr-profile-pill {
+        padding: 3px 7px 3px 3px;
+        gap: 4px;
     }
 
-    .profile-area button mat-icon {
-        font-size: 17x;
-        width: 17px;
-        height: 17px;
-    }
-
-    .content-area {
-        padding: 10px;
-    }
-
-    .profile-details {
-        width: 140px;
-        /* Increased width for mobile */
+    .hdr-avatar {
+        width: 30px;
+        height: 30px;
         font-size: 13px;
-        /* Base font size for profile details */
-        padding: 10px 12px;
     }
 
-    /* NEW: Adjust font sizes for new classes in mobile media query */
-    .profile-detail-row {
-        margin-bottom: 0px;
-        /* Less space between rows on mobile */
+    .hdr-chevron {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
     }
 
-    .detail-label,
-    .detail-colon,
-    .detail-value {
-        font-size: 11px;
-        /* Adjust font size for mobile */
-    }
+    .hdr-bell { width: 36px; height: 36px; }
+    .hdr-bell mat-icon { font-size: 20px; width: 20px; height: 20px; }
 
-    .detail-label {
-        min-width: 35px;
-        /* Adjust min-width for mobile */
-    }
-
-    .detail-colon {
-        margin-right: 5px;
-    }
-
-    /* REMOVED: Old .profile-row */
-
-    .profile-details button {
-        margin-top: 3px;
-        font-size: 11px;
-        padding: 4px 8px;
-        border: 1px solid;
-        width: 90%;
-    }
-
-    .profile-details button .button-icon {
-        font-size: 14px;
-        width: 14px;
-        height: 14px;
-        margin-right: 6px;
-    }
-
-    .profile-overview {
-        margin-bottom: 8px;
-        padding-bottom: 6px;
-    }
-
-    .user-initials {
-        width: 38px;
-        height: 38px;
-        font-size: 16px;
-        margin-right: 10px;
-    }
-
-    .profile-separator {
-        margin: 8px 0;
-    }
+    .content-area { padding: 10px; }
 }

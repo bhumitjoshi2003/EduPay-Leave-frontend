@@ -53,49 +53,52 @@
         #rla11="routerLinkActive" [active]="rla11.isActive">Payment History</a>
     </nav>
 
-    <div class="profile-area">
+    <div class="hdr-controls">
 
       <!-- Notification bell -->
-      <button class="nb-bell-btn" (click)="navigateToNoticeBoard()" title="Notice Board"
-        [matBadge]="unreadNotificationCount > 0 ? unreadNotificationCount : null"
+      <button class="hdr-bell" (click)="navigateToNoticeBoard()" title="Notice Board"
+        [matBadge]="unreadNotificationCount"
+        [matBadgeHidden]="unreadNotificationCount === 0"
         matBadgeColor="warn" matBadgeSize="small">
-        <mat-icon>notifications</mat-icon>
+        <mat-icon>notifications_none</mat-icon>
       </button>
 
-      <button mat-icon-button [matMenuTriggerFor]="profileMenu">
-        <mat-icon>account_circle</mat-icon>
+      <!-- Profile pill -->
+      <button class="hdr-profile-pill" [matMenuTriggerFor]="profileMenu">
+        <div class="hdr-avatar">{{ (Name || Role).charAt(0).toUpperCase() }}</div>
+        <span class="hdr-pill-name">{{ Name || Role }}</span>
+        <mat-icon class="hdr-chevron">expand_more</mat-icon>
       </button>
-      <mat-menu #profileMenu="matMenu" class="custom-profile-menu">
-        <div class="profile-details">
-          <div class="profile-overview">
-            <div class="user-initials">
-              {{ (Role ? Role.charAt(0) : '') }}
-            </div>
-            <div class="user-main-info">
-              <div class="profile-detail-row">
-                <span class="detail-label">ID</span><span class="detail-colon">:</span> <span class="detail-value">{{ Id
-                  }}</span>
-              </div>
-              <div class="profile-detail-row">
-                <span class="detail-label">Role</span><span class="detail-colon">:</span> <span class="detail-value">{{
-                  Role }}</span>
-              </div>
-              <div class="profile-detail-row" *ngIf="isTeacher() && ClassTeacher">
-                <span class="detail-label">Class Teacher</span><span class="detail-colon">:</span> <span
-                  class="detail-value">{{ ClassTeacher }}</span>
-              </div>
+
+      <mat-menu #profileMenu="matMenu" xPosition="before" class="hdr-profile-menu">
+
+        <!-- Menu header — not a menu item, click won't close -->
+        <div class="hdr-menu-header" (click)="$event.stopPropagation()">
+          <div class="hdr-menu-avatar">{{ (Name || Role).charAt(0).toUpperCase() }}</div>
+          <div class="hdr-menu-info">
+            <div class="hdr-menu-name">{{ Name || '—' }}</div>
+            <div class="hdr-menu-role">{{ Role }}</div>
+            <div class="hdr-menu-id">ID: {{ Id }}</div>
+            <div class="hdr-menu-class" *ngIf="isTeacher() && ClassTeacher">
+              Class Teacher · {{ ClassTeacher }}
             </div>
           </div>
-
-          <hr class="profile-separator" />
-          <button *ngIf="isStudent() || isTeacher() || isAdmin()" mat-menu-item (click)="navigateToMyProfile()"
-            class="profile-btn">
-            <mat-icon class="button-icon">person</mat-icon> My Profile
-          </button>
-          <button mat-menu-item class="logout-button" (click)="logout()" class="logout-btn">
-            <mat-icon class="button-icon">logout</mat-icon> Logout
-          </button>
         </div>
+
+        <div class="hdr-menu-divider"></div>
+
+        <button mat-menu-item class="hdr-menu-item"
+          *ngIf="isStudent() || isTeacher() || isAdmin()"
+          (click)="navigateToMyProfile()">
+          <mat-icon>person_outline</mat-icon>
+          <span>My Profile</span>
+        </button>
+
+        <button mat-menu-item class="hdr-menu-item hdr-menu-logout" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Sign Out</span>
+        </button>
+
       </mat-menu>
     </div>
   </div>

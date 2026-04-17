@@ -16,6 +16,8 @@ import { NotificationService } from '../../services/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { WelcomeDialogComponent } from '../welcome-dialog/welcome-dialog.component';
 import { Subject, takeUntil, interval, Subscription } from 'rxjs';
+import { NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard',
@@ -65,7 +67,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.getDetails();
     this.handleInitialNavigation();
     this.fetchUnreadCount();
-    // Poll unread count every 60 seconds
+    // Re-fetch on every navigation (catches mark-all-read from notice board)
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd),
+      takeUntil(this.ngUnsubscribe)
+    ).subscribe(() => this.fetchUnreadCount());
+    // Also poll every 60 seconds as a background fallback
     this.pollingIntervalSubscription = interval(60000)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => this.fetchUnreadCount());

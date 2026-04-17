@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RegisterStudentComponent } from '../register-student/register-student.component'; 
@@ -9,7 +9,8 @@ import { RegisterTeacherComponent } from '../register-teacher/register-teacher.c
   selector: 'app-register',
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RegisterStudentComponent, RegisterTeacherComponent],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.css'
+  styleUrl: './register.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterComponent implements OnInit {
   showStudentForm: boolean = true;

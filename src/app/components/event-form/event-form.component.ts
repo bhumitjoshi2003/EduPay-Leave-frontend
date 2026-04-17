@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, AbstractControl, FormArray } from '@angular/forms';
 import { EventService } from '../../services/event.service';
@@ -40,6 +40,7 @@ export const dateRangeValidator: ValidatorFn = (control: AbstractControl): { [ke
   selector: 'app-event-form',
   templateUrl: './event-form.component.html',
   styleUrls: ['./event-form.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -74,7 +75,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
     private eventService: EventService,
     private router: Router,
     private route: ActivatedRoute,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) {
     this.eventForm = this.fb.group({
       title: ['', Validators.required],
@@ -152,6 +154,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
         if (this.fileInput) {
           this.fileInput.nativeElement.value = '';
         }
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.logger.error('Error loading event for edit:', err);
@@ -181,7 +184,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
       // Generate preview for the newly selected image
       const reader = new FileReader();
-      reader.onload = e => this.imagePreviewUrl = reader.result;
+      reader.onload = e => { this.imagePreviewUrl = reader.result; this.cdr.markForCheck(); };
       reader.readAsDataURL(this.selectedFile);
 
       // CRITICAL: When a new file is selected, nullify the imageUrl in the form control.

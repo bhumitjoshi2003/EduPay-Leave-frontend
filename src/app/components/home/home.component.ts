@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -21,7 +21,8 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatSnackBarModule, FormsModule, MatIconModule, CommonModule],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrl: './home.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit {
   authenticated = false;
@@ -36,7 +37,8 @@ export class HomeComponent implements OnInit {
     private authStateService: AuthStateService,
     private snackBar: MatSnackBar,
     private router: Router,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -73,6 +75,7 @@ export class HomeComponent implements OnInit {
         this.authenticated = true;
         this.showLoginForm = false;
         this.loginState = 'initial';
+        this.cdr.markForCheck();
 
         const redirectUrl = localStorage.getItem('redirectUrl') || '/dashboard';
         localStorage.removeItem('redirectUrl');
@@ -92,8 +95,8 @@ export class HomeComponent implements OnInit {
 
   logout() {
     this.authService.logout().subscribe({
-      next: () => { this.authenticated = false; },
-      error: () => { this.authenticated = false; }
+      next: () => { this.authenticated = false; this.cdr.markForCheck(); },
+      error: () => { this.authenticated = false; this.cdr.markForCheck(); }
     });
   }
 

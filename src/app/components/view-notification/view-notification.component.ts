@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -15,7 +15,8 @@ import { Subject, takeUntil } from 'rxjs';
   ],
   providers: [DatePipe],
   templateUrl: './view-notification.component.html',
-  styleUrls: ['./view-notification.component.css']
+  styleUrls: ['./view-notification.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ViewNotificationComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -26,7 +27,8 @@ export class ViewNotificationComponent implements OnInit, OnDestroy {
   constructor(
     private notificationService: NotificationService,
     private datePipe: DatePipe,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnDestroy(): void {
@@ -44,11 +46,13 @@ export class ViewNotificationComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.userNotifications = data;
         this.isLoading = false;
+        this.cdr.markForCheck();
 
         if (this.userNotifications.some(n => !n.isRead)) {
           this.notificationService.markAllNotificationsAsRead().subscribe({
             next: () => {
               this.userNotifications.forEach(n => n.isRead = true);
+              this.cdr.markForCheck();
             },
             error: (err) => {
               this.logger.error('Mark read error:', err);
@@ -59,6 +63,7 @@ export class ViewNotificationComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.logger.error('Fetch error:', err);
         this.isLoading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -67,6 +72,7 @@ export class ViewNotificationComponent implements OnInit, OnDestroy {
     this.notificationService.markAllNotificationsAsRead().subscribe({
       next: () => {
         this.userNotifications.forEach(n => n.isRead = true);
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.logger.error('Mark all read error:', err);

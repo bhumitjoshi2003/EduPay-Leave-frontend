@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { CommonModule } from '@angular/common';
@@ -22,7 +22,8 @@ interface Admin {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-details.component.html',
-  styleUrl: './admin-details.component.css'
+  styleUrl: './admin-details.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminDetailsComponent implements OnInit, OnDestroy {
   adminId: string = '';
@@ -51,7 +52,8 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private adminService: AdminService,
     private authService: AuthService,
-    private authStateService: AuthStateService
+    private authStateService: AuthStateService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -81,6 +83,7 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.adminDetails = data;
         this.updatedDetails = { ...data };
+        this.cdr.markForCheck();
       },
       error: () => Swal.fire('Error', 'Could not load admin details', 'error')
     });
@@ -137,6 +140,7 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
             Swal.fire('Saved!', 'Admin details updated successfully.', 'success');
             this.isEditing = false;
             this.updatedDetails = { ...this.adminDetails! };
+            this.cdr.markForCheck();
           },
           error: (err) => Swal.fire('Error', err.error?.message || 'Server error occurred', 'error')
         });

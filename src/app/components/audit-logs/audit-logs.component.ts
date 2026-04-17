@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { AuditLog, AuditFilters, AuditService } from '../../services/audit.service';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -9,7 +9,8 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './audit-logs.component.html',
-  styleUrl: './audit-logs.component.css'
+  styleUrl: './audit-logs.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AuditLogsComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -39,7 +40,7 @@ export class AuditLogsComponent implements OnInit, OnDestroy {
 
   selectedLog?: AuditLog;
 
-  constructor(private auditService: AuditService) { }
+  constructor(private auditService: AuditService, private cdr: ChangeDetectorRef) { }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -56,6 +57,7 @@ export class AuditLogsComponent implements OnInit, OnDestroy {
       .subscribe(res => {
         this.logs = res.content;
         this.totalPages = res.totalPages;
+        this.cdr.markForCheck();
       });
   }
 

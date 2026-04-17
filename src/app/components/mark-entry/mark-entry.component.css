@@ -44,6 +44,7 @@
   font-size: 0.88rem;
   transition: all 0.2s;
   flex: 1;
+  white-space: nowrap;
 }
 
 .me-mode-toggle button.active {

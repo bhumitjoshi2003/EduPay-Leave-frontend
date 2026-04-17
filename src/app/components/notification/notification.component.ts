@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -31,7 +31,8 @@ import { Subject, takeUntil } from 'rxjs';
   ],
   providers: [DatePipe],
   templateUrl: './notification.component.html',
-  styleUrls: ['./notification.component.css']
+  styleUrls: ['./notification.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NotificationComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -57,7 +58,8 @@ export class NotificationComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private snackBar: MatSnackBar,
     private datePipe: DatePipe,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   isMobile: boolean = false;
@@ -113,6 +115,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
     this.notificationService.getAllNotifications().pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => {
         this.notifications = data;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.logger.error('Error loading notifications:', err);

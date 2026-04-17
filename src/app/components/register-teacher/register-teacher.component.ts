@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TeacherService } from '../../services/teacher.service';
@@ -15,7 +15,8 @@ import { catchError, map, switchMap } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './register-teacher.component.html',
-  styleUrls: ['./register-teacher.component.css']
+  styleUrls: ['./register-teacher.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterTeacherComponent implements OnInit {
   teacherForm: FormGroup;

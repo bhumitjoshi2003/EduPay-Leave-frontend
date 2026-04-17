@@ -7,7 +7,7 @@ import { BusFeesComponent } from './components/bus-fees/bus-fees.component';
 import { PaymentHistoryComponent } from './components/payment-history/payment-history.component';
 import { PaymentDetailsComponent } from './components/payment-details/payment-details.component';
 import { ApplyLeaveComponent } from './components/apply-leave/apply-leave.component';
-import { AuthGuard } from './auth/auth.guard';
+import { authGuard } from './auth/auth.guard';
 import { TeacherAttendanceComponent } from './components/teacher-attendance/teacher-attendance.component';
 import { StudentAttendanceComponent } from './components/student-attendance/student-attendance.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -44,7 +44,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     children: [
       // ── Student routes ────────────────────────────────────────────────
       {

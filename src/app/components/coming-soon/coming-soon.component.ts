@@ -1,10 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-coming-soon',
   standalone: true,
   templateUrl: './coming-soon.component.html',
-  styleUrls: ['./coming-soon.component.css']
+  styleUrls: ['./coming-soon.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ComingSoonComponent {
 

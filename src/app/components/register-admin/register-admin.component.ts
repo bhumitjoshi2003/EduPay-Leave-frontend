@@ -3,14 +3,15 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import Swal from 'sweetalert2';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'app-register-admin',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './register-admin.component.html',
-  styleUrl: './register-admin.component.css'
+  styleUrl: './register-admin.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterAdminComponent {
   // Initializing with empty strings for the registration form

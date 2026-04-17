@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { ActivatedRoute } from '@angular/router';
 import { PaymentHistoryService } from '../../services/payment-history.service';
@@ -11,7 +11,8 @@ import { Subject, takeUntil } from 'rxjs';
   selector: 'app-payment-details',
   templateUrl: './payment-details.component.html',
   imports: [CommonModule],
-  styleUrls: ['./payment-details.component.css']
+  styleUrls: ['./payment-details.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PaymentDetailsComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -21,7 +22,7 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
   error: string = '';
   months: string[] = [];
 
-  constructor(private route: ActivatedRoute, private paymentHistoryService: PaymentHistoryService, private logger: LoggerService) {}
+  constructor(private route: ActivatedRoute, private paymentHistoryService: PaymentHistoryService, private logger: LoggerService, private cdr: ChangeDetectorRef) {}
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -44,11 +45,13 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
         this.paymentDetails = data;
         this.loading = false;
         this.getMonths();
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error = 'Failed to fetch payment details.';
         this.logger.error('Error fetching payment details:', err);
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -78,11 +81,13 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
         const filename = `receipt_${paymentId}.pdf`;
         saveAs(data, filename);
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error = 'Failed to download receipt.';
         this.logger.error('Download error:', err);
         this.loading = false;
+        this.cdr.markForCheck();
       },
     });
   }

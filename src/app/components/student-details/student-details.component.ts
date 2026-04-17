@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StudentService } from '../../services/student.service';
@@ -31,7 +31,8 @@ interface StudentDetails {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './student-details.component.html',
-  styleUrl: './student-details.component.css'
+  styleUrl: './student-details.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StudentDetailsComponent implements OnInit, OnDestroy {
   studentId: string = '';
@@ -74,7 +75,8 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private authService: AuthService,
     private location: Location,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -97,6 +99,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
       next: (details) => {
         this.studentDetails = details;
         this.updatedDetails = { ...details };
+        this.cdr.markForCheck();
       },
       error: (error) => {
         this.logger.error('Error fetching details:', error);
@@ -126,6 +129,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.isEditing = true;
         this.validationErrors = {};
+        this.cdr.markForCheck();
       }
     });
   }
@@ -264,6 +268,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
               this.isEditing = false;
               this.effectiveFromMonth = null;
               this.validationErrors = {};
+              this.cdr.markForCheck();
               Swal.fire({
                 icon: 'success',
                 title: 'Success!',

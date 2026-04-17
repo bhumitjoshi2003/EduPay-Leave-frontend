@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, NgZone } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, NgZone } from '@angular/core';
 import { EMPTY } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { LoggerService } from '../../services/logger.service';
@@ -13,7 +13,8 @@ declare var Razorpay: any;
   selector: 'app-payment',
   imports: [],
   templateUrl: './payment.component.html',
-  styleUrl: './payment.component.css'
+  styleUrl: './payment.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PaymentComponent {
 

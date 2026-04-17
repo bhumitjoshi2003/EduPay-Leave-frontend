@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EMPTY, Subject, takeUntil } from 'rxjs';
@@ -13,7 +13,8 @@ import { AuthService } from '../../auth/auth.service';
   selector: 'app-register-student',
   templateUrl: './register-student.component.html',
   imports: [CommonModule, ReactiveFormsModule],
-  styleUrls: ['./register-student.component.css']
+  styleUrls: ['./register-student.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterStudentComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();

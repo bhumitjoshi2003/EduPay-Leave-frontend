@@ -1,11 +1,12 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-welcome-dialog',
   standalone: true,
   templateUrl: './welcome-dialog.component.html',
-  styleUrls: ['./welcome-dialog.component.css']
+  styleUrls: ['./welcome-dialog.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WelcomeDialogComponent {
   constructor(

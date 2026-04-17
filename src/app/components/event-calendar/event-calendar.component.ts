@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { isPlatformBrowser } from '@angular/common';
 import { EventService } from '../../services/event.service';
@@ -32,7 +32,8 @@ interface DayCell {
     MatFormFieldModule,
     MatInputModule
   ],
-  styleUrls: ['./event-calendar.component.css']
+  styleUrls: ['./event-calendar.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EventCalendarComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();

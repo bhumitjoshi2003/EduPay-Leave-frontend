@@ -20,7 +20,7 @@ export class AuthService {
   constructor(private http: HttpClient, private authStateService: AuthStateService) { }
 
   register(userData: any): Observable<any> {
-    return this.http.post(this.apiUrl + '/register', userData, { responseType: 'text' });
+    return this.http.post(`${this.apiUrl}/register`, userData, { responseType: 'text' });
   }
 
   login(userId: string, password: string): Observable<any> {
@@ -41,11 +41,11 @@ export class AuthService {
   }
 
   changePassword(request: ChangePasswordRequest): Observable<any> {
-    return this.http.post(this.apiUrl + '/change-password', request, { responseType: 'text' });
+    return this.http.post(`${this.apiUrl}/change-password`, request, { responseType: 'text' });
   }
 
   requestPasswordReset(userId: string, email: string): Observable<any> {
-    return this.http.post(this.apiUrl + '/request-password-reset', { userId, email }, { responseType: 'text' });
+    return this.http.post(`${this.apiUrl}/request-password-reset`, { userId, email }, { responseType: 'text' });
   }
 
   resetPassword(token: string, newPassword: string): Observable<any> {

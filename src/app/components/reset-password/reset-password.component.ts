@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
@@ -18,7 +18,8 @@ import { Subject, takeUntil } from 'rxjs';
   standalone: true,
   imports: [RouterModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, FormsModule, ReactiveFormsModule, MatIconModule, CommonModule],
   templateUrl: './reset-password.component.html',
-  styleUrl: './reset-password.component.css'
+  styleUrl: './reset-password.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResetPasswordComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -33,7 +34,8 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {
     this.resetForm = this.fb.group({
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
@@ -76,6 +78,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
       this.authService.resetPassword(this.resetToken, this.resetForm.value.newPassword).subscribe({
         next: (response: any) => {
           this.loading = false;
+          this.cdr.markForCheck();
           Swal.fire({
             icon: 'success',
             title: 'Password Reset Successful',
@@ -90,6 +93,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
         },
         error: (error: any) => {
           this.loading = false;
+          this.cdr.markForCheck();
           Swal.fire({
             icon: 'error',
             title: 'Password Reset Failed',

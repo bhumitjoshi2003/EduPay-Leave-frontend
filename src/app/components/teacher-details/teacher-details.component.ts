@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TeacherService } from '../../services/teacher.service';
@@ -22,7 +22,8 @@ interface TeacherDetails {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './teacher-details.component.html',
-  styleUrl: './teacher-details.component.css'
+  styleUrl: './teacher-details.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TeacherDetailsComponent implements OnInit, OnDestroy {
   teacherId: string = '';
@@ -53,7 +54,8 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private teacherService: TeacherService,
     private authService: AuthService,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -76,6 +78,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
       next: (details) => {
         this.teacherDetails = details;
         this.updatedDetails = { ...details };
+        this.cdr.markForCheck();
       },
       error: (error) => {
         this.logger.error('Error fetching teacher details:', error);
@@ -100,6 +103,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     }).then((result) => {
       if (result.isConfirmed) {
         this.isEditing = true;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -168,6 +172,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
             next: (response) => {
               this.teacherDetails = { ...this.updatedDetails };
               this.isEditing = false;
+              this.cdr.markForCheck();
               Swal.fire({
                 icon: 'success',
                 title: 'Success!',

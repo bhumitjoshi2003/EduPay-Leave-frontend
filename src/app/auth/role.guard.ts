@@ -12,9 +12,15 @@ import { AuthStateService } from './auth-state.service';
  * If data.roles is absent or empty, any authenticated user is allowed through.
  * On failure, the user is redirected to /dashboard (the default landing page).
  */
-export const roleGuard: CanActivateFn = (route) => {
+export const roleGuard: CanActivateFn = (route, state) => {
   const authState = inject(AuthStateService);
   const router = inject(Router);
+
+  if (!authState.isLoggedIn()) {
+    localStorage.setItem('redirectUrl', state.url);
+    router.navigate(['/home']);
+    return false;
+  }
 
   const allowedRoles: string[] = route.data['roles'] ?? [];
 

@@ -6,4 +6,5 @@ export interface Teacher {
   dob?: string;
   gender?: string;
   classTeacher?: string | null;
+  photoUrl?: string;
 }

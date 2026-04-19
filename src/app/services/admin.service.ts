@@ -37,4 +37,10 @@ export class AdminService {
   sendNoticeToStudents(data: { title: string; subject: string; body: string }): Observable<string> {
     return this.http.post(this.noticeUrl + '/notice', data, { responseType: 'text' });
   }
+
+  uploadAdminPhoto(adminId: string, file: File): Observable<{ photoUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ photoUrl: string }>(`${this.baseUrl}/${adminId}/photo`, formData);
+  }
 }

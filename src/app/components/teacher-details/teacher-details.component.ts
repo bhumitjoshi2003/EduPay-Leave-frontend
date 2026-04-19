@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TeacherService } from '../../services/teacher.service';
@@ -7,6 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
 import Swal from 'sweetalert2';
+import { environment } from '../../../environments/environment';
 
 interface TeacherDetails {
   teacherId?: string;
@@ -15,6 +16,7 @@ interface TeacherDetails {
   phoneNumber?: string;
   dob?: string;
   classTeacher?: string | null;
+  photoUrl?: string;
 }
 
 @Component({
@@ -32,6 +34,10 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
   isEditing: boolean = false;
   updatedDetails: TeacherDetails | null = null;
   private ngUnsubscribe = new Subject<void>();
+
+  // Photo upload state
+  photoUploading = false;
+  @ViewChild('photoInput') photoInput!: ElementRef<HTMLInputElement>;
 
   // Change-password modal state
   showPasswordModal = false;
@@ -195,6 +201,53 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     if (this.updatedDetails) {
       this.updatedDetails[field] = event.target.value;
     }
+  }
+
+  canUploadPhoto(): boolean {
+    const role = this.getUserRole();
+    if (role === 'ADMIN' || role === 'SUB_ADMIN' || role === 'SUPER_ADMIN') return true;
+    if (role === 'TEACHER') return this.authService.getUserId() === this.teacherId;
+    return false;
+  }
+
+  getInitials(): string {
+    return this.teacherDetails?.name?.charAt(0).toUpperCase() ?? '?';
+  }
+
+  getPhotoUrl(relativePath: string): string {
+    if (relativePath.startsWith('http')) return relativePath;
+    return `${environment.apiUrl}${relativePath}`;
+  }
+
+  triggerPhotoUpload(): void {
+    this.photoInput?.nativeElement.click();
+  }
+
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    input.value = '';
+
+    this.photoUploading = true;
+    this.cdr.markForCheck();
+
+    this.teacherService.uploadTeacherPhoto(this.teacherId, file).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: (res) => {
+        if (this.teacherDetails) {
+          this.teacherDetails = { ...this.teacherDetails, photoUrl: res.photoUrl + '?t=' + Date.now() };
+        }
+        this.photoUploading = false;
+        this.cdr.markForCheck();
+        Swal.fire({ icon: 'success', title: 'Photo updated!', timer: 1500, showConfirmButton: false });
+      },
+      error: (err) => {
+        this.logger.error('Photo upload error:', err);
+        this.photoUploading = false;
+        this.cdr.markForCheck();
+        Swal.fire({ icon: 'error', title: 'Upload failed', text: 'Could not upload photo. Please try again.' });
+      }
+    });
   }
 
   goBackToTeacherList(): void {

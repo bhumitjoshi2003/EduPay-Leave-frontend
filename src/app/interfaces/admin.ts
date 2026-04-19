@@ -7,4 +7,5 @@ export interface Admin {
     gender: string;
     createdAt?: string;
     updatedAt?: string;
+    photoUrl?: string;
 }

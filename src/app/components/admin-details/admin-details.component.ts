@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { CommonModule } from '@angular/common';
@@ -7,6 +7,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import Swal from 'sweetalert2';
+import { environment } from '../../../environments/environment';
 
 interface Admin {
   adminId: string;
@@ -15,6 +16,7 @@ interface Admin {
   phoneNumber: string;
   dob: string;
   gender: string;
+  photoUrl?: string;
 }
 
 @Component({
@@ -46,6 +48,10 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
   cpShowOldField = false;
 
   private ngUnsubscribe = new Subject<void>();
+
+  // Photo upload state
+  photoUploading = false;
+  @ViewChild('photoInput') photoInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private route: ActivatedRoute,
@@ -212,6 +218,51 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
             this.router.navigate(['/dashboard/admin-list']);
           }
         });
+      }
+    });
+  }
+
+  canUploadPhoto(): boolean {
+    return !this.isNewAdmin && (
+      this.loggedInUserRole === 'SUPER_ADMIN' || this.loggedInUserId === this.adminId
+    );
+  }
+
+  getInitials(): string {
+    return this.adminDetails?.name?.charAt(0).toUpperCase() ?? '?';
+  }
+
+  getPhotoUrl(relativePath: string): string {
+    if (relativePath.startsWith('http')) return relativePath;
+    return `${environment.apiUrl}${relativePath}`;
+  }
+
+  triggerPhotoUpload(): void {
+    this.photoInput?.nativeElement.click();
+  }
+
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    input.value = '';
+
+    this.photoUploading = true;
+    this.cdr.markForCheck();
+
+    this.adminService.uploadAdminPhoto(this.adminId, file).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: (res) => {
+        if (this.adminDetails) {
+          this.adminDetails = { ...this.adminDetails, photoUrl: res.photoUrl + '?t=' + Date.now() };
+        }
+        this.photoUploading = false;
+        this.cdr.markForCheck();
+        Swal.fire({ icon: 'success', title: 'Photo updated!', timer: 1500, showConfirmButton: false });
+      },
+      error: () => {
+        this.photoUploading = false;
+        this.cdr.markForCheck();
+        Swal.fire({ icon: 'error', title: 'Upload failed', text: 'Could not upload photo. Please try again.' });
       }
     });
   }

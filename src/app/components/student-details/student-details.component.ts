@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StudentService } from '../../services/student.service';
@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Subject, takeUntil } from 'rxjs';
 import { Location } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 interface StudentDetails {
   studentId?: string;
@@ -24,6 +25,7 @@ interface StudentDetails {
   joiningDate?: string;
   leavingDate?: string;
   status?: string;
+  photoUrl?: string;
 }
 
 @Component({
@@ -45,6 +47,10 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
 
   // Track validation errors for CSS classes
   validationErrors: { [key: string]: boolean } = {};
+
+  // Photo upload state
+  photoUploading = false;
+  @ViewChild('photoInput') photoInput!: ElementRef<HTMLInputElement>;
 
   // Change-password modal state
   showPasswordModal = false;
@@ -360,6 +366,56 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.logger.error('Error changing password', error);
         Swal.fire('Error', error.error || 'Failed to change password', 'error');
+      }
+    });
+  }
+
+  canUploadPhoto(): boolean {
+    const role = this.getUserRole();
+    if (role === 'ADMIN' || role === 'SUB_ADMIN' || role === 'SUPER_ADMIN') return true;
+    if (role === 'STUDENT') {
+      const ownId = this.authService.getUserId();
+      return ownId === this.studentId;
+    }
+    return false;
+  }
+
+  getInitials(): string {
+    return this.studentDetails?.name?.charAt(0).toUpperCase() ?? '?';
+  }
+
+  getPhotoUrl(relativePath: string): string {
+    if (relativePath.startsWith('http')) return relativePath;
+    return `${environment.apiUrl}${relativePath}`;
+  }
+
+  triggerPhotoUpload(): void {
+    this.photoInput?.nativeElement.click();
+  }
+
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    input.value = '';
+
+    this.photoUploading = true;
+    this.cdr.markForCheck();
+
+    this.studentService.uploadStudentPhoto(this.studentId, file).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: (res) => {
+        if (this.studentDetails) {
+          this.studentDetails = { ...this.studentDetails, photoUrl: res.photoUrl + '?t=' + Date.now() };
+        }
+        this.photoUploading = false;
+        this.cdr.markForCheck();
+        Swal.fire({ icon: 'success', title: 'Photo updated!', timer: 1500, showConfirmButton: false });
+      },
+      error: (err) => {
+        this.logger.error('Photo upload error:', err);
+        this.photoUploading = false;
+        this.cdr.markForCheck();
+        Swal.fire({ icon: 'error', title: 'Upload failed', text: 'Could not upload photo. Please try again.' });
       }
     });
   }

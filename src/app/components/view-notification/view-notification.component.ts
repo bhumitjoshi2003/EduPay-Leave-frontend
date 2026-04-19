@@ -4,7 +4,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NotificationService } from '../../services/notification.service';
 import { UserNotification } from '../../interfaces/user-notification';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, of, takeUntil } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-view-notification',
@@ -42,26 +43,26 @@ export class ViewNotificationComponent implements OnInit, OnDestroy {
 
   loadUserNotifications(): void {
     this.isLoading = true;
-    this.notificationService.getUserNotifications().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (data) => {
+    this.notificationService.getUserNotifications().pipe(
+      takeUntil(this.destroy$),
+      tap(data => {
         this.userNotifications = data;
         this.isLoading = false;
         this.cdr.markForCheck();
-
-        if (this.userNotifications.some(n => !n.isRead)) {
-          this.notificationService.markAllNotificationsAsRead().subscribe({
-            next: () => {
-              this.userNotifications.forEach(n => n.isRead = true);
-              this.cdr.markForCheck();
-            },
-            error: (err) => {
-              this.logger.error('Mark read error:', err);
-            }
-          });
-        }
-      },
+      }),
+      switchMap(data =>
+        data.some(n => !n.isRead)
+          ? this.notificationService.markAllNotificationsAsRead().pipe(
+              tap(() => {
+                this.userNotifications.forEach(n => n.isRead = true);
+                this.cdr.markForCheck();
+              })
+            )
+          : of(null)
+      )
+    ).subscribe({
       error: (err) => {
-        this.logger.error('Fetch error:', err);
+        this.logger.error('Fetch or mark-read error:', err);
         this.isLoading = false;
         this.cdr.markForCheck();
       }

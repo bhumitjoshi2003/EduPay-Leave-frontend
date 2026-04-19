@@ -64,4 +64,10 @@ export class StudentService {
     return this.http.post<BulkImportResult>(`${this.baseUrl}/bulk`, formData);
   }
 
+  uploadStudentPhoto(studentId: string, file: File): Observable<{ photoUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ photoUrl: string }>(`${this.baseUrl}/${studentId}/photo`, formData);
+  }
+
 }

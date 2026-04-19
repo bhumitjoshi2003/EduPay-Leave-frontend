@@ -13,4 +13,5 @@ export interface Student {
   joiningDate?: string;
   leavingDate?: string;
   status?: string;
+  photoUrl?: string;
 }

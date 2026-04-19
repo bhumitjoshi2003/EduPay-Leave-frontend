@@ -19,7 +19,7 @@
 
   <!-- Add Exam -->
   <div class="ec-add-row">
-    <input [(ngModel)]="newExamName" placeholder="Exam name (e.g. Half Yearly)" (keyup.enter)="addExam()" />
+    <input [(ngModel)]="newExamName" placeholder="Exam name (e.g. Half Yearly)" (keyup.enter)="addExam()" aria-label="New exam name" />
     <button class="btn-primary" (click)="addExam()">+ Add Exam</button>
   </div>
 
@@ -31,7 +31,7 @@
       <span class="ec-exam-name">{{ exam.examName }}</span>
       <div class="ec-header-actions">
         <span class="ec-chevron">{{ expandedExamId === exam.id ? '▲' : '▼' }}</span>
-        <button class="btn-delete" (click)="$event.stopPropagation(); deleteExam(exam.id)">&#x2715;</button>
+        <button class="btn-delete" (click)="$event.stopPropagation(); deleteExam(exam.id)" [attr.aria-label]="'Delete exam ' + exam.examName">&#x2715;</button>
       </div>
     </div>
 
@@ -54,16 +54,16 @@
               <td data-label="Exam Date">{{ entry.examDate }}</td>
               <td data-label="Actions" class="ec-actions">
                 <button class="btn-edit" (click)="startEdit(entry)">Edit</button>
-                <button class="btn-delete" (click)="deleteExamSubject(exam.id, entry.id)">&#x2715;</button>
+                <button class="btn-delete" (click)="deleteExamSubject(exam.id, entry.id)" [attr.aria-label]="'Delete subject ' + entry.subjectName">&#x2715;</button>
               </td>
             </ng-container>
             <ng-container *ngIf="editingEntry?.id === entry.id">
               <td data-label="Subject">{{ entry.subjectName }}</td>
               <td data-label="Max Marks">
-                <input type="number" [(ngModel)]="editMaxMarks" class="ec-input-sm" min="1" />
+                <input type="number" [(ngModel)]="editMaxMarks" class="ec-input-sm" min="1" aria-label="Max marks" />
               </td>
               <td data-label="Exam Date">
-                <input type="date" [(ngModel)]="editExamDate" class="ec-input-sm" />
+                <input type="date" [(ngModel)]="editExamDate" class="ec-input-sm" aria-label="Exam date" />
               </td>
               <td data-label="Actions" class="ec-actions">
                 <button class="btn-save" (click)="saveEdit(exam.id)">Save</button>
@@ -78,9 +78,9 @@
       <!-- Add Subject Row -->
       <div class="ec-add-subject" (click)="initNewSubject(exam.id)">
         <div class="ec-add-subject-row" *ngIf="newSubject[exam.id] !== undefined">
-          <input [(ngModel)]="newSubject[exam.id].subjectName" placeholder="Subject name" class="ec-input" />
-          <input type="number" [(ngModel)]="newSubject[exam.id].maxMarks" placeholder="Max marks" class="ec-input-sm" min="1" />
-          <input type="date" [(ngModel)]="newSubject[exam.id].examDate" class="ec-input-sm" />
+          <input [(ngModel)]="newSubject[exam.id].subjectName" placeholder="Subject name" class="ec-input" aria-label="Subject name" />
+          <input type="number" [(ngModel)]="newSubject[exam.id].maxMarks" placeholder="Max marks" class="ec-input-sm" min="1" aria-label="Max marks" />
+          <input type="date" [(ngModel)]="newSubject[exam.id].examDate" class="ec-input-sm" aria-label="Exam date" />
           <button class="btn-primary btn-sm" (click)="addExamSubject(exam.id)">+ Add</button>
         </div>
         <button *ngIf="newSubject[exam.id] === undefined" class="btn-outline" (click)="initNewSubject(exam.id)">

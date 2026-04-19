@@ -9,29 +9,29 @@
     <div class="search-card">
         <div class="modern-grid-layout">
             <div class="field">
-                <label>Operator ID</label>
-                <input type="text" placeholder="Search User..." [(ngModel)]="filters.username">
+                <label for="filter-username">Operator ID</label>
+                <input id="filter-username" type="text" placeholder="Search User..." [(ngModel)]="filters.username">
             </div>
 
             <div class="field">
-                <label>Action Type</label>
-                <select [(ngModel)]="filters.action">
+                <label for="filter-action">Action Type</label>
+                <select id="filter-action" [(ngModel)]="filters.action">
                     <option value="">All Activities</option>
                     <option *ngFor="let type of actionTypes; let i = index; trackBy: trackByIndex" [value]="type">{{type}}</option>
                 </select>
             </div>
 
             <div class="field">
-                <label>Entity</label>
-                <input type="text" placeholder="e.g. Student" [(ngModel)]="filters.entityName">
+                <label for="filter-entity">Entity</label>
+                <input id="filter-entity" type="text" placeholder="e.g. Student" [(ngModel)]="filters.entityName">
             </div>
 
             <div class="field date-range-field">
                 <label>Date Range</label>
                 <div class="date-inputs-wrapper">
-                    <input type="date" [(ngModel)]="filters.startDate">
+                    <input type="date" [(ngModel)]="filters.startDate" aria-label="Start date">
                     <span class="to-text">to</span>
-                    <input type="date" [(ngModel)]="filters.endDate">
+                    <input type="date" [(ngModel)]="filters.endDate" aria-label="End date">
                 </div>
             </div>
 
@@ -119,7 +119,7 @@
                         <h3>Change Breakdown</h3>
                     </div>
                 </div>
-                <button class="close-x" (click)="closeDetails()">&times;</button>
+                <button class="close-x" (click)="closeDetails()" aria-label="Close change breakdown">&times;</button>
             </div>
 
             <div class="comparison-grid">

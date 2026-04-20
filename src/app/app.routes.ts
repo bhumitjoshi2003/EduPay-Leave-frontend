@@ -36,6 +36,7 @@ import { MarkEntryComponent } from './components/mark-entry/mark-entry.component
 import { StudentResultsComponent } from './components/student-results/student-results.component';
 import { ClassResultsComponent } from './components/class-results/class-results.component';
 import { ReportCardComponent } from './components/report-card/report-card.component';
+import { AttendanceSummaryComponent } from './components/attendance-summary/attendance-summary.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -78,6 +79,10 @@ export const routes: Routes = [
       {
         path: 'student-attendance/:studentId', component: StudentAttendanceComponent,
         canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'attendance-summary', component: AttendanceSummaryComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUB_ADMIN', 'SUPER_ADMIN'] }
       },
 
       // ── Teacher routes ────────────────────────────────────────────────

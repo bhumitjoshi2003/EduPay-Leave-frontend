@@ -14,6 +14,9 @@
         [active]="rla6.isActive">Apply Leave</a>
       <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/student-attendance" routerLinkActive
         #rla8="routerLinkActive" [active]="rla8.isActive">Student Attendance</a>
+      <a *ngIf="isStudent() || (isTeacher() && ClassTeacher) || isAdmin()" mat-tab-link
+        routerLink="/dashboard/attendance-summary" routerLinkActive #rlaAs="routerLinkActive"
+        [active]="rlaAs.isActive">Attendance Summary</a>
       <a *ngIf="((isTeacher() && ClassTeacher) && ClassTeacher) || isAdmin()" mat-tab-link
         routerLink="/dashboard/teacher-attendance" routerLinkActive #rla7="routerLinkActive"
         [active]="rla7.isActive">Attendance</a>

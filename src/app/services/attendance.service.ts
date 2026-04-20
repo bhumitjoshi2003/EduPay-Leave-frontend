@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AttendanceData } from '../interfaces/atendance-data';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { StudentAttendanceSummary, ClassAttendanceSummary, DailyDetail } from '../interfaces/attendance-summary';
 
 @Injectable({
   providedIn: 'root'
@@ -42,5 +43,22 @@ export class AttendanceService {
       `${this.apiUrl}/student/${studentId}/month/${month}/year/${year}`,
       { params: { className } }
     );
+  }
+
+  getStudentSummary(studentId: string, params: Record<string, string | number>): Observable<StudentAttendanceSummary> {
+    let httpParams = new HttpParams();
+    Object.entries(params).forEach(([k, v]) => httpParams = httpParams.set(k, String(v)));
+    return this.http.get<StudentAttendanceSummary>(`${this.apiUrl}/summary/student/${studentId}`, { params: httpParams });
+  }
+
+  getClassSummary(className: string, params: Record<string, string | number>): Observable<ClassAttendanceSummary[]> {
+    let httpParams = new HttpParams();
+    Object.entries(params).forEach(([k, v]) => httpParams = httpParams.set(k, String(v)));
+    return this.http.get<ClassAttendanceSummary[]>(`${this.apiUrl}/summary/class/${className}`, { params: httpParams });
+  }
+
+  getStudentDailyDetail(studentId: string, month: number, year: number): Observable<DailyDetail> {
+    const params = new HttpParams().set('month', month).set('year', year);
+    return this.http.get<DailyDetail>(`${this.apiUrl}/summary/student/${studentId}/daily`, { params });
   }
 }

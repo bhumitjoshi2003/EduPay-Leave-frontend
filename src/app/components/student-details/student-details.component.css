@@ -286,6 +286,10 @@
   }
 }
 
+.attendance-summary-button {
+  background: linear-gradient(135deg, #8e44ad, #9b59b6);
+}
+
 .payment-history-button {
   background: linear-gradient(135deg, #27ae60, #2ecc71);
   color: white;

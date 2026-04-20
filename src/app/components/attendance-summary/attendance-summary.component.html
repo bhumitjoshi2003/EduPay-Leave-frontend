@@ -1,0 +1,320 @@
+<div class="as-container">
+
+  <!-- ── Page Header ───────────────────────────────────────────── -->
+  <div class="as-page-header no-print">
+    <h2 class="as-title">Attendance Summary</h2>
+    <button class="as-back-btn" (click)="goBack()" aria-label="Back to student list">← Back</button>
+  </div>
+
+  <!-- ── Controls Card ─────────────────────────────────────────── -->
+  <div class="as-controls no-print" *ngIf="role !== 'STUDENT'">
+
+    <!-- View mode toggle -->
+    <div class="as-toggle-row" *ngIf="canShowViewToggle()">
+      <div class="as-toggle-group" role="group" aria-label="View mode">
+        <button [class.active]="viewMode === 'student'" (click)="setViewMode('student')">Student View</button>
+        <button [class.active]="viewMode === 'class'" (click)="setViewMode('class')">Class View</button>
+      </div>
+    </div>
+
+    <!-- Period type + selectors row -->
+    <div class="as-filters-row">
+
+      <div class="as-toggle-group" role="group" aria-label="Period type">
+        <button [class.active]="periodType === 'month'" (click)="setPeriodType('month')">Month</button>
+        <button [class.active]="periodType === 'year'" (click)="setPeriodType('year')">Academic Year</button>
+      </div>
+
+      <ng-container *ngIf="periodType === 'month'">
+        <select [(ngModel)]="selectedMonth" aria-label="Select month" class="as-select">
+          <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+        </select>
+        <select [(ngModel)]="selectedYear" aria-label="Select year" class="as-select">
+          <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+        </select>
+      </ng-container>
+
+      <ng-container *ngIf="periodType === 'year'">
+        <select [(ngModel)]="selectedSession" aria-label="Select session" class="as-select">
+          <option *ngFor="let s of sessions" [value]="s">{{ s }}</option>
+        </select>
+      </ng-container>
+
+      <!-- Class selector -->
+      <select *ngIf="canChangeClass()" [(ngModel)]="selectedClass" (ngModelChange)="onClassChange()"
+        aria-label="Select class" class="as-select">
+        <option value="">-- Class --</option>
+        <option *ngFor="let c of classList" [value]="c">Class {{ c }}</option>
+      </select>
+
+      <!-- Student selector (student view only) -->
+      <select *ngIf="viewMode === 'student'" [(ngModel)]="selectedStudentId"
+        aria-label="Select student" class="as-select"
+        [disabled]="studentList.length === 0">
+        <option value="">-- Student --</option>
+        <option *ngFor="let s of studentList" [value]="s.studentId">{{ s.name }}</option>
+      </select>
+
+      <button class="as-load-btn" (click)="loadReport()" [disabled]="isLoading">
+        {{ isLoading ? 'Loading…' : 'Load Report' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- STUDENT role: minimal period controls -->
+  <div class="as-controls no-print" *ngIf="role === 'STUDENT'">
+    <div class="as-filters-row">
+      <div class="as-toggle-group" role="group" aria-label="Period type">
+        <button [class.active]="periodType === 'month'" (click)="setPeriodType('month')">Month</button>
+        <button [class.active]="periodType === 'year'" (click)="setPeriodType('year')">Academic Year</button>
+      </div>
+
+      <ng-container *ngIf="periodType === 'month'">
+        <select [(ngModel)]="selectedMonth" aria-label="Select month" class="as-select">
+          <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+        </select>
+        <select [(ngModel)]="selectedYear" aria-label="Select year" class="as-select">
+          <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+        </select>
+      </ng-container>
+
+      <ng-container *ngIf="periodType === 'year'">
+        <select [(ngModel)]="selectedSession" aria-label="Select session" class="as-select">
+          <option *ngFor="let s of sessions" [value]="s">{{ s }}</option>
+        </select>
+      </ng-container>
+
+      <button class="as-load-btn" (click)="loadReport()" [disabled]="isLoading">
+        {{ isLoading ? 'Loading…' : 'Load Report' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Error / Loading ───────────────────────────────────────── -->
+  <p class="as-error" *ngIf="error">{{ error }}</p>
+  <div class="as-loading" *ngIf="isLoading">
+    <div class="as-spinner"></div>
+    <span>Loading attendance data…</span>
+  </div>
+
+  <!-- ── Student Summary Report ────────────────────────────────── -->
+  <div class="as-report" *ngIf="studentSummary && !isLoading">
+
+    <div class="as-report-header">
+      <div>
+        <h3 class="as-student-name">{{ studentSummary.studentName }}</h3>
+        <p class="as-sub">{{ studentSummary.className }} &nbsp;·&nbsp; {{ getPeriodLabel() }}</p>
+      </div>
+      <button class="as-print-btn no-print" (click)="printReport()" aria-label="Download PDF">
+        ⬇ Download PDF
+      </button>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="as-stats">
+      <div class="as-stat-card">
+        <span class="as-stat-value">{{ studentSummary.totalWorkingDays }}</span>
+        <span class="as-stat-label">Working Days</span>
+      </div>
+      <div class="as-stat-card as-stat-present">
+        <span class="as-stat-value">{{ studentSummary.daysPresent }}</span>
+        <span class="as-stat-label">Present</span>
+      </div>
+      <div class="as-stat-card as-stat-absent">
+        <span class="as-stat-value">{{ studentSummary.daysAbsent }}</span>
+        <span class="as-stat-label">Absent</span>
+      </div>
+      <div class="as-stat-card">
+        <span class="as-stat-value" [ngClass]="getAttendanceClass(studentSummary.attendancePercentage)">
+          {{ studentSummary.attendancePercentage }}%
+        </span>
+        <span class="as-stat-label">Attendance</span>
+        <span class="as-badge" [ngClass]="getAttendanceClass(studentSummary.attendancePercentage)">
+          {{ getAttendanceLabel(studentSummary.attendancePercentage) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- ── Month view: Day-by-Day calendar toggle ── -->
+    <div class="as-calendar-section" *ngIf="periodType === 'month'">
+      <button class="as-expand-toggle no-print" (click)="toggleMonthCalendar()"
+        [attr.aria-expanded]="calendarExpanded"
+        aria-label="Toggle day-by-day calendar view">
+        <span class="as-expand-icon">{{ calendarExpanded ? '▲' : '▼' }}</span>
+        {{ calendarExpanded ? 'Hide Day-by-Day' : 'Show Day-by-Day' }}
+      </button>
+
+      <div class="as-calendar-wrap" *ngIf="calendarExpanded">
+        <div class="as-cal-loading" *ngIf="calendarLoading">
+          <div class="as-spinner"></div>
+          <span>Loading calendar…</span>
+        </div>
+
+        <ng-container *ngIf="!calendarLoading">
+          <div class="as-calendar" *ngIf="currentCalendarWeeks.length > 0">
+            <!-- Legend -->
+            <div class="as-cal-legend no-print">
+              <span class="as-legend-item"><span class="as-legend-dot dot-present"></span> Present</span>
+              <span class="as-legend-item"><span class="as-legend-dot dot-absent"></span> Absent</span>
+              <span class="as-legend-item"><span class="as-legend-dot dot-closed"></span> Holiday / No school</span>
+            </div>
+            <!-- Day-of-week header -->
+            <div class="as-cal-header">
+              <span *ngFor="let d of dayNames; trackBy: trackByIndex">{{ d }}</span>
+            </div>
+            <!-- Weeks -->
+            <div *ngFor="let week of currentCalendarWeeks; trackBy: trackByIndex" class="as-cal-week">
+              <div *ngFor="let cell of week; trackBy: trackByIndex"
+                class="as-cal-cell"
+                [ngClass]="'cell-' + cell.status"
+                [attr.title]="cell.date">
+                <span *ngIf="cell.day !== null">{{ cell.day }}</span>
+              </div>
+            </div>
+          </div>
+          <p class="as-cal-empty" *ngIf="currentCalendarWeeks.length === 0">
+            No attendance data recorded for this month.
+          </p>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- ── Year view: Monthly breakdown table with expandable calendars ── -->
+    <div class="as-breakdown" *ngIf="studentSummary.monthlyBreakdown?.length">
+      <div class="as-breakdown-header">
+        <h4 class="as-breakdown-title">Month-by-Month Breakdown</h4>
+        <div class="as-breakdown-actions no-print" *ngIf="periodType === 'year'">
+          <button class="as-collapse-all-btn" *ngIf="expandAllActive" (click)="collapseAll()">
+            ▲ Collapse All
+          </button>
+          <button class="as-expand-all-btn" *ngIf="!expandAllActive" (click)="expandAll()">
+            ▼ Expand All
+          </button>
+        </div>
+      </div>
+
+      <div class="as-table-wrap">
+        <table class="as-table">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Working Days</th>
+              <th>Present</th>
+              <th>Absent</th>
+              <th>Attendance %</th>
+              <th class="no-print" *ngIf="periodType === 'year'">Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let row of studentSummary.monthlyBreakdown; trackBy: trackByMonth">
+              <tr [class.as-row-expanded]="isRowExpanded(row)">
+                <td data-label="Month">{{ row.month }} {{ row.year }}</td>
+                <td data-label="Working Days">{{ row.workingDays }}</td>
+                <td data-label="Present" class="as-present-cell">{{ row.present }}</td>
+                <td data-label="Absent" class="as-absent-cell">{{ row.absent }}</td>
+                <td data-label="Attendance %">
+                  <span class="as-pct-badge" [ngClass]="getAttendanceClass(row.percentage)">
+                    {{ row.percentage }}%
+                  </span>
+                </td>
+                <td class="no-print" *ngIf="periodType === 'year'">
+                  <button class="as-row-expand-btn"
+                    (click)="toggleRowCalendar(row)"
+                    [class.active]="isRowExpanded(row)"
+                    [attr.aria-label]="'Toggle calendar for ' + row.month + ' ' + row.year"
+                    [attr.aria-expanded]="isRowExpanded(row)">
+                    {{ isRowExpanded(row) ? '▲' : '▼' }}
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Inline calendar row -->
+              <tr *ngIf="isRowExpanded(row)" class="as-cal-inline-row">
+                <td colspan="6">
+                  <div class="as-inline-calendar">
+                    <div class="as-cal-loading" *ngIf="isRowLoading(row)">
+                      <div class="as-spinner"></div>
+                      <span>Loading calendar…</span>
+                    </div>
+                    <ng-container *ngIf="!isRowLoading(row)">
+                      <div class="as-calendar" *ngIf="getRowCalendar(row).length > 0">
+                        <div class="as-cal-legend no-print">
+                          <span class="as-legend-item"><span class="as-legend-dot dot-present"></span> Present</span>
+                          <span class="as-legend-item"><span class="as-legend-dot dot-absent"></span> Absent</span>
+                          <span class="as-legend-item"><span class="as-legend-dot dot-closed"></span> Holiday / No school</span>
+                        </div>
+                        <div class="as-cal-header">
+                          <span *ngFor="let d of dayNames; trackBy: trackByIndex">{{ d }}</span>
+                        </div>
+                        <div *ngFor="let week of getRowCalendar(row); trackBy: trackByIndex" class="as-cal-week">
+                          <div *ngFor="let cell of week; trackBy: trackByIndex"
+                            class="as-cal-cell"
+                            [ngClass]="'cell-' + cell.status"
+                            [attr.title]="cell.date">
+                            <span *ngIf="cell.day !== null">{{ cell.day }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <p class="as-cal-empty" *ngIf="getRowCalendar(row).length === 0">
+                        No attendance data for {{ row.month }} {{ row.year }}.
+                      </p>
+                    </ng-container>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Class Summary Report ──────────────────────────────────── -->
+  <div class="as-report" *ngIf="classSummary.length > 0 && !isLoading">
+
+    <div class="as-report-header">
+      <div>
+        <h3 class="as-student-name">Class {{ selectedClass }} — Attendance</h3>
+        <p class="as-sub">{{ getPeriodLabel() }} &nbsp;·&nbsp; {{ classSummary.length }} students (sorted by lowest first)</p>
+      </div>
+      <button class="as-print-btn no-print" (click)="printReport()" aria-label="Download PDF">
+        ⬇ Download PDF
+      </button>
+    </div>
+
+    <div class="as-table-wrap">
+      <table class="as-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Student</th>
+            <th>Working Days</th>
+            <th>Present</th>
+            <th>Absent</th>
+            <th>Attendance %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of classSummary; let i = index; trackBy: trackByStudentId">
+            <td data-label="#">{{ i + 1 }}</td>
+            <td data-label="Student">{{ row.studentName }}</td>
+            <td data-label="Working Days">{{ row.totalWorkingDays }}</td>
+            <td data-label="Present" class="as-present-cell">{{ row.daysPresent }}</td>
+            <td data-label="Absent" class="as-absent-cell">{{ row.daysAbsent }}</td>
+            <td data-label="Attendance %">
+              <span class="as-pct-badge" [ngClass]="getAttendanceClass(row.attendancePercentage)">
+                {{ row.attendancePercentage }}%
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="as-empty" *ngIf="!isLoading && !studentSummary && classSummary.length === 0 && !error">
+    <p>Select the filters above and click <strong>Load Report</strong> to view the attendance summary.</p>
+  </div>
+
+</div>

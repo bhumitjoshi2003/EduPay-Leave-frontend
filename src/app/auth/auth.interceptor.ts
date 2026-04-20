@@ -11,11 +11,18 @@ import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { AuthStateService } from './auth-state.service';
 
-import { Observable, throwError } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, filter, switchMap, take, tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class AuthInterceptor implements HttpInterceptor {
+
+  private isRefreshing = false;
+  /**
+   * While isRefreshing=true, queued requests wait on this Subject.
+   * Emits true once refresh completes, false if it fails.
+   */
+  private refreshDone$ = new BehaviorSubject<boolean>(false);
 
   constructor(
     private router: Router,
@@ -35,23 +42,51 @@ export class AuthInterceptor implements HttpInterceptor {
 
     return next.handle(reqWithCredentials).pipe(
       catchError((error: HttpErrorResponse) => {
-
-        if (error.status === 401 && !isAuthUrl) {
-          return this.authService.refreshToken().pipe(
-            tap((userInfo: any) => {
-              this.authStateService.setUser(userInfo);
-            }),
-            switchMap(() => next.handle(reqWithCredentials)),
-            catchError((refreshError: HttpErrorResponse) => {
-              this.authStateService.clearUser();
-              this.router.navigate(['/home']);
-              return throwError(() => refreshError);
-            })
-          );
+        // 401 = missing/invalid token; 403 = expired access token (backend behaviour)
+        // Only attempt refresh for non-auth URLs to avoid infinite loops
+        if ((error.status === 401 || error.status === 403) && !isAuthUrl) {
+          return this.handleTokenExpiry(reqWithCredentials, next);
         }
-
         return throwError(() => error);
       })
     );
+  }
+
+  private handleTokenExpiry(
+    request: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
+
+    if (!this.isRefreshing) {
+      // First failing request kicks off the refresh
+      this.isRefreshing = true;
+      this.refreshDone$.next(false);
+
+      return this.authService.refreshToken().pipe(
+        tap((userInfo: any) => {
+          this.authStateService.setUser(userInfo);
+        }),
+        switchMap(() => {
+          this.isRefreshing = false;
+          this.refreshDone$.next(true);
+          return next.handle(request);
+        }),
+        catchError((refreshError) => {
+          // Refresh token itself is expired/invalid → log out
+          this.isRefreshing = false;
+          this.refreshDone$.next(false);
+          this.authStateService.clearUser();
+          this.router.navigate(['/home']);
+          return throwError(() => refreshError);
+        })
+      );
+    } else {
+      // Other requests that fail while refresh is in progress wait here
+      return this.refreshDone$.pipe(
+        filter(done => done === true),
+        take(1),
+        switchMap(() => next.handle(request))
+      );
+    }
   }
 }

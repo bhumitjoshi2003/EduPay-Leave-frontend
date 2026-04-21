@@ -37,6 +37,8 @@ import { StudentResultsComponent } from './components/student-results/student-re
 import { ClassResultsComponent } from './components/class-results/class-results.component';
 import { ReportCardComponent } from './components/report-card/report-card.component';
 import { AttendanceSummaryComponent } from './components/attendance-summary/attendance-summary.component';
+import { TimetableComponent } from './components/timetable/timetable.component';
+import { FeeRemindersComponent } from './components/fee-reminders/fee-reminders.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -123,6 +125,10 @@ export const routes: Routes = [
         canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
       {
+        path: 'fee-reminders', component: FeeRemindersComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
         path: 'teacher-list', component: TeacherListComponent,
         canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
@@ -197,6 +203,12 @@ export const routes: Routes = [
       {
         path: 'report-card', component: ReportCardComponent,
         canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN'] }
+      },
+
+      // ── Timetable ─────────────────────────────────────────────────────
+      {
+        path: 'timetable', component: TimetableComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUB_ADMIN', 'SUPER_ADMIN'] }
       },
 
       // ── Open to all authenticated users ──────────────────────────────

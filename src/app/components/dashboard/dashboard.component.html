@@ -8,6 +8,8 @@
       <a *ngIf="isStudent() || isAdmin() || isSuperAdmin()" mat-tab-link routerLink="/dashboard/fee-structure"
         routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">Fee
         Structure</a>
+      <a *ngIf="isStudent() || isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/timetable"
+        routerLinkActive #rlaTt="routerLinkActive" [active]="rlaTt.isActive">Timetable</a>
       <a *ngIf="isStudent() || isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/event-calendar"
         routerLinkActive #rla14="routerLinkActive" [active]="rla14.isActive">Event Calendar</a>
       <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/apply-leave" routerLinkActive #rla6="routerLinkActive"
@@ -54,6 +56,8 @@
         #rla5="routerLinkActive" [active]="rla5.isActive">Payment History</a>
       <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/payment-history-admin" routerLinkActive
         #rla11="routerLinkActive" [active]="rla11.isActive">Payment History</a>
+      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/fee-reminders" routerLinkActive
+        #rlaFr="routerLinkActive" [active]="rlaFr.isActive">Fee Reminders</a>
     </nav>
 
     <div class="hdr-controls">

@@ -40,12 +40,14 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
   selectedSubjectEntryId: number | null = null;
   subjectStudents: MarkEntryStudent[] = [];
   marksInputA: Record<string, number | null> = {};
+  originalMarksA: Record<string, number | null> = {};
 
   // Mode B — by student
   students: { studentId: string; name: string }[] = [];
   selectedStudentId = '';
   studentSubjects: StudentExamSubject[] = [];
   marksInputB: Record<number, number | null> = {};
+  originalMarksB: Record<number, number | null> = {};
 
   saving = false;
 
@@ -159,7 +161,12 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           this.subjectStudents = data;
-          data.forEach(s => { this.marksInputA[s.studentId] = s.marksObtained; });
+          this.marksInputA = {};
+          this.originalMarksA = {};
+          data.forEach(s => {
+            this.marksInputA[s.studentId] = s.marksObtained;
+            this.originalMarksA[s.studentId] = s.marksObtained;
+          });
           this.cdr.markForCheck();
         },
         error: (e) => this.logger.error('Error loading students for subject:', e),
@@ -177,7 +184,12 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           this.studentSubjects = data;
-          data.forEach(s => { this.marksInputB[s.examSubjectEntryId] = s.marksObtained; });
+          this.marksInputB = {};
+          this.originalMarksB = {};
+          data.forEach(s => {
+            this.marksInputB[s.examSubjectEntryId] = s.marksObtained;
+            this.originalMarksB[s.examSubjectEntryId] = s.marksObtained;
+          });
           this.cdr.markForCheck();
         },
         error: (e) => this.logger.error('Error loading subjects for student:', e),
@@ -186,19 +198,31 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
 
   saveMarksA(): void {
     if (!this.selectedSubjectEntryId) return;
+
+    // Only send entries where the mark has actually changed from the loaded value
     const entries: MarkEntryRequest[] = this.subjectStudents
-      .filter(s => this.marksInputA[s.studentId] !== null && this.marksInputA[s.studentId] !== undefined)
+      .filter(s => {
+        const current = this.marksInputA[s.studentId];
+        const original = this.originalMarksA[s.studentId];
+        return current !== null && current !== undefined && current !== original;
+      })
       .map(s => ({
         studentId: s.studentId,
         examSubjectEntryId: this.selectedSubjectEntryId!,
         marksObtained: this.marksInputA[s.studentId]!,
       }));
 
-    if (entries.length === 0) return;
+    if (entries.length === 0) {
+      Swal.fire('No Changes', 'No marks were modified.', 'info');
+      return;
+    }
+
     this.saving = true;
     this.marksService.saveBulkMarks(entries).pipe(takeUntil(this.destroy$)).subscribe({
       next: (result) => {
         this.saving = false;
+        // Sync snapshot so a second save won't re-send the same changes
+        entries.forEach(e => { this.originalMarksA[e.studentId] = e.marksObtained; });
         this.cdr.markForCheck();
         const msg = `Saved: ${result.saved}, Updated: ${result.updated}` +
           (result.errors.length ? `, Errors: ${result.errors.length}` : '');
@@ -215,19 +239,31 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
 
   saveMarksB(): void {
     if (!this.selectedStudentId) return;
+
+    // Only send subjects where the mark has actually changed from the loaded value
     const entries: MarkEntryRequest[] = this.studentSubjects
-      .filter(s => this.marksInputB[s.examSubjectEntryId] !== null && this.marksInputB[s.examSubjectEntryId] !== undefined)
+      .filter(s => {
+        const current = this.marksInputB[s.examSubjectEntryId];
+        const original = this.originalMarksB[s.examSubjectEntryId];
+        return current !== null && current !== undefined && current !== original;
+      })
       .map(s => ({
         studentId: this.selectedStudentId,
         examSubjectEntryId: s.examSubjectEntryId,
         marksObtained: this.marksInputB[s.examSubjectEntryId]!,
       }));
 
-    if (entries.length === 0) return;
+    if (entries.length === 0) {
+      Swal.fire('No Changes', 'No marks were modified.', 'info');
+      return;
+    }
+
     this.saving = true;
     this.marksService.saveBulkMarks(entries).pipe(takeUntil(this.destroy$)).subscribe({
       next: (result) => {
         this.saving = false;
+        // Sync snapshot so a second save won't re-send the same changes
+        entries.forEach(e => { this.originalMarksB[e.examSubjectEntryId] = e.marksObtained; });
         this.cdr.markForCheck();
         Swal.fire('Marks Saved', `Saved: ${result.saved}, Updated: ${result.updated}`, 'success');
       },
@@ -260,6 +296,7 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
     this.selectedSubjectEntryId = null;
     this.subjectStudents = [];
     this.marksInputA = {};
+    this.originalMarksA = {};
   }
 
   private resetStudentSelection(): void {
@@ -267,6 +304,7 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
     this.selectedStudentId = '';
     this.studentSubjects = [];
     this.marksInputB = {};
+    this.originalMarksB = {};
   }
 
   trackById(index: number, item: { id: number }): number { return item.id; }

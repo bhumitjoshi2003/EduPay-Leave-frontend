@@ -1,0 +1,201 @@
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
+import { FeeReminderService } from '../../services/fee-reminder.service';
+import { LoggerService } from '../../services/logger.service';
+import { OverdueStudent } from '../../interfaces/fee-reminder';
+import Swal from 'sweetalert2';
+
+@Component({
+  selector: 'app-fee-reminders',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './fee-reminders.component.html',
+  styleUrl: './fee-reminders.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class FeeRemindersComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  readonly classList = [
+    'Play group', 'Nursery', 'LKG', 'UKG',
+    '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
+  ];
+
+  sessions: string[] = [];
+  selectedSession = '';
+  selectedClass = '';
+  minDaysOverdue = 0;   // 0 = all, 30 = 30+ days, 60 = 60+ days
+
+  allStudents: OverdueStudent[] = [];
+  isLoading = false;
+  error: string | null = null;
+
+  /** studentIds for which reminder was sent this session */
+  reminderSent = new Set<string>();
+  sendingId: string | null = null;   // single reminder in-flight
+  sendingBulk = false;
+
+  constructor(
+    private feeReminderService: FeeReminderService,
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.initSessions();
+    this.loadOverdue();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private initSessions(): void {
+    const now = new Date();
+    const y = now.getFullYear();
+    const startYear = now.getMonth() + 1 >= 4 ? y : y - 1;
+    for (let i = 0; i < 3; i++) {
+      const s = startYear - i;
+      this.sessions.push(`${s}-${s + 1}`);
+    }
+    this.selectedSession = this.sessions[0];
+  }
+
+  // ── Filtered view ────────────────────────────────────────────────
+
+  get filteredStudents(): OverdueStudent[] {
+    return this.allStudents.filter(s => {
+      if (this.selectedClass && s.className !== this.selectedClass) return false;
+      if (this.minDaysOverdue && s.daysOverdue < this.minDaysOverdue) return false;
+      return true;
+    });
+  }
+
+  get totalDue(): number {
+    return this.filteredStudents.reduce((sum, s) => sum + s.totalDue, 0);
+  }
+
+  get criticalCount(): number {
+    return this.filteredStudents.filter(s => s.daysOverdue >= 60).length;
+  }
+
+  get warningCount(): number {
+    return this.filteredStudents.filter(s => s.daysOverdue >= 30 && s.daysOverdue < 60).length;
+  }
+
+  // ── Load ─────────────────────────────────────────────────────────
+
+  loadOverdue(): void {
+    this.isLoading = true;
+    this.error = null;
+    this.allStudents = [];
+    this.reminderSent.clear();
+    this.cdr.markForCheck();
+
+    this.feeReminderService.getOverdueStudents(this.selectedSession)
+      .pipe(takeUntil(this.destroy$)).subscribe({
+        next: (data) => {
+          // Sort: most overdue first
+          this.allStudents = data.sort((a, b) => b.daysOverdue - a.daysOverdue);
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.logger.error('Failed to load overdue students:', err);
+          this.error = 'Failed to load overdue fees. Please try again.';
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  // ── Status helpers ───────────────────────────────────────────────
+
+  getRowClass(s: OverdueStudent): string {
+    if (s.daysOverdue >= 60) return 'row-critical';
+    if (s.daysOverdue >= 30) return 'row-warning';
+    return 'row-mild';
+  }
+
+  getBadgeClass(s: OverdueStudent): string {
+    if (s.daysOverdue >= 60) return 'badge-critical';
+    if (s.daysOverdue >= 30) return 'badge-warning';
+    return 'badge-mild';
+  }
+
+  // ── Send reminder ────────────────────────────────────────────────
+
+  sendReminder(student: OverdueStudent): void {
+    if (this.sendingId || this.reminderSent.has(student.studentId)) return;
+
+    this.sendingId = student.studentId;
+    this.cdr.markForCheck();
+
+    this.feeReminderService.sendReminder(student.studentId, this.selectedSession)
+      .pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.reminderSent.add(student.studentId);
+          this.sendingId = null;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.logger.error('Failed to send reminder:', err);
+          this.sendingId = null;
+          this.cdr.markForCheck();
+          Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to send reminder. Please try again.' });
+        }
+      });
+  }
+
+  sendAllReminders(): void {
+    const unsent = this.filteredStudents.filter(s => !this.reminderSent.has(s.studentId));
+    if (unsent.length === 0) {
+      Swal.fire({ icon: 'info', title: 'All done', text: 'Reminders already sent to all students shown.' });
+      return;
+    }
+
+    Swal.fire({
+      title: `Send reminders to ${unsent.length} student${unsent.length > 1 ? 's' : ''}?`,
+      text: 'A fee reminder will be sent to each parent.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3498db',
+      confirmButtonText: 'Yes, send all'
+    }).then(result => {
+      if (!result.isConfirmed) return;
+
+      this.sendingBulk = true;
+      this.cdr.markForCheck();
+
+      const ids = unsent.map(s => s.studentId);
+      this.feeReminderService.sendBulkReminders(ids, this.selectedSession)
+        .pipe(takeUntil(this.destroy$)).subscribe({
+          next: (res) => {
+            ids.forEach(id => this.reminderSent.add(id));
+            this.sendingBulk = false;
+            this.cdr.markForCheck();
+            Swal.fire({
+              icon: 'success',
+              title: 'Reminders sent!',
+              text: `Successfully sent ${res.sent} reminder${res.sent !== 1 ? 's' : ''}.`,
+              timer: 2500,
+              showConfirmButton: false
+            });
+          },
+          error: (err) => {
+            this.logger.error('Failed to send bulk reminders:', err);
+            this.sendingBulk = false;
+            this.cdr.markForCheck();
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to send reminders. Please try again.' });
+          }
+        });
+    });
+  }
+
+  printReport(): void { window.print(); }
+
+  trackById(_: number, s: OverdueStudent): string { return s.studentId; }
+}

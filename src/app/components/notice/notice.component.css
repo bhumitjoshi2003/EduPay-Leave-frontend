@@ -1,41 +1,372 @@
-/* ── Page wrapper ────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────
+   Page wrapper
+───────────────────────────────────────────────────────────────── */
 .nb-page {
   min-height: 100vh;
-  padding: 24px 20px 48px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
   box-sizing: border-box;
+  padding-bottom: 48px;
 }
 
-/* ── Page headers ────────────────────────────────────────────────── */
-.nb-admin-header,
-.nb-user-header {
+/* ─────────────────────────────────────────────────────────────────
+   STUDENT / TEACHER — Hero banner
+───────────────────────────────────────────────────────────────── */
+.nb-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e3a5f 0%, #1f6f8b 45%, #4fbdbd 100%);
+  border-radius: 20px;
+  padding: 32px 36px 48px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  box-shadow: 0 12px 40px rgba(31, 111, 139, 0.35);
+}
+
+.nb-hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+.nb-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -40px; left: 30%;
+  width: 150px; height: 150px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+
+.nb-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.nb-hero-icon-wrap {
+  font-size: 2.8rem;
+  background: rgba(255,255,255,0.15);
+  border-radius: 16px;
+  width: 64px; height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+}
+
+.nb-hero-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.nb-hero-sub {
+  margin: 4px 0 0;
+  color: rgba(255,255,255,0.75);
+  font-size: 0.9rem;
+}
+
+.nb-hero-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
+}
+
+.nb-hero-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.nb-hero-stat {
+  text-align: center;
+  background: rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 10px 20px;
+  backdrop-filter: blur(6px);
+}
+
+.nb-hero-stat-new {
+  background: rgba(255,193,7,0.2);
+  border: 1px solid rgba(255,193,7,0.4);
+}
+
+.nb-hero-stat-num {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.nb-hero-stat-lbl {
+  display: block;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 3px;
+}
+
+.nb-mark-all-btn {
+  padding: 10px 22px;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+}
+.nb-mark-all-btn:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.7); }
+
+.nb-hero-wave {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  width: 100%; height: 48px;
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   STUDENT / TEACHER — Empty state
+───────────────────────────────────────────────────────────────── */
+.nb-empty-hero {
+  text-align: center;
+  padding: 80px 20px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 20px;
+  border: 2px dashed #d0dfe8;
+}
+.nb-empty-big-icon { font-size: 3.5rem; margin-bottom: 14px; }
+.nb-empty-title { margin: 0 0 8px; font-size: 1.3rem; font-weight: 700; color: #333; }
+.nb-empty-text { margin: 0; color: #888; font-size: 0.95rem; }
+
+/* ─────────────────────────────────────────────────────────────────
+   STUDENT / TEACHER — Notice cards grid
+───────────────────────────────────────────────────────────────── */
+.nb-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Notice card */
+.nb-card {
+  position: relative;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  overflow: visible;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.nb-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.14);
+}
+
+/* Colored top strip using CSS var --accent */
+.nb-card-strip {
+  height: 6px;
+  background: var(--accent, #6366f1);
+  border-radius: 18px 18px 0 0;
+}
+
+/* Thumbtack pin */
+.nb-pin {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nb-pin-head {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent, #6366f1);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Unread glow pulse */
+.nb-unread-pulse {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  animation: pulseGlow 2s infinite;
+  z-index: 3;
+}
+@keyframes pulseGlow {
+  0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  70%  { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.nb-card-inner {
+  padding: 20px 22px 22px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nb-card-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.nb-card-icon-wrap {
+  font-size: 1.7rem;
+  line-height: 1;
+  background: color-mix(in srgb, var(--accent, #6366f1) 12%, white);
+  border-radius: 10px;
+  width: 42px; height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nb-card-meta-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.nb-new-tag {
+  display: inline-block;
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.nb-card-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: #aaa;
+  font-weight: 500;
+}
+
+.nb-card-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a2a3a;
+  line-height: 1.3;
+}
+
+.nb-card-unread .nb-card-title {
+  color: var(--accent, #1f6f8b);
+}
+
+.nb-card-msg {
+  margin: 0;
+  font-size: 0.87rem;
+  color: #555;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   ADMIN — Hero
+───────────────────────────────────────────────────────────────── */
+.nb-admin-hero {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 24px;
+  padding: 20px 28px;
+  background: linear-gradient(135deg, rgba(31,111,139,0.08), rgba(79,189,189,0.06));
+  border-radius: 16px;
+  border-left: 5px solid #1f6f8b;
 }
 
-.nb-page-title {
+.nb-admin-title {
   margin: 0;
   font-size: 1.7rem;
-  font-weight: 700;
-  color: #1f6f8b;
+  font-weight: 800;
+  color: #1a2a3a;
 }
 
-.nb-role-badge {
-  background: #e8f4f8;
-  color: #1f6f8b;
-  font-size: 0.8rem;
+.nb-admin-subtitle {
+  margin: 3px 0 0;
+  color: #666;
+  font-size: 0.88rem;
+}
+
+.nb-admin-badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #1f6f8b;
+  color: #fff;
+  font-size: 0.78rem;
   font-weight: 700;
-  padding: 4px 14px;
+  padding: 6px 16px;
   border-radius: 20px;
   letter-spacing: 0.4px;
   text-transform: uppercase;
 }
 
-/* ── Admin two-column layout ─────────────────────────────────────── */
+.nb-admin-badge-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #4fbdbd;
+  animation: pulseGlow 2s infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   ADMIN — Two-column layout
+───────────────────────────────────────────────────────────────── */
 .nb-admin-layout {
   display: grid;
   grid-template-columns: 380px 1fr;
@@ -43,37 +374,199 @@
   align-items: start;
 }
 
-/* ── Shared card ─────────────────────────────────────────────────── */
-.nb-compose-card,
-.nb-list-card {
+/* ─────────────────────────────────────────────────────────────────
+   ADMIN — Compose card
+───────────────────────────────────────────────────────────────── */
+.nb-compose-card {
   background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  padding: 24px 22px;
+  border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.09);
+  padding: 28px 24px;
+  position: sticky;
+  top: 16px;
 }
 
-.nb-card-title {
-  margin: 0 0 20px;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #1f6f8b;
+.nb-compose-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 2px solid #e8f4f8;
-  padding-bottom: 12px;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #eef4f8;
 }
 
-.nb-count-badge {
+.nb-compose-icon { font-size: 1.4rem; }
+
+.nb-compose-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1a2a3a;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   ADMIN — List card
+───────────────────────────────────────────────────────────────── */
+.nb-list-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.09);
+  padding: 28px 24px;
+}
+
+.nb-list-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #eef4f8;
+}
+
+.nb-list-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1a2a3a;
+}
+
+.nb-list-sub {
+  margin: 3px 0 0;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.nb-count-chip {
   background: #1f6f8b;
   color: #fff;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  padding: 2px 9px;
+  padding: 3px 12px;
   border-radius: 12px;
+  flex-shrink: 0;
 }
 
-/* ── Form fields ─────────────────────────────────────────────────── */
+.nb-empty-admin {
+  text-align: center;
+  padding: 48px 20px;
+  color: #aaa;
+  font-size: 0.92rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border: 2px dashed #e0eef5;
+  border-radius: 14px;
+}
+.nb-empty-admin span { font-size: 2rem; }
+
+/* ─────────────────────────────────────────────────────────────────
+   ADMIN — Notice list items
+───────────────────────────────────────────────────────────────── */
+.nb-admin-notice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 680px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.nb-admin-notice-item {
+  display: flex;
+  border-radius: 14px;
+  border: 1px solid #eef4f8;
+  background: #fafcfe;
+  overflow: hidden;
+  transition: box-shadow 0.18s, transform 0.18s;
+}
+
+.nb-admin-notice-item:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  transform: translateX(2px);
+}
+
+.nb-ani-strip {
+  width: 5px;
+  flex-shrink: 0;
+  background: var(--accent, #6366f1);
+}
+
+.nb-ani-body {
+  padding: 14px 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.nb-ani-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.nb-ani-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.nb-ani-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.nb-ani-title {
+  margin: 0 0 4px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a2a3a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nb-ani-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nb-ani-date {
+  font-size: 0.72rem;
+  color: #aaa;
+}
+
+.nb-ani-msg {
+  margin: 0 0 6px;
+  font-size: 0.85rem;
+  color: #555;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nb-ani-by {
+  font-size: 0.72rem;
+  color: #bbb;
+}
+
+.nb-ani-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Shared form fields
+───────────────────────────────────────────────────────────────── */
 .nb-field {
   display: flex;
   flex-direction: column;
@@ -82,7 +575,7 @@
 }
 
 .nb-label {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: #555;
   text-transform: uppercase;
@@ -94,13 +587,13 @@
 .nb-input,
 .nb-select,
 .nb-textarea {
-  border: 1px solid #d0dfe8;
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-size: 0.93rem;
+  border: 1.5px solid #d0dfe8;
+  border-radius: 10px;
+  padding: 10px 13px;
+  font-size: 0.92rem;
   font-family: inherit;
   color: #222;
-  background: #fafcfe;
+  background: #f8fbfe;
   transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
   width: 100%;
@@ -112,438 +605,141 @@
   outline: none;
   border-color: #4fbdbd;
   box-shadow: 0 0 0 3px rgba(79, 189, 189, 0.15);
+  background: #fff;
 }
 
 .nb-textarea { resize: vertical; }
 
-/* ── Delivery mode buttons ───────────────────────────────────────── */
+/* Delivery mode toggle */
 .nb-mode-group {
   display: flex;
   gap: 0;
-  border: 1px solid #d0dfe8;
-  border-radius: 8px;
+  border: 1.5px solid #d0dfe8;
+  border-radius: 10px;
   overflow: hidden;
 }
 
 .nb-mode-btn {
   flex: 1;
-  padding: 9px 0;
+  padding: 10px 0;
   border: none;
-  background: #fafcfe;
-  color: #555;
-  font-size: 0.85rem;
+  background: #f8fbfe;
+  color: #666;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
-  border-right: 1px solid #d0dfe8;
+  border-right: 1.5px solid #d0dfe8;
 }
-
 .nb-mode-btn:last-child { border-right: none; }
-
-.nb-mode-btn.active {
-  background: #1f6f8b;
-  color: #fff;
-}
-
+.nb-mode-btn.active { background: #1f6f8b; color: #fff; }
 .nb-mode-btn:hover:not(.active) { background: #e8f4f8; }
 
-/* ── Post button ─────────────────────────────────────────────────── */
+/* Post button */
 .nb-btn-post {
   width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, #1f6f8b, #4fbdbd);
+  padding: 13px;
+  background: linear-gradient(135deg, #1e3a5f, #1f6f8b 50%, #4fbdbd);
   color: #fff;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s;
-  margin-top: 4px;
-}
-
-.nb-btn-post:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
-.nb-btn-post:disabled { opacity: 0.55; cursor: not-allowed; }
-
-/* ── Posted notices list ─────────────────────────────────────────── */
-.nb-notice-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  max-height: 640px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.nb-notice-item {
-  border: 1px solid #e0eef5;
-  border-radius: 10px;
-  padding: 14px 16px;
-  background: #fafcfe;
-  transition: box-shadow 0.15s;
-}
-
-.nb-notice-item:hover { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07); }
-
-.nb-notice-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.nb-audience-tag {
-  background: #e8f4f8;
-  color: #1f6f8b;
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 12px;
-  text-transform: uppercase;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(31,111,139,0.35);
   letter-spacing: 0.3px;
 }
-
-.nb-date {
-  font-size: 0.75rem;
-  color: #999;
+.nb-btn-post:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(31,111,139,0.4);
 }
+.nb-btn-post:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.nb-notice-title {
-  margin: 0 0 6px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #1a3a47;
-}
-
-.nb-notice-body {
-  margin: 0 0 8px;
-  font-size: 0.88rem;
-  color: #444;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.nb-posted-by {
-  font-size: 0.75rem;
-  color: #aaa;
-  margin-bottom: 10px;
-}
-
-.nb-notice-actions {
-  display: flex;
-  gap: 8px;
-}
-
+/* Edit / Delete / Save / Cancel buttons */
 .nb-btn-edit,
 .nb-btn-delete,
 .nb-btn-save,
 .nb-btn-cancel {
-  padding: 6px 16px;
+  padding: 5px 14px;
   border: none;
   border-radius: 7px;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, transform 0.15s;
+  white-space: nowrap;
 }
-
-.nb-btn-edit  { background: #e8f4f8; color: #1f6f8b; }
-.nb-btn-edit:hover  { background: #d0eaf5; }
-
+.nb-btn-edit   { background: #e8f4f8; color: #1f6f8b; }
+.nb-btn-edit:hover   { background: #d0eaf5; transform: translateY(-1px); }
 .nb-btn-delete { background: #fde8e8; color: #c0392b; }
-.nb-btn-delete:hover { background: #fbd1d1; }
-
-.nb-btn-save { background: #1f6f8b; color: #fff; }
-.nb-btn-save:hover { opacity: 0.85; }
-
+.nb-btn-delete:hover { background: #fbd1d1; transform: translateY(-1px); }
+.nb-btn-save   { background: #1f6f8b; color: #fff; }
+.nb-btn-save:hover   { opacity: 0.85; }
 .nb-btn-cancel { background: #f0f0f0; color: #555; }
 .nb-btn-cancel:hover { background: #e0e0e0; }
 
-/* ── Inline edit form ────────────────────────────────────────────── */
-.nb-edit-form {
+/* Audience tag */
+.nb-audience-tag {
+  background: rgba(31,111,139,0.1);
+  color: #1f6f8b;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Edit body */
+.nb-edit-body {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-
+.nb-edit-label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1f6f8b;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
 .nb-edit-actions {
   display: flex;
   gap: 8px;
 }
 
-/* ── Empty states ────────────────────────────────────────────────── */
-.nb-empty {
-  text-align: center;
-  color: #aaa;
-  font-style: italic;
-  padding: 32px 0;
-  font-size: 0.9rem;
+/* ─────────────────────────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .nb-cards-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-.nb-empty-user {
-  text-align: center;
-  color: #999;
-  font-style: italic;
-  padding: 60px 0;
-  font-size: 1rem;
-}
-
-/* ── Student/Teacher: mark all read button ───────────────────────── */
-.nb-btn-mark-read {
-  padding: 8px 20px;
-  background: #e8f4f8;
-  color: #1f6f8b;
-  border: 2px solid #4fbdbd;
-  border-radius: 8px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.nb-btn-mark-read:hover { background: #d0eaf5; }
-
-/* ── Student/Teacher: notifications list ────────────────────────── */
-.nb-user-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  max-width: 780px;
-  margin: 0 auto;
-}
-
-.nb-user-item {
-  display: flex;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
-  transition: box-shadow 0.15s;
-}
-
-.nb-user-item:hover { box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1); }
-
-.nb-user-item-bar {
-  width: 5px;
-  flex-shrink: 0;
-  background: #d0eaf5;
-}
-
-.nb-unread .nb-user-item-bar {
-  background: linear-gradient(to bottom, #1f6f8b, #4fbdbd);
-}
-
-.nb-user-item-body {
-  padding: 16px 18px;
-  flex: 1;
-}
-
-.nb-user-item-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 6px;
-}
-
-.nb-user-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1a3a47;
-}
-
-.nb-unread .nb-user-title { color: #1f6f8b; }
-
-.nb-user-date {
-  font-size: 0.75rem;
-  color: #aaa;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.nb-user-message {
-  margin: 0 0 8px;
-  font-size: 0.9rem;
-  color: #444;
-  line-height: 1.55;
-}
-
-.nb-unread-dot {
-  display: inline-block;
-  background: #1f6f8b;
-  color: #fff;
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 2px 9px;
-  border-radius: 10px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-/* ── Tablet (≤ 900px) ────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .nb-admin-layout {
-    grid-template-columns: 1fr;
-  }
+  .nb-admin-layout { grid-template-columns: 1fr; }
+  .nb-compose-card { position: static; }
 }
 
-/* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
-@media (max-width: 600px) {
-
-  /* Page */
-  .nb-page {
-    padding: 12px 10px 40px;
-  }
-
-  /* Headers */
-  .nb-admin-header,
-  .nb-user-header {
+@media (max-width: 640px) {
+  .nb-hero {
+    padding: 24px 20px 42px;
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
-    margin-bottom: 16px;
   }
-
-  .nb-page-title { font-size: 1.2rem; }
-
-  .nb-role-badge { font-size: 0.72rem; padding: 3px 10px; }
-
-  /* Cards */
-  .nb-compose-card,
-  .nb-list-card {
-    padding: 16px 14px;
-    border-radius: 10px;
-  }
-
-  .nb-card-title {
-    font-size: 0.95rem;
-    margin-bottom: 14px;
-  }
-
-  /* Form inputs */
-  .nb-input,
-  .nb-select,
-  .nb-textarea {
-    font-size: 0.88rem;
-    padding: 9px 10px;
-  }
-
-  .nb-label { font-size: 0.75rem; }
-
-  /* Delivery mode — stack labels vertically on very small screens */
-  .nb-mode-group {
-    border-radius: 8px;
-  }
-
-  .nb-mode-btn {
-    font-size: 0.75rem;
-    padding: 10px 0;
-  }
-
-  /* Post button */
-  .nb-btn-post {
-    font-size: 0.92rem;
-    padding: 13px;
-  }
-
-  /* Posted notice items */
-  .nb-notice-list {
-    max-height: none;
-    gap: 12px;
-  }
-
-  .nb-notice-item {
-    padding: 12px 12px;
-  }
-
-  .nb-notice-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-
-  .nb-audience-tag { font-size: 0.68rem; }
-
-  .nb-notice-title { font-size: 0.9rem; }
-
-  .nb-notice-body {
-    font-size: 0.83rem;
-    -webkit-line-clamp: 4;
-  }
-
-  /* Edit / Delete buttons — full width on mobile */
-  .nb-notice-actions {
-    flex-direction: row;
-    gap: 8px;
-  }
-
-  .nb-btn-edit,
-  .nb-btn-delete,
-  .nb-btn-save,
-  .nb-btn-cancel {
-    flex: 1;
-    text-align: center;
-    padding: 9px 0;
-    font-size: 0.8rem;
-  }
-
-  /* Inline edit form */
-  .nb-edit-actions {
-    gap: 8px;
-  }
-
-  /* Mark all read button */
-  .nb-btn-mark-read {
-    width: 100%;
-    text-align: center;
-    font-size: 0.85rem;
-    padding: 10px;
-  }
-
-  /* User notification list */
-  .nb-user-list {
-    max-width: 100%;
-    gap: 10px;
-  }
-
-  .nb-user-item {
-    border-radius: 10px;
-  }
-
-  .nb-user-item-body {
-    padding: 13px 14px;
-  }
-
-  .nb-user-item-top {
-    flex-direction: column;
-    gap: 3px;
-    margin-bottom: 6px;
-  }
-
-  .nb-user-title { font-size: 0.95rem; }
-
-  .nb-user-date {
-    font-size: 0.7rem;
-    white-space: normal;
-  }
-
-  .nb-user-message {
-    font-size: 0.85rem;
-    line-height: 1.5;
-  }
-
-  .nb-unread-dot {
-    font-size: 0.65rem;
-    padding: 2px 8px;
-  }
-
-  /* Empty states */
-  .nb-empty { padding: 24px 0; font-size: 0.85rem; }
-  .nb-empty-user { padding: 40px 0; font-size: 0.9rem; }
+  .nb-hero-left { gap: 12px; }
+  .nb-hero-icon-wrap { width: 50px; height: 50px; font-size: 2rem; }
+  .nb-hero-title { font-size: 1.5rem; }
+  .nb-hero-right { width: 100%; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .nb-hero-stats { gap: 10px; }
+  .nb-mark-all-btn { width: 100%; text-align: center; }
+  .nb-cards-grid { grid-template-columns: 1fr; gap: 16px; }
+  .nb-card-inner { padding: 16px 18px 18px; }
+  .nb-admin-hero { padding: 16px 18px; }
+  .nb-admin-title { font-size: 1.3rem; }
+  .nb-compose-card, .nb-list-card { padding: 20px 16px; }
+  .nb-ani-top { flex-direction: column; gap: 8px; }
+  .nb-ani-actions { width: 100%; justify-content: flex-end; }
 }

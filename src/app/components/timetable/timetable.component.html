@@ -1,0 +1,227 @@
+<div class="tt-container">
+
+  <!-- ── Page Header ───────────────────────────────────────────── -->
+  <div class="tt-page-header">
+    <h2 class="tt-title">Timetable</h2>
+    <button class="tt-print-btn no-print" (click)="printTimetable()" aria-label="Print timetable"
+      *ngIf="(hasAnyEntry() && isAdmin()) || (isTeacher() && hasAnyTeacherEntry())">
+      🖨 Print
+    </button>
+  </div>
+
+  <!-- ── Admin controls ────────────────────────────────────────── -->
+  <div class="tt-controls no-print" *ngIf="isAdmin()">
+    <div class="tt-controls-row">
+      <div class="tt-control-group">
+        <label class="tt-label" for="tt-class-select">Class</label>
+        <select id="tt-class-select" class="tt-select" [(ngModel)]="selectedClass"
+          (ngModelChange)="loadClassTimetable()">
+          <option value="">-- Choose Class --</option>
+          <option *ngFor="let c of classList" [value]="c">Class {{ c }}</option>
+        </select>
+      </div>
+      <div class="tt-control-group">
+        <label class="tt-label" for="tt-max-periods">Periods per day</label>
+        <select id="tt-max-periods" class="tt-select tt-select-sm" [(ngModel)]="maxPeriods"
+          (ngModelChange)="onMaxPeriodsChange()">
+          <option *ngFor="let n of periodOptions" [value]="n">{{ n }}</option>
+        </select>
+      </div>
+    </div>
+    <p class="tt-hint" *ngIf="selectedClass">
+      Click an empty cell to add · Click an existing subject to edit or delete
+    </p>
+  </div>
+
+  <!-- ── Loading / Error ───────────────────────────────────────── -->
+  <div class="tt-loading" *ngIf="isLoading">
+    <div class="tt-spinner"></div>
+    <span>Loading timetable…</span>
+  </div>
+  <p class="tt-error" *ngIf="error">{{ error }}</p>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       CLASS TIMETABLE GRID  (Student + Admin)
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="tt-grid-wrap" *ngIf="!isTeacher() && !isLoading && selectedClass">
+
+    <div class="tt-print-header">
+      <h3>Class {{ selectedClass }} — Weekly Timetable</h3>
+    </div>
+
+    <div *ngIf="hasAnyEntry() || isAdmin()">
+      <div class="tt-table-scroll">
+        <table class="tt-table" aria-label="Class timetable">
+          <thead>
+            <tr>
+              <th class="tt-th-period">#</th>
+              <th *ngFor="let day of days; trackBy: trackByDay" class="tt-th-day">
+                {{ dayLabels[day] }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let period of visiblePeriods; trackBy: trackByPeriod">
+              <td class="tt-td-period">
+                <span class="tt-period-badge">{{ period }}</span>
+              </td>
+              <td *ngFor="let day of days; trackBy: trackByDay"
+                class="tt-td"
+                [class.tt-td-filled]="getCell(day, period)"
+                [class.tt-td-empty]="!getCell(day, period)"
+                [class.tt-td-clickable]="isAdmin()"
+                (click)="isAdmin() && (getCell(day, period) ? openEdit(getCell(day, period)!) : openCreate(day, period))">
+
+                <ng-container *ngIf="getCell(day, period) as cell">
+                  <span class="tt-subject">{{ cell.subjectName }}</span>
+                  <span class="tt-teacher">{{ cell.teacherName }}</span>
+                  <span class="tt-time">{{ cell.startTime }} – {{ cell.endTime }}</span>
+                  <span class="tt-edit-hint no-print" *ngIf="isAdmin()">✎ Edit</span>
+                </ng-container>
+
+                <span class="tt-add-hint no-print" *ngIf="!getCell(day, period) && isAdmin()">
+                  + Add
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tt-empty" *ngIf="!hasAnyEntry() && isStudent()">
+      <p>No timetable has been set up for your class yet. Please check back later.</p>
+    </div>
+    <div class="tt-empty" *ngIf="!hasAnyEntry() && isAdmin() && selectedClass">
+      <p>No timetable yet for Class {{ selectedClass }}. Click any cell above to start adding periods.</p>
+    </div>
+  </div>
+
+  <div class="tt-empty" *ngIf="isAdmin() && !selectedClass && !isLoading">
+    <p>Select a class above to view or edit its timetable.</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       TEACHER SCHEDULE VIEW
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="tt-teacher-wrap" *ngIf="isTeacher() && !isLoading">
+
+    <div class="tt-print-header">
+      <h3>My Weekly Schedule</h3>
+    </div>
+
+    <ng-container *ngIf="hasAnyTeacherEntry(); else noTeacherSchedule">
+      <div *ngFor="let day of days; trackBy: trackByDay">
+        <div class="tt-day-block" *ngIf="hasTeacherEntries(day)">
+          <h4 class="tt-day-label">{{ dayLabels[day] }}</h4>
+          <div class="tt-table-scroll">
+            <table class="tt-table" [attr.aria-label]="dayLabels[day] + ' schedule'">
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>Time</th>
+                  <th>Class</th>
+                  <th>Subject</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let e of teacherGrid[day]; trackBy: trackByEntry">
+                  <td data-label="Period">{{ e.periodNumber }}</td>
+                  <td data-label="Time">{{ e.startTime }} – {{ e.endTime }}</td>
+                  <td data-label="Class">
+                    <span class="tt-class-badge">Class {{ e.className }}</span>
+                  </td>
+                  <td data-label="Subject">
+                    <span class="tt-subject">{{ e.subjectName }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #noTeacherSchedule>
+      <div class="tt-empty">
+        <p>You have no periods scheduled yet. Contact your admin to set up your timetable.</p>
+      </div>
+    </ng-template>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ADD / EDIT MODAL
+══════════════════════════════════════════════════════════════ -->
+<div class="tt-overlay" *ngIf="showModal" (click)="closeModal()" role="dialog" aria-modal="true"
+  [attr.aria-label]="isEditMode ? 'Edit period' : 'Add period'">
+  <div class="tt-modal" (click)="$event.stopPropagation()">
+
+    <h3 class="tt-modal-title">{{ isEditMode ? 'Edit Period' : 'Add Period' }}</h3>
+
+    <div class="tt-modal-meta" *ngIf="modalForm.day && modalForm.periodNumber">
+      {{ dayLabels[modalForm.day] }} · Period {{ modalForm.periodNumber }}
+      <span *ngIf="modalForm.className"> · Class {{ modalForm.className }}</span>
+    </div>
+
+    <div class="tt-modal-body">
+
+      <div class="tt-field">
+        <label class="tt-field-label" for="modal-day">Day</label>
+        <select id="modal-day" class="tt-field-input" [(ngModel)]="modalForm.day">
+          <option *ngFor="let d of days; trackBy: trackByDay" [value]="d">{{ dayLabels[d] }}</option>
+        </select>
+      </div>
+
+      <div class="tt-field">
+        <label class="tt-field-label" for="modal-period">Period</label>
+        <select id="modal-period" class="tt-field-input" [(ngModel)]="modalForm.periodNumber">
+          <option *ngFor="let p of allPeriods; trackBy: trackByPeriod" [value]="p">{{ p }}</option>
+        </select>
+      </div>
+
+      <div class="tt-field-row">
+        <div class="tt-field">
+          <label class="tt-field-label" for="modal-start">Start Time</label>
+          <input id="modal-start" type="time" class="tt-field-input" [(ngModel)]="modalForm.startTime">
+        </div>
+        <div class="tt-field">
+          <label class="tt-field-label" for="modal-end">End Time</label>
+          <input id="modal-end" type="time" class="tt-field-input" [(ngModel)]="modalForm.endTime">
+        </div>
+      </div>
+
+      <div class="tt-field">
+        <label class="tt-field-label" for="modal-subject">Subject</label>
+        <input id="modal-subject" type="text" class="tt-field-input" [(ngModel)]="modalForm.subjectName"
+          placeholder="e.g. Mathematics" autocomplete="off">
+      </div>
+
+      <div class="tt-field">
+        <label class="tt-field-label" for="modal-teacher">Teacher</label>
+        <select id="modal-teacher" class="tt-field-input" [(ngModel)]="modalForm.teacherId"
+          (ngModelChange)="onTeacherSelect()">
+          <option value="">-- Select Teacher --</option>
+          <option *ngFor="let t of teachers" [value]="t.teacherId">{{ t.name }}</option>
+        </select>
+      </div>
+
+    </div>
+
+    <p class="tt-modal-error" *ngIf="modalError" role="alert">{{ modalError }}</p>
+
+    <div class="tt-modal-actions">
+      <button class="tt-btn-delete" *ngIf="isEditMode" (click)="deleteEntry()" [disabled]="modalSaving">
+        Delete
+      </button>
+      <div class="tt-modal-right-actions">
+        <button class="tt-btn-cancel" (click)="closeModal()" [disabled]="modalSaving">Cancel</button>
+        <button class="tt-btn-save" (click)="saveEntry()" [disabled]="modalSaving">
+          {{ modalSaving ? 'Saving…' : (isEditMode ? 'Update' : 'Add Period') }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

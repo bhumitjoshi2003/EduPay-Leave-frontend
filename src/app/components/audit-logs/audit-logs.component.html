@@ -122,27 +122,111 @@
                 <button class="close-x" (click)="closeDetails()" aria-label="Close change breakdown">&times;</button>
             </div>
 
-            <div class="comparison-grid">
-                <div class="diff-panel original">
-                    <div class="diff-header">
-                        <span class="status-indicator"></span>
-                        <label>Previous Data</label>
-                    </div>
-                    <div class="code-container">
-                        <pre><code>{{ formatJson(selectedLog.oldValue) || '// No previous data recorded' }}</code></pre>
-                    </div>
+            <!-- UPDATE actions: show only changed fields -->
+            <ng-container *ngIf="isUpdateAction(selectedLog.action)">
+              <div class="diff-table-wrap">
+                <ng-container *ngIf="selectedDiff.length > 0; else noDiff">
+                  <table class="diff-table">
+                    <thead>
+                      <tr>
+                        <th class="col-field">Field</th>
+                        <th class="col-old">Previous Value</th>
+                        <th class="col-new">New Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let d of selectedDiff; trackBy: trackByIndex">
+                        <td class="diff-cell diff-field-name">{{ d.field }}</td>
+                        <td class="diff-cell diff-old-val">{{ formatValue(d.old) }}</td>
+                        <td class="diff-cell diff-new-val">{{ formatValue(d.new) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </ng-container>
+                <ng-template #noDiff>
+                  <div class="diff-no-changes">
+                    <span class="diff-no-icon">✓</span>
+                    <p>No field differences detected between old and new values.</p>
+                  </div>
+                </ng-template>
+              </div>
+            </ng-container>
+
+            <!-- CREATE / DELETE / SAVE actions: smart renderer -->
+            <ng-container *ngIf="!isUpdateAction(selectedLog.action)">
+              <div class="al-data-wrap">
+
+                <!-- Header row -->
+                <div class="al-data-header-bar">
+                  <div class="al-data-header-left">
+                    <span class="al-data-badge" [class.al-badge-delete]="selectedParsedLabel === 'Deleted'"
+                      [class.al-badge-create]="selectedParsedLabel === 'Created'">
+                      {{ selectedParsedLabel }}
+                    </span>
+                    <span class="al-data-title">{{ selectedLog.entityName }}</span>
+                  </div>
+                  <span class="al-data-count" *ngIf="isArray(selectedParsed)">
+                    {{ selectedParsed.length }} record{{ selectedParsed.length !== 1 ? 's' : '' }}
+                  </span>
                 </div>
 
-                <div class="diff-panel updated">
-                    <div class="diff-header">
-                        <span class="status-indicator"></span>
-                        <label>Updated Data</label>
-                    </div>
-                    <div class="code-container">
-                        <pre><code>{{ formatJson(selectedLog.newValue) }}</code></pre>
-                    </div>
+                <!-- Empty state -->
+                <div class="al-empty-state"
+                  *ngIf="!selectedParsed || (isArray(selectedParsed) && selectedParsed.length === 0)">
+                  <span class="al-empty-icon">📭</span>
+                  <p>No data was recorded for this action.</p>
                 </div>
-            </div>
+
+                <!-- Array of objects → table (e.g. attendance records) -->
+                <ng-container *ngIf="isArray(selectedParsed) && selectedParsed.length > 0">
+                  <div class="al-table-scroll">
+                    <table class="al-array-table">
+                      <thead>
+                        <tr>
+                          <th *ngFor="let col of getArrayColumns(selectedParsed)">{{ col }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of selectedParsed; trackBy: trackByIndex">
+                          <td *ngFor="let col of getArrayColumns(selectedParsed)" class="al-td">
+                            <span *ngIf="!isStatusField(col)">{{ formatValue(getCellValue(item, col)) }}</span>
+                            <span *ngIf="isStatusField(col)" class="al-status-badge"
+                              [ngClass]="getStatusClass(getCellValue(item, col))">
+                              {{ getCellValue(item, col) }}
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+
+                <!-- Plain object → key-value table (e.g. created/deleted entity) -->
+                <ng-container *ngIf="isObject(selectedParsed)">
+                  <table class="diff-table al-kv-table">
+                    <thead>
+                      <tr>
+                        <th class="col-field">Field</th>
+                        <th>Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let key of getObjectKeys(selectedParsed); trackBy: trackByIndex">
+                        <td class="diff-cell diff-field-name">{{ key }}</td>
+                        <td class="diff-cell al-kv-val">
+                          <span *ngIf="!isStatusField(key)">{{ formatValue(selectedParsed[key]) }}</span>
+                          <span *ngIf="isStatusField(key)" class="al-status-badge"
+                            [ngClass]="getStatusClass(selectedParsed[key])">
+                            {{ selectedParsed[key] }}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </ng-container>
+
+              </div>
+            </ng-container>
 
             <div class="modal-footer">
                 <button class="close-btn-footer" (click)="closeDetails()">

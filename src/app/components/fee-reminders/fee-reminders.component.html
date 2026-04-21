@@ -1,0 +1,181 @@
+<div class="fr-container">
+
+  <!-- ── Header ───────────────────────────────────────────────── -->
+  <div class="fr-page-header">
+    <div>
+      <h2 class="fr-title">Fee Reminders</h2>
+      <p class="fr-subtitle">Students with overdue fee payments</p>
+    </div>
+  </div>
+
+  <!-- ── Controls ─────────────────────────────────────────────── -->
+  <div class="fr-controls no-print">
+    <div class="fr-controls-row">
+
+      <div class="fr-control-group">
+        <label class="fr-label" for="fr-session">Session</label>
+        <select id="fr-session" class="fr-select" [(ngModel)]="selectedSession" (ngModelChange)="loadOverdue()">
+          <option *ngFor="let s of sessions" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="fr-control-group">
+        <label class="fr-label" for="fr-class">Class</label>
+        <select id="fr-class" class="fr-select" [(ngModel)]="selectedClass">
+          <option value="">All Classes</option>
+          <option *ngFor="let c of classList" [value]="c">Class {{ c }}</option>
+        </select>
+      </div>
+
+      <div class="fr-control-group">
+        <label class="fr-label" for="fr-days">Overdue by</label>
+        <select id="fr-days" class="fr-select" [(ngModel)]="minDaysOverdue">
+          <option [value]="0">All</option>
+          <option [value]="30">30+ days</option>
+          <option [value]="60">60+ days</option>
+          <option [value]="90">90+ days</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Loading / Error ──────────────────────────────────────── -->
+  <div class="fr-loading" *ngIf="isLoading">
+    <div class="fr-spinner"></div>
+    <span>Loading overdue fees…</span>
+  </div>
+  <p class="fr-error" *ngIf="error">{{ error }}</p>
+
+  <!-- ── Summary cards ────────────────────────────────────────── -->
+  <div class="fr-stats" *ngIf="!isLoading && allStudents.length > 0">
+    <div class="fr-stat-card">
+      <span class="fr-stat-value">{{ filteredStudents.length }}</span>
+      <span class="fr-stat-label">Overdue Students</span>
+    </div>
+    <div class="fr-stat-card fr-stat-amount">
+      <span class="fr-stat-value">₹{{ totalDue | number }}</span>
+      <span class="fr-stat-label">Total Due</span>
+    </div>
+    <div class="fr-stat-card fr-stat-critical">
+      <span class="fr-stat-value">{{ criticalCount }}</span>
+      <span class="fr-stat-label">Critical (60+ days)</span>
+    </div>
+    <div class="fr-stat-card fr-stat-warning">
+      <span class="fr-stat-value">{{ warningCount }}</span>
+      <span class="fr-stat-label">Warning (30-60 days)</span>
+    </div>
+  </div>
+
+  <!-- ── Action bar ────────────────────────────────────────────── -->
+  <div class="fr-action-bar no-print" *ngIf="!isLoading && filteredStudents.length > 0">
+    <span class="fr-showing">
+      Showing {{ filteredStudents.length }} student{{ filteredStudents.length !== 1 ? 's' : '' }}
+    </span>
+    <button class="fr-send-all-btn" (click)="sendAllReminders()" [disabled]="sendingBulk">
+      <span *ngIf="!sendingBulk">📣 Send All Reminders</span>
+      <span *ngIf="sendingBulk">Sending…</span>
+    </button>
+  </div>
+
+  <!-- ── Table ─────────────────────────────────────────────────── -->
+  <div class="fr-table-wrap" *ngIf="!isLoading && filteredStudents.length > 0">
+
+    <!-- Print header -->
+    <div class="fr-print-header">
+      <h3>Fee Overdue Report — {{ selectedSession }}</h3>
+      <p *ngIf="selectedClass">Class: {{ selectedClass }}</p>
+    </div>
+
+    <table class="fr-table" aria-label="Overdue fee students">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student</th>
+          <th>Class</th>
+          <th>Unpaid Months</th>
+          <th>Amount Due</th>
+          <th>Last Payment</th>
+          <th>Days Overdue</th>
+          <th class="no-print">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of filteredStudents; let i = index; trackBy: trackById"
+          [ngClass]="getRowClass(s)">
+
+          <td data-label="#">{{ i + 1 }}</td>
+
+          <td data-label="Student">
+            <span class="fr-student-name">{{ s.studentName }}</span>
+            <span class="fr-student-id">{{ s.studentId }}</span>
+          </td>
+
+          <td data-label="Class">Class {{ s.className }}</td>
+
+          <td data-label="Unpaid Months">
+            <div class="fr-months">
+              <span *ngFor="let m of s.unpaidMonths" class="fr-month-tag">{{ m }}</span>
+            </div>
+          </td>
+
+          <td data-label="Amount Due">
+            <span class="fr-amount">₹{{ s.totalDue | number }}</span>
+          </td>
+
+          <td data-label="Last Payment">
+            <span *ngIf="s.lastPaymentDate">{{ s.lastPaymentDate | date:'dd MMM yyyy' }}</span>
+            <span *ngIf="!s.lastPaymentDate" class="fr-never">Never paid</span>
+          </td>
+
+          <td data-label="Days Overdue">
+            <span class="fr-days-badge" [ngClass]="getBadgeClass(s)">
+              {{ s.daysOverdue }} days
+            </span>
+          </td>
+
+          <td data-label="Action" class="no-print">
+            <button class="fr-remind-btn"
+              [class.fr-remind-sent]="reminderSent.has(s.studentId)"
+              [class.fr-remind-sending]="sendingId === s.studentId"
+              [disabled]="!!sendingId || sendingBulk || reminderSent.has(s.studentId)"
+              (click)="sendReminder(s)"
+              [attr.aria-label]="'Send fee reminder to ' + s.studentName">
+              <ng-container *ngIf="reminderSent.has(s.studentId)">✓ Sent</ng-container>
+              <ng-container *ngIf="sendingId === s.studentId">…</ng-container>
+              <ng-container *ngIf="sendingId !== s.studentId && !reminderSent.has(s.studentId)">
+                Remind
+              </ng-container>
+            </button>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── Legend ────────────────────────────────────────────────── -->
+  <div class="fr-legend no-print" *ngIf="!isLoading && filteredStudents.length > 0">
+    <span class="fr-legend-item">
+      <span class="fr-legend-dot dot-critical"></span> Critical — 60+ days overdue
+    </span>
+    <span class="fr-legend-item">
+      <span class="fr-legend-dot dot-warning"></span> Warning — 30–60 days overdue
+    </span>
+    <span class="fr-legend-item">
+      <span class="fr-legend-dot dot-mild"></span> Mild — under 30 days overdue
+    </span>
+  </div>
+
+  <!-- ── Empty state ───────────────────────────────────────────── -->
+  <div class="fr-empty" *ngIf="!isLoading && !error && allStudents.length === 0">
+    <div class="fr-empty-icon">✅</div>
+    <p class="fr-empty-title">All fees are up to date!</p>
+    <p class="fr-empty-sub">No overdue payments found for {{ selectedSession }}.</p>
+  </div>
+
+  <div class="fr-empty" *ngIf="!isLoading && !error && allStudents.length > 0 && filteredStudents.length === 0">
+    <p>No students match the selected filters. Try adjusting the class or days filter.</p>
+  </div>
+
+</div>

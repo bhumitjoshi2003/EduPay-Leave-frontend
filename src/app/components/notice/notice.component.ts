@@ -247,4 +247,24 @@ export class NoticeComponent implements OnInit, OnDestroy {
   }
 
   trackById(_: number, item: { id?: number }): number { return item.id ?? 0; }
+
+  getNoticeAccent(index: number): string {
+    const palette = ['#6366f1', '#0891b2', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#0284c7'];
+    return palette[index % palette.length];
+  }
+
+  getNoticeIcon(title: string): string {
+    const t = (title ?? '').toLowerCase();
+    if (t.includes('fee') || t.includes('payment') || t.includes('due')) return '💰';
+    if (t.includes('exam') || t.includes('test') || t.includes('result') || t.includes('mark')) return '📝';
+    if (t.includes('holiday') || t.includes('vacation') || t.includes('break') || t.includes('closed')) return '🎉';
+    if (t.includes('leave')) return '🏖️';
+    if (t.includes('meeting') || t.includes('parent')) return '👥';
+    if (t.includes('sport') || t.includes('game') || t.includes('match')) return '🏆';
+    if (t.includes('event') || t.includes('fest') || t.includes('cultural') || t.includes('function')) return '🎭';
+    if (t.includes('schedule') || t.includes('timetable') || t.includes('class')) return '📅';
+    if (t.includes('health') || t.includes('medical') || t.includes('clinic')) return '🏥';
+    if (t.includes('trip') || t.includes('tour') || t.includes('excursion')) return '🚌';
+    return '📌';
+  }
 }

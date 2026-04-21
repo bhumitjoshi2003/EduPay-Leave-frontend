@@ -5,9 +5,10 @@
     </div>
 
     <nav mat-tab-nav-bar class="custom-tab-nav" #tabNav [tabPanel]="tabPanel">
+      <a *ngIf="isAdmin() || isSuperAdmin()" mat-tab-link routerLink="/dashboard/analytics"
+        routerLinkActive #rlaAn="routerLinkActive" [active]="rlaAn.isActive">📊 Dashboard</a>
       <a *ngIf="isStudent() || isAdmin() || isSuperAdmin()" mat-tab-link routerLink="/dashboard/fee-structure"
-        routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">Fee
-        Structure</a>
+        routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">Fee Structure</a>
       <a *ngIf="isStudent() || isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/timetable"
         routerLinkActive #rlaTt="routerLinkActive" [active]="rlaTt.isActive">Timetable</a>
       <a *ngIf="isStudent() || isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/event-calendar"

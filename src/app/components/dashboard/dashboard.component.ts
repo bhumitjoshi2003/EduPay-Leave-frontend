@@ -176,7 +176,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       } else if (this.Role === 'TEACHER') {
         this.router.navigate(['/dashboard/event-calendar']);
       } else if (this.Role === 'ADMIN') {
-        this.router.navigate(['/dashboard/fee-structure']);
+        this.router.navigate(['/dashboard/analytics']);
       } else if (this.Role === 'SUPER_ADMIN') {
         this.router.navigate(['/dashboard/admin-list']);
       } else {

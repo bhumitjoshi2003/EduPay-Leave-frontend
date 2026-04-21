@@ -1,0 +1,201 @@
+<div class="an-page">
+
+  <!-- ── Loading ─────────────────────────────────────────────────── -->
+  <div class="an-loading" *ngIf="isLoading">
+    <div class="an-spinner"></div>
+    <span>Loading dashboard…</span>
+  </div>
+
+  <p class="an-error" *ngIf="error && !isLoading">{{ error }}</p>
+
+  <ng-container *ngIf="!isLoading && !error">
+
+    <!-- ── Hero greeting ──────────────────────────────────────────── -->
+    <div class="an-hero">
+      <div class="an-hero-left">
+        <p class="an-greeting">{{ greeting }}</p>
+        <h1 class="an-hero-name">{{ adminName || 'Admin' }} 👋</h1>
+        <p class="an-hero-sub">Here's what's happening at your school today</p>
+      </div>
+      <div class="an-hero-right">
+        <div class="an-date-card">
+          <span class="an-date-day">{{ today | date:'EEEE' }}</span>
+          <span class="an-date-full">{{ today | date:'d MMMM yyyy' }}</span>
+        </div>
+      </div>
+      <!-- Decorative blobs -->
+      <div class="an-blob an-blob-1"></div>
+      <div class="an-blob an-blob-2"></div>
+      <svg class="an-wave" viewBox="0 0 1440 60" preserveAspectRatio="none">
+        <path d="M0,30 C480,60 960,0 1440,30 L1440,60 L0,60 Z" fill="rgba(255,255,255,0.06)"/>
+      </svg>
+    </div>
+
+    <!-- ── 6 Stat cards ───────────────────────────────────────────── -->
+    <div class="an-stats-grid">
+
+      <div class="an-stat-card" style="--c1:#6366f1;--c2:#818cf8">
+        <div class="an-stat-icon-wrap">👨‍🎓</div>
+        <div class="an-stat-info">
+          <span class="an-stat-value">{{ stats?.totalStudents | number }}</span>
+          <span class="an-stat-label">Total Students</span>
+        </div>
+        <div class="an-stat-bg-icon">🎓</div>
+      </div>
+
+      <div class="an-stat-card" style="--c1:#0891b2;--c2:#22d3ee">
+        <div class="an-stat-icon-wrap">👨‍🏫</div>
+        <div class="an-stat-info">
+          <span class="an-stat-value">{{ stats?.totalTeachers | number }}</span>
+          <span class="an-stat-label">Total Teachers</span>
+        </div>
+        <div class="an-stat-bg-icon">🏫</div>
+      </div>
+
+      <div class="an-stat-card" style="--c1:#059669;--c2:#34d399">
+        <div class="an-stat-icon-wrap">💰</div>
+        <div class="an-stat-info">
+          <span class="an-stat-value">₹{{ stats?.feesCollectedThisMonth | number }}</span>
+          <span class="an-stat-label">Collected This Month</span>
+        </div>
+        <div class="an-stat-bg-icon">💵</div>
+      </div>
+
+      <div class="an-stat-card" style="--c1:#dc2626;--c2:#f87171">
+        <div class="an-stat-icon-wrap">⚠️</div>
+        <div class="an-stat-info">
+          <span class="an-stat-value">{{ stats?.overdueStudents }}</span>
+          <span class="an-stat-label">Overdue Payments</span>
+        </div>
+        <div class="an-stat-bg-icon">📛</div>
+      </div>
+
+      <div class="an-stat-card" [style]="'--c1:' + attendanceColor + ';--c2:' + attendanceColor + 'aa'">
+        <div class="an-stat-icon-wrap">📊</div>
+        <div class="an-stat-info">
+          <span class="an-stat-value">{{ stats?.todayAttendanceRate | number:'1.1-1' }}%</span>
+          <span class="an-stat-label">Today's Attendance</span>
+        </div>
+        <div class="an-stat-bg-icon">✅</div>
+      </div>
+
+      <div class="an-stat-card" style="--c1:#d97706;--c2:#fbbf24">
+        <div class="an-stat-icon-wrap">🏖️</div>
+        <div class="an-stat-info">
+          <span class="an-stat-value">{{ stats?.pendingLeaves }}</span>
+          <span class="an-stat-label">Pending Leaves</span>
+        </div>
+        <div class="an-stat-bg-icon">📋</div>
+      </div>
+
+    </div>
+
+    <!-- ── Charts row 1 ───────────────────────────────────────────── -->
+    <div class="an-charts-row">
+
+      <!-- Fee trend -->
+      <div class="an-chart-card an-chart-wide">
+        <div class="an-chart-header">
+          <div>
+            <h3 class="an-chart-title">Monthly Fee Collection</h3>
+            <p class="an-chart-sub">Revenue collected over the last 6 months</p>
+          </div>
+          <span class="an-chart-badge an-badge-indigo">Bar Chart</span>
+        </div>
+        <div class="an-chart-body">
+          <canvas baseChart [data]="feeTrendData" [options]="feeTrendOptions" type="bar"></canvas>
+        </div>
+      </div>
+
+      <!-- Class attendance -->
+      <div class="an-chart-card">
+        <div class="an-chart-header">
+          <div>
+            <h3 class="an-chart-title">Class-wise Attendance</h3>
+            <p class="an-chart-sub">Average attendance % per class this month</p>
+          </div>
+          <span class="an-chart-badge an-badge-teal">Rate</span>
+        </div>
+        <div class="an-chart-body">
+          <canvas baseChart [data]="attendanceData" [options]="attendanceOptions" type="bar"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Charts row 2 ───────────────────────────────────────────── -->
+    <div class="an-charts-row">
+
+      <!-- Student distribution -->
+      <div class="an-chart-card">
+        <div class="an-chart-header">
+          <div>
+            <h3 class="an-chart-title">Student Distribution</h3>
+            <p class="an-chart-sub">Total students across all classes</p>
+          </div>
+          <span class="an-chart-badge an-badge-violet">Donut</span>
+        </div>
+        <div class="an-chart-body an-donut-body">
+          <canvas baseChart [data]="distributionData" [options]="distributionOptions" type="doughnut"></canvas>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="an-chart-card an-chart-wide">
+        <div class="an-chart-header">
+          <div>
+            <h3 class="an-chart-title">Quick Actions</h3>
+            <p class="an-chart-sub">Jump to the most-used sections</p>
+          </div>
+        </div>
+        <div class="an-quick-grid">
+
+          <a class="an-quick-btn" routerLink="/dashboard/fee-reminders">
+            <span class="an-quick-icon" style="--qc:#dc2626">🔔</span>
+            <span class="an-quick-label">Fee Reminders</span>
+            <span class="an-quick-count" *ngIf="stats?.overdueStudents">{{ stats?.overdueStudents }} overdue</span>
+          </a>
+
+          <a class="an-quick-btn" routerLink="/dashboard/view-leaves">
+            <span class="an-quick-icon" style="--qc:#d97706">📋</span>
+            <span class="an-quick-label">Pending Leaves</span>
+            <span class="an-quick-count" *ngIf="stats?.pendingLeaves">{{ stats?.pendingLeaves }} pending</span>
+          </a>
+
+          <a class="an-quick-btn" routerLink="/dashboard/teacher-attendance">
+            <span class="an-quick-icon" style="--qc:#059669">✅</span>
+            <span class="an-quick-label">Mark Attendance</span>
+          </a>
+
+          <a class="an-quick-btn" routerLink="/dashboard/notice">
+            <span class="an-quick-icon" style="--qc:#6366f1">📣</span>
+            <span class="an-quick-label">Post Notice</span>
+          </a>
+
+          <a class="an-quick-btn" routerLink="/dashboard/register">
+            <span class="an-quick-icon" style="--qc:#0891b2">➕</span>
+            <span class="an-quick-label">Register Student</span>
+          </a>
+
+          <a class="an-quick-btn" routerLink="/dashboard/payment-history-admin">
+            <span class="an-quick-icon" style="--qc:#7c3aed">💳</span>
+            <span class="an-quick-label">Payment History</span>
+          </a>
+
+          <a class="an-quick-btn" routerLink="/dashboard/timetable">
+            <span class="an-quick-icon" style="--qc:#0d9488">📅</span>
+            <span class="an-quick-label">Timetable</span>
+          </a>
+
+          <a class="an-quick-btn" routerLink="/dashboard/audit-logs">
+            <span class="an-quick-icon" style="--qc:#475569">🔍</span>
+            <span class="an-quick-label">Audit Logs</span>
+          </a>
+
+        </div>
+      </div>
+
+    </div>
+
+  </ng-container>
+</div>

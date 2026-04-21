@@ -39,6 +39,7 @@ import { ReportCardComponent } from './components/report-card/report-card.compon
 import { AttendanceSummaryComponent } from './components/attendance-summary/attendance-summary.component';
 import { TimetableComponent } from './components/timetable/timetable.component';
 import { FeeRemindersComponent } from './components/fee-reminders/fee-reminders.component';
+import { AnalyticsComponent } from './components/analytics/analytics.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -203,6 +204,12 @@ export const routes: Routes = [
       {
         path: 'report-card', component: ReportCardComponent,
         canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN'] }
+      },
+
+      // ── Analytics Dashboard ───────────────────────────────────────────
+      {
+        path: 'analytics', component: AnalyticsComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUPER_ADMIN'] }
       },
 
       // ── Timetable ─────────────────────────────────────────────────────

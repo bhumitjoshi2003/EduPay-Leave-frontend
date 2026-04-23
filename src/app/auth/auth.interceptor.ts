@@ -42,9 +42,9 @@ export class AuthInterceptor implements HttpInterceptor {
 
     return next.handle(reqWithCredentials).pipe(
       catchError((error: HttpErrorResponse) => {
-        // 401 = missing/invalid token; 403 = expired access token (backend behaviour)
-        // Only attempt refresh for non-auth URLs to avoid infinite loops
-        if ((error.status === 401 || error.status === 403) && !isAuthUrl) {
+        // 401 = missing/expired/invalid token → attempt refresh (once)
+        // 403 = valid token but wrong role → propagate as-is
+        if (error.status === 401 && !isAuthUrl) {
           return this.handleTokenExpiry(reqWithCredentials, next);
         }
         return throwError(() => error);

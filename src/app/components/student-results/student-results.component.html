@@ -5,7 +5,11 @@
       <select [(ngModel)]="selectedSession" (ngModelChange)="loadResults()">
         <option *ngFor="let s of sessions; trackBy: trackByIndex" [value]="s">{{ s }}</option>
       </select>
-      <button *ngIf="results.length > 0" class="sr-btn-report" (click)="openReportCard(null)">
+      <button *ngIf="results.length > 0" class="sr-btn-toggle" [class.active]="showProgress"
+        (click)="toggleProgress()">
+        {{ showProgress ? '📋 Exam Details' : '📈 Progress Tracker' }}
+      </button>
+      <button *ngIf="results.length > 0 && !showProgress" class="sr-btn-report" (click)="openReportCard(null)">
         &#128438; Full Report Card
       </button>
     </div>
@@ -17,61 +21,136 @@
     No results found for {{ selectedSession }}.
   </div>
 
-  <div *ngFor="let exam of results; trackBy: trackById" class="sr-exam-card">
-    <!-- Exam Header -->
-    <div class="sr-exam-header" (click)="toggleExam(exam.examId)">
-      <div class="sr-exam-info">
-        <span class="sr-exam-name">{{ exam.examName }}</span>
-        <div class="sr-exam-summary">
-          <span class="sr-summary-chip">{{ exam.totalMarksObtained }}/{{ exam.totalMaxMarks }}</span>
-          <span class="sr-summary-chip">{{ exam.percentage | number:'1.1-1' }}%</span>
-          <span class="sr-grade-badge" [ngClass]="getGradeClass(exam.percentage)">{{ getGrade(exam.percentage) }}</span>
-          <span class="sr-rank-badge">Rank {{ exam.overallRank }}</span>
-        </div>
+  <!-- ── Progress Tracker View ─────────────────────────────────────── -->
+  <div *ngIf="showProgress && !loading && results.length > 0" class="sp-section">
+
+    <!-- Stat Cards -->
+    <div class="sp-stats-row">
+      <div class="sp-stat-card sp-stat-primary">
+        <div class="sp-stat-icon">📝</div>
+        <div class="sp-stat-value">{{ results.length }}</div>
+        <div class="sp-stat-label">Exams Taken</div>
       </div>
-      <div class="sr-exam-actions" (click)="$event.stopPropagation()">
-        <button class="sr-btn-report-sm" (click)="openReportCard(exam.examId)" title="Report Card">&#128438;</button>
-        <span class="sr-chevron">{{ expandedExamId === exam.examId ? '▲' : '▼' }}</span>
+      <div class="sp-stat-card sp-stat-success">
+        <div class="sp-stat-icon">🏆</div>
+        <div class="sp-stat-value">{{ bestExam ? (bestExam.percentage | number:'1.1-1') + '%' : '—' }}</div>
+        <div class="sp-stat-sub" *ngIf="bestExam">{{ bestExam.examName }}</div>
+        <div class="sp-stat-label">Best Exam</div>
+      </div>
+      <div class="sp-stat-card sp-stat-info">
+        <div class="sp-stat-icon">📊</div>
+        <div class="sp-stat-value">{{ averagePercentage | number:'1.1-1' }}%</div>
+        <div class="sp-stat-label">Session Average</div>
+      </div>
+      <div class="sp-stat-card"
+        [ngClass]="trend === '↑' ? 'sp-stat-success' : trend === '↓' ? 'sp-stat-danger' : 'sp-stat-neutral'">
+        <div class="sp-stat-icon">{{ trend === '↑' ? '📈' : trend === '↓' ? '📉' : '➡️' }}</div>
+        <div class="sp-stat-value" [ngClass]="trendClass">{{ trend }}</div>
+        <div class="sp-stat-label">Recent Trend</div>
       </div>
     </div>
 
-    <!-- Expanded Detail -->
-    <div *ngIf="expandedExamId === exam.examId" class="sr-exam-body">
-      <!-- Subject Table -->
-      <table class="sr-table">
-        <thead>
-          <tr>
-            <th>Subject</th>
-            <th>Date</th>
-            <th>Marks</th>
-            <th>Max</th>
-            <th>Class Avg</th>
-            <th>Rank</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let s of exam.subjects; trackBy: trackByIndex"
-              [class.sr-row-absent]="s.marksObtained === null">
-            <td data-label="Subject">{{ s.subjectName }}</td>
-            <td data-label="Date">{{ s.examDate }}</td>
-            <td data-label="Marks" class="sr-marks">
-              <span *ngIf="s.marksObtained !== null">{{ s.marksObtained }}</span>
-              <span *ngIf="s.marksObtained === null" class="sr-not-entered">—</span>
-            </td>
-            <td data-label="Max">{{ s.maxMarks }}</td>
-            <td data-label="Class Avg">{{ s.classAverage !== null ? (s.classAverage | number:'1.1-1') : '—' }}</td>
-            <td data-label="Rank">
-              <span *ngIf="s.rank !== null" class="sr-rank">{{ s.rank }}</span>
-              <span *ngIf="s.rank === null">—</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Line Chart -->
+    <div class="sp-chart-card">
+      <div class="sp-card-title">Performance Over Time</div>
+      <div class="sp-chart-wrap">
+        <canvas #progressCanvas></canvas>
+      </div>
+    </div>
 
-      <!-- Bar Chart -->
-      <div class="sr-chart-wrapper">
-        <canvas #barCanvas [attr.data-exam-id]="exam.examId"></canvas>
+    <!-- Subject-wise Breakdown Table -->
+    <div class="sp-subject-card" *ngIf="uniqueSubjects.length > 0">
+      <div class="sp-card-title">Subject-wise Breakdown</div>
+      <div class="sp-table-scroll">
+        <table class="sp-table">
+          <thead>
+            <tr>
+              <th class="sp-th-subject">Subject</th>
+              <th *ngFor="let exam of results; trackBy: trackById" class="sp-th-exam">{{ exam.examName }}</th>
+              <th class="sp-th-trend">Trend</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let subj of uniqueSubjects; trackBy: trackByIndex">
+              <td class="sp-td-subject">{{ subj }}</td>
+              <td *ngFor="let exam of results; trackBy: trackById" class="sp-td-marks">
+                <ng-container *ngIf="getSubjectMarks(exam, subj) as sm">
+                  <ng-container *ngIf="sm.obtained !== null">
+                    <span class="sp-marks-val">{{ sm.obtained }}/{{ sm.max }}</span>
+                    <div class="sp-mini-bar">
+                      <div class="sp-mini-fill" [style.width.%]="(sm.obtained / sm.max) * 100"></div>
+                    </div>
+                  </ng-container>
+                  <span *ngIf="sm.obtained === null" class="sp-absent">—</span>
+                </ng-container>
+                <span *ngIf="!getSubjectMarks(exam, subj)" class="sp-absent">—</span>
+              </td>
+              <td class="sp-td-trend" [ngClass]="getSubjectTrendClass(subj)">{{ getSubjectTrend(subj) }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
+
+  <!-- ── Exam Cards View ───────────────────────────────────────────── -->
+  <ng-container *ngIf="!showProgress">
+    <div *ngFor="let exam of results; trackBy: trackById" class="sr-exam-card">
+      <!-- Exam Header -->
+      <div class="sr-exam-header" (click)="toggleExam(exam.examId)">
+        <div class="sr-exam-info">
+          <span class="sr-exam-name">{{ exam.examName }}</span>
+          <div class="sr-exam-summary">
+            <span class="sr-summary-chip">{{ exam.totalMarksObtained }}/{{ exam.totalMaxMarks }}</span>
+            <span class="sr-summary-chip">{{ exam.percentage | number:'1.1-1' }}%</span>
+            <span class="sr-grade-badge" [ngClass]="getGradeClass(exam.percentage)">{{ getGrade(exam.percentage) }}</span>
+            <span class="sr-rank-badge">Rank {{ exam.overallRank }}</span>
+          </div>
+        </div>
+        <div class="sr-exam-actions" (click)="$event.stopPropagation()">
+          <button class="sr-btn-report-sm" (click)="openReportCard(exam.examId)" title="Report Card">&#128438;</button>
+          <span class="sr-chevron">{{ expandedExamId === exam.examId ? '▲' : '▼' }}</span>
+        </div>
+      </div>
+
+      <!-- Expanded Detail -->
+      <div *ngIf="expandedExamId === exam.examId" class="sr-exam-body">
+        <!-- Subject Table -->
+        <table class="sr-table">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Date</th>
+              <th>Marks</th>
+              <th>Max</th>
+              <th>Class Avg</th>
+              <th>Rank</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let s of exam.subjects; trackBy: trackByIndex"
+                [class.sr-row-absent]="s.marksObtained === null">
+              <td data-label="Subject">{{ s.subjectName }}</td>
+              <td data-label="Date">{{ s.examDate }}</td>
+              <td data-label="Marks" class="sr-marks">
+                <span *ngIf="s.marksObtained !== null">{{ s.marksObtained }}</span>
+                <span *ngIf="s.marksObtained === null" class="sr-not-entered">—</span>
+              </td>
+              <td data-label="Max">{{ s.maxMarks }}</td>
+              <td data-label="Class Avg">{{ s.classAverage !== null ? (s.classAverage | number:'1.1-1') : '—' }}</td>
+              <td data-label="Rank">
+                <span *ngIf="s.rank !== null" class="sr-rank">{{ s.rank }}</span>
+                <span *ngIf="s.rank === null">—</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Bar Chart -->
+        <div class="sr-chart-wrapper">
+          <canvas #barCanvas [attr.data-exam-id]="exam.examId"></canvas>
+        </div>
+      </div>
+    </div>
+  </ng-container>
 </div>

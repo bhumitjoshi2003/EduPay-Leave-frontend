@@ -66,7 +66,8 @@
               <th>Student Name</th>
               <th>Leave Date</th>
               <th>Reason</th>
-              <th *ngIf="loggedInUserRole === 'ADMIN'">Actions</th>
+              <th>Status</th>
+              <th *ngIf="loggedInUserRole === 'ADMIN' || loggedInUserRole === 'TEACHER'">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -75,8 +76,20 @@
               <td>{{ leave.studentName }}</td>
               <td>{{ leave.leaveDate }}</td>
               <td>{{ leave.reason }}</td>
-              <td *ngIf="loggedInUserRole === 'ADMIN'">
-                <button class="delete-button" (click)="deleteLeave(leave.id)">Delete</button>
+              <td>
+                <span class="leave-status-badge" [ngClass]="'status-' + leave.status.toLowerCase()">
+                  {{ leave.status }}
+                </span>
+              </td>
+              <td *ngIf="loggedInUserRole === 'ADMIN' || loggedInUserRole === 'TEACHER'" class="actions-cell">
+                <button *ngIf="leave.status === 'PENDING'" class="approve-button"
+                  (click)="updateLeaveStatus(leave, 'APPROVED')">Approve</button>
+                <button *ngIf="leave.status === 'PENDING'" class="reject-button"
+                  (click)="updateLeaveStatus(leave, 'REJECTED')">Reject</button>
+                <button *ngIf="leave.status === 'APPROVED' || leave.status === 'REJECTED'" class="edit-button"
+                  (click)="editLeaveStatus(leave)">Edit</button>
+                <button *ngIf="loggedInUserRole === 'ADMIN' && leave.status !== 'APPROVED'"
+                  class="delete-button" (click)="deleteLeave(leave.id)">Delete</button>
               </td>
             </tr>
           </tbody>
@@ -101,8 +114,23 @@
             <span class="card-label">Reason:</span>
             <span class="card-value">{{ leave.reason }}</span>
           </div>
-          <div class="card-actions" *ngIf="loggedInUserRole === 'ADMIN'">
-            <button class="card-delete-button" (click)="deleteLeave(leave.id)">Delete</button>
+          <div class="card-item">
+            <span class="card-label">Status:</span>
+            <span class="card-value">
+              <span class="leave-status-badge" [ngClass]="'status-' + leave.status.toLowerCase()">
+                {{ leave.status }}
+              </span>
+            </span>
+          </div>
+          <div class="card-actions" *ngIf="loggedInUserRole === 'ADMIN' || loggedInUserRole === 'TEACHER'">
+            <button *ngIf="leave.status === 'PENDING'" class="card-approve-button"
+              (click)="updateLeaveStatus(leave, 'APPROVED')">Approve</button>
+            <button *ngIf="leave.status === 'PENDING'" class="card-reject-button"
+              (click)="updateLeaveStatus(leave, 'REJECTED')">Reject</button>
+            <button *ngIf="leave.status === 'APPROVED' || leave.status === 'REJECTED'" class="card-edit-button"
+              (click)="editLeaveStatus(leave)">Edit</button>
+            <button *ngIf="loggedInUserRole === 'ADMIN' && leave.status !== 'APPROVED'"
+              class="card-delete-button" (click)="deleteLeave(leave.id)">Delete</button>
           </div>
         </div>
       </div>

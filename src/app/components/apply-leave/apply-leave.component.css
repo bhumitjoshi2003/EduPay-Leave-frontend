@@ -277,6 +277,35 @@
   gap: 1rem;
 }
 
+.leave-status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.leave-status-badge.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+.leave-status-badge.status-approved {
+  background-color: #d1e7dd;
+  color: #0a5e38;
+  border: 1px solid #198754;
+}
+
+.leave-status-badge.status-rejected {
+  background-color: #f8d7da;
+  color: #842029;
+  border: 1px solid #dc3545;
+}
+
 .page-button {
   background-color: #007bff;
   color: white;

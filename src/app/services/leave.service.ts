@@ -5,12 +5,13 @@ import { LeaveRequest } from '../interfaces/leave-request';
 import { environment } from '../../environments/environment';
 
 export interface LeaveApplication {
-  id: string;
+  id: number;
   studentId: string;
   studentName: string;
   leaveDate: string;
   reason: string;
   className: string;
+  status: string;
 }
 
 export interface PaginatedResponse<T> {
@@ -34,7 +35,7 @@ export class LeaveService {
   constructor(private http: HttpClient) { }
 
   applyLeave(leaveRequest: LeaveRequest): Observable<string> {
-    return this.http.post(`${this.apiUrl}/apply-leave`, leaveRequest, { responseType: 'text' });
+    return this.http.post(`${this.apiUrl}/apply-leave`, leaveRequest, { responseType: 'text', withCredentials: true });
   }
 
   getLeavesPaginated(
@@ -63,7 +64,7 @@ export class LeaveService {
       params = params.append('sort', `${sortBy},${sortDir || 'asc'}`);
     }
 
-    return this.http.get<PaginatedResponse<LeaveApplication>>(`${this.apiUrl}/student`, { params });
+    return this.http.get<PaginatedResponse<LeaveApplication>>(`${this.apiUrl}/student`, { params, withCredentials: true });
   }
 
   getLeavesByStudentId(
@@ -75,19 +76,23 @@ export class LeaveService {
       .append('page', page.toString())
       .append('size', size.toString());
     return this.http.get<PaginatedResponse<LeaveApplication>>(
-      `${this.apiUrl}/student/${studentId}`, { params });
+      `${this.apiUrl}/student/${studentId}`, { params, withCredentials: true });
   }
 
   deleteLeave(studentId: string, leaveDate: string): Observable<string> {
-    return this.http.delete(`${this.apiUrl}/delete/${studentId}/${leaveDate}`, { responseType: 'text' });
+    return this.http.delete(`${this.apiUrl}/delete/${studentId}/${leaveDate}`, { responseType: 'text', withCredentials: true });
   }
 
-  deleteLeaveById(leaveId: string): Observable<string> {
-    return this.http.delete(`${this.apiUrl}/${leaveId}`, { responseType: 'text' });
+  deleteLeaveById(leaveId: number): Observable<string> {
+    return this.http.delete(`${this.apiUrl}/${leaveId}`, { responseType: 'text', withCredentials: true });
+  }
+
+  updateLeaveStatus(leaveId: number, status: string): Observable<LeaveApplication> {
+    return this.http.patch<LeaveApplication>(`${this.apiUrl}/${leaveId}/status`, { status }, { withCredentials: true });
   }
 
   getLeavesByDateAndClass(date: string, selectedClass: string): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/date/${date}/class/${selectedClass}`);
+    return this.http.get<string[]>(`${this.apiUrl}/date/${date}/class/${selectedClass}`, { withCredentials: true });
   }
 }
 

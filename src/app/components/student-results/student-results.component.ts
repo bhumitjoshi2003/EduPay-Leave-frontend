@@ -1,6 +1,6 @@
 import {
   AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef,
-  Component, ElementRef, Inject, OnDestroy, OnInit, PLATFORM_ID, QueryList, ViewChildren
+  Component, ElementRef, Inject, OnDestroy, OnInit, PLATFORM_ID, QueryList, ViewChild, ViewChildren
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -24,8 +24,11 @@ export class StudentResultsComponent implements OnInit, OnDestroy, AfterViewChec
   private destroy$ = new Subject<void>();
   private charts: Map<number, Chart> = new Map();
   private chartsNeedRender = false;
+  private progressChart: Chart | null = null;
+  private progressNeedsRender = false;
 
   @ViewChildren('barCanvas') barCanvases!: QueryList<ElementRef>;
+  @ViewChild('progressCanvas') progressCanvas!: ElementRef;
 
   sessions: string[] = [];
   selectedSession = '';
@@ -33,6 +36,7 @@ export class StudentResultsComponent implements OnInit, OnDestroy, AfterViewChec
   results: ExamResult[] = [];
   expandedExamId: number | null = null;
   loading = false;
+  showProgress = false;
 
   constructor(
     private marksService: MarksService,
@@ -52,14 +56,20 @@ export class StudentResultsComponent implements OnInit, OnDestroy, AfterViewChec
 
   ngOnDestroy(): void {
     this.charts.forEach(c => c.destroy());
+    if (this.progressChart) { this.progressChart.destroy(); }
     this.destroy$.next();
     this.destroy$.complete();
   }
 
   ngAfterViewChecked(): void {
-    if (this.chartsNeedRender && isPlatformBrowser(this.platformId)) {
+    if (!isPlatformBrowser(this.platformId)) return;
+    if (this.chartsNeedRender) {
       this.chartsNeedRender = false;
       this.renderCharts();
+    }
+    if (this.progressNeedsRender) {
+      this.progressNeedsRender = false;
+      this.renderProgressChart();
     }
   }
 
@@ -78,6 +88,7 @@ export class StudentResultsComponent implements OnInit, OnDestroy, AfterViewChec
     this.expandedExamId = null;
     this.charts.forEach(c => c.destroy());
     this.charts.clear();
+    if (this.progressChart) { this.progressChart.destroy(); this.progressChart = null; }
 
     this.marksService.getStudentResults(this.studentId, this.selectedSession)
       .pipe(takeUntil(this.destroy$))
@@ -85,6 +96,9 @@ export class StudentResultsComponent implements OnInit, OnDestroy, AfterViewChec
         next: (data) => {
           this.results = data;
           this.loading = false;
+          if (this.showProgress && this.results.length > 0) {
+            this.progressNeedsRender = true;
+          }
           this.cdr.markForCheck();
         },
         error: (e) => {
@@ -93,6 +107,163 @@ export class StudentResultsComponent implements OnInit, OnDestroy, AfterViewChec
           this.cdr.markForCheck();
         },
       });
+  }
+
+  toggleProgress(): void {
+    this.showProgress = !this.showProgress;
+    if (this.showProgress && this.results.length > 0) {
+      this.progressNeedsRender = true;
+    } else if (!this.showProgress && this.progressChart) {
+      this.progressChart.destroy();
+      this.progressChart = null;
+    }
+    this.cdr.markForCheck();
+  }
+
+  // ── Progress Tracker computed values ────────────────────────────
+
+  get bestExam(): ExamResult | null {
+    if (!this.results.length) return null;
+    return this.results.reduce((best, r) => r.percentage > best.percentage ? r : best);
+  }
+
+  get averagePercentage(): number {
+    if (!this.results.length) return 0;
+    return this.results.reduce((sum, r) => sum + r.percentage, 0) / this.results.length;
+  }
+
+  get trend(): string {
+    if (this.results.length < 2) return '—';
+    const last = this.results[this.results.length - 1].percentage;
+    const prev = this.results[this.results.length - 2].percentage;
+    if (last > prev + 1) return '↑';
+    if (last < prev - 1) return '↓';
+    return '→';
+  }
+
+  get trendClass(): string {
+    const t = this.trend;
+    if (t === '↑') return 'trend-up';
+    if (t === '↓') return 'trend-down';
+    return 'trend-flat';
+  }
+
+  get uniqueSubjects(): string[] {
+    const seen = new Set<string>();
+    this.results.forEach(r => r.subjects.forEach(s => seen.add(s.subjectName)));
+    return Array.from(seen);
+  }
+
+  getSubjectMarks(exam: ExamResult, subjectName: string): { obtained: number | null; max: number } | null {
+    const s = exam.subjects.find(sub => sub.subjectName === subjectName);
+    return s ? { obtained: s.marksObtained, max: s.maxMarks } : null;
+  }
+
+  getSubjectTrend(subjectName: string): string {
+    const entries = this.results
+      .map(r => r.subjects.find(s => s.subjectName === subjectName))
+      .filter((s): s is NonNullable<typeof s> => !!s && s.marksObtained !== null);
+    if (entries.length < 2) return '—';
+    const firstPct = (entries[0].marksObtained! / entries[0].maxMarks) * 100;
+    const lastPct  = (entries[entries.length - 1].marksObtained! / entries[entries.length - 1].maxMarks) * 100;
+    if (lastPct > firstPct + 2) return '↑';
+    if (lastPct < firstPct - 2) return '↓';
+    return '→';
+  }
+
+  getSubjectTrendClass(subjectName: string): string {
+    const t = this.getSubjectTrend(subjectName);
+    if (t === '↑') return 'trend-up';
+    if (t === '↓') return 'trend-down';
+    return 'trend-flat';
+  }
+
+  private renderProgressChart(): void {
+    if (!this.progressCanvas) return;
+    const canvas = this.progressCanvas.nativeElement;
+    if (this.progressChart) { this.progressChart.destroy(); this.progressChart = null; }
+
+    const labels = this.results.map(r => r.examName);
+    const studentData = this.results.map(r => parseFloat(r.percentage.toFixed(1)));
+    const classAvgData = this.results.map(r => {
+      const totalMax = r.subjects.reduce((sum, s) => sum + s.maxMarks, 0);
+      const totalAvg = r.subjects.reduce((sum, s) => sum + (s.classAverage ?? 0), 0);
+      return totalMax > 0 ? parseFloat(((totalAvg / totalMax) * 100).toFixed(1)) : 0;
+    });
+
+    const isMobile = window.innerWidth <= 600;
+
+    this.progressChart = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Your %',
+            data: studentData,
+            borderColor: '#1f6f8b',
+            backgroundColor: 'rgba(31,111,139,0.12)',
+            borderWidth: 3,
+            pointBackgroundColor: '#1f6f8b',
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            fill: true,
+            tension: 0.35,
+          } as any,
+          {
+            label: 'Class Avg %',
+            data: classAvgData,
+            borderColor: '#4fbdbd',
+            backgroundColor: 'rgba(79,189,189,0.08)',
+            borderWidth: 2,
+            borderDash: [6, 4],
+            pointBackgroundColor: '#4fbdbd',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            fill: false,
+            tension: 0.35,
+          } as any,
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              boxWidth: isMobile ? 10 : 14,
+              font: { size: isMobile ? 10 : 12 },
+              padding: 12,
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y}%`,
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            min: 0,
+            max: 100,
+            grid: { color: 'rgba(0,0,0,0.05)' },
+            ticks: {
+              font: { size: isMobile ? 10 : 12 },
+              callback: (v) => v + '%',
+            },
+          },
+          x: {
+            grid: { display: false },
+            ticks: {
+              font: { size: isMobile ? 9 : 12 },
+              maxRotation: isMobile ? 30 : 0,
+            },
+          },
+        },
+      },
+    });
   }
 
   toggleExam(examId: number): void {

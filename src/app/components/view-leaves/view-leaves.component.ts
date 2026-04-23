@@ -206,22 +206,23 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   }
 
   deleteAllFilteredLeaves(): void {
-    if (this.filteredLeaves.length === 0) {
-      Swal.fire('Info', 'No leaves are currently displayed to delete.', 'info');
+    const deletable = this.filteredLeaves.filter(l => l.status !== 'APPROVED');
+    if (deletable.length === 0) {
+      Swal.fire('Info', 'No deletable leaves on this page (approved leaves cannot be deleted).', 'info');
       return;
     }
 
     Swal.fire({
       title: 'Are you sure?',
-      text: `You want to delete all ${this.filteredLeaves.length} leave applications displayed on this page?`,
+      text: `You want to delete ${deletable.length} leave application(s) on this page? Approved leaves will be skipped.`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete all!',
+      confirmButtonText: 'Yes, delete!',
     }).then((result) => {
       if (result.isConfirmed) {
-        from(this.filteredLeaves).pipe(
+        from(deletable).pipe(
           concatMap(leave => this.leaveService.deleteLeaveById(leave.id)),
           takeUntil(this.ngUnsubscribe)
         ).subscribe({
@@ -248,7 +249,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteLeave(leaveId: string): void {
+  deleteLeave(leaveId: number): void {
     Swal.fire({
       title: 'Are you sure?',
       text: 'You want to delete this leave application?',
@@ -261,22 +262,92 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.leaveService.deleteLeaveById(leaveId).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
           next: (response) => {
-            Swal.fire(
-              'Deleted!',
-              response,
-              'success'
-            );
+            Swal.fire('Deleted!', response, 'success');
             this.fetchLeaves();
           },
           error: (error) => {
             this.logger.error('Error deleting leave:', error);
-            Swal.fire(
-              'Error!',
-              'Failed to delete the leave application.',
-              'error'
-            );
+            Swal.fire('Error!', error?.error || 'Failed to delete the leave application.', 'error');
           }
         });
+      }
+    });
+  }
+
+  editLeaveStatus(leave: LeaveApplication): void {
+    Swal.fire({
+      title: 'Change Leave Status',
+      text: `${leave.studentName} — ${leave.leaveDate}`,
+      input: 'select',
+      inputOptions: {
+        PENDING: 'Pending',
+        APPROVED: 'Approved',
+        REJECTED: 'Rejected',
+      },
+      inputValue: leave.status ?? 'PENDING',
+      showCancelButton: true,
+      confirmButtonColor: '#00acc1',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Update',
+      inputAttributes: { 'aria-label': 'Select new status' },
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        const newStatus = result.value as string;
+        if (newStatus === leave.status) return;
+        this.leaveService.updateLeaveStatus(leave.id, newStatus)
+          .pipe(takeUntil(this.ngUnsubscribe))
+          .subscribe({
+            next: (updated) => {
+              leave.status = updated.status;
+              this.cdr.markForCheck();
+              Swal.fire({
+                title: 'Updated!',
+                text: `Status changed to ${updated.status}.`,
+                icon: 'success',
+                timer: 1800,
+                showConfirmButton: false,
+              });
+            },
+            error: (error) => {
+              this.logger.error('Error updating leave status:', error);
+              Swal.fire('Error!', error?.error || 'Failed to update leave status.', 'error');
+            }
+          });
+      }
+    });
+  }
+
+  updateLeaveStatus(leave: LeaveApplication, status: 'APPROVED' | 'REJECTED'): void {
+    const action = status === 'APPROVED' ? 'approve' : 'reject';
+    Swal.fire({
+      title: `${status === 'APPROVED' ? 'Approve' : 'Reject'} Leave?`,
+      text: `${leave.studentName} — ${leave.leaveDate}`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: status === 'APPROVED' ? '#198754' : '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: `Yes, ${action} it!`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.leaveService.updateLeaveStatus(leave.id, status)
+          .pipe(takeUntil(this.ngUnsubscribe))
+          .subscribe({
+            next: (updated) => {
+              leave.status = updated.status;
+              this.cdr.markForCheck();
+              Swal.fire({
+                title: status === 'APPROVED' ? 'Approved!' : 'Rejected!',
+                text: `Leave has been ${status.toLowerCase()}.`,
+                icon: status === 'APPROVED' ? 'success' : 'info',
+                timer: 1800,
+                showConfirmButton: false,
+              });
+            },
+            error: (error) => {
+              this.logger.error('Error updating leave status:', error);
+              Swal.fire('Error!', error?.error || 'Failed to update leave status.', 'error');
+            }
+          });
       }
     });
   }
@@ -303,7 +374,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   }
 
 
-  trackByLeaveId(index: number, leave: LeaveApplication): string { return leave.id; }
+  trackByLeaveId(index: number, leave: LeaveApplication): number { return leave.id; }
   trackByClass(index: number, className: string): string { return className; }
   trackByIndex(index: number): number { return index; }
 

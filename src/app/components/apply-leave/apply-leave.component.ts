@@ -27,7 +27,7 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
   studentId: string = '';
   studentName: string = '';
   className = '';
-  leaves: { originalLeaveDate: string; leaveDate: string; reason: string }[] = [];
+  leaves: { originalLeaveDate: string; leaveDate: string; reason: string; status: string }[] = [];
 
   // Pagination
   currentPage: number = 0;
@@ -56,7 +56,7 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
     this.leaveForm = this.fb.group({
       leaveDate: ['', Validators.required],
       reason: ['', Validators.required],
-      otherReason: ['', Validators.maxLength(20)],
+      otherReason: ['', Validators.maxLength(200)],
     });
   }
 
@@ -82,7 +82,7 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
   onReasonChange(): void {
     this.showOtherReasonInput = this.reasonControl?.value === 'Others';
     if (this.showOtherReasonInput) {
-      this.otherReasonControl?.setValidators([Validators.required, Validators.maxLength(20)]);
+      this.otherReasonControl?.setValidators([Validators.required, Validators.maxLength(200)]);
     } else {
       this.otherReasonControl?.clearValidators();
     }
@@ -108,12 +108,14 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
 
   loadStudentLeaves(): void {
     this.leaveService.getLeavesByStudentId(this.studentId, this.currentPage, this.pageSize)
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: PaginatedResponse<any>) => {
           this.leaves = response.content.map((leave: any) => ({
             originalLeaveDate: leave.leaveDate,
             leaveDate: leave.leaveDate,
             reason: leave.reason,
+            status: leave.status ?? 'PENDING',
           }));
           this.totalPages = response.totalPages;
           this.totalElements = response.totalElements;
@@ -165,7 +167,8 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
                 timer: 2000,
                 showConfirmButton: false,
               });
-              this.ngOnInit();
+              this.currentPage = 0;
+              this.loadStudentLeaves();
             },
             error: (error) => {
               this.logger.error('Error deleting leave:', error);
@@ -194,7 +197,7 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
     } else if (this.showOtherReasonInput && this.otherReasonControl?.hasError('required')) {
       this.errorMessage = "Please provide a reason.";
     } else if (this.otherReasonControl?.hasError('maxlength')) {
-      this.errorMessage = "Reason cannot be more than 20 words.";
+      this.errorMessage = "Reason cannot be more than 200 characters.";
     } else {
       this.errorMessage = "";
     }
@@ -272,7 +275,8 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
             timer: 2000,
             showConfirmButton: false,
           });
-          this.ngOnInit();
+          this.currentPage = 0;
+          this.loadStudentLeaves();
         },
         error: (error) => {
           this.logger.error('Error applying leave:', error);

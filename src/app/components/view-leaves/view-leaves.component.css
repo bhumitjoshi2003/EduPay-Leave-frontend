@@ -128,12 +128,12 @@
 .leave-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
+  min-width: 780px;
 }
 
 .leave-table th,
 .leave-table td {
-  padding: 12px 15px;
+  padding: 10px 12px;
   text-align: left;
   border-bottom: 1px solid #eee;
   white-space: nowrap;
@@ -162,28 +162,162 @@
   max-width: 120px;
 }
 
-.leave-table td:last-child {
+.actions-cell {
   text-align: center;
-  max-width: 130px;
-  min-width: 100px;
-  white-space: normal;
+  white-space: nowrap;
   overflow: visible;
   text-overflow: clip;
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+  min-width: 210px;
+}
+
+.leave-status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.leave-status-badge.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+.leave-status-badge.status-approved {
+  background-color: #d1e7dd;
+  color: #0a5e38;
+  border: 1px solid #198754;
+}
+
+.leave-status-badge.status-rejected {
+  background-color: #f8d7da;
+  color: #842029;
+  border: 1px solid #dc3545;
+}
+
+.approve-button {
+  background-color: #198754;
+  color: white;
+  border: none;
+  padding: 4px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.78em;
+  white-space: nowrap;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.approve-button:hover {
+  background-color: #146c43;
+}
+
+.reject-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 4px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.78em;
+  white-space: nowrap;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.reject-button:hover {
+  background-color: #5a6268;
+}
+
+.edit-button {
+  background-color: #0077b6;
+  color: white;
+  border: none;
+  padding: 4px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.78em;
+  white-space: nowrap;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.edit-button:hover {
+  background-color: #005f8e;
+}
+
+.card-approve-button {
+  padding: 7px 12px;
+  background-color: #198754;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.82em;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: inline-block;
+}
+
+.card-approve-button:hover {
+  background-color: #146c43;
+}
+
+.card-reject-button {
+  padding: 7px 12px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.82em;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: inline-block;
+}
+
+.card-reject-button:hover {
+  background-color: #5a6268;
+}
+
+.card-edit-button {
+  padding: 7px 12px;
+  background-color: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.82em;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: inline-block;
+}
+
+.card-edit-button:hover {
+  background-color: #005f8e;
 }
 
 .delete-button {
   background-color: #f44336;
   color: white;
   border: none;
-  padding: 8px 12px;
+  padding: 4px 9px;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  font-size: 0.9em;
+  font-size: 0.78em;
   white-space: nowrap;
+  font-weight: 500;
+  letter-spacing: 0.2px;
 }
 
 .delete-button:hover {

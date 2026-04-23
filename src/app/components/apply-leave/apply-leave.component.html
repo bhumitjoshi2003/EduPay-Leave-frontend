@@ -24,7 +24,7 @@
 
     <!-- Other Reason -->
     <div class="form-group" *ngIf="showOtherReasonInput">
-      <label for="otherReason" class="form-label">Specify Reason (Max 20 words):</label>
+      <label for="otherReason" class="form-label">Specify Reason (Max 200 characters):</label>
       <textarea id="otherReason" formControlName="otherReason" class="form-textarea styled-input" rows="3"
         maxlength="200" placeholder="Type your reason here..."></textarea>
     </div>
@@ -43,6 +43,7 @@
           <tr>
             <th>Leave Date</th>
             <th>Reason</th>
+            <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -51,8 +52,13 @@
             <td>{{ leave.leaveDate }}</td>
             <td>{{ leave.reason }}</td>
             <td>
-              <button [disabled]="leave.originalLeaveDate <= today" (click)="deleteLeave(leave.originalLeaveDate)"
-                class="delete-button" [title]="leave.originalLeaveDate <= today ? 'Cannot delete past leaves' : ''">
+              <span class="leave-status-badge" [ngClass]="'status-' + leave.status.toLowerCase()">
+                {{ leave.status }}
+              </span>
+            </td>
+            <td>
+              <button [disabled]="leave.originalLeaveDate <= today || leave.status === 'APPROVED'" (click)="deleteLeave(leave.originalLeaveDate)"
+                class="delete-button" [title]="leave.originalLeaveDate <= today ? 'Cannot delete past leaves' : leave.status === 'APPROVED' ? 'Cannot delete approved leave' : ''">
                 Delete
               </button>
             </td>
@@ -72,10 +78,18 @@
           <span class="card-label">Reason:</span>
           <span class="card-value">{{ leave.reason }}</span>
         </div>
+        <div class="card-item">
+          <span class="card-label">Status:</span>
+          <span class="card-value">
+            <span class="leave-status-badge" [ngClass]="'status-' + leave.status.toLowerCase()">
+              {{ leave.status }}
+            </span>
+          </span>
+        </div>
         <div class="card-actions">
-          <button [disabled]="leave.originalLeaveDate <= today" (click)="deleteLeave(leave.originalLeaveDate)"
+          <button [disabled]="leave.originalLeaveDate <= today || leave.status === 'APPROVED'" (click)="deleteLeave(leave.originalLeaveDate)"
             class="card-delete-button"
-            [title]="leave.originalLeaveDate <= today ? 'Cannot delete past leaves' : 'Delete leave'">
+            [title]="leave.originalLeaveDate <= today ? 'Cannot delete past leaves' : leave.status === 'APPROVED' ? 'Cannot delete approved leave' : 'Delete leave'">
             Delete
           </button>
         </div>

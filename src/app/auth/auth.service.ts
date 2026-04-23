@@ -41,7 +41,7 @@ export class AuthService {
   }
 
   changePassword(request: ChangePasswordRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/change-password`, request, { responseType: 'text' });
+    return this.http.post(`${this.apiUrl}/change-password`, request, { responseType: 'text', withCredentials: true });
   }
 
   requestPasswordReset(userId: string, email: string): Observable<any> {

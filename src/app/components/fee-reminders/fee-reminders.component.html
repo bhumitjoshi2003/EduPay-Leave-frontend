@@ -21,7 +21,7 @@
 
       <div class="fr-control-group">
         <label class="fr-label" for="fr-class">Class</label>
-        <select id="fr-class" class="fr-select" [(ngModel)]="selectedClass">
+        <select id="fr-class" class="fr-select" [(ngModel)]="selectedClass" (ngModelChange)="onFilterChange()">
           <option value="">All Classes</option>
           <option *ngFor="let c of classList" [value]="c">Class {{ c }}</option>
         </select>
@@ -29,7 +29,7 @@
 
       <div class="fr-control-group">
         <label class="fr-label" for="fr-days">Overdue by</label>
-        <select id="fr-days" class="fr-select" [(ngModel)]="minDaysOverdue">
+        <select id="fr-days" class="fr-select" [(ngModel)]="minDaysOverdue" (ngModelChange)="onFilterChange()">
           <option [value]="0">All</option>
           <option [value]="30">30+ days</option>
           <option [value]="60">60+ days</option>
@@ -69,9 +69,17 @@
 
   <!-- ── Action bar ────────────────────────────────────────────── -->
   <div class="fr-action-bar no-print" *ngIf="!isLoading && filteredStudents.length > 0">
-    <span class="fr-showing">
-      Showing {{ filteredStudents.length }} student{{ filteredStudents.length !== 1 ? 's' : '' }}
-    </span>
+    <div class="fr-action-left">
+      <span class="fr-showing">
+        {{ filteredStudents.length }} student{{ filteredStudents.length !== 1 ? 's' : '' }} total
+      </span>
+      <div class="fr-page-size">
+        Per page:
+        <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+          <option *ngFor="let s of pageSizes; trackBy: trackByIndex" [ngValue]="s">{{ s }}</option>
+        </select>
+      </div>
+    </div>
     <button class="fr-send-all-btn" (click)="sendAllReminders()" [disabled]="sendingBulk">
       <span *ngIf="!sendingBulk">📣 Send All Reminders</span>
       <span *ngIf="sendingBulk">Sending…</span>
@@ -101,10 +109,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let s of filteredStudents; let i = index; trackBy: trackById"
+        <tr *ngFor="let s of pagedStudents; let i = index; trackBy: trackById"
           [ngClass]="getRowClass(s)">
 
-          <td data-label="#">{{ i + 1 }}</td>
+          <td data-label="#">{{ currentPage * pageSize + i + 1 }}</td>
 
           <td data-label="Student">
             <span class="fr-student-name">{{ s.studentName }}</span>
@@ -152,6 +160,17 @@
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- ── Pagination ───────────────────────────────────────────────── -->
+  <div class="fr-pagination no-print" *ngIf="!isLoading && totalPages > 1">
+    <button class="fr-page-btn" (click)="prevPage()" [disabled]="currentPage === 0">&#8249; Prev</button>
+
+    <span class="fr-page-info">
+      Page {{ currentPage + 1 }} of {{ totalPages }}
+    </span>
+
+    <button class="fr-page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages - 1">Next &#8250;</button>
   </div>
 
   <!-- ── Legend ────────────────────────────────────────────────── -->

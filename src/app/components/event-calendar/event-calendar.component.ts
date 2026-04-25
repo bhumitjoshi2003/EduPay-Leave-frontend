@@ -297,6 +297,7 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
     this.daysInMonth.forEach(cell => {
       cell.events = cell.date ? (this.eventMap.get(format(cell.date, 'yyyy-MM-dd')) ?? []) : [];
     });
+    this.cdr.markForCheck();
   }
 
   isToday(date: Date | null): boolean {
@@ -586,10 +587,12 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
           }
 
         });
+        this.cdr.markForCheck();
 
       },
       error: (err) => {
         this.logger.error('Error loading attendance:', err);
+        this.cdr.markForCheck();
       }
     });
   }

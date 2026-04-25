@@ -181,10 +181,35 @@
   padding: 14px 20px;
 }
 
+.fr-action-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .fr-showing {
   font-size: 0.88em;
   color: #666;
   font-weight: 500;
+}
+
+.fr-page-size {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85em;
+  color: #666;
+}
+
+.fr-page-size select {
+  padding: 4px 8px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 0.9em;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
 }
 
 .fr-send-all-btn {
@@ -326,6 +351,48 @@
 }
 .fr-remind-sending { opacity: 0.7; cursor: wait; }
 
+/* ── Pagination ──────────────────────────────────────────────── */
+.fr-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 12px;
+}
+
+.fr-page-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: #fff;
+  font-size: 0.88em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+.fr-page-btn:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+.fr-page-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+}
+
+.fr-page-info {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #555;
+  min-width: 110px;
+  text-align: center;
+}
+
 /* ── Legend ──────────────────────────────────────────────────── */
 .fr-legend {
   display: flex;
@@ -420,7 +487,11 @@
   .fr-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .fr-stat-value { font-size: 1.6em; }
   .fr-action-bar { flex-direction: column; align-items: stretch; }
+  .fr-action-left { flex-direction: column; gap: 8px; }
   .fr-send-all-btn { width: 100%; }
+  .fr-pagination { gap: 10px; }
+  .fr-page-btn { padding: 8px 14px; }
+  .fr-page-info { min-width: auto; }
 
   .fr-table thead { display: none; }
   .fr-table td {

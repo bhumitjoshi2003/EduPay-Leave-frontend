@@ -37,6 +37,11 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
   sendingId: string | null = null;   // single reminder in-flight
   sendingBulk = false;
 
+  // ── Pagination ───────────────────────────────────────────────────
+  currentPage = 0;
+  pageSize = 10;
+  readonly pageSizes = [5, 10, 20, 50];
+
   constructor(
     private feeReminderService: FeeReminderService,
     private logger: LoggerService,
@@ -74,6 +79,15 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
     });
   }
 
+  get pagedStudents(): OverdueStudent[] {
+    const start = this.currentPage * this.pageSize;
+    return this.filteredStudents.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredStudents.length / this.pageSize);
+  }
+
   get totalDue(): number {
     return this.filteredStudents.reduce((sum, s) => sum + s.totalDue, 0);
   }
@@ -86,12 +100,36 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
     return this.filteredStudents.filter(s => s.daysOverdue >= 30 && s.daysOverdue < 60).length;
   }
 
+  // ── Pagination helpers ───────────────────────────────────────────
+
+  onFilterChange(): void {
+    this.currentPage = 0;
+    this.cdr.markForCheck();
+  }
+
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+      this.cdr.markForCheck();
+    }
+  }
+
+  nextPage(): void { this.goToPage(this.currentPage + 1); }
+  prevPage(): void { this.goToPage(this.currentPage - 1); }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = +size;
+    this.currentPage = 0;
+    this.cdr.markForCheck();
+  }
+
   // ── Load ─────────────────────────────────────────────────────────
 
   loadOverdue(): void {
     this.isLoading = true;
     this.error = null;
     this.allStudents = [];
+    this.currentPage = 0;
     this.reminderSent.clear();
     this.cdr.markForCheck();
 
@@ -198,4 +236,5 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
   printReport(): void { window.print(); }
 
   trackById(_: number, s: OverdueStudent): string { return s.studentId; }
+  trackByIndex(i: number): number { return i; }
 }

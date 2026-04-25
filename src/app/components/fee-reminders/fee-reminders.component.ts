@@ -5,12 +5,14 @@ import { Subject, takeUntil } from 'rxjs';
 import { FeeReminderService } from '../../services/fee-reminder.service';
 import { LoggerService } from '../../services/logger.service';
 import { OverdueStudent } from '../../interfaces/fee-reminder';
+import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
+import { MODULE_MESSAGES } from '../../config/module-messages.config';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-fee-reminders',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ComingSoonComponent],
   templateUrl: './fee-reminders.component.html',
   styleUrl: './fee-reminders.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -23,6 +25,8 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
     '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
   ];
 
+  comingSoonConfig = MODULE_MESSAGES.feesReminder;
+  showFeesReminderModule: boolean = false;
   sessions: string[] = [];
   selectedSession = '';
   selectedClass = '';

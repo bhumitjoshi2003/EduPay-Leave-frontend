@@ -11,7 +11,7 @@ import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormsModule, F
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { environment } from '../../../environments/environment';
-import { CalendarEvent } from '../../interfaces/event-calendar.component'; // Ensure this interface has imageUrl: string | null;
+import { CalendarEvent } from '../../interfaces/event-calendar.component';
 import { AttendanceService } from '../../services/attendance.service';
 import { forkJoin, Subject, takeUntil } from 'rxjs';
 

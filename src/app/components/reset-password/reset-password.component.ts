@@ -4,19 +4,14 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import Swal from 'sweetalert2';
 
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
+import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [RouterModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, FormsModule, ReactiveFormsModule, MatIconModule, CommonModule],
+  imports: [RouterModule, ReactiveFormsModule, CommonModule],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -40,7 +35,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     this.resetForm = this.fb.group({
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required]
-    }, { validator: this.checkPasswordMatch });
+    }, { validators: this.checkPasswordMatch });
   }
 
   ngOnDestroy(): void {
@@ -56,18 +51,16 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
           icon: 'error',
           title: 'Invalid Reset Link',
           text: 'The password reset link is invalid or missing.',
-          confirmButtonColor: '#d33',
+          confirmButtonColor: '#1e3a5f',
         }).then(() => {
-          this.router.navigate(['/']); 
+          this.router.navigate(['/']);
         });
       }
     });
   }
 
-
-
   checkPasswordMatch(group: FormGroup) {
-    const newPassword = group.controls['newPassword'].value;
+    const newPassword     = group.controls['newPassword'].value;
     const confirmPassword = group.controls['confirmPassword'].value;
     return newPassword === confirmPassword ? null : { passwordMismatch: true };
   }
@@ -75,6 +68,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   onSubmit() {
     if (this.resetForm.valid && this.resetToken) {
       this.loading = true;
+      this.cdr.markForCheck();
       this.authService.resetPassword(this.resetToken, this.resetForm.value.newPassword).subscribe({
         next: (response: any) => {
           this.loading = false;
@@ -82,11 +76,9 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
           Swal.fire({
             icon: 'success',
             title: 'Password Reset Successful',
-            text: response.message || 'Your password has been reset successfully. You can now log in with your new password.',
-            confirmButtonColor: '#3085d6',
-            customClass: {
-              confirmButton: 'swal-primary-button'
-            }
+            text: response.message || 'Your password has been reset. You can now sign in with your new password.',
+            confirmButtonColor: '#1e3a5f',
+            confirmButtonText: 'Sign In'
           }).then(() => {
             this.router.navigate(['/']);
           });
@@ -97,27 +89,16 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
           Swal.fire({
             icon: 'error',
             title: 'Password Reset Failed',
-            text: error.error || 'Failed to reset password. The link might be invalid or expired. Please try again.',
-            confirmButtonColor: '#d33',
-            customClass: {
-              confirmButton: 'swal-error-button'
-            }
+            text: error.error || 'The link may be invalid or expired. Please request a new reset link.',
+            confirmButtonColor: '#1e3a5f'
           });
         }
       });
     } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Invalid Form',
-        text: 'Please ensure all fields are filled correctly and passwords match.',
-        confirmButtonColor: '#f8bb86',
-        customClass: {
-          confirmButton: 'swal-warning-button'
-        }
-      });
+      this.resetForm.markAllAsTouched();
+      this.cdr.markForCheck();
     }
   }
-  
 
   toggleNewPasswordVisibility() {
     this.hideNewPassword = !this.hideNewPassword;

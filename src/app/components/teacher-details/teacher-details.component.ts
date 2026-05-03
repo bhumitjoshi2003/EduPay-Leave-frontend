@@ -103,7 +103,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
       text: 'Do you want to edit the teacher details?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
+      confirmButtonColor: '#1e3a5f',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, edit it!',
     }).then((result) => {
@@ -168,7 +168,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
       text: 'Do you want to save the changes?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
+      confirmButtonColor: '#1e3a5f',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, save it!',
     }).then((result) => {

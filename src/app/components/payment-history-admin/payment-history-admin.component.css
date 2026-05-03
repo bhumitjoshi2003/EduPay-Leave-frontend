@@ -1,7 +1,7 @@
 .payment-history-container {
   display: flex;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #e0f7fa, #80deea);
+  background: linear-gradient(135deg, #e8f4f8, #bee3f8);
   border-radius: 15px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   animation: fadeIn 0.8s ease-in-out;
@@ -12,7 +12,7 @@
 }
 
 .payment-history-container h2 {
-  color: #004d40;
+  color: #1e293b;
   margin-bottom: 25px;
   text-align: center;
   border-bottom: 3px solid #26c6da;
@@ -54,8 +54,8 @@
 
 .chevron {
   position: relative;
-  background-color: #b2ebf2;
-  color: #004d40;
+  background-color: #d0eaf0;
+  color: #1e293b;
   padding: 10px 15px;
   border-radius: 15px 0 0 15px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.08);
@@ -66,7 +66,7 @@
 }
 
 .class-item-vertical.selected .chevron {
-  background-color: #00acc1;
+  background-color: #1f6f8b;
   color: #fff;
 }
 
@@ -111,7 +111,7 @@
   border-bottom: 3px solid #26c6da;
   padding-bottom: 12px;
   margin-bottom: 25px;
-  color: #004d40;
+  color: #1e293b;
   font-size: 1.4em;
 }
 
@@ -152,7 +152,7 @@
 }
 
 .payment-history-table th {
-  background-color: #00acc1;
+  background-color: #1f6f8b;
   color: white;
   font-weight: 600;
   text-transform: uppercase;
@@ -246,7 +246,7 @@
 .filter-options .form-label {
   margin-bottom: 3px;
   font-weight: bold;
-  color: #004d40;
+  color: #1e293b;
   font-size: 0.75em;
 }
 
@@ -262,7 +262,7 @@
 }
 
 .filter-options .mat-datepicker-toggle button {
-  color: #00acc1;
+  color: #1f6f8b;
   margin-left: 5px;
 }
 
@@ -338,7 +338,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   font-size: 0.9em;
-  color: #004d40;
+  color: #1e293b;
   gap: 10px;
 }
 
@@ -356,10 +356,10 @@
 
 .top-pagination-controls .page-size select {
   padding: 7px 10px;
-  border: 1px solid #00acc1;
+  border: 1px solid #1f6f8b;
   border-radius: 5px;
   background-color: white;
-  color: #004d40;
+  color: #1e293b;
   font-size: 0.9em;
   cursor: pointer;
   outline: none;
@@ -384,7 +384,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   font-size: 0.9em;
-  color: #004d40;
+  color: #1e293b;
   gap: 15px;
 }
 
@@ -397,7 +397,7 @@
 }
 
 .pagination-controls .pagination-buttons button {
-  background-color: #00acc1;
+  background-color: #1f6f8b;
   color: white;
   border: none;
   padding: 8px 12px;
@@ -420,14 +420,14 @@
 }
 
 .pagination-controls .pagination-buttons button.active {
-  background-color: #004d40;
+  background-color: #1e293b;
   font-weight: bold;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .pagination-controls .ellipsis {
   padding: 8px 5px;
-  color: #004d40;
+  color: #1e293b;
   font-weight: bold;
 }
 
@@ -878,7 +878,7 @@
 
 .card-label {
   font-weight: 600;
-  color: #004d40;
+  color: #1e293b;
   flex-shrink: 0;
   margin-right: 10px;
   font-size: 0.9em;

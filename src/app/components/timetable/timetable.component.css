@@ -33,7 +33,7 @@
   margin: 0;
   font-size: 2em;
   color: #222;
-  border-bottom: 4px solid #3498db;
+  border-bottom: 4px solid #1e3a5f;
   padding-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 1.5px;
@@ -96,7 +96,7 @@
   min-width: 180px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-.tt-select:focus { border-color: #3498db; box-shadow: 0 0 0 3px rgba(52,152,219,0.15); outline: none; }
+.tt-select:focus { border-color: #1e3a5f; box-shadow: 0 0 0 3px rgba(30,58,95,0.10); outline: none; }
 .tt-select-sm { min-width: 80px; }
 
 .tt-hint {
@@ -119,7 +119,7 @@
   width: 22px;
   height: 22px;
   border: 3px solid #d8d8d8;
-  border-top-color: #3498db;
+  border-top-color: #1e3a5f;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
@@ -171,7 +171,7 @@
 }
 
 .tt-th-day {
-  background: linear-gradient(135deg, #3498db, #1abc9c);
+  background: linear-gradient(135deg, #1e3a5f, #4fbdbd);
   color: #fff;
   padding: 14px 10px;
   text-align: center;
@@ -197,7 +197,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3498db, #1abc9c);
+  background: linear-gradient(135deg, #1e3a5f, #4fbdbd);
   color: #fff;
   font-weight: 700;
   font-size: 0.82em;
@@ -245,7 +245,7 @@
 .tt-edit-hint {
   display: none;
   font-size: 0.72em;
-  color: #3498db;
+  color: #1e3a5f;
   margin-top: 4px;
   font-weight: 500;
 }
@@ -260,7 +260,7 @@
   padding: 10px 0;
   transition: color 0.15s;
 }
-.tt-td-clickable:hover .tt-add-hint { color: #1abc9c; }
+.tt-td-clickable:hover .tt-add-hint { color: #4fbdbd; }
 
 /* ── Teacher schedule view ───────────────────────────────────── */
 .tt-teacher-wrap {
@@ -274,21 +274,21 @@
   border-radius: 14px;
   padding: 20px 24px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-  border-left: 4px solid #3498db;
+  border-left: 4px solid #1e3a5f;
 }
 
 .tt-day-label {
   margin: 0 0 14px;
   font-size: 1.05em;
   font-weight: 700;
-  color: #3498db;
+  color: #1e3a5f;
   padding-left: 2px;
 }
 
 .tt-class-badge {
   display: inline-block;
   background: rgba(52, 152, 219, 0.1);
-  color: #2980b9;
+  color: #1e3a5f;
   border: 1px solid rgba(52, 152, 219, 0.3);
   border-radius: 6px;
   padding: 2px 8px;
@@ -297,7 +297,7 @@
 }
 
 .tt-teacher-wrap .tt-table th {
-  background: linear-gradient(135deg, #3498db, #1abc9c);
+  background: linear-gradient(135deg, #1e3a5f, #4fbdbd);
   color: #fff;
   padding: 12px 14px;
   text-align: left;
@@ -358,7 +358,7 @@
   font-size: 1.2rem;
   font-weight: 700;
   color: #1a1a2e;
-  border-bottom: 3px solid #3498db;
+  border-bottom: 3px solid #1e3a5f;
   padding-bottom: 10px;
 }
 
@@ -405,8 +405,8 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .tt-field-input:focus {
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52,152,219,0.15);
+  border-color: #1e3a5f;
+  box-shadow: 0 0 0 3px rgba(30,58,95,0.10);
   outline: none;
 }
 
@@ -450,7 +450,7 @@
 .tt-btn-cancel:hover { background: #e4e4e4; }
 
 .tt-btn-save {
-  background: linear-gradient(135deg, #3498db, #1abc9c);
+  background: linear-gradient(135deg, #1e3a5f, #4fbdbd);
   color: #fff;
   box-shadow: 0 4px 12px rgba(52,152,219,0.3);
 }

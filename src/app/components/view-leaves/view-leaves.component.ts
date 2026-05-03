@@ -218,7 +218,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
+      cancelButtonColor: '#64748b',
       confirmButtonText: 'Yes, delete!',
     }).then((result) => {
       if (result.isConfirmed) {
@@ -256,7 +256,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
+      cancelButtonColor: '#64748b',
       confirmButtonText: 'Yes, delete it!',
     }).then((result) => {
       if (result.isConfirmed) {
@@ -286,7 +286,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
       },
       inputValue: leave.status ?? 'PENDING',
       showCancelButton: true,
-      confirmButtonColor: '#00acc1',
+      confirmButtonColor: '#1e3a5f',
       cancelButtonColor: '#6c757d',
       confirmButtonText: 'Update',
       inputAttributes: { 'aria-label': 'Select new status' },

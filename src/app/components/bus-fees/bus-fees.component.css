@@ -1,7 +1,7 @@
 .bus-fees-container {
   width: 94%;
   margin: 0px auto;
-  background: linear-gradient(145deg, #f0faff, #e0f7fa);
+  background: linear-gradient(145deg, #f7faff, #e8f4f8);
   border-radius: 16px;
   box-shadow: 9px 9px 18px #d1e9f1, -9px -9px 18px #efffff;
   padding: 40px;
@@ -124,7 +124,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .bus-fees-table td {
   padding: 16px;
   text-align: left;
-  border-bottom: 1px solid #b2ebf2;
+  border-bottom: 1px solid #d0eaf0;
 }
 
 .bus-fees-table th {
@@ -140,7 +140,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .bus-fees-table tr:hover {
-  background-color: #e0f7fa;
+  background-color: #e8f4f8;
   transition: background-color 0.3s ease;
   transform: scale(1.005);
 }
@@ -212,7 +212,7 @@ input[type="number"]::-webkit-inner-spin-button {
   width: 100%;
   border-radius: 10px;
   box-shadow: 4px 4px 8px #d1e9f1, -4px -4px 8px #efffff;
-  background-color: #e0f7fa;
+  background-color: #e8f4f8;
 }
 
 @media (max-width: 1023px) {

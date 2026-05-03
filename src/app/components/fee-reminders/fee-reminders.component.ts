@@ -204,7 +204,7 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
       text: 'A fee reminder will be sent to each parent.',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3498db',
+      confirmButtonColor: '#1e3a5f',
       confirmButtonText: 'Yes, send all'
     }).then(result => {
       if (!result.isConfirmed) return;

@@ -3,7 +3,7 @@
 .student-list-container {
   display: flex;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(145deg, #f0faff, #e0f7fa);
+  background: linear-gradient(145deg, #f7faff, #e8f4f8);
   border-radius: 15px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   animation: fadeIn 0.8s ease-in-out;

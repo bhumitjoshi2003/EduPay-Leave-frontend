@@ -254,7 +254,7 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
       text: 'Are you sure you want to save the attendance?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
+      confirmButtonColor: '#1e3a5f',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, save it!',
     }).then((result) => {
@@ -346,7 +346,7 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
+      cancelButtonColor: '#64748b',
     }).then((result) => {
       if (result.isConfirmed) {
         const formattedDate = formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en');

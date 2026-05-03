@@ -88,15 +88,15 @@ export class PaymentComponent {
           key: response.razorpayKey,
           amount: response.amount,
           currency: 'INR',
-          name: 'Indra Academy Sr. Sec. School',
-          description: 'IAS Fee Payment',
+          name: 'Edunexify School',
+          description: 'Edunexify Fee Payment',
           order_id: response.orderId,
           prefill: {
             name: this.studentDetails.name || '',
             email: this.studentDetails.email || '',
             contact: this.studentDetails.phoneNumber || ''
           },
-          theme: { color: '#3399cc' },
+          theme: { color: '#4fbdbd' },
           method: { netbanking: true, card: true, upi: true, wallet: false },
           handler: (paymentResponse: RazorpayPaymentResponse) => {
             this.verifyPayment(paymentResponse, response);

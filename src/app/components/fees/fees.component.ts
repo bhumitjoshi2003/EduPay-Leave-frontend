@@ -451,7 +451,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
       text: `Mark selected months as manually paid with a total amount of ₹${this.manualPaymentAmount}?`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
+      confirmButtonColor: '#1e3a5f',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, mark as paid!'
     }).then((result) => {

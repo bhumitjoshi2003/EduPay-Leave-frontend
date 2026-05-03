@@ -65,16 +65,22 @@
 
 /* ── School Header ───────────────────────────────────────────────── */
 .rc-school-header {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+  border-radius: 10px 10px 0 0;
   margin-bottom: 24px;
 }
 
 .rc-header-img {
-  width: 100%;
-  max-width: 780px;
-  height: auto;
+  height: 38px;
+  width: auto;
   display: block;
-  margin: 0 auto;
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
 }
 
 /* ── Card Title row ──────────────────────────────────────────────── */

@@ -147,7 +147,7 @@
   align-items: center;
   gap: 6px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  border-left: 5px solid #3498db;
+  border-left: 5px solid #1e3a5f;
   text-align: center;
 }
 
@@ -331,7 +331,7 @@
   padding: 6px 16px;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #3498db, #1abc9c);
+  background: linear-gradient(135deg, #1e3a5f, #4fbdbd);
   color: #fff;
   font-size: 0.82em;
   font-weight: 600;
@@ -415,7 +415,7 @@
 }
 .dot-critical { background: rgba(231,76,60,0.2); border: 1px solid #e74c3c; }
 .dot-warning  { background: rgba(243,156,18,0.2); border: 1px solid #f39c12; }
-.dot-mild     { background: rgba(52,152,219,0.15); border: 1px solid #3498db; }
+.dot-mild     { background: rgba(30,58,95,0.10); border: 1px solid #1e3a5f; }
 
 /* ── Empty state ─────────────────────────────────────────────── */
 .fr-empty {
@@ -516,5 +516,5 @@
   }
   .row-critical { border-left: 4px solid #e74c3c !important; }
   .row-warning  { border-left: 4px solid #f39c12 !important; }
-  .row-mild     { border-left: 4px solid #3498db !important; }
+  .row-mild     { border-left: 4px solid #1e3a5f !important; }
 }

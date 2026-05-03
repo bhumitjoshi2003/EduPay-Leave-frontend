@@ -1,133 +1,130 @@
-<div class="student-details-container" *ngIf="studentDetails && updatedDetails">
-  <div class="header">
-    <h2>Student Profile</h2>
-    <div class="header-buttons">
-      <button *ngIf="getUserRole() === 'ADMIN' && !isEditing" (click)="enableEditMode()">Edit Details</button>
-      <div *ngIf="getUserRole() === 'ADMIN' && isEditing">
-        <button (click)="saveStudentDetails()">Save</button>
-        <button (click)="cancelEditMode()">Cancel</button>
+<div class="sd-page" *ngIf="studentDetails && updatedDetails">
+
+  <!-- ── Hero banner ─────────────────────────────────────────────── -->
+  <div class="sd-hero">
+    <!-- Avatar -->
+    <div class="photo-section">
+      <div class="photo-wrapper" [class.uploadable]="canUploadPhoto()" (click)="canUploadPhoto() && triggerPhotoUpload()">
+        <img *ngIf="studentDetails.photoUrl" [src]="getPhotoUrl(studentDetails.photoUrl)" alt="Student photo" class="student-photo">
+        <div *ngIf="!studentDetails.photoUrl" class="photo-initials">{{ getInitials() }}</div>
+        <div *ngIf="canUploadPhoto() && !photoUploading" class="photo-overlay">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Upload</span>
+        </div>
+        <div *ngIf="photoUploading" class="photo-uploading">
+          <span class="spinner"></span>
+        </div>
       </div>
-      <button *ngIf="getUserRole() !== 'TEACHER'" (click)="openPasswordModal()">Change Password</button>
+      <input type="file" #photoInput accept="image/*" (change)="onPhotoSelected($event)" style="display:none">
+    </div>
+
+    <!-- Title + sub -->
+    <div class="sd-hero-text">
+      <span class="sd-hero-badge">Student Profile</span>
+      <h1 class="sd-hero-name">{{ studentDetails.name }}</h1>
+      <p class="sd-hero-sub">{{ studentDetails.studentId }}&nbsp;&nbsp;·&nbsp;&nbsp;Class {{ studentDetails.className }}</p>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="sd-hero-actions">
+      <ng-container *ngIf="getUserRole() === 'ADMIN' && !isEditing">
+        <button class="sd-btn sd-btn-edit" (click)="enableEditMode()">Edit Details</button>
+      </ng-container>
+      <ng-container *ngIf="getUserRole() === 'ADMIN' && isEditing">
+        <button class="sd-btn sd-btn-save" (click)="saveStudentDetails()">Save</button>
+        <button class="sd-btn sd-btn-cancel-edit" (click)="cancelEditMode()">Cancel</button>
+      </ng-container>
+      <button *ngIf="getUserRole() !== 'TEACHER'" class="sd-btn sd-btn-pwd" (click)="openPasswordModal()">Change Password</button>
     </div>
   </div>
 
-  <!-- Photo section -->
-  <div class="photo-section">
-    <div class="photo-wrapper" [class.uploadable]="canUploadPhoto()" (click)="canUploadPhoto() && triggerPhotoUpload()">
-      <img *ngIf="studentDetails.photoUrl" [src]="getPhotoUrl(studentDetails.photoUrl)" alt="Student photo" class="student-photo">
-      <div *ngIf="!studentDetails.photoUrl" class="photo-initials">{{ getInitials() }}</div>
-      <div *ngIf="canUploadPhoto() && !photoUploading" class="photo-overlay">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span>Upload</span>
+  <!-- ── Details card ─────────────────────────────────────────────── -->
+  <div class="sd-card">
+    <div class="details-grid">
+      <div class="detail-item">
+        <span class="label">Name</span>
+        <span class="value" *ngIf="!isEditing">{{ studentDetails.name }}</span>
+        <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.name" (input)="updateFieldValue('name', $event)" [class.invalid-field]="validationErrors['name']">
       </div>
-      <div *ngIf="photoUploading" class="photo-uploading">
-        <span class="spinner"></span>
+      <div class="detail-item">
+        <span class="label">Student ID</span>
+        <span class="value">{{ studentDetails.studentId }}</span>
       </div>
-    </div>
-    <input type="file" #photoInput accept="image/*" (change)="onPhotoSelected($event)" style="display:none">
-  </div>
-
-  <div class="details-grid">
-    <div class="detail-item">
-      <span class="label">Name:</span>
-      <span class="value" *ngIf="!isEditing">{{ studentDetails.name }}</span>
-      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.name" (input)="updateFieldValue('name', $event)"
-        [class.invalid-field]="validationErrors['name']">
-    </div>
-    <div class="detail-item">
-      <span class="label">Student ID:</span>
-      <span class="value">{{ studentDetails.studentId }}</span>
-    </div>
-    <div class="detail-item">
-      <span class="label">Class:</span>
-      <span class="value" *ngIf="!isEditing">{{ studentDetails.className }}</span>
-      <select *ngIf="isEditing && getUserRole() === 'ADMIN'" [(ngModel)]="updatedDetails.className"
-        (input)="updateFieldValue('className', $event)" class="form-control">
-        <option *ngFor="let className of classList" [value]="className">
-          {{ className }}
-        </option>
-      </select>
-      <span class="value" *ngIf="isEditing && getUserRole() !== 'ADMIN'">{{ studentDetails.className }}</span>
-    </div>
-    <div class="detail-item">
-      <span class="label">Phone:</span>
-      <span class="value" *ngIf="!isEditing">{{ studentDetails.phoneNumber }}</span>
-      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.phoneNumber"
-        (input)="updateFieldValue('phoneNumber', $event)" [class.invalid-field]="validationErrors['phoneNumber']">
-    </div>
-    <div class="detail-item">
-      <span class="label">Email:</span>
-      <span class="value" *ngIf="!isEditing">{{ studentDetails.email }}</span>
-      <input type="email" *ngIf="isEditing" [(ngModel)]="updatedDetails.email"
-        (input)="updateFieldValue('email', $event)" [class.invalid-field]="validationErrors['email']">
-    </div>
-    <div class="detail-item">
-      <span class="label">Date of Birth:</span>
-      <span class="value" *ngIf="!isEditing">{{ studentDetails.dob | date }}</span>
-      <input type="date" *ngIf="isEditing" [(ngModel)]="updatedDetails.dob" (input)="updateFieldValue('dob', $event)">
-    </div>
-    <div class="detail-item parent-info">
-      <span class="label">Father:</span>
-      <span class="value" *ngIf="!isEditing">{{ studentDetails.fatherName }}</span>
-      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.fatherName"
-        (input)="updateFieldValue('fatherName', $event)">
-    </div>
-    <div class="detail-item parent-info">
-      <span class="label">Mother:</span>
-      <span class="value" *ngIf="!isEditing">{{ studentDetails.motherName }}</span>
-      <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.motherName"
-        (input)="updateFieldValue('motherName', $event)">
-    </div>
-
-    <div *ngIf="getUserRole() === 'ADMIN'" class="detail-item">
-      <span class="label">Uses Bus Facility:</span>
-      <span class="value" *ngIf="!isEditing">{{ studentDetails.takesBus ? 'Yes' : 'No' }}</span>
-      <div *ngIf="isEditing">
-        <input type="checkbox" id="takesBus" [(ngModel)]="updatedDetails.takesBus"
-          (change)="updateFieldValue('takesBus', $event)">
+      <div class="detail-item">
+        <span class="label">Class</span>
+        <span class="value" *ngIf="!isEditing">{{ studentDetails.className }}</span>
+        <select *ngIf="isEditing && getUserRole() === 'ADMIN'" [(ngModel)]="updatedDetails.className" (input)="updateFieldValue('className', $event)" class="form-control">
+          <option *ngFor="let className of classList" [value]="className">{{ className }}</option>
+        </select>
+        <span class="value" *ngIf="isEditing && getUserRole() !== 'ADMIN'">{{ studentDetails.className }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="label">Phone</span>
+        <span class="value" *ngIf="!isEditing">{{ studentDetails.phoneNumber }}</span>
+        <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.phoneNumber" (input)="updateFieldValue('phoneNumber', $event)" [class.invalid-field]="validationErrors['phoneNumber']">
+      </div>
+      <div class="detail-item">
+        <span class="label">Email</span>
+        <span class="value" *ngIf="!isEditing">{{ studentDetails.email }}</span>
+        <input type="email" *ngIf="isEditing" [(ngModel)]="updatedDetails.email" (input)="updateFieldValue('email', $event)" [class.invalid-field]="validationErrors['email']">
+      </div>
+      <div class="detail-item">
+        <span class="label">Date of Birth</span>
+        <span class="value" *ngIf="!isEditing">{{ studentDetails.dob | date }}</span>
+        <input type="date" *ngIf="isEditing" [(ngModel)]="updatedDetails.dob" (input)="updateFieldValue('dob', $event)">
+      </div>
+      <div class="detail-item parent-info">
+        <span class="label">Father</span>
+        <span class="value" *ngIf="!isEditing">{{ studentDetails.fatherName }}</span>
+        <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.fatherName" (input)="updateFieldValue('fatherName', $event)">
+      </div>
+      <div class="detail-item parent-info">
+        <span class="label">Mother</span>
+        <span class="value" *ngIf="!isEditing">{{ studentDetails.motherName }}</span>
+        <input type="text" *ngIf="isEditing" [(ngModel)]="updatedDetails.motherName" (input)="updateFieldValue('motherName', $event)">
+      </div>
+      <div *ngIf="getUserRole() === 'ADMIN'" class="detail-item">
+        <span class="label">Uses Bus Facility</span>
+        <span class="value" *ngIf="!isEditing">{{ studentDetails.takesBus ? 'Yes' : 'No' }}</span>
+        <div *ngIf="isEditing">
+          <input type="checkbox" id="takesBus" [(ngModel)]="updatedDetails.takesBus" (change)="updateFieldValue('takesBus', $event)">
+        </div>
+      </div>
+      <div class="detail-item" *ngIf="getUserRole() === 'ADMIN' && (studentDetails.takesBus || (isEditing && updatedDetails.takesBus))">
+        <span class="label">Distance (km)</span>
+        <span class="value" *ngIf="!isEditing">{{ studentDetails.distance }}</span>
+        <input type="number" *ngIf="isEditing" [(ngModel)]="updatedDetails.distance" (input)="updateFieldValue('distance', $event)" [class.invalid-field]="validationErrors['distance']">
+      </div>
+      <div *ngIf="getUserRole() === 'ADMIN'" class="detail-item">
+        <span class="label">Joining Date</span>
+        <span class="value" *ngIf="!isEditing">{{ studentDetails.joiningDate | date }}</span>
+        <input type="date" *ngIf="isEditing" [(ngModel)]="updatedDetails.joiningDate" (input)="updateFieldValue('joiningDate', $event)">
+      </div>
+      <div *ngIf="getUserRole() === 'ADMIN' && (studentDetails.leavingDate || isEditing)" class="detail-item">
+        <span class="label">Leaving Date</span>
+        <span class="value" *ngIf="!isEditing && studentDetails.leavingDate">{{ studentDetails.leavingDate | date }}</span>
+        <input type="date" *ngIf="isEditing" [(ngModel)]="updatedDetails.leavingDate" (input)="updateFieldValue('leavingDate', $event)">
       </div>
     </div>
-    <div class="detail-item"
-      *ngIf="getUserRole() === 'ADMIN' && (studentDetails.takesBus || (isEditing && updatedDetails.takesBus))">
-      <span class="label">Distance (km):</span>
-      <span class="value" *ngIf="!isEditing">{{ studentDetails.distance }}</span>
-      <input type="number" *ngIf="isEditing" [(ngModel)]="updatedDetails.distance"
-        (input)="updateFieldValue('distance', $event)" [class.invalid-field]="validationErrors['distance']">
-    </div>
-    <div *ngIf="getUserRole() === 'ADMIN'" class="detail-item">
-      <span class="label">Joining Date:</span>
-      <span class="value" *ngIf="!isEditing">{{ studentDetails.joiningDate | date }}</span>
-      <input type="date" *ngIf="isEditing" [(ngModel)]="updatedDetails.joiningDate"
-        (input)="updateFieldValue('joiningDate', $event)">
-    </div>
-    <div *ngIf="getUserRole() === 'ADMIN' && (studentDetails.leavingDate || isEditing)" class="detail-item">
-      <span class="label">Leaving Date:</span>
 
-      <span class="value" *ngIf="!isEditing && studentDetails.leavingDate">
-        {{ studentDetails.leavingDate | date }}
-      </span>
-
-      <input type="date" *ngIf="isEditing" [(ngModel)]="updatedDetails.leavingDate"
-        (input)="updateFieldValue('leavingDate', $event)">
+    <!-- Quick action buttons -->
+    <div *ngIf="getUserRole() !== 'STUDENT'" class="actions">
+      <button (click)="viewAttendance()">📅 View Attendance</button>
+      <button class="attendance-summary-button" (click)="viewAttendanceSummary()">📊 Attendance Summary</button>
+      <button *ngIf="getUserRole() === 'ADMIN'" class="payment-history-button" (click)="viewPaymentHistory()">💳 Payment History</button>
+      <button (click)="viewLeaves()" class="view-leaves-button">🌿 View Leaves</button>
+      <button *ngIf="getUserRole() === 'ADMIN'" class="fees" (click)="viewFeeDetails()">📋 Fee Details</button>
     </div>
+
+    <button class="back-button" (click)="goBack()">← Back to Student List</button>
   </div>
-
-  <div *ngIf="getUserRole() !== 'STUDENT'" class="actions">
-    <button (click)="viewAttendance()">View Attendance</button>
-    <button class="attendance-summary-button" (click)="viewAttendanceSummary()">Attendance Summary</button>
-    <button *ngIf="getUserRole() === 'ADMIN'" class="payment-history-button" (click)="viewPaymentHistory()">View Payment
-      History</button>
-    <button (click)="viewLeaves()" class="view-leaves-button">View Applied Leaves</button>
-    <button *ngIf="getUserRole() === 'ADMIN'" class="fees" (click)="viewFeeDetails()">View Fee Details</button>
-  </div>
-  <button class="back-button" (click)="goBack()">Back to Student List</button>
 </div>
 
 <div *ngIf="!studentDetails">
   <p class="loading-message">Loading student details...</p>
 </div>
 
-<!-- ── Change Password Modal ───────────────────────────────────────── -->
+<!-- ── Change Password Modal ─────────────────────────────────────── -->
 <div class="cp-overlay" *ngIf="showPasswordModal" (click)="closePasswordModal()">
   <div class="cp-modal" (click)="$event.stopPropagation()">
     <h3 class="cp-title">Change Password</h3>
@@ -136,9 +133,9 @@
       <label class="cp-label">Current Password</label>
       <div class="cp-input-wrap">
         <input [type]="cpShowOld ? 'text' : 'password'" [(ngModel)]="cpOldPw" placeholder="Enter current password" class="cp-input">
-        <button type="button" class="cp-toggle" (click)="cpShowOld = !cpShowOld" [attr.aria-label]="cpShowOld ? 'Hide current password' : 'Show current password'">
-          <svg *ngIf="!cpShowOld" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          <svg *ngIf="cpShowOld" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        <button type="button" class="cp-toggle" (click)="cpShowOld = !cpShowOld">
+          <svg *ngIf="!cpShowOld" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg *ngIf="cpShowOld" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
         </button>
       </div>
     </div>
@@ -146,10 +143,10 @@
     <div class="cp-field">
       <label class="cp-label">New Password</label>
       <div class="cp-input-wrap">
-        <input [type]="cpShowNew ? 'text' : 'password'" [(ngModel)]="cpNewPw" placeholder="Enter new password (min 6 chars)" class="cp-input">
-        <button type="button" class="cp-toggle" (click)="cpShowNew = !cpShowNew" [attr.aria-label]="cpShowNew ? 'Hide new password' : 'Show new password'">
-          <svg *ngIf="!cpShowNew" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          <svg *ngIf="cpShowNew" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        <input [type]="cpShowNew ? 'text' : 'password'" [(ngModel)]="cpNewPw" placeholder="Min 6 characters" class="cp-input">
+        <button type="button" class="cp-toggle" (click)="cpShowNew = !cpShowNew">
+          <svg *ngIf="!cpShowNew" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg *ngIf="cpShowNew" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
         </button>
       </div>
     </div>
@@ -158,9 +155,9 @@
       <label class="cp-label">Confirm New Password</label>
       <div class="cp-input-wrap">
         <input [type]="cpShowConfirm ? 'text' : 'password'" [(ngModel)]="cpConfirmPw" placeholder="Confirm new password" class="cp-input">
-        <button type="button" class="cp-toggle" (click)="cpShowConfirm = !cpShowConfirm" [attr.aria-label]="cpShowConfirm ? 'Hide confirm password' : 'Show confirm password'">
-          <svg *ngIf="!cpShowConfirm" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          <svg *ngIf="cpShowConfirm" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        <button type="button" class="cp-toggle" (click)="cpShowConfirm = !cpShowConfirm">
+          <svg *ngIf="!cpShowConfirm" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg *ngIf="cpShowConfirm" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
         </button>
       </div>
     </div>

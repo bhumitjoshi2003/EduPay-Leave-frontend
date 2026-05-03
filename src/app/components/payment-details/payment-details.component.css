@@ -177,7 +177,7 @@ td:hover {
 
 .download-button:hover svg {
   transform: scale(1.1);
-  color: #007bff;
+  color: #1e3a5f;
 }
 
 @media (min-width: 769px) {

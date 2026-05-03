@@ -275,7 +275,7 @@ mat-form-field {
 }
 
 .type-sports {
-    background-color: #4CAF50;
+    background-color: #4fbdbd;
 }
 
 .type-payment {
@@ -305,15 +305,15 @@ mat-form-field {
 }
 
 .card-actions .mat-icon-button {
-    color: #007bff;
+    color: #1e3a5f;
     transition: color 0.3s ease, background-color 0.3s ease;
     border-radius: 50%;
     margin-left: 8px;
 }
 
 .card-actions .mat-icon-button:hover {
-    background-color: rgba(0, 123, 255, 0.1);
-    color: #0056b3;
+    background-color: rgba(30, 58, 95, 0.2);
+    color: #1f6f8b;
 }
 
 .card-actions .mat-icon-button.mat-warn {

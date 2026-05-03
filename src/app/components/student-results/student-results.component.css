@@ -152,7 +152,7 @@
   font-weight: 700;
   font-size: 0.85rem;
 }
-.grade-a { background: #d4edda; color: #155724; }
+.grade-a { background: #d4edda; color: #0f172a; }
 .grade-b { background: #d1ecf1; color: #0c5460; }
 .grade-c { background: #fff3cd; color: #856404; }
 .grade-f { background: #f8d7da; color: #721c24; }
@@ -345,7 +345,7 @@
 
 /* Toggle button */
 .sr-btn-toggle {
-  background: linear-gradient(135deg, #6366f1, #818cf8);
+  background: linear-gradient(135deg, #4fbdbd, #4fbdbd);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -387,7 +387,7 @@
 }
 .sp-stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
 
-.sp-stat-primary { border-top-color: #6366f1; }
+.sp-stat-primary { border-top-color: #4fbdbd; }
 .sp-stat-success  { border-top-color: #22c55e; }
 .sp-stat-info     { border-top-color: #1f6f8b; }
 .sp-stat-neutral  { border-top-color: #64748b; }

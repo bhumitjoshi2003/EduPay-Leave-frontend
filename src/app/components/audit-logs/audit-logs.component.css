@@ -1,5 +1,5 @@
 :host {
-    --primary: #6366f1;
+    --primary: #4fbdbd;
     --primary-hover: #4f46e5;
     --bg: #f3f4f6;
     --white: #ffffff;
@@ -249,7 +249,7 @@
 
 .cat-exam {
     background: #eef2ff;
-    color: #3730a3;
+    color: #1e3a5f;
     border: 1px solid #a5b4fc;
 }
 
@@ -502,7 +502,7 @@
 }
 
 .al-array-table thead tr {
-  background: linear-gradient(135deg, #6366f1, #818cf8);
+  background: linear-gradient(135deg, #4fbdbd, #4fbdbd);
 }
 
 .al-array-table th {
@@ -680,7 +680,7 @@
 
 .updated .status-dot {
     background: var(--primary);
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 4px rgba(79, 189, 189, 0.35);
     animation: pulse 2s infinite;
 }
 

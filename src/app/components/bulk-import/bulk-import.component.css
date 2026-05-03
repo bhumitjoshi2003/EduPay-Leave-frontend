@@ -295,7 +295,7 @@
   border-color: #c8e6c9;
 }
 .summary-card--success .summary-card__value { color: #2e7d32; }
-.summary-card--success .summary-card__label { color: #4caf50; }
+.summary-card--success .summary-card__label { color: #4fbdbd; }
 
 .summary-card--fail {
   background: #fff5f5;

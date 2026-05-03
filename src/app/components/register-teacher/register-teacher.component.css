@@ -333,11 +333,11 @@ select.form-control {
 }
 
 input:checked+.slider {
-    background-color: #4caf50;
+    background-color: #4fbdbd;
 }
 
 input:focus+.slider {
-    box-shadow: 0 0 1px #4caf50;
+    box-shadow: 0 0 1px #4fbdbd;
 }
 
 input:checked+.slider:before {

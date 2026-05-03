@@ -15,7 +15,7 @@
   color: #1e293b;
   margin-bottom: 25px;
   text-align: center;
-  border-bottom: 3px solid #26c6da;
+  border-bottom: 3px solid #4fbdbd;
   padding-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -27,7 +27,7 @@
   width: 15%;
   margin-right: 30px;
   padding: 20px 10px;
-  background-color: #e0f2f1;
+  background-color: #eef6f8;
   border-radius: 10px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
@@ -38,7 +38,7 @@
   border-bottom: 1px solid #ccc;
   padding-bottom: 5px;
   margin-bottom: 10px;
-  color: #00695c;
+  color: #1e3a5f;
   font-size: 1.2em;
 }
 
@@ -76,12 +76,12 @@
   right: -20px;
   top: 0;
   border-top: 20px solid transparent;
-  border-left: 20px solid #e0f2f1;
+  border-left: 20px solid #eef6f8;
   border-bottom: 20px solid transparent;
 }
 
 .class-item-vertical.selected .chevron::before {
-  border-left-color: #00838f;
+  border-left-color: #1f6f8b;
 }
 
 .chevron span {
@@ -93,7 +93,7 @@
 }
 
 .class-item-vertical:hover .chevron {
-  background-color: #26c6da;
+  background-color: #4fbdbd;
   transform: translateX(-5px);
 }
 
@@ -108,7 +108,7 @@
 
 .payment-history-area h2 {
   text-align: left;
-  border-bottom: 3px solid #26c6da;
+  border-bottom: 3px solid #4fbdbd;
   padding-bottom: 12px;
   margin-bottom: 25px;
   color: #1e293b;
@@ -201,7 +201,7 @@
 }
 
 .download-button {
-  background-color: #28a745;
+  background-color: #1e3a5f;
   color: white;
   border: none;
   padding: 8px;
@@ -216,7 +216,7 @@
 }
 
 .download-button:hover {
-  background-color: #218838;
+  background-color: #1f6f8b;
 }
 
 .download-button svg {
@@ -229,7 +229,7 @@
   gap: 10px;
   margin-bottom: 20px;
   align-items: center;
-  background-color: #e0f2f1;
+  background-color: #eef6f8;
   padding: 10px;
   border-radius: 6px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -310,7 +310,7 @@
 
 .status-success {
   font-weight: bold;
-  color: green;
+  color: #4fbdbd;
   /* Added color for success status */
 }
 
@@ -334,7 +334,7 @@
   margin-top: 20px;
   margin-bottom: 20px;
   padding: 10px 15px;
-  background-color: #e0f2f1;
+  background-color: #eef6f8;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   font-size: 0.9em;
@@ -367,7 +367,7 @@
 }
 
 .top-pagination-controls .page-size select:focus {
-  border-color: #00838f;
+  border-color: #1f6f8b;
   box-shadow: 0 0 0 2px rgba(0, 172, 193, 0.2);
 }
 
@@ -380,7 +380,7 @@
   align-items: center;
   margin-top: 30px;
   padding: 15px 20px;
-  background-color: #e0f2f1;
+  background-color: #eef6f8;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   font-size: 0.9em;
@@ -409,7 +409,7 @@
 }
 
 .pagination-controls .pagination-buttons button:hover:not(:disabled) {
-  background-color: #00838f;
+  background-color: #1f6f8b;
   transform: translateY(-1px);
 }
 
@@ -465,12 +465,12 @@
   .chevron::before {
     right: -16px;
     border-top: 16px solid transparent;
-    border-left: 16px solid #e0f2f1;
+    border-left: 16px solid #eef6f8;
     border-bottom: 16px solid transparent;
   }
 
   .class-item-vertical.selected .chevron::before {
-    border-left-color: #00838f;
+    border-left-color: #1f6f8b;
   }
 
   .payment-history-area {

@@ -79,7 +79,7 @@
 }
 
 .class-item-vertical.selected .chevron::before {
-  border-left-color: #388e3c;
+  border-left-color: #1f6f8b;
 }
 
 .class-item-vertical:hover .chevron {
@@ -256,7 +256,7 @@
 }
 
 .attendance-button.present {
-  background: linear-gradient(135deg, #81c784, #4caf50);
+  background: linear-gradient(135deg, #81c784, #4fbdbd);
 }
 
 .attendance-button[disabled] {

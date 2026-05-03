@@ -77,7 +77,7 @@
   display: flex;
   align-items: center;
   background: #eaf6f6;
-  border: 1px solid #b2dfdb;
+  border: 1px solid #d0eaf0;
   border-radius: 8px;
   padding: 16px 24px;
   margin-bottom: 24px;
@@ -98,7 +98,7 @@
 .instructions-card__divider {
   width: 1px;
   height: 32px;
-  background: #b2dfdb;
+  background: #d0eaf0;
 }
 
 .step-number {
@@ -118,7 +118,7 @@
 /* ── Drop zone ────────────────────────────── */
 
 .drop-zone {
-  border: 2px dashed #b2dfdb;
+  border: 2px dashed #d0eaf0;
   border-radius: 10px;
   padding: 48px 24px;
   text-align: center;
@@ -295,7 +295,7 @@
   border-color: #c8e6c9;
 }
 .summary-card--success .summary-card__value { color: #2e7d32; }
-.summary-card--success .summary-card__label { color: #4caf50; }
+.summary-card--success .summary-card__label { color: #4fbdbd; }
 
 .summary-card--fail {
   background: #fff5f5;

@@ -62,7 +62,7 @@
 }
 
 .header div button:first-child {
-  background: linear-gradient(135deg, #28a745, #4fbdbd);
+  background: linear-gradient(135deg, #1e3a5f, #4fbdbd);
 }
 
 .header div button:last-child {
@@ -287,11 +287,11 @@
 }
 
 .attendance-summary-button {
-  background: linear-gradient(135deg, #8e44ad, #9b59b6);
+  background: linear-gradient(135deg, #1f6f8b, #4fbdbd);
 }
 
 .payment-history-button {
-  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  background: linear-gradient(135deg, #1f6f8b, #4fbdbd);
   color: white;
   padding: 12px 20px;
   border: none;

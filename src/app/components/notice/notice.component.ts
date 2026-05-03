@@ -249,7 +249,7 @@ export class NoticeComponent implements OnInit, OnDestroy {
   trackById(_: number, item: { id?: number }): number { return item.id ?? 0; }
 
   getNoticeAccent(index: number): string {
-    const palette = ['#6366f1', '#0891b2', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#0284c7'];
+    const palette = ['#4fbdbd', '#0891b2', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#0284c7'];
     return palette[index % palette.length];
   }
 

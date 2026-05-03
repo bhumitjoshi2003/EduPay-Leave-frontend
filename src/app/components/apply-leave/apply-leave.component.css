@@ -297,7 +297,7 @@
 .leave-status-badge.status-approved {
   background-color: #d1e7dd;
   color: #0a5e38;
-  border: 1px solid #198754;
+  border: 1px solid #1f6f8b;
 }
 
 .leave-status-badge.status-rejected {

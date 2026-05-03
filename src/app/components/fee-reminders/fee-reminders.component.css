@@ -49,7 +49,7 @@
   padding: 10px 22px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  background: linear-gradient(135deg, #1f6f8b, #4fbdbd);
   color: #fff;
   font-weight: 600;
   font-size: 0.9em;
@@ -57,7 +57,7 @@
   transition: transform 0.2s, box-shadow 0.2s;
   white-space: nowrap;
 }
-.fr-print-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(39,174,96,0.35); }
+.fr-print-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(31,111,139,0.35); }
 
 /* ── Controls ────────────────────────────────────────────────── */
 .fr-controls {
@@ -151,7 +151,7 @@
   text-align: center;
 }
 
-.fr-stat-amount  { border-left-color: #8e44ad; }
+.fr-stat-amount  { border-left-color: #1f6f8b; }
 .fr-stat-critical { border-left-color: #e74c3c; }
 .fr-stat-warning  { border-left-color: #f39c12; }
 
@@ -303,7 +303,7 @@
 
 .fr-amount {
   font-weight: 700;
-  color: #8e44ad;
+  color: #1f6f8b;
   font-size: 1.05em;
 }
 
@@ -346,7 +346,7 @@
 }
 .fr-remind-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 .fr-remind-sent {
-  background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+  background: linear-gradient(135deg, #1f6f8b, #4fbdbd) !important;
   cursor: default;
 }
 .fr-remind-sending { opacity: 0.7; cursor: wait; }

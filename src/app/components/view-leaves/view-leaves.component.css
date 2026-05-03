@@ -195,7 +195,7 @@
 .leave-status-badge.status-approved {
   background-color: #d1e7dd;
   color: #0a5e38;
-  border: 1px solid #198754;
+  border: 1px solid #1f6f8b;
 }
 
 .leave-status-badge.status-rejected {
@@ -205,7 +205,7 @@
 }
 
 .approve-button {
-  background-color: #198754;
+  background-color: #1f6f8b;
   color: white;
   border: none;
   padding: 4px 9px;
@@ -219,7 +219,7 @@
 }
 
 .approve-button:hover {
-  background-color: #146c43;
+  background-color: #14505d;
 }
 
 .reject-button {
@@ -260,7 +260,7 @@
 
 .card-approve-button {
   padding: 7px 12px;
-  background-color: #198754;
+  background-color: #1f6f8b;
   color: white;
   border: none;
   border-radius: 6px;
@@ -271,7 +271,7 @@
 }
 
 .card-approve-button:hover {
-  background-color: #146c43;
+  background-color: #14505d;
 }
 
 .card-reject-button {

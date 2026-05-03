@@ -192,7 +192,7 @@
 /* Colored top strip using CSS var --accent */
 .nb-card-strip {
   height: 6px;
-  background: var(--accent, #6366f1);
+  background: var(--accent, #4fbdbd);
   border-radius: 18px 18px 0 0;
 }
 
@@ -213,7 +213,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: var(--accent, #6366f1);
+  background: var(--accent, #4fbdbd);
   border: 3px solid #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
@@ -253,7 +253,7 @@
 .nb-card-icon-wrap {
   font-size: 1.7rem;
   line-height: 1;
-  background: color-mix(in srgb, var(--accent, #6366f1) 12%, white);
+  background: color-mix(in srgb, var(--accent, #4fbdbd) 12%, white);
   border-radius: 10px;
   width: 42px; height: 42px;
   display: flex;
@@ -489,7 +489,7 @@
 .nb-ani-strip {
   width: 5px;
   flex-shrink: 0;
-  background: var(--accent, #6366f1);
+  background: var(--accent, #4fbdbd);
 }
 
 .nb-ani-body {

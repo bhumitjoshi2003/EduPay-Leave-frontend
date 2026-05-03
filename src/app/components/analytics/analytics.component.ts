@@ -17,7 +17,7 @@ import { LoggerService } from '../../services/logger.service';
 Chart.register(...registerables);
 
 const PALETTE = [
-  '#6366f1', '#0891b2', '#059669', '#d97706',
+  '#4fbdbd', '#0891b2', '#059669', '#d97706',
   '#dc2626', '#7c3aed', '#db2777', '#0284c7',
   '#65a30d', '#ea580c', '#0d9488', '#8b5cf6',
 ];
@@ -146,7 +146,7 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
         data: data.map(d => d.amount),
         backgroundColor: data.map((_, i) =>
           `rgba(99,102,241,${0.4 + (i / Math.max(data.length - 1, 1)) * 0.55})`),
-        borderColor: '#6366f1',
+        borderColor: '#4fbdbd',
         borderWidth: 2,
         borderRadius: 8,
         borderSkipped: false,

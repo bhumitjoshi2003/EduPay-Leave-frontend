@@ -1,22 +1,42 @@
 <div class="teacher-list-container">
-    <div class="teacher-list-area">
-      <div class="teacher-list-area__header">
-        <h2>List of Teachers</h2>
-        <button class="bulk-import-btn" (click)="navigateToBulkImport()">&#8679; Bulk Import</button>
+
+  <!-- Hero banner -->
+  <div class="tl-hero">
+    <div class="tl-hero-left">
+      <div class="tl-hero-icon">👩‍🏫</div>
+      <div class="tl-hero-text">
+        <h1>Faculty Directory</h1>
+        <p>{{ teachers.length }} teacher{{ teachers.length !== 1 ? 's' : '' }} enrolled</p>
       </div>
-      <div *ngIf="teachers.length > 0; else noTeachersContainer">
-        <ul class="teacher-list">
-          <li *ngFor="let teacher of teachers; trackBy: trackByTeacherId" class="teacher-item" (click)="viewTeacherDetails(teacher.teacherId)">
-            <div class="teacher-info">
-              <span class="teacher-name">{{ teacher.name }}</span>
-              <span class="teacher-id">({{ teacher.teacherId }})</span>
-              </div>
-            <button class="view-details-button" (click)="viewTeacherDetails(teacher.teacherId)">View Details</button>
-          </li>
-        </ul>
-      </div>
-      <ng-template #noTeachersContainer>
-        <p class="no-teachers">No teachers found.</p>
-      </ng-template>
     </div>
+    <button class="bulk-import-btn" (click)="navigateToBulkImport()">&#8679; Bulk Import</button>
   </div>
+
+  <!-- List area -->
+  <div class="teacher-list-area">
+    <div *ngIf="teachers.length > 0; else noTeachersContainer">
+      <ul class="teacher-list">
+        <li *ngFor="let teacher of teachers; trackBy: trackByTeacherId"
+            class="teacher-item"
+            (click)="viewTeacherDetails(teacher.teacherId)">
+          <div class="teacher-avatar">{{ teacher.name.charAt(0).toUpperCase() }}</div>
+          <div class="teacher-info">
+            <span class="teacher-name">{{ teacher.name }}</span>
+            <span class="teacher-id">{{ teacher.teacherId }}</span>
+          </div>
+          <button class="view-details-button"
+                  (click)="viewTeacherDetails(teacher.teacherId)">
+            View Details
+          </button>
+        </li>
+      </ul>
+    </div>
+    <ng-template #noTeachersContainer>
+      <div class="no-teachers">
+        <span class="no-icon">🔍</span>
+        <p>No teachers found.</p>
+      </div>
+    </ng-template>
+  </div>
+
+</div>

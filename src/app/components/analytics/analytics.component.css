@@ -27,7 +27,7 @@
 .an-spinner {
   width: 28px; height: 28px;
   border: 3px solid #e0e0e0;
-  border-top-color: #6366f1;
+  border-top-color: #4fbdbd;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -46,7 +46,7 @@
 .an-hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 40%, #6366f1 80%, #818cf8 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #1f6f8b 80%, #4fbdbd 100%);
   border-radius: 20px;
   padding: 36px 40px 52px;
   display: flex;
@@ -54,7 +54,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 20px;
-  box-shadow: 0 16px 48px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 16px 48px rgba(31, 111, 139, 0.35);
 }
 
 .an-blob {
@@ -290,12 +290,12 @@
   transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(0,0,0,0.1);
   background: #fff;
-  border-color: var(--qc, #6366f1);
+  border-color: var(--qc, #4fbdbd);
 }
 
 .an-quick-icon {
   font-size: 1.6rem;
-  background: linear-gradient(135deg, var(--qc, #6366f1) 0%, var(--qc, #6366f1) 100%);
+  background: linear-gradient(135deg, var(--qc, #4fbdbd) 0%, var(--qc, #4fbdbd) 100%);
   border-radius: 12px;
   width: 48px; height: 48px;
   display: flex;

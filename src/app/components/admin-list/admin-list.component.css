@@ -1,234 +1,265 @@
+/* ── Page wrapper ────────────────────────────────────────────────── */
 .admin-list-container {
-    display: flex;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #eaf6f6, #f0f8ff);
-    border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-    animation: fadeIn 0.8s ease-in-out;
-    padding: 30px;
-    margin: auto auto;
-    width: 95%;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  width: 95%;
+  margin: 0 auto;
+  animation: al-fade-up 0.5s ease-out both;
 }
 
-.list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #4fbdbd;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
+/* ── Hero banner ─────────────────────────────────────────────────── */
+.al-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 28px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 16px 16px 0 0;
+  flex-wrap: wrap;
 }
 
-.list-header h2 {
-    border-bottom: none !important;
-    margin-bottom: 0 !important;
-    width: auto !important;
+.al-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.al-hero-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(79, 189, 189, 0.4));
+}
+
+.al-hero-text h1 {
+  margin: 0 0 4px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+
+.al-hero-text p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(79, 189, 189, 0.85);
+  font-weight: 500;
 }
 
 .create-admin-button {
-    background: linear-gradient(135deg, #28a745, #218838);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);
+  background: linear-gradient(135deg, #1e3a5f, #1f6f8b);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s, transform 0.2s;
+  white-space: nowrap;
 }
 
 .create-admin-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
-    background: linear-gradient(135deg, #218838, #1e7e34);
+  opacity: 0.88;
+  transform: translateY(-1px);
 }
 
 .plus-icon {
-    font-size: 1.2em;
-    font-weight: bold;
+  font-size: 1.15em;
+  font-weight: 700;
+  line-height: 1;
 }
 
-.admin-list-container h2 {
-    color: #1f6f8b;
-    margin-bottom: 20px;
-    text-align: center;
-    border-bottom: 2px solid #4fbdbd;
-    padding-bottom: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    width: 100%;
-}
-
+/* ── List area ───────────────────────────────────────────────────── */
 .admin-list-area {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: rgba(255, 255, 255, 0.95);
-    border-radius: 10px;
-}
-
-.admin-list-area h2 {
-    text-align: left;
-    border-bottom: 2px solid #4fbdbd;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    color: #1f6f8b;
-    font-size: 1.4em;
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.10);
+  padding: 24px;
 }
 
 .admin-list {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
+/* ── Admin card ──────────────────────────────────────────────────── */
 .admin-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    transition: background-color 0.3s ease;
-    background-color: #f0f9f9;
-    border-left: 8px solid #4fbdbd;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: #f8faff;
+  border: 1px solid #e8f0f8;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .admin-item:hover {
-    background-color: #ccf7f7;
+  background: #eef2ff;
+  border-color: rgba(79, 189, 189, 0.35);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.10);
+  transform: translateY(-1px);
 }
 
+/* ── Avatar ──────────────────────────────────────────────────────── */
+.admin-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0f172a, #1e3a5f);
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+}
+
+/* ── Admin info ──────────────────────────────────────────────────── */
 .admin-info {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    min-width: 0;
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .admin-name {
-    font-weight: bold;
-    color: #333;
-    margin-right: 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-weight: 700;
+  font-size: 0.97rem;
+  color: #1a2a3a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .admin-id-label {
-    color: #666;
-    font-size: 0.9em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #4fbdbd;
+  letter-spacing: 0.3px;
 }
 
+/* ── Button group ────────────────────────────────────────────────── */
 .button-group {
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .view-details-button {
-    background-color: #1f6f8b;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    white-space: nowrap;
+  background: linear-gradient(135deg, #1e3a5f, #1f6f8b);
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s, transform 0.15s;
 }
 
 .view-details-button:hover {
-    background-color: #14505d;
+  opacity: 0.88;
+  transform: translateY(-1px);
 }
 
 .delete-button {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap;
+  background: transparent;
+  color: #dc3545;
+  border: 1.5px solid rgba(220, 53, 69, 0.4);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
 }
 
 .delete-button:hover {
-    background-color: #c82333;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
+  background: rgba(220, 53, 69, 0.08);
+  border-color: #dc3545;
 }
 
+/* ── Empty state ─────────────────────────────────────────────────── */
 .no-admins {
-    text-align: center;
-    padding: 20px;
-    font-style: italic;
-    color: #666;
+  text-align: center;
+  padding: 48px 20px;
+  color: #aaa;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.no-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 12px;
 }
 
-/* --- Responsive Adjustments --- */
+.no-admins p {
+  margin: 0;
+  font-size: 1rem;
+  font-style: italic;
+}
 
+/* ── Animation ───────────────────────────────────────────────────── */
+@keyframes al-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Tablet (≤ 1023px) ───────────────────────────────────────────── */
 @media (max-width: 1023px) {
-    .admin-list-container {
-        padding: 20px;
-        width: 95%;
-    }
+  .admin-list-container { width: 98%; }
 
-    .admin-item {
-        padding: 12px;
-    }
+  .al-hero { padding: 20px; border-radius: 12px 12px 0 0; }
+  .al-hero-text h1 { font-size: 1.2rem; }
 
-    .view-details-button,
-    .delete-button {
-        padding: 6px 12px;
-        font-size: 0.85em;
-    }
+  .admin-list-area { padding: 18px; border-radius: 0 0 12px 12px; }
+
+  .admin-item { padding: 12px 14px; }
+
+  .admin-avatar { width: 40px; height: 40px; font-size: 1rem; }
+
+  .view-details-button,
+  .delete-button { padding: 7px 13px; font-size: 0.79rem; }
 }
 
+/* ── Mobile (≤ 767px) ────────────────────────────────────────────── */
 @media (max-width: 767px) {
-    .admin-list-container {
-        padding: 10px;
-        width: 95%;
-    }
+  .admin-list-container { width: 100%; }
 
-    .admin-item {
-        padding: 10px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
+  .al-hero {
+    border-radius: 0;
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 
-    .admin-info {
-        width: 100%;
-    }
+  .create-admin-button { width: 100%; justify-content: center; }
 
-    .button-group {
-        display: none;
-    }
+  .admin-list-area { padding: 12px; border-radius: 0; }
 
-    .list-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start;
-    }
+  .admin-item {
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 
-    .create-admin-button {
-        width: 100%;
-        justify-content: center;
-    }
+  .admin-info { width: 100%; display: flex; flex-direction: row; align-items: center; gap: 10px; }
+
+  .button-group { display: none; }
 }

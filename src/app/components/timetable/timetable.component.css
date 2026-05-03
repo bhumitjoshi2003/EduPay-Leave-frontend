@@ -43,7 +43,7 @@
   padding: 10px 22px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  background: linear-gradient(135deg, #1f6f8b, #4fbdbd);
   color: #fff;
   font-weight: 600;
   font-size: 0.9em;
@@ -51,7 +51,7 @@
   transition: transform 0.2s, box-shadow 0.2s;
   white-space: nowrap;
 }
-.tt-print-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(39,174,96,0.35); }
+.tt-print-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(31,111,139,0.35); }
 
 /* ── Controls ────────────────────────────────────────────────── */
 .tt-controls {

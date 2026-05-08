@@ -13,6 +13,7 @@ import { AttendanceService } from '../../services/attendance.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { TeacherService } from '../../services/teacher.service';
 import { Subject, takeUntil } from 'rxjs';
+import { SchoolService } from '../../services/school.service';
 
 interface Student {
   studentId: string;
@@ -46,10 +47,7 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
   loggedInUserRole: string = '';
   hasStudents: boolean = false;
 
-  classList: string[] = [
-    'Play group', 'Nursery', 'LKG', 'UKG', '1', '2', '3', '4',
-    '5', '6', '7', '8', '9', '10', '11', '12'
-  ];
+  classList: string[] = [];
 
 
   constructor(
@@ -59,7 +57,8 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
     private teacherService: TeacherService,
     private authStateService: AuthStateService,
     private logger: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private schoolService: SchoolService
   ) { }
 
   ngOnDestroy(): void {
@@ -86,9 +85,20 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
       this.teacherId = user.userId;
 
       if (this.loggedInUserRole === 'ADMIN') {
-        this.selectedClass = localStorage.getItem('lastSelectedClass') || this.classList[0];
-        this.loadStudentsAndApplyAttendance();
+        this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
+          next: classes => {
+            this.classList = classes;
+            this.selectedClass = localStorage.getItem('lastSelectedClass') || this.classList[0];
+            this.cdr.markForCheck();
+            this.loadStudentsAndApplyAttendance();
+          },
+          error: () => {}
+        });
       } else {
+        this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
+          next: classes => { this.classList = classes; this.cdr.markForCheck(); },
+          error: () => {}
+        });
         this.getTeacherClassAndLoadStudents();
       }
     }

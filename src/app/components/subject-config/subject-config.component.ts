@@ -11,9 +11,8 @@ import {
   OptionalSubjectGroup,
   OptionalSubject,
 } from '../../services/subject-config.service';
+import { SchoolService } from '../../services/school.service';
 import { LoggerService } from '../../services/logger.service';
-
-const CLASS_OPTIONS = ['1','2','3','4','5','6','7','8','9','10'];
 
 @Component({
   selector: 'app-subject-config',
@@ -27,10 +26,10 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   activeTab: 'class' | 'streams' | 'optional' = 'class';
-  classOptions = CLASS_OPTIONS;
+  classOptions: string[] = [];
 
   // Class subjects tab
-  selectedClass = '1';
+  selectedClass = '';
   classSubjects: ClassSubject[] = [];
   newSubjectName = '';
 
@@ -48,12 +47,21 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
 
   constructor(
     private service: SubjectConfigService,
+    private schoolService: SchoolService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService
   ) { }
 
   ngOnInit(): void {
-    this.loadClassSubjects();
+    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
+      next: classes => {
+        this.classOptions = classes;
+        if (!this.selectedClass && classes.length > 0) this.selectedClass = classes[0];
+        this.cdr.markForCheck();
+        this.loadClassSubjects();
+      },
+      error: e => this.logger.error('Failed to load classes', e)
+    });
     this.loadStreams();
     this.loadOptionalGroups();
   }

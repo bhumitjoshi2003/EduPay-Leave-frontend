@@ -74,7 +74,8 @@ export class LeaveService {
   ): Observable<PaginatedResponse<LeaveApplication>> {
     let params = new HttpParams()
       .append('page', page.toString())
-      .append('size', size.toString());
+      .append('size', size.toString())
+      .append('sort', 'leaveDate,desc');
     return this.http.get<PaginatedResponse<LeaveApplication>>(
       `${this.apiUrl}/student/${studentId}`, { params, withCredentials: true });
   }

@@ -1,0 +1,95 @@
+<div class="sp-page">
+
+  <div class="sp-header">
+    <div>
+      <h1 class="sp-title">Student Promotion</h1>
+      <p class="sp-subtitle">Review and promote students to the next academic year</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="sp-loading" *ngIf="isLoading">
+    <div class="sp-spinner"></div>
+    <span>Loading student data…</span>
+  </div>
+
+  <!-- Result screen -->
+  <div class="sp-result-card" *ngIf="result && !isLoading">
+    <div class="sp-result-icon">🎓</div>
+    <h2 class="sp-result-title">Promotion Complete</h2>
+    <div class="sp-result-stats">
+      <div class="sp-result-stat sp-stat-promote">
+        <span class="sp-stat-num">{{ result.promoted }}</span>
+        <span class="sp-stat-label">Promoted</span>
+      </div>
+      <div class="sp-result-stat sp-stat-detain">
+        <span class="sp-stat-num">{{ result.detained }}</span>
+        <span class="sp-stat-label">Detained</span>
+      </div>
+      <div class="sp-result-stat sp-stat-passout">
+        <span class="sp-stat-num">{{ result.passedOut }}</span>
+        <span class="sp-stat-label">Passed Out</span>
+      </div>
+    </div>
+    <div class="sp-result-errors" *ngIf="result.errors?.length">
+      <h3 class="sp-errors-title">Errors ({{ result.errors.length }})</h3>
+      <div class="sp-error-row" *ngFor="let e of result.errors">
+        <span class="sp-error-id">{{ e.studentId }}</span>
+        <span class="sp-error-msg">{{ e.reason }}</span>
+      </div>
+    </div>
+    <button class="sp-btn sp-btn-primary" (click)="resetResult()">Back to Preview</button>
+  </div>
+
+  <!-- Preview -->
+  <ng-container *ngIf="!isLoading && !result">
+
+    <!-- Summary bar -->
+    <div class="sp-summary-bar" *ngIf="groups.length > 0">
+      <div class="sp-summary-chip sp-chip-promote">✓ {{ promotedCount }} to promote</div>
+      <div class="sp-summary-chip sp-chip-detain">⟳ {{ detainedCount }} to detain</div>
+      <div class="sp-summary-chip sp-chip-passout">🎓 {{ passOutCount }} pass out</div>
+      <button class="sp-btn sp-btn-primary sp-execute-btn"
+              (click)="execute()" [disabled]="isExecuting">
+        {{ isExecuting ? 'Processing…' : 'Execute Promotion' }}
+      </button>
+    </div>
+
+    <!-- Empty -->
+    <div class="sp-empty" *ngIf="groups.length === 0">
+      <p>No active students found for promotion.</p>
+    </div>
+
+    <!-- Class groups -->
+    <div class="sp-group" *ngFor="let group of groups; trackBy: trackByClass">
+      <div class="sp-group-header">
+        <h2 class="sp-group-title">Class {{ group.className }}</h2>
+        <span class="sp-group-count">{{ group.students.length }} students</span>
+        <div class="sp-group-actions">
+          <button class="sp-chip-btn sp-chip-btn-promote" (click)="setClassAction(group, 'PROMOTE')">All Promote</button>
+          <button class="sp-chip-btn sp-chip-btn-detain" (click)="setClassAction(group, 'DETAIN')">All Detain</button>
+          <button class="sp-chip-btn sp-chip-btn-passout" *ngIf="isClass12(group)"
+                  (click)="setClassAction(group, 'PASS_OUT')">All Pass Out</button>
+        </div>
+      </div>
+
+      <div class="sp-student-list">
+        <div class="sp-student-row" *ngFor="let s of group.students; trackBy: trackByStudent">
+          <span class="sp-student-name">{{ s.name }}</span>
+          <span class="sp-student-id">{{ s.studentId }}</span>
+          <div class="sp-action-pills">
+            <button class="sp-pill" [class.sp-pill-active-promote]="getAction(s.studentId) === 'PROMOTE'"
+                    (click)="setAction(s.studentId, 'PROMOTE')">Promote</button>
+            <button class="sp-pill" [class.sp-pill-active-detain]="getAction(s.studentId) === 'DETAIN'"
+                    (click)="setAction(s.studentId, 'DETAIN')">Detain</button>
+            <button class="sp-pill" *ngIf="isClass12(group)"
+                    [class.sp-pill-active-passout]="getAction(s.studentId) === 'PASS_OUT'"
+                    (click)="setAction(s.studentId, 'PASS_OUT')">Pass Out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
+</div>

@@ -1,0 +1,184 @@
+<div class="ss-page">
+
+  <div class="ss-header">
+    <div>
+      <h1 class="ss-title">School Settings</h1>
+      <p class="ss-subtitle">Manage your school profile and integrations</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="ss-tabs">
+    <button class="ss-tab" [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">
+      General
+    </button>
+    <button class="ss-tab" [class.active]="activeTab === 'razorpay'" (click)="activeTab = 'razorpay'">
+      Razorpay
+      <span class="ss-configured-badge" *ngIf="settings?.razorpayConfigured">Configured</span>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="ss-loading" *ngIf="loading">
+    <div class="ss-spinner"></div>
+    <span>Loading settings…</span>
+  </div>
+
+  <!-- ── GENERAL TAB ── -->
+  <ng-container *ngIf="!loading && activeTab === 'general' && settings">
+
+    <!-- View mode -->
+    <div class="ss-card" *ngIf="!isEditing">
+      <div class="ss-card-header">
+        <h2 class="ss-card-title">School Information</h2>
+        <button class="ss-btn ss-btn-outline" (click)="startEdit()" *ngIf="isAdmin">Edit</button>
+      </div>
+
+      <div class="ss-info-grid">
+        <div class="ss-info-row">
+          <span class="ss-label">School Name</span>
+          <span class="ss-value">{{ settings.name }}</span>
+        </div>
+        <div class="ss-info-row">
+          <span class="ss-label">Board Type</span>
+          <span class="ss-value">
+            <span class="ss-badge">{{ settings.boardType || '—' }}</span>
+          </span>
+        </div>
+        <div class="ss-info-row">
+          <span class="ss-label">Address</span>
+          <span class="ss-value">{{ settings.address || '—' }}</span>
+        </div>
+        <div class="ss-info-row">
+          <span class="ss-label">City</span>
+          <span class="ss-value">{{ settings.city || '—' }}</span>
+        </div>
+        <div class="ss-info-row">
+          <span class="ss-label">State</span>
+          <span class="ss-value">{{ settings.state || '—' }}</span>
+        </div>
+        <div class="ss-info-row">
+          <span class="ss-label">Pincode</span>
+          <span class="ss-value">{{ settings.pincode || '—' }}</span>
+        </div>
+        <div class="ss-info-row">
+          <span class="ss-label">Phone</span>
+          <span class="ss-value">{{ settings.phone || '—' }}</span>
+        </div>
+        <div class="ss-info-row">
+          <span class="ss-label">Email</span>
+          <span class="ss-value">{{ settings.email || '—' }}</span>
+        </div>
+        <div class="ss-info-row">
+          <span class="ss-label">Website</span>
+          <span class="ss-value">{{ settings.website || '—' }}</span>
+        </div>
+        <div class="ss-info-row">
+          <span class="ss-label">Plan</span>
+          <span class="ss-value">{{ settings.plan || '—' }}</span>
+        </div>
+        <div class="ss-info-row">
+          <span class="ss-label">Max Students</span>
+          <span class="ss-value">{{ settings.maxStudents }}</span>
+        </div>
+        <div class="ss-info-row">
+          <span class="ss-label">Expiry Date</span>
+          <span class="ss-value">{{ settings.expiryDate | date:'d MMM yyyy' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit mode -->
+    <div class="ss-card" *ngIf="isEditing">
+      <div class="ss-card-header">
+        <h2 class="ss-card-title">Edit School Information</h2>
+      </div>
+
+      <div class="ss-form-grid">
+        <div class="ss-field">
+          <label class="ss-field-label">School Name *</label>
+          <input class="ss-input" type="text" [(ngModel)]="editForm.name" placeholder="School name" />
+        </div>
+        <div class="ss-field">
+          <label class="ss-field-label">Board Type</label>
+          <select class="ss-input" [(ngModel)]="editForm.boardType">
+            <option value="">— Select —</option>
+            <option *ngFor="let b of boardTypes" [value]="b">{{ b }}</option>
+          </select>
+        </div>
+        <div class="ss-field ss-field-full">
+          <label class="ss-field-label">Address</label>
+          <input class="ss-input" type="text" [(ngModel)]="editForm.address" placeholder="Street address" />
+        </div>
+        <div class="ss-field">
+          <label class="ss-field-label">City</label>
+          <input class="ss-input" type="text" [(ngModel)]="editForm.city" placeholder="City" />
+        </div>
+        <div class="ss-field">
+          <label class="ss-field-label">State</label>
+          <input class="ss-input" type="text" [(ngModel)]="editForm.state" placeholder="State" />
+        </div>
+        <div class="ss-field">
+          <label class="ss-field-label">Pincode</label>
+          <input class="ss-input" type="text" [(ngModel)]="editForm.pincode" placeholder="Pincode" maxlength="6" />
+        </div>
+        <div class="ss-field">
+          <label class="ss-field-label">Phone</label>
+          <input class="ss-input" type="tel" [(ngModel)]="editForm.phone" placeholder="Phone number" />
+        </div>
+        <div class="ss-field">
+          <label class="ss-field-label">Email</label>
+          <input class="ss-input" type="email" [(ngModel)]="editForm.email" placeholder="Contact email" />
+        </div>
+        <div class="ss-field">
+          <label class="ss-field-label">Website</label>
+          <input class="ss-input" type="url" [(ngModel)]="editForm.website" placeholder="https://yourschool.com" />
+        </div>
+      </div>
+
+      <div class="ss-form-actions">
+        <button class="ss-btn ss-btn-outline" (click)="cancelEdit()" [disabled]="saving">Cancel</button>
+        <button class="ss-btn ss-btn-primary" (click)="saveSettings()" [disabled]="saving">
+          {{ saving ? 'Saving…' : 'Save Changes' }}
+        </button>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- ── RAZORPAY TAB ── -->
+  <ng-container *ngIf="!loading && activeTab === 'razorpay'">
+    <div class="ss-card">
+      <div class="ss-card-header">
+        <h2 class="ss-card-title">Razorpay Configuration</h2>
+        <span class="ss-status-chip ss-chip-ok" *ngIf="settings?.razorpayConfigured">✓ Configured</span>
+        <span class="ss-status-chip ss-chip-warn" *ngIf="!settings?.razorpayConfigured">Not Configured</span>
+      </div>
+
+      <p class="ss-rp-desc">
+        Enter your Razorpay Key ID and Key Secret to enable online fee payments.
+        The secret is write-only and will not be shown after saving.
+      </p>
+
+      <div class="ss-form-grid">
+        <div class="ss-field ss-field-full">
+          <label class="ss-field-label">Razorpay Key ID</label>
+          <input class="ss-input" type="text" [(ngModel)]="razorpayKeyId"
+                 placeholder="rzp_live_xxxxxxxxxxxxxxxxxx" autocomplete="off" />
+        </div>
+        <div class="ss-field ss-field-full">
+          <label class="ss-field-label">Razorpay Key Secret</label>
+          <input class="ss-input" type="password" [(ngModel)]="razorpayKeySecret"
+                 placeholder="Enter key secret" autocomplete="new-password" />
+        </div>
+      </div>
+
+      <div class="ss-form-actions">
+        <button class="ss-btn ss-btn-primary" (click)="saveRazorpayKeys()" [disabled]="savingRazorpay || !isAdmin">
+          {{ savingRazorpay ? 'Saving…' : 'Save Razorpay Keys' }}
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

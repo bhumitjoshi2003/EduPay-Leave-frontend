@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
+import { SchoolService } from '../../services/school.service';
 import Swal from 'sweetalert2';
 import { environment } from '../../../environments/environment';
 
@@ -49,11 +50,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
   cpShowConfirm = false;
   cpShowOldField = false;
 
-  classList: string[] = [
-    'Play group', 'Nursery', 'LKG', 'UKG',
-    '1', '2', '3', '4', '5', '6', '7',
-    '8', '9', '10', '11', '12'
-  ];
+  classList: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -61,10 +58,16 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     private teacherService: TeacherService,
     private authService: AuthService,
     private logger: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private schoolService: SchoolService
   ) { }
 
   ngOnInit(): void {
+    this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: classes => { this.classList = classes; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+
     this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
       this.teacherId = params['teacherId'];
       if (this.teacherId) {

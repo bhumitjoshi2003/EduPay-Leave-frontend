@@ -21,6 +21,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
   sessions: string[] = [];
   currentSession: string = '';
   isEditing = false;
+  isLoading = false;
   isNewSessionStarted = false;
   newSessionYear: string = '';
   feeStructures: FeeStructure[] = [];
@@ -43,21 +44,41 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
   }
 
   fetchSessions(): void {
-    this.feeStructureService.getAcademicYears().pipe(takeUntil(this.destroy$)).subscribe(sessions => {
-      this.sessions = sessions;
-      if (this.sessions.length > 0) {
-        this.currentSession = this.sessions[this.sessions.length - 1];
+    this.isLoading = true;
+    this.feeStructureService.getAcademicYears().pipe(takeUntil(this.destroy$)).subscribe({
+      next: sessions => {
+        this.sessions = sessions;
+        if (this.sessions.length > 0) {
+          this.currentSession = this.sessions[this.sessions.length - 1];
+          this.fetchFeeStructures();
+        } else {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        }
+      },
+      error: () => {
+        this.isLoading = false;
         this.cdr.markForCheck();
-        this.fetchFeeStructures();
-      }
+        Swal.fire('Error', 'Failed to load academic years.', 'error');
+      },
     });
   }
 
   fetchFeeStructures(): void {
-    this.feeStructureService.getFeeStructures(this.currentSession).pipe(takeUntil(this.destroy$)).subscribe(feeStructures => {
-      this.feeStructures = feeStructures;
-      this.originalFeeStructure = JSON.parse(JSON.stringify(this.feeStructures));
-      this.cdr.markForCheck();
+    this.isLoading = true;
+    this.cdr.markForCheck();
+    this.feeStructureService.getFeeStructures(this.currentSession).pipe(takeUntil(this.destroy$)).subscribe({
+      next: feeStructures => {
+        this.feeStructures = feeStructures;
+        this.originalFeeStructure = JSON.parse(JSON.stringify(this.feeStructures));
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+        Swal.fire('Error', 'Failed to load fee structures.', 'error');
+      },
     });
   }
 
@@ -242,6 +263,6 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
   trackByClassName(index: number, fee: FeeStructure): string { return fee.className; }
 
   canEdit(): boolean {
-    return this.authStateService.getUserRole() === 'SUPER_ADMIN';
+    return this.authStateService.getUserRole() === 'ADMIN';
   }
 }

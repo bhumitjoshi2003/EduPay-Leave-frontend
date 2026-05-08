@@ -16,6 +16,7 @@ import { Router } from '@angular/router';
 import { saveAs } from 'file-saver';
 import { MODULE_MESSAGES } from '../../config/module-messages.config';
 import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
+import { SchoolService } from '../../services/school.service';
 
 @Component({
   selector: 'app-payment-history-admin',
@@ -40,9 +41,7 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
   comingSoonConfig = MODULE_MESSAGES.paymentHistory;
   showFeesModule: boolean = false;
   filteredPayments: PaymentHistory[] = [];
-  classList: string[] = [
-    'Play group', 'Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
-  ];
+  classList: string[] = [];
   selectedClass: string = 'all';
   selectedDate: Date | null = null;
   loading: boolean = true;
@@ -58,9 +57,14 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
   totalPages: number = 0;
   pageSizes: number[] = [5, 10, 20, 50];
 
-  constructor(private router: Router, private paymentHistoryService: PaymentHistoryService, private datePipe: DatePipe, private logger: LoggerService, private cdr: ChangeDetectorRef) { }
+  constructor(private router: Router, private paymentHistoryService: PaymentHistoryService, private datePipe: DatePipe, private logger: LoggerService, private cdr: ChangeDetectorRef, private schoolService: SchoolService) { }
 
   ngOnInit(): void {
+    this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: classes => { this.classList = classes; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+
     this.fetchPaymentHistory();
 
     this.studentIdInputSubject.pipe(

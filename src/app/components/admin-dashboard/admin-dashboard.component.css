@@ -1,0 +1,240 @@
+:host { display: block; }
+
+.ad-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 0 24px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* ── Loading ────────────────────────────────────────────────────── */
+.ad-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 80px 20px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+.ad-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Stats error ────────────────────────────────────────────────── */
+.ad-stats-error {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+  color: #be123c;
+  font-weight: 600;
+}
+.ad-stats-error p { margin: 0; }
+
+/* ── Hero ───────────────────────────────────────────────────────── */
+.ad-hero {
+  position: relative;
+  background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 55%, #6366f1 100%);
+  border-radius: 20px;
+  padding: 28px 28px 32px;
+  margin: 0 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  overflow: hidden;
+  color: #fff;
+}
+.ad-blob { position: absolute; border-radius: 50%; opacity: 0.12; pointer-events: none; }
+.ad-blob-1 { width: 160px; height: 160px; background: #fff; top: -50px; right: -40px; }
+.ad-blob-2 { width: 100px; height: 100px; background: #a5b4fc; bottom: -25px; left: 35%; }
+
+.ad-hero-left { position: relative; z-index: 1; flex: 1; }
+.ad-greeting { font-size: 0.8rem; font-weight: 500; color: rgba(255,255,255,0.75); margin: 0 0 4px; letter-spacing: 0.3px; }
+.ad-hero-name { font-size: 1.6rem; font-weight: 800; margin: 0 0 12px; color: #fff; letter-spacing: -0.3px; line-height: 1.2; }
+.ad-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 20px;
+  padding: 4px 12px 4px 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+}
+.ad-role-badge mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+.ad-hero-right { position: relative; z-index: 1; flex-shrink: 0; }
+.ad-date-card { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; padding: 12px 18px; text-align: center; }
+.ad-date-day { display: block; font-size: 0.68rem; font-weight: 600; color: rgba(255,255,255,0.75); text-transform: uppercase; letter-spacing: 0.5px; }
+.ad-date-full { display: block; font-size: 0.85rem; font-weight: 700; color: #fff; white-space: nowrap; margin-top: 2px; }
+
+/* ── Stat Cards ─────────────────────────────────────────────────── */
+.ad-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.ad-stat-card {
+  position: relative;
+  background: linear-gradient(135deg, var(--c1), var(--c2));
+  border-radius: 16px;
+  padding: 20px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+.ad-stat-icon { font-size: 30px; line-height: 1; flex-shrink: 0; z-index: 1; }
+.ad-stat-info { display: flex; flex-direction: column; gap: 2px; z-index: 1; }
+.ad-stat-value { font-size: 1.6rem; font-weight: 800; color: #fff; line-height: 1; letter-spacing: -0.5px; }
+.ad-stat-value--sm { font-size: 1.1rem !important; letter-spacing: 0 !important; }
+.ad-stat-label { font-size: 0.7rem; font-weight: 600; color: rgba(255,255,255,0.82); letter-spacing: 0.2px; }
+.ad-stat-bg { position: absolute; right: -6px; bottom: -8px; font-size: 60px; opacity: 0.12; line-height: 1; pointer-events: none; }
+
+/* ── Sections ───────────────────────────────────────────────────── */
+.ad-section {
+  background: #fff;
+  border-radius: 18px;
+  padding: 20px 22px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border: 1px solid #f1f5f9;
+}
+.ad-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ad-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* ── Quick Actions ──────────────────────────────────────────────── */
+.ad-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+.ad-action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+  padding: 14px 8px 12px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e8edf2;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.ad-action-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #fff; }
+.ad-action-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.ad-action-icon mat-icon { font-size: 22px; width: 22px; height: 22px; }
+.ad-action-card span { font-size: 0.65rem; font-weight: 600; color: #374151; text-align: center; line-height: 1.2; }
+
+/* ── Leave Cards ────────────────────────────────────────────────── */
+.ad-empty-leaves { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px 0 8px; color: #94a3b8; }
+.ad-empty-leaves mat-icon { font-size: 36px; width: 36px; height: 36px; color: #34d399; }
+.ad-empty-leaves p { font-size: 0.85rem; font-weight: 500; margin: 0; }
+
+.ad-leave-list { display: flex; flex-direction: column; gap: 10px; }
+.ad-leave-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e8edf2;
+}
+.ad-leave-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4338ca, #6366f1);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ad-leave-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ad-leave-name { font-size: 0.88rem; font-weight: 700; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ad-leave-meta { display: flex; align-items: center; gap: 3px; font-size: 0.72rem; color: #64748b; flex-wrap: wrap; }
+.ad-leave-meta mat-icon { font-size: 11px; width: 11px; height: 11px; }
+.ad-leave-dot { margin: 0 2px; }
+.ad-leave-reason { font-size: 0.72rem; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.ad-leave-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.ad-btn-approve,
+.ad-btn-reject {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.ad-btn-approve:hover, .ad-btn-reject:hover { transform: scale(1.1); }
+.ad-btn-approve { background: #dcfce7; color: #16a34a; }
+.ad-btn-reject { background: #fee2e2; color: #dc2626; }
+.ad-btn-approve mat-icon, .ad-btn-reject mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+.ad-view-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4338ca;
+  text-decoration: none;
+}
+.ad-view-all mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .ad-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .ad-actions-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 600px) {
+  .ad-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .ad-actions-grid { grid-template-columns: repeat(3, 1fr); }
+  .ad-hero-name { font-size: 1.35rem; }
+}

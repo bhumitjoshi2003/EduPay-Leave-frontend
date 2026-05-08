@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
-import { MatTabsModule } from '@angular/material/tabs';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,7 +22,6 @@ import { filter } from 'rxjs/operators';
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    MatTabsModule,
     RouterLink,
     RouterLinkActive,
     RouterOutlet,
@@ -46,6 +44,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ClassTeacher: string = '';
   hasShownWelcomeMessage: boolean = false;
   unreadNotificationCount: number = 0;
+  sidebarCollapsed: boolean = false;
+  mobileSidebarOpen: boolean = false;
   private ngUnsubscribe = new Subject<void>();
   private welcomeMessageKey = 'hasShownWelcome';
   private pollingIntervalSubscription: Subscription | undefined;
@@ -172,15 +172,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const currentUrl = this.router.url;
     if (!currentUrl.startsWith('/dashboard/payment-history-details/')) {
       if (this.Role === 'STUDENT') {
-        this.router.navigate(['/dashboard/apply-leave']);
+        this.router.navigate(['/dashboard/student-dashboard']);
       } else if (this.Role === 'TEACHER') {
-        this.router.navigate(['/dashboard/event-calendar']);
-      } else if (this.Role === 'ADMIN') {
-        this.router.navigate(['/dashboard/analytics']);
+        this.router.navigate(['/dashboard/teacher-dashboard']);
+      } else if (this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN' || this.Role === 'SUB_ADMIN') {
+        this.router.navigate(['/dashboard/admin-dashboard']);
       } else if (this.Role === 'SUPER_ADMIN') {
-        this.router.navigate(['/dashboard/admin-list']);
-      } else {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard/super-admin-dashboard']);
       }
     }
   }
@@ -210,6 +208,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   fetchUnreadCount(): void {
+    if (this.Role === 'SUPER_ADMIN') return;
     this.notificationService.getUnreadNotificationCount()
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe({
@@ -220,6 +219,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   navigateToNoticeBoard(): void {
     this.router.navigate(['/dashboard/notice']);
+  }
+
+  private get isMobile(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth <= 900;
+  }
+
+  get menuIcon(): string {
+    if (this.isMobile) return this.mobileSidebarOpen ? 'menu_open' : 'menu';
+    return this.sidebarCollapsed ? 'menu' : 'menu_open';
+  }
+
+  toggleSidebar(): void {
+    if (this.isMobile) {
+      this.mobileSidebarOpen = !this.mobileSidebarOpen;
+    } else {
+      this.sidebarCollapsed = !this.sidebarCollapsed;
+    }
+    this.cdr.markForCheck();
+  }
+
+  closeMobileSidebar(): void {
+    this.mobileSidebarOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  closeSidebarOnMobile(): void {
+    if (this.isMobile) {
+      this.mobileSidebarOpen = false;
+      this.cdr.markForCheck();
+    }
   }
 
   navigateToMyProfile(): void {

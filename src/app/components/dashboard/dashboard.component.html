@@ -1,67 +1,323 @@
-<div class="dashboard-container">
-  <div class="header-area">
-    <div class="logo-container">
-      <img src="EdunexifyLogo.png" alt="Edunexify" class="logo" />
+<div class="layout-wrapper"
+     [class.sidebar-collapsed]="sidebarCollapsed"
+     [class.sidebar-open]="mobileSidebarOpen">
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" (click)="closeMobileSidebar()"></div>
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+
+    <!-- Logo row -->
+    <div class="sidebar-logo">
+      <img src="EdunexifyLogo.png" alt="Edunexify" class="logo-img" />
+      <button class="sidebar-collapse-btn" (click)="toggleSidebar()" title="Collapse sidebar">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
     </div>
 
-    <nav mat-tab-nav-bar class="custom-tab-nav" #tabNav [tabPanel]="tabPanel">
-      <a *ngIf="isAdmin() || isSuperAdmin()" mat-tab-link routerLink="/dashboard/analytics"
-        routerLinkActive #rlaAn="routerLinkActive" [active]="rlaAn.isActive">📊 Dashboard</a>
-      <a *ngIf="isStudent() || isAdmin() || isSuperAdmin()" mat-tab-link routerLink="/dashboard/fee-structure"
-        routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">Fee Structure</a>
-      <a *ngIf="isStudent() || isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/timetable"
-        routerLinkActive #rlaTt="routerLinkActive" [active]="rlaTt.isActive">Timetable</a>
-      <a *ngIf="isStudent() || isTeacher() || isAdmin()" mat-tab-link routerLink="/dashboard/event-calendar"
-        routerLinkActive #rla14="routerLinkActive" [active]="rla14.isActive">Event Calendar</a>
-      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/apply-leave" routerLinkActive #rla6="routerLinkActive"
-        [active]="rla6.isActive">Apply Leave</a>
-      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/student-attendance" routerLinkActive
-        #rla8="routerLinkActive" [active]="rla8.isActive">Student Attendance</a>
-      <a *ngIf="isStudent() || (isTeacher() && ClassTeacher) || isAdmin()" mat-tab-link
-        routerLink="/dashboard/attendance-summary" routerLinkActive #rlaAs="routerLinkActive"
-        [active]="rlaAs.isActive">Attendance Summary</a>
-      <a *ngIf="((isTeacher() && ClassTeacher) && ClassTeacher) || isAdmin()" mat-tab-link
-        routerLink="/dashboard/teacher-attendance" routerLinkActive #rla7="routerLinkActive"
-        [active]="rla7.isActive">Attendance</a>
-      <a *ngIf="(isTeacher() && ClassTeacher) || isAdmin()" mat-tab-link routerLink="/dashboard/student-list"
-        routerLinkActive #rla9="routerLinkActive" [active]="rla9.isActive">Students</a>
-      <a *ngIf="(isTeacher() && ClassTeacher) || isAdmin()" mat-tab-link routerLink="/dashboard/view-leaves"
-        routerLinkActive #rla10="routerLinkActive" [active]="rla10.isActive">Leaves</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/teacher-list" routerLinkActive #rla12="routerLinkActive"
-        [active]="rla12.isActive">Teachers</a>
-      <a *ngIf="isAdmin() || isSuperAdmin()" mat-tab-link routerLink="/dashboard/admin-list" routerLinkActive
-        #rla12="routerLinkActive" [active]="rla12.isActive">Admins</a>
-      <a mat-tab-link routerLink="/dashboard/notice" routerLinkActive #rla13="routerLinkActive"
-        [active]="rla13.isActive">Notice Board</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/register" routerLinkActive #rla13="routerLinkActive"
-        [active]="rla13.isActive">Register</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/event-new" routerLinkActive #rla15="routerLinkActive"
-        [active]="rla15.isActive">Create Event</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/subject-config" routerLinkActive
-        #rla17="routerLinkActive" [active]="rla17.isActive">Subjects</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/exam-config" routerLinkActive #rla18="routerLinkActive"
-        [active]="rla18.isActive">Exams</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/student-stream" routerLinkActive
-        #rla19="routerLinkActive" [active]="rla19.isActive">Streams</a>
-      <a *ngIf="isAdmin() || isTeacher()" mat-tab-link routerLink="/dashboard/mark-entry" routerLinkActive
-        #rla20="routerLinkActive" [active]="rla20.isActive">Mark Entry</a>
-      <a *ngIf="isAdmin() || isTeacher()" mat-tab-link routerLink="/dashboard/class-results" routerLinkActive
-        #rla21="routerLinkActive" [active]="rla21.isActive">Class Results</a>
-      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/my-results" routerLinkActive #rla22="routerLinkActive"
-        [active]="rla22.isActive">My Results</a>
-      <a *ngIf="isAdmin() || isSuperAdmin()" mat-tab-link routerLink="/dashboard/audit-logs" routerLinkActive
-        #rla16="routerLinkActive" [active]="rla16.isActive">Audit Logs</a>
-      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/fees" routerLinkActive #rla2="routerLinkActive"
-        [active]="rla2.isActive">Fees</a>
-      <a *ngIf="isStudent()" mat-tab-link routerLink="/dashboard/payment-history" routerLinkActive
-        #rla5="routerLinkActive" [active]="rla5.isActive">Payment History</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/payment-history-admin" routerLinkActive
-        #rla11="routerLinkActive" [active]="rla11.isActive">Payment History</a>
-      <a *ngIf="isAdmin()" mat-tab-link routerLink="/dashboard/fee-reminders" routerLinkActive
-        #rlaFr="routerLinkActive" [active]="rlaFr.isActive">Fee Reminders</a>
+    <!-- Nav items -->
+    <nav class="sidebar-nav">
+
+      <!-- ── STUDENT ── -->
+      <ng-container *ngIf="isStudent()">
+        <div class="nav-section-label">Main</div>
+
+        <a class="nav-item" routerLink="/dashboard/student-dashboard" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Dashboard">
+          <mat-icon>home</mat-icon><span>Dashboard</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/apply-leave" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Leave">
+          <mat-icon>event_note</mat-icon><span>Leave</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/student-attendance" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="My Attendance">
+          <mat-icon>fact_check</mat-icon><span>My Attendance</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/attendance-summary" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Attendance Summary">
+          <mat-icon>bar_chart</mat-icon><span>Attendance Summary</span>
+        </a>
+
+        <div class="nav-section-label">Academics</div>
+
+        <a class="nav-item" routerLink="/dashboard/timetable" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Timetable">
+          <mat-icon>schedule</mat-icon><span>Timetable</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/my-results" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="My Results">
+          <mat-icon>grade</mat-icon><span>My Results</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/report-card" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Report Card">
+          <mat-icon>description</mat-icon><span>Report Card</span>
+        </a>
+
+        <div class="nav-section-label">Fees</div>
+
+        <a class="nav-item" routerLink="/dashboard/fees" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="My Fees">
+          <mat-icon>account_balance_wallet</mat-icon><span>My Fees</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/payment-history" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Payment History">
+          <mat-icon>receipt_long</mat-icon><span>Payment History</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/fee-structure" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Fee Structure">
+          <mat-icon>list_alt</mat-icon><span>Fee Structure</span>
+        </a>
+
+        <div class="nav-section-label">Communication</div>
+
+        <a class="nav-item" routerLink="/dashboard/notice" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Notice Board">
+          <mat-icon>campaign</mat-icon><span>Notice Board</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/event-calendar" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Event Calendar">
+          <mat-icon>calendar_month</mat-icon><span>Event Calendar</span>
+        </a>
+      </ng-container>
+
+      <!-- ── TEACHER ── -->
+      <ng-container *ngIf="isTeacher()">
+        <div class="nav-section-label">Main</div>
+
+        <a class="nav-item" routerLink="/dashboard/teacher-dashboard" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Dashboard">
+          <mat-icon>home</mat-icon><span>Dashboard</span>
+        </a>
+
+        <div class="nav-section-label">My Class</div>
+
+        <a class="nav-item" routerLink="/dashboard/student-list" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Students">
+          <mat-icon>groups</mat-icon><span>Students</span>
+        </a>
+        <a class="nav-item" *ngIf="ClassTeacher" routerLink="/dashboard/teacher-attendance"
+           routerLinkActive="active" (click)="closeSidebarOnMobile()" title="Mark Attendance">
+          <mat-icon>how_to_reg</mat-icon><span>Mark Attendance</span>
+        </a>
+        <a class="nav-item" *ngIf="ClassTeacher" routerLink="/dashboard/view-leaves"
+           routerLinkActive="active" (click)="closeSidebarOnMobile()" title="Leave Requests">
+          <mat-icon>event_available</mat-icon><span>Leave Requests</span>
+        </a>
+        <a class="nav-item" *ngIf="ClassTeacher" routerLink="/dashboard/attendance-summary"
+           routerLinkActive="active" (click)="closeSidebarOnMobile()" title="Attendance Summary">
+          <mat-icon>bar_chart</mat-icon><span>Attendance Summary</span>
+        </a>
+
+        <div class="nav-section-label">Academics</div>
+
+        <a class="nav-item" routerLink="/dashboard/mark-entry" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Mark Entry">
+          <mat-icon>edit_note</mat-icon><span>Mark Entry</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/class-results" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Class Results">
+          <mat-icon>leaderboard</mat-icon><span>Class Results</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/report-card" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Report Card">
+          <mat-icon>description</mat-icon><span>Report Card</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/timetable" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Timetable">
+          <mat-icon>schedule</mat-icon><span>Timetable</span>
+        </a>
+
+        <div class="nav-section-label">Communication</div>
+
+        <a class="nav-item" routerLink="/dashboard/notice" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Notice Board">
+          <mat-icon>campaign</mat-icon><span>Notice Board</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/event-calendar" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Event Calendar">
+          <mat-icon>calendar_month</mat-icon><span>Event Calendar</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/event-new" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Create Event">
+          <mat-icon>add_circle_outline</mat-icon><span>Create Event</span>
+        </a>
+      </ng-container>
+
+      <!-- ── ADMIN / SUB_ADMIN ── -->
+      <ng-container *ngIf="isAdmin()">
+        <div class="nav-section-label">Overview</div>
+
+        <a class="nav-item" routerLink="/dashboard/admin-dashboard" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Dashboard">
+          <mat-icon>home</mat-icon><span>Dashboard</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/analytics" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Analytics">
+          <mat-icon>insights</mat-icon><span>Analytics</span>
+        </a>
+
+        <div class="nav-section-label">People</div>
+
+        <a class="nav-item" routerLink="/dashboard/student-search" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Student Search">
+          <mat-icon>search</mat-icon><span>Student Search</span>
+        </a>
+
+        <a class="nav-item" routerLink="/dashboard/student-list" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Students">
+          <mat-icon>school</mat-icon><span>Students</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/teacher-list" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Teachers">
+          <mat-icon>person_pin</mat-icon><span>Teachers</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/admin-list" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Admins">
+          <mat-icon>manage_accounts</mat-icon><span>Admins</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/register" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Register">
+          <mat-icon>person_add</mat-icon><span>Register</span>
+        </a>
+
+        <div class="nav-section-label">Attendance</div>
+
+        <a class="nav-item" routerLink="/dashboard/teacher-attendance" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Mark Attendance">
+          <mat-icon>how_to_reg</mat-icon><span>Mark Attendance</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/attendance-summary" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Attendance Summary">
+          <mat-icon>bar_chart</mat-icon><span>Summary</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/view-leaves" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Leave Requests">
+          <mat-icon>event_available</mat-icon><span>Leave Requests</span>
+        </a>
+
+        <div class="nav-section-label">Academics</div>
+
+        <a class="nav-item" routerLink="/dashboard/mark-entry" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Mark Entry">
+          <mat-icon>edit_note</mat-icon><span>Mark Entry</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/class-results" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Class Results">
+          <mat-icon>leaderboard</mat-icon><span>Class Results</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/exam-config" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Exam Config">
+          <mat-icon>quiz</mat-icon><span>Exam Config</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/subject-config" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Subjects">
+          <mat-icon>menu_book</mat-icon><span>Subjects</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/student-stream" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Streams">
+          <mat-icon>fork_right</mat-icon><span>Streams</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/timetable" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Timetable">
+          <mat-icon>schedule</mat-icon><span>Timetable</span>
+        </a>
+
+        <div class="nav-section-label">Fees</div>
+
+        <a class="nav-item" routerLink="/dashboard/fee-structure" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Fee Structure">
+          <mat-icon>list_alt</mat-icon><span>Fee Structure</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/bus-fees" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Bus Fees">
+          <mat-icon>directions_bus</mat-icon><span>Bus Fees</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/payment-history-admin" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Payment History">
+          <mat-icon>receipt_long</mat-icon><span>Payment History</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/fee-reminders" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Fee Reminders">
+          <mat-icon>notifications_active</mat-icon><span>Fee Reminders</span>
+        </a>
+
+        <div class="nav-section-label">Communication</div>
+
+        <a class="nav-item" routerLink="/dashboard/notice" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Notice Board">
+          <mat-icon>campaign</mat-icon><span>Notice Board</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/event-calendar" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Event Calendar">
+          <mat-icon>calendar_month</mat-icon><span>Event Calendar</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/event-new" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Create Event">
+          <mat-icon>add_circle_outline</mat-icon><span>Create Event</span>
+        </a>
+
+        <div class="nav-section-label">System</div>
+
+        <a class="nav-item" routerLink="/dashboard/class-management" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Class Management">
+          <mat-icon>class</mat-icon><span>Class Management</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/student-promotion" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Student Promotion">
+          <mat-icon>upgrade</mat-icon><span>Student Promotion</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/school-settings" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="School Settings">
+          <mat-icon>settings</mat-icon><span>School Settings</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/audit-logs" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Audit Logs">
+          <mat-icon>history</mat-icon><span>Audit Logs</span>
+        </a>
+      </ng-container>
+
+      <!-- ── SUB_ADMIN extra nav (class management) shown inside admin block already ── -->
+
+      <!-- ── SUPER_ADMIN ── -->
+      <ng-container *ngIf="isSuperAdmin()">
+        <div class="nav-section-label">Platform</div>
+
+        <a class="nav-item" routerLink="/dashboard/super-admin-dashboard" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Dashboard">
+          <mat-icon>home</mat-icon><span>Dashboard</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/admin-list" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Admins">
+          <mat-icon>manage_accounts</mat-icon><span>Admins</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/register-admin" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Register Admin">
+          <mat-icon>person_add</mat-icon><span>Register Admin</span>
+        </a>
+      </ng-container>
+
     </nav>
 
-    <div class="hdr-controls">
+    <!-- Sidebar footer -->
+    <div class="sidebar-footer">
+      <button class="nav-item nav-logout" (click)="logout()" title="Sign Out">
+        <mat-icon>logout</mat-icon><span>Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN AREA ══ -->
+  <div class="main-area">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <button class="topbar-hamburger" (click)="toggleSidebar()" title="Toggle sidebar">
+        <mat-icon>{{ menuIcon }}</mat-icon>
+      </button>
+
+      <div class="topbar-spacer"></div>
 
       <!-- Notification bell -->
       <button class="hdr-bell" (click)="navigateToNoticeBoard()" title="Notice Board"
@@ -79,8 +335,6 @@
       </button>
 
       <mat-menu #profileMenu="matMenu" xPosition="before" class="hdr-profile-menu">
-
-        <!-- Menu header — not a menu item, click won't close -->
         <div class="hdr-menu-header" (click)="$event.stopPropagation()">
           <div class="hdr-menu-avatar">{{ (Name || Role).charAt(0).toUpperCase() }}</div>
           <div class="hdr-menu-info">
@@ -106,14 +360,12 @@
           <mat-icon>logout</mat-icon>
           <span>Sign Out</span>
         </button>
-
       </mat-menu>
-    </div>
-  </div>
+    </header>
 
-  <mat-tab-nav-panel #tabPanel>
-    <div class="content-area">
+    <!-- Content -->
+    <main class="content-area">
       <router-outlet></router-outlet>
-    </div>
-  </mat-tab-nav-panel>
+    </main>
+  </div>
 </div>

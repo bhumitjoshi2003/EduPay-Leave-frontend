@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Student } from '../interfaces/student';
@@ -7,6 +7,20 @@ import { Student } from '../interfaces/student';
 interface StudentDTO {
   studentId: string;
   name: string;
+}
+
+export type PromotionAction = 'PROMOTE' | 'DETAIN' | 'PASS_OUT';
+
+export interface PromotionPreviewGroup {
+  className: string;
+  students: { studentId: string; name: string; }[];
+}
+
+export interface PromotionResult {
+  promoted: number;
+  detained: number;
+  passedOut: number;
+  errors: { studentId: string; reason: string; }[];
 }
 
 export interface BulkImportError {
@@ -68,6 +82,19 @@ export class StudentService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<{ photoUrl: string }>(`${this.baseUrl}/${studentId}/photo`, formData);
+  }
+
+  getPromotionPreview(): Observable<PromotionPreviewGroup[]> {
+    return this.http.get<PromotionPreviewGroup[]>(`${this.baseUrl}/promotion/preview`);
+  }
+
+  executePromotion(decisions: { studentId: string; action: PromotionAction }[]): Observable<PromotionResult> {
+    return this.http.post<PromotionResult>(`${this.baseUrl}/promotion/execute`, { decisions });
+  }
+
+  searchStudents(query: string): Observable<Student[]> {
+    const params = new HttpParams().set('q', query);
+    return this.http.get<Student[]>(`${this.baseUrl}/search`, { params });
   }
 
 }

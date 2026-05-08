@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { FeeReminderService } from '../../services/fee-reminder.service';
 import { LoggerService } from '../../services/logger.service';
+import { SchoolService } from '../../services/school.service';
 import { OverdueStudent } from '../../interfaces/fee-reminder';
 import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
 import { MODULE_MESSAGES } from '../../config/module-messages.config';
@@ -20,10 +21,7 @@ import Swal from 'sweetalert2';
 export class FeeRemindersComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  readonly classList = [
-    'Play group', 'Nursery', 'LKG', 'UKG',
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
-  ];
+  classList: string[] = [];
 
   comingSoonConfig = MODULE_MESSAGES.feesReminder;
   showFeesReminderModule: boolean = false;
@@ -49,10 +47,16 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
   constructor(
     private feeReminderService: FeeReminderService,
     private logger: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private schoolService: SchoolService
   ) {}
 
   ngOnInit(): void {
+    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
+      next: classes => { this.classList = classes; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+
     this.initSessions();
     this.loadOverdue();
   }

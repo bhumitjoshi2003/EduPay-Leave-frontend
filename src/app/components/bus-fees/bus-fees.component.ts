@@ -21,6 +21,7 @@ export class BusFeesComponent implements OnInit, OnDestroy {
   isNewSession: boolean = false;
   busFeeStructures: BusFee[] = [];
   isEditing = false;
+  isLoading = false;
   originalBusFees: BusFee[] = [];
 
   constructor(
@@ -39,21 +40,41 @@ export class BusFeesComponent implements OnInit, OnDestroy {
   }
 
   fetchAcademicYears(): void {
-    this.busFeesService.getAcademicYears().pipe(takeUntil(this.destroy$)).subscribe(years => {
-      this.academicYears = years;
-      if (this.academicYears.length > 0) {
-        this.currentSession = this.academicYears[this.academicYears.length - 1];
+    this.isLoading = true;
+    this.busFeesService.getAcademicYears().pipe(takeUntil(this.destroy$)).subscribe({
+      next: years => {
+        this.academicYears = years;
+        if (this.academicYears.length > 0) {
+          this.currentSession = this.academicYears[this.academicYears.length - 1];
+          this.fetchBusFees();
+        } else {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        }
+      },
+      error: () => {
+        this.isLoading = false;
         this.cdr.markForCheck();
-        this.fetchBusFees();
-      }
+        Swal.fire('Error', 'Failed to load academic years.', 'error');
+      },
     });
   }
 
   fetchBusFees(): void {
-    this.busFeesService.getBusFees(this.currentSession).pipe(takeUntil(this.destroy$)).subscribe(fees => {
-      this.busFeeStructures = fees;
-      this.originalBusFees = JSON.parse(JSON.stringify(this.busFeeStructures));
-      this.cdr.markForCheck();
+    this.isLoading = true;
+    this.cdr.markForCheck();
+    this.busFeesService.getBusFees(this.currentSession).pipe(takeUntil(this.destroy$)).subscribe({
+      next: fees => {
+        this.busFeeStructures = fees;
+        this.originalBusFees = JSON.parse(JSON.stringify(this.busFeeStructures));
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+        Swal.fire('Error', 'Failed to load bus fees.', 'error');
+      },
     });
   }
 
@@ -221,7 +242,7 @@ export class BusFeesComponent implements OnInit, OnDestroy {
   }
 
   canEdit(): boolean {
-    return this.authStateService.getUserRole() === 'SUPER_ADMIN';
+    return this.authStateService.getUserRole() === 'ADMIN';
   }
 
   trackByIndex(index: number): number { return index; }

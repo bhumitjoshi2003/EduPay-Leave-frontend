@@ -18,6 +18,11 @@ export interface StudentStreamOverview {
   optionalSubjectName: string | null;
 }
 
+export interface EligibleStudentsResponse {
+  eligibleClassCount: number;
+  students: StudentStreamOverview[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class StudentStreamService {
   private base = `${environment.apiUrl}/student-stream`;
@@ -42,5 +47,9 @@ export class StudentStreamService {
 
   getClassStreamOverview(className: string): Observable<StudentStreamOverview[]> {
     return this.http.get<StudentStreamOverview[]>(`${this.base}/class/${className}`);
+  }
+
+  getEligibleStudents(): Observable<EligibleStudentsResponse> {
+    return this.http.get<EligibleStudentsResponse>(`${this.base}/eligible-students`);
   }
 }

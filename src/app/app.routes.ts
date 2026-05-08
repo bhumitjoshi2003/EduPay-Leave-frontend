@@ -40,6 +40,14 @@ import { AttendanceSummaryComponent } from './components/attendance-summary/atte
 import { TimetableComponent } from './components/timetable/timetable.component';
 import { FeeRemindersComponent } from './components/fee-reminders/fee-reminders.component';
 import { AnalyticsComponent } from './components/analytics/analytics.component';
+import { ClassManagementComponent } from './components/class-management/class-management.component';
+import { SchoolSettingsComponent } from './components/school-settings/school-settings.component';
+import { StudentPromotionComponent } from './components/student-promotion/student-promotion.component';
+import { StudentDashboardComponent } from './components/student-dashboard/student-dashboard.component';
+import { TeacherDashboardComponent } from './components/teacher-dashboard/teacher-dashboard.component';
+import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
+import { SuperAdminDashboardComponent } from './components/super-admin-dashboard/super-admin-dashboard.component';
+import { StudentSearchComponent } from './components/student-search/student-search.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -85,7 +93,7 @@ export const routes: Routes = [
       },
       {
         path: 'attendance-summary', component: AttendanceSummaryComponent,
-        canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUB_ADMIN', 'SUPER_ADMIN'] }
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUB_ADMIN'] }
       },
 
       // ── Teacher routes ────────────────────────────────────────────────
@@ -109,7 +117,7 @@ export const routes: Routes = [
       },
       {
         path: 'view-leaves/:studentId', component: ViewLeavesComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+        canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN'] }
       },
       {
         path: 'event-new', component: EventFormComponent,
@@ -165,15 +173,31 @@ export const routes: Routes = [
       },
       {
         path: 'audit-logs', component: AuditLogsComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUPER_ADMIN'] }
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'student-search', component: StudentSearchComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'class-management', component: ClassManagementComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUB_ADMIN'] }
+      },
+      {
+        path: 'school-settings', component: SchoolSettingsComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'student-promotion', component: StudentPromotionComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
       {
         path: 'fee-structure', component: FeeStructureComponent,
-        canActivate: [roleGuard], data: { roles: ['STUDENT', 'ADMIN', 'SUPER_ADMIN'] }
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'ADMIN'] }
       },
       {
         path: 'bus-fees', component: BusFeesComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUPER_ADMIN'] }
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
 
       // ── Exam / Results ────────────────────────────────────────────────
@@ -206,22 +230,40 @@ export const routes: Routes = [
         canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN'] }
       },
 
+      // ── Dashboards ────────────────────────────────────────────────────
+      {
+        path: 'student-dashboard', component: StudentDashboardComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT'] }
+      },
+      {
+        path: 'teacher-dashboard', component: TeacherDashboardComponent,
+        canActivate: [roleGuard], data: { roles: ['TEACHER'] }
+      },
+      {
+        path: 'admin-dashboard', component: AdminDashboardComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'super-admin-dashboard', component: SuperAdminDashboardComponent,
+        canActivate: [roleGuard], data: { roles: ['SUPER_ADMIN'] }
+      },
+
       // ── Analytics Dashboard ───────────────────────────────────────────
       {
         path: 'analytics', component: AnalyticsComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUPER_ADMIN'] }
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
 
       // ── Timetable ─────────────────────────────────────────────────────
       {
         path: 'timetable', component: TimetableComponent,
-        canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUB_ADMIN', 'SUPER_ADMIN'] }
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUB_ADMIN'] }
       },
 
       // ── Open to all authenticated users ──────────────────────────────
       {
         path: 'notice', component: NoticeComponent,
-        canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUPER_ADMIN'] }
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN'] }
       },
       { path: 'event-calendar', component: EventCalendarComponent },
       { path: 'payment', component: PaymentComponent },

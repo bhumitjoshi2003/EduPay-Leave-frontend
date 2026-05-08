@@ -7,6 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { TimetableService } from '../../services/timetable.service';
 import { TeacherService } from '../../services/teacher.service';
 import { AuthStateService } from '../../auth/auth-state.service';
+import { SchoolService } from '../../services/school.service';
 import { LoggerService } from '../../services/logger.service';
 import { TimetableEntry } from '../../interfaces/timetable';
 import { Teacher } from '../../interfaces/teacher';
@@ -34,10 +35,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
     THURSDAY: 'Thursday', FRIDAY: 'Friday', SATURDAY: 'Saturday'
   };
   readonly periodOptions = [4, 5, 6, 7, 8, 9, 10];
-  readonly classList = [
-    'Play group', 'Nursery', 'LKG', 'UKG',
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
-  ];
+  classList: string[] = [];
 
   maxPeriods: number = parseInt(localStorage.getItem(this.PERIODS_KEY) ?? '8', 10);
 
@@ -78,7 +76,8 @@ export class TimetableComponent implements OnInit, OnDestroy {
     private teacherService: TeacherService,
     private authStateService: AuthStateService,
     private logger: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private schoolService: SchoolService
   ) {}
 
   ngOnInit(): void {
@@ -86,6 +85,11 @@ export class TimetableComponent implements OnInit, OnDestroy {
     this.role = user?.role ?? '';
     this.userId = user?.userId ?? '';
     this.userClassName = user?.className ?? '';
+
+    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
+      next: classes => { this.classList = classes; this.cdr.markForCheck(); },
+      error: () => {}
+    });
 
     if (this.isStudent()) {
       this.selectedClass = this.userClassName;

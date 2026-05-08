@@ -1,0 +1,100 @@
+<div class="search-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="page-title">Student Search</h1>
+    <p class="page-sub">Search by name or student ID</p>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar-wrapper">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        class="search-input"
+        [(ngModel)]="query"
+        (ngModelChange)="onQueryChange()"
+        placeholder="Type student name or ID…"
+        autocomplete="off"
+        autofocus
+      />
+      <button
+        class="clear-btn"
+        *ngIf="query.length > 0"
+        (click)="clearSearch()"
+        title="Clear search"
+      >✕</button>
+    </div>
+    <p class="search-hint" *ngIf="query.length > 0 && query.length < 2">
+      Type at least 2 characters to search
+    </p>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Searching…</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="error && !isLoading">
+    <span class="error-icon">⚠️</span>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="hasSearched && !isLoading && !error && results.length === 0">
+    <span class="empty-icon">🔎</span>
+    <p>No students found for "<strong>{{ query }}</strong>"</p>
+    <span class="empty-sub">Try a different name or ID</span>
+  </div>
+
+  <!-- Results Table -->
+  <div class="results-wrapper" *ngIf="results.length > 0 && !isLoading">
+    <div class="results-header">
+      <span class="results-count">{{ results.length }} result{{ results.length === 1 ? '' : 's' }} found</span>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Student ID</th>
+            <th>Class</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let student of results; trackBy: trackByStudentId"
+            class="result-row"
+            (click)="viewStudent(student.studentId)"
+          >
+            <td>
+              <div class="student-cell">
+                <div class="avatar">{{ getInitial(student.name) }}</div>
+                <div class="student-info">
+                  <div class="student-name">{{ student.name }}</div>
+                  <div class="student-email" *ngIf="student.email">{{ student.email }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="student-id">{{ student.studentId }}</td>
+            <td>{{ student.className }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(student.status)">
+                {{ getStatusLabel(student.status) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Idle State -->
+  <div class="idle-state" *ngIf="!hasSearched && !isLoading && !error && results.length === 0 && query.length < 2">
+    <span class="idle-icon">👨‍🎓</span>
+    <p>Start typing to search for students</p>
+  </div>
+</div>

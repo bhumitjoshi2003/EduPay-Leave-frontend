@@ -1,0 +1,63 @@
+<div class="cm-page">
+
+  <div class="cm-header">
+    <div>
+      <h1 class="cm-title">Class Management</h1>
+      <p class="cm-subtitle">Manage classes, their order, and stream eligibility</p>
+    </div>
+    <button class="cm-btn cm-btn-primary" (click)="saveOrder()" [disabled]="savingOrder || isLoading">
+      {{ savingOrder ? 'Saving…' : 'Save Order' }}
+    </button>
+  </div>
+
+  <!-- Add class (admin only) -->
+  <div class="cm-add-row" *ngIf="isAdmin">
+    <input class="cm-input" type="text" [(ngModel)]="newClassName"
+           placeholder="New class name (e.g. 11 A)" (keyup.enter)="addNewClass()" />
+    <button class="cm-btn cm-btn-primary" (click)="addNewClass()" [disabled]="!newClassName.trim() || addingClass">
+      {{ addingClass ? 'Adding…' : '+ Add Class' }}
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="cm-loading" *ngIf="isLoading">
+    <div class="cm-spinner"></div>
+    <span>Loading classes…</span>
+  </div>
+
+  <!-- Empty -->
+  <div class="cm-empty" *ngIf="!isLoading && classes.length === 0">
+    <p>No classes configured yet. Add your first class above.</p>
+  </div>
+
+  <!-- Class list -->
+  <div class="cm-list" *ngIf="!isLoading && classes.length > 0">
+    <div class="cm-item" *ngFor="let cls of classes; let i = index; trackBy: trackById">
+      <div class="cm-item-order">
+        <button class="cm-arrow" (click)="moveClass(i, 'up')" [disabled]="i === 0" title="Move up">▲</button>
+        <button class="cm-arrow" (click)="moveClass(i, 'down')" [disabled]="i === classes.length - 1" title="Move down">▼</button>
+      </div>
+
+      <div class="cm-item-info">
+        <span class="cm-class-name">{{ cls.name }}</span>
+        <span class="cm-badge cm-badge-active" *ngIf="cls.active">Active</span>
+        <span class="cm-badge cm-badge-inactive" *ngIf="!cls.active">Inactive</span>
+      </div>
+
+      <div class="cm-item-actions">
+        <label class="cm-toggle" title="Stream Eligible (Class 11/12)">
+          <input type="checkbox" [checked]="cls.streamEligible"
+                 (change)="toggleStreamEligible(cls)" [disabled]="!isAdmin" />
+          <span class="cm-toggle-slider"></span>
+          <span class="cm-toggle-label">Stream</span>
+        </label>
+
+        <button class="cm-btn cm-btn-danger cm-btn-sm" *ngIf="isAdmin"
+                (click)="removeClass(cls)" title="Remove class">
+          Remove
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

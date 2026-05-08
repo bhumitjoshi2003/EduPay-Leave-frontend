@@ -1,0 +1,169 @@
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
+import { SchoolService, SchoolClass } from '../../services/school.service';
+import { AuthStateService } from '../../auth/auth-state.service';
+import { LoggerService } from '../../services/logger.service';
+import Swal from 'sweetalert2';
+
+@Component({
+  selector: 'app-class-management',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './class-management.component.html',
+  styleUrl: './class-management.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class ClassManagementComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  classes: SchoolClass[] = [];
+  isLoading = false;
+  newClassName = '';
+  addingClass = false;
+  savingOrder = false;
+  role = '';
+
+  constructor(
+    private schoolService: SchoolService,
+    private authStateService: AuthStateService,
+    private cdr: ChangeDetectorRef,
+    private logger: LoggerService
+  ) {}
+
+  ngOnInit(): void {
+    this.role = this.authStateService.getUser()?.role ?? '';
+    this.loadClasses();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  get isAdmin(): boolean {
+    return this.role === 'ADMIN';
+  }
+
+  loadClasses(): void {
+    this.isLoading = true;
+    this.cdr.markForCheck();
+    this.schoolService.getManagedClasses().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (list) => {
+        this.classes = list ?? [];
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (e) => {
+        this.logger.error('Failed to load classes', e);
+        Swal.fire({ title: 'Error', text: 'Failed to load classes.', icon: 'error', confirmButtonColor: '#4f46e5' });
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  addNewClass(): void {
+    const name = this.newClassName.trim();
+    if (!name) return;
+    this.addingClass = true;
+    this.cdr.markForCheck();
+    this.schoolService.addClass(name).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (c) => {
+        this.classes = [...this.classes, c];
+        this.newClassName = '';
+        this.addingClass = false;
+        this.schoolService.invalidateClasses();
+        Swal.fire({ title: 'Added', text: `"${c.name}" added.`, icon: 'success', timer: 1500, showConfirmButton: false });
+        this.cdr.markForCheck();
+      },
+      error: (e) => {
+        this.logger.error('Failed to add class', e);
+        Swal.fire({ title: 'Error', text: 'Could not add class. It may already exist.', icon: 'error', confirmButtonColor: '#4f46e5' });
+        this.addingClass = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  removeClass(cls: SchoolClass): void {
+    Swal.fire({
+      title: `Remove "${cls.name}"?`,
+      text: 'This will remove the class. You can re-add it later.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, remove',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.schoolService.deleteClass(cls.id).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.classes = this.classes.filter(c => c.id !== cls.id);
+          this.schoolService.invalidateClasses();
+          Swal.fire({ title: 'Removed', text: `"${cls.name}" removed.`, icon: 'success', timer: 1500, showConfirmButton: false });
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          this.logger.error('Failed to delete class', e);
+          const reason = e?.error?.message;
+          if (reason) {
+            Swal.fire({ title: 'Cannot Remove Class', text: reason, icon: 'error', confirmButtonColor: '#4f46e5' });
+          } else {
+            Swal.fire({ title: 'Error', text: 'Could not remove class.', icon: 'error', confirmButtonColor: '#4f46e5' });
+          }
+          this.cdr.markForCheck();
+        }
+      });
+    });
+  }
+
+  moveClass(index: number, direction: 'up' | 'down'): void {
+    const swap = direction === 'up' ? index - 1 : index + 1;
+    if (swap < 0 || swap >= this.classes.length) return;
+    const list = [...this.classes];
+    [list[index], list[swap]] = [list[swap], list[index]];
+    this.classes = list;
+    this.cdr.markForCheck();
+  }
+
+  saveOrder(): void {
+    this.savingOrder = true;
+    this.cdr.markForCheck();
+    const ids = this.classes.map(c => c.id);
+    this.schoolService.reorderClasses(ids).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.savingOrder = false;
+        this.schoolService.invalidateClasses();
+        Swal.fire({ title: 'Saved', text: 'Class order saved.', icon: 'success', timer: 1500, showConfirmButton: false });
+        this.cdr.markForCheck();
+      },
+      error: (e) => {
+        this.logger.error('Failed to reorder classes', e);
+        Swal.fire({ title: 'Error', text: 'Could not save order.', icon: 'error', confirmButtonColor: '#4f46e5' });
+        this.savingOrder = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  toggleStreamEligible(cls: SchoolClass): void {
+    const newValue = !cls.streamEligible;
+    this.schoolService.toggleStreamEligible(cls.id, newValue).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (updated) => {
+        this.classes = this.classes.map(c => c.id === updated.id ? updated : c);
+        const msg = newValue ? `"${cls.name}" added to stream assignment.` : `"${cls.name}" removed from stream assignment.`;
+        Swal.fire({ title: newValue ? 'Stream On' : 'Stream Off', text: msg, icon: 'success', timer: 1500, showConfirmButton: false });
+        this.cdr.markForCheck();
+      },
+      error: (e) => {
+        this.logger.error('Failed to toggle stream eligibility', e);
+        Swal.fire({ title: 'Error', text: 'Could not update stream eligibility.', icon: 'error', confirmButtonColor: '#4f46e5' });
+      }
+    });
+  }
+
+  trackById(_: number, cls: SchoolClass): number { return cls.id; }
+}

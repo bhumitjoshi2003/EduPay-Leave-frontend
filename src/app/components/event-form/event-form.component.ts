@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, A
 import { EventService } from '../../services/event.service';
 import { CalendarEvent } from '../../interfaces/event-calendar.component';
 import { Router, ActivatedRoute } from '@angular/router';
+import { SchoolService } from '../../services/school.service';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -61,7 +62,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
   eventId: number | null = null;
 
   categories: string[] = ['Academic', 'Sports', 'Cultural', 'Social', 'Holiday', 'Meeting', 'Other'];
-  targetAudiences: string[] = ['ALL', 'TEACHERS', 'STUDENTS', 'Play group', 'NURSERY', 'LGK', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+  targetAudiences: string[] = ['ALL', 'TEACHERS', 'STUDENTS'];
+  classList: string[] = [];
 
   // Image related properties
   selectedFile: File | null = null;
@@ -76,7 +78,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private logger: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private schoolService: SchoolService
   ) {
     this.eventForm = this.fb.group({
       title: ['', Validators.required],
@@ -99,6 +102,11 @@ export class EventFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
+      next: classes => { this.classList = classes; this.targetAudiences = ['ALL', 'TEACHERS', 'STUDENTS', ...classes]; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = params.get('id');
       if (id) {

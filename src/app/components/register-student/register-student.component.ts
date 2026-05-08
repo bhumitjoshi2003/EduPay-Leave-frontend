@@ -5,6 +5,7 @@ import { EMPTY, Subject, takeUntil } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { StudentService } from '../../services/student.service';
 import { Router } from '@angular/router';
+import { SchoolService } from '../../services/school.service';
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth.service';
@@ -20,18 +21,15 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   studentForm: FormGroup;
   isBusUser = false;
-  classList: string[] = [
-    'Play group', 'Nursery', 'LKG', 'UKG',
-    '1', '2', '3', '4', '5', '6', '7',
-    '8', '9', '10', '11', '12'
-  ];
+  classList: string[] = [];
 
   constructor(
     private fb: FormBuilder,
     private studentService: StudentService,
     private router: Router,
     private authService: AuthService,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private schoolService: SchoolService
   ) {
     this.studentForm = this.fb.group({
       studentId: ['', Validators.required],
@@ -55,6 +53,11 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
+      next: classes => { this.classList = classes; },
+      error: () => {}
+    });
+
     this.studentForm.get('takesBus')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
       this.isBusUser = value;
       if (this.isBusUser) {

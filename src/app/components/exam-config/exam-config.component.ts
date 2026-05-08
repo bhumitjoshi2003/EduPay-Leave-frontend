@@ -6,8 +6,7 @@ import Swal from 'sweetalert2';
 import { ExamConfigService, ExamConfig, ExamSubjectEntry } from '../../services/exam-config.service';
 import { LoggerService } from '../../services/logger.service';
 import { FeesCalculationService } from '../../services/fees-calculation.service';
-
-const ALL_CLASSES = ['1','2','3','4','5','6','7','8','9','10','11','12'];
+import { SchoolService } from '../../services/school.service';
 
 @Component({
   selector: 'app-exam-config',
@@ -20,8 +19,8 @@ const ALL_CLASSES = ['1','2','3','4','5','6','7','8','9','10','11','12'];
 export class ExamConfigComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  classOptions = ALL_CLASSES;
-  selectedClass = '1';
+  classOptions: string[] = [];
+  selectedClass = '';
   selectedSession = '';
   sessions: string[] = [];
 
@@ -40,13 +39,24 @@ export class ExamConfigComponent implements OnInit, OnDestroy {
   constructor(
     private examService: ExamConfigService,
     private feesCalc: FeesCalculationService,
+    private schoolService: SchoolService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService
   ) { }
 
   ngOnInit(): void {
     this.buildSessions();
-    this.loadExams();
+    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
+      next: classes => {
+        this.classOptions = classes;
+        if (!this.selectedClass && classes.length > 0) {
+          this.selectedClass = classes[0];
+        }
+        this.cdr.markForCheck();
+        this.loadExams();
+      },
+      error: e => this.logger.error('Failed to load classes', e),
+    });
   }
 
   ngOnDestroy(): void {

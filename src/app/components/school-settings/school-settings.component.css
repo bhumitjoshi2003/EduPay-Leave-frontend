@@ -1,0 +1,217 @@
+.ss-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 8px 0 40px;
+}
+
+.ss-header {
+  margin-bottom: 24px;
+}
+.ss-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+.ss-subtitle {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Tabs */
+.ss-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid #e8ecf2;
+  margin-bottom: 24px;
+}
+.ss-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.ss-tab.active {
+  color: #4fbdbd;
+  border-bottom-color: #4fbdbd;
+}
+.ss-tab:hover:not(.active) { color: #0f172a; }
+
+.ss-configured-badge {
+  font-size: 10px;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #15803d;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+/* Loading */
+.ss-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 0;
+  color: #64748b;
+  font-size: 14px;
+}
+.ss-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #4fbdbd;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Card */
+.ss-card {
+  background: #fff;
+  border: 1px solid #e8ecf2;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.ss-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ss-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* Info grid */
+.ss-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.ss-info-row {
+  display: flex;
+  padding: 11px 0;
+  border-bottom: 1px solid #f1f5f9;
+  gap: 16px;
+}
+.ss-info-row:last-child { border-bottom: none; }
+.ss-label {
+  width: 160px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+.ss-value {
+  flex: 1;
+  font-size: 14px;
+  color: #0f172a;
+  word-break: break-word;
+}
+.ss-badge {
+  display: inline-block;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+
+/* Form */
+.ss-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.ss-field { display: flex; flex-direction: column; gap: 5px; }
+.ss-field-full { grid-column: 1 / -1; }
+.ss-field-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #475569;
+}
+.ss-input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+}
+.ss-input:focus { border-color: #4fbdbd; }
+
+.ss-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Buttons */
+.ss-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s, opacity 0.2s;
+}
+.ss-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ss-btn-primary { background: #4fbdbd; color: #fff; }
+.ss-btn-primary:hover:not(:disabled) { background: #3ea9a9; }
+.ss-btn-outline {
+  background: transparent;
+  border: 1.5px solid #e2e8f0;
+  color: #475569;
+}
+.ss-btn-outline:hover:not(:disabled) { background: #f8fafc; }
+
+/* Status chips */
+.ss-status-chip {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.ss-chip-ok { background: #dcfce7; color: #15803d; }
+.ss-chip-warn { background: #fef9c3; color: #854d0e; }
+
+.ss-rp-desc {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .ss-form-grid { grid-template-columns: 1fr; }
+  .ss-label { width: 120px; }
+  .ss-card { padding: 16px; }
+}

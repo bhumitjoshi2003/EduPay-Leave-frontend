@@ -23,6 +23,11 @@ export interface ClassStats {
   attendanceRate: number;
 }
 
+export interface AttendanceTrend {
+  period: string;
+  rate: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class DashboardAnalyticsService {
   private base = `${environment.apiUrl}/dashboard`;
@@ -39,5 +44,11 @@ export class DashboardAnalyticsService {
 
   getClassStats(): Observable<ClassStats[]> {
     return this.http.get<ClassStats[]>(`${this.base}/class-stats`);
+  }
+
+  getAttendanceTrend(className: string, mode: 'weekly' | 'monthly'): Observable<AttendanceTrend[]> {
+    return this.http.get<AttendanceTrend[]>(`${this.base}/attendance-trend`, {
+      params: { className, mode }
+    });
   }
 }

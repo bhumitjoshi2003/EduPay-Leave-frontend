@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 import { from, concatMap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { LeaveApplication, LeaveService, PaginatedResponse } from '../../services/leave.service';
+import { SchoolService } from '../../services/school.service';
 
 @Component({
   selector: 'app-view-leaves',
@@ -37,9 +38,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   loggedInUserClass: string = '';
   filteredLeaves: LeaveApplication[] = [];
 
-  classList: string[] = [
-    'Play group', 'Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
-  ];
+  classList: string[] = [];
   selectedClass: string = 'all';
   selectedDate: Date | null = null;
   studentIdFilter: string = '';
@@ -59,10 +58,16 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
     private teacherService: TeacherService,
     private authStateService: AuthStateService,
     private logger: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private schoolService: SchoolService
   ) { }
 
   ngOnInit(): void {
+    this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: classes => { this.classList = classes; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+
     this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
       const studentIdFromParams = params['studentId'];
       if (studentIdFromParams) {

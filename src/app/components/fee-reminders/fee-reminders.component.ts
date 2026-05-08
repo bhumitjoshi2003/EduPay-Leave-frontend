@@ -8,7 +8,7 @@ import { SchoolService } from '../../services/school.service';
 import { OverdueStudent } from '../../interfaces/fee-reminder';
 import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
 import { MODULE_MESSAGES } from '../../config/module-messages.config';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-fee-reminders',
@@ -24,7 +24,7 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
   classList: string[] = [];
 
   comingSoonConfig = MODULE_MESSAGES.feesReminder;
-  showFeesReminderModule: boolean = false;
+  showFeesReminderModule: boolean = true;
   sessions: string[] = [];
   selectedSession = '';
   selectedClass = '';
@@ -48,13 +48,14 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
     private feeReminderService: FeeReminderService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
-    private schoolService: SchoolService
-  ) {}
+    private schoolService: SchoolService,
+    private toast: ToastService
+  ) { }
 
   ngOnInit(): void {
     this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
       next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-      error: () => {}
+      error: () => { }
     });
 
     this.initSessions();
@@ -191,7 +192,7 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
           this.logger.error('Failed to send reminder:', err);
           this.sendingId = null;
           this.cdr.markForCheck();
-          Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to send reminder. Please try again.' });
+          this.toast.error('Error', 'Failed to send reminder. Please try again.');
         }
       });
   }
@@ -199,19 +200,18 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
   sendAllReminders(): void {
     const unsent = this.filteredStudents.filter(s => !this.reminderSent.has(s.studentId));
     if (unsent.length === 0) {
-      Swal.fire({ icon: 'info', title: 'All done', text: 'Reminders already sent to all students shown.' });
+      this.toast.info('All done', 'Reminders already sent to all students shown.');
       return;
     }
 
-    Swal.fire({
+    this.toast.confirm({
       title: `Send reminders to ${unsent.length} student${unsent.length > 1 ? 's' : ''}?`,
-      text: 'A fee reminder will be sent to each parent.',
+      message: 'A fee reminder will be sent to each parent.',
       icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#1e3a5f',
-      confirmButtonText: 'Yes, send all'
-    }).then(result => {
-      if (!result.isConfirmed) return;
+      confirmText: 'Yes, send all',
+      cancelText: 'Cancel',
+    }).then(confirmed => {
+      if (!confirmed) return;
 
       this.sendingBulk = true;
       this.cdr.markForCheck();
@@ -223,19 +223,13 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
             ids.forEach(id => this.reminderSent.add(id));
             this.sendingBulk = false;
             this.cdr.markForCheck();
-            Swal.fire({
-              icon: 'success',
-              title: 'Reminders sent!',
-              text: `Successfully sent ${res.sent} reminder${res.sent !== 1 ? 's' : ''}.`,
-              timer: 2500,
-              showConfirmButton: false
-            });
+            this.toast.success('Reminders sent!', `Successfully sent ${res.sent} reminder${res.sent !== 1 ? 's' : ''}.`);
           },
           error: (err) => {
             this.logger.error('Failed to send bulk reminders:', err);
             this.sendingBulk = false;
             this.cdr.markForCheck();
-            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to send reminders. Please try again.' });
+            this.toast.error('Error', 'Failed to send reminders. Please try again.');
           }
         });
     });

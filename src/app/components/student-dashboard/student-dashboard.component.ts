@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Subject, forkJoin, takeUntil } from 'rxjs';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 
 import { AuthStateService } from '../../auth/auth-state.service';
 import { StudentService } from '../../services/student.service';
@@ -47,7 +47,8 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     private attendanceService: AttendanceService,
     private leaveService: LeaveService,
     private logger: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -73,7 +74,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
           this.logger.error('Failed to load student', err);
           this.isLoading = false;
           this.cdr.markForCheck();
-          Swal.fire('Error', 'Failed to load student profile.', 'error');
+          this.toast.error('Error', 'Failed to load student profile.');
         },
       });
   }
@@ -120,7 +121,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
           this.logger.error('Failed to load dashboard data', err);
           this.isLoading = false;
           this.cdr.markForCheck();
-          Swal.fire('Error', 'Failed to load dashboard data.', 'error');
+          this.toast.error('Error', 'Failed to load dashboard data.');
         },
       });
   }

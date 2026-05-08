@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 import { Admin } from '../../interfaces/admin';
 
 @Component({
@@ -27,7 +27,8 @@ export class AdminListComponent implements OnInit, OnDestroy {
     private router: Router,
     private authStateService: AuthStateService,
     private logger: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -72,27 +73,26 @@ export class AdminListComponent implements OnInit, OnDestroy {
     event.stopPropagation();
 
     if (adminId === this.currentUserId) {
-      Swal.fire('Error', 'You cannot delete your own account.', 'error');
+      this.toast.error('Error', 'You cannot delete your own account.');
       return;
     }
 
-    Swal.fire({
+    this.toast.confirm({
       title: 'Are you sure?',
-      text: "This admin will be permanently removed!",
+      message: 'This admin will be permanently removed!',
       icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#64748b',
-      confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.adminService.deleteAdmin(adminId).subscribe({
+      danger: true,
+      confirmText: 'Yes, delete it!',
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (confirmed) {
+        this.adminService.deleteAdmin(adminId).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
           next: () => {
             this.admins = this.admins.filter(a => a.adminId !== adminId);
             this.cdr.markForCheck();
-            Swal.fire('Deleted!', 'Admin has been deleted.', 'success');
+            this.toast.success('Deleted!', 'Admin has been deleted.');
           },
-          error: (err) => Swal.fire('Error', 'Failed to delete admin.', 'error')
+          error: () => this.toast.error('Error', 'Failed to delete admin.')
         });
       }
     });

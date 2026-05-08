@@ -8,7 +8,7 @@ import { SchoolService } from '../../services/school.service';
 import { Notification } from '../../interfaces/notification';
 import { UserNotification } from '../../interfaces/user-notification';
 import { LoggerService } from '../../services/logger.service';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-notice',
@@ -51,7 +51,8 @@ export class NoticeComponent implements OnInit, OnDestroy {
     private authStateService: AuthStateService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
-    private schoolService: SchoolService
+    private schoolService: SchoolService,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -106,22 +107,21 @@ export class NoticeComponent implements OnInit, OnDestroy {
 
   postNotice(): void {
     if (!this.form.title.trim() || !this.form.body.trim() || !this.form.targetAudience) {
-      Swal.fire('Incomplete', 'Please fill in all required fields.', 'warning');
+      this.toast.warning('Incomplete', 'Please fill in all required fields.');
       return;
     }
     if (this.requiresSubject && !this.form.subject.trim()) {
-      Swal.fire('Incomplete', 'Subject is required for email delivery.', 'warning');
+      this.toast.warning('Incomplete', 'Subject is required for email delivery.');
       return;
     }
 
-    Swal.fire({
+    this.toast.confirm({
       title: 'Post this notice?',
       icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#1f6f8b',
-      confirmButtonText: 'Yes, post it',
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+      confirmText: 'Yes, post it',
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (!confirmed) return;
       this.submitting = true;
       this.cdr.markForCheck();
 
@@ -139,13 +139,13 @@ export class NoticeComponent implements OnInit, OnDestroy {
           next: () => {
             this.submitting = false;
             this.form = { title: '', subject: '', body: '', targetAudience: '', deliveryMode: 'BOTH' };
-            Swal.fire({ icon: 'success', title: 'Notice Posted!', text: 'The notice has been sent successfully.', timer: 1800, showConfirmButton: false });
+            this.toast.success('Notice Posted!', 'The notice has been sent successfully.');
             this.loadData();
           },
           error: (e) => {
             this.submitting = false;
             this.logger.error('Error posting notice:', e);
-            Swal.fire('Error', 'Failed to post the notice. Please try again.', 'error');
+            this.toast.error('Error', 'Failed to post the notice. Please try again.');
             this.cdr.markForCheck();
           },
         });
@@ -172,7 +172,7 @@ export class NoticeComponent implements OnInit, OnDestroy {
 
   saveEdit(): void {
     if (!this.editForm.title.trim() || !this.editForm.message.trim()) {
-      Swal.fire('Incomplete', 'Title and message are required.', 'warning');
+      this.toast.warning('Incomplete', 'Title and message are required.');
       return;
     }
     this.notificationService.updateNotification(this.editingId!, this.editForm as Notification)
@@ -180,12 +180,12 @@ export class NoticeComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.editingId = null;
-          Swal.fire({ icon: 'success', title: 'Updated', timer: 1200, showConfirmButton: false });
+          this.toast.success('Updated', 'Notice has been updated successfully.');
           this.loadData();
         },
         error: (e) => {
           this.logger.error('Error updating notice:', e);
-          Swal.fire('Error', 'Failed to update the notice.', 'error');
+          this.toast.error('Error', 'Failed to update the notice.');
         },
       });
   }
@@ -193,26 +193,26 @@ export class NoticeComponent implements OnInit, OnDestroy {
   // ── Admin: delete notice ─────────────────────────────────────────────
 
   deleteNotice(id: number): void {
-    Swal.fire({
+    this.toast.confirm({
       title: 'Delete this notice?',
-      text: 'This action cannot be undone.',
+      message: 'This action cannot be undone.',
       icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete',
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+      danger: true,
+      confirmText: 'Yes, delete',
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (!confirmed) return;
       this.notificationService.deleteNotification(id)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
             this.allNotices = this.allNotices.filter(n => n.id !== id);
-            Swal.fire({ icon: 'success', title: 'Deleted', timer: 1200, showConfirmButton: false });
+            this.toast.success('Deleted', 'Notice has been deleted.');
             this.cdr.markForCheck();
           },
           error: (e) => {
             this.logger.error('Error deleting notice:', e);
-            Swal.fire('Error', 'Failed to delete the notice.', 'error');
+            this.toast.error('Error', 'Failed to delete the notice.');
           },
         });
     });

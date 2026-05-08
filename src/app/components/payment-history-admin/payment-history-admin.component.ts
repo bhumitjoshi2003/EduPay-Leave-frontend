@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 import { PaymentHistory } from '../../interfaces/payment-history';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
@@ -57,7 +57,7 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
   totalPages: number = 0;
   pageSizes: number[] = [5, 10, 20, 50];
 
-  constructor(private router: Router, private paymentHistoryService: PaymentHistoryService, private datePipe: DatePipe, private logger: LoggerService, private cdr: ChangeDetectorRef, private schoolService: SchoolService) { }
+  constructor(private router: Router, private paymentHistoryService: PaymentHistoryService, private datePipe: DatePipe, private logger: LoggerService, private cdr: ChangeDetectorRef, private schoolService: SchoolService, private toast: ToastService) { }
 
   ngOnInit(): void {
     this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
@@ -116,7 +116,7 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
         this.totalElements = 0;
         this.totalPages = 0;
         this.cdr.markForCheck();
-        Swal.fire('Error!', 'Failed to load payment history.', 'error');
+        this.toast.error('Error!', 'Failed to load payment history.');
       }
     });
   }
@@ -164,7 +164,7 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
         this.logger.error('Error downloading payment receipt:', err);
         this.loading = false;
         this.cdr.markForCheck();
-        Swal.fire('Error!', 'Failed to download payment receipt.', 'error');
+        this.toast.error('Error!', 'Failed to download payment receipt.');
       },
     });
   }

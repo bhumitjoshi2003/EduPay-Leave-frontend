@@ -5,7 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { SchoolService, SchoolSettings } from '../../services/school.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { LoggerService } from '../../services/logger.service';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-school-settings',
@@ -37,7 +37,8 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
     private schoolService: SchoolService,
     private authStateService: AuthStateService,
     private cdr: ChangeDetectorRef,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -62,7 +63,7 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
       },
       error: (e) => {
         this.logger.error('Failed to load school settings', e);
-        Swal.fire({ title: 'Error', text: 'Failed to load school settings.', icon: 'error', confirmButtonColor: '#4f46e5' });
+        this.toast.error('Error', 'Failed to load school settings.');
         this.loading = false;
         this.cdr.markForCheck();
       }
@@ -92,7 +93,7 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
 
   saveSettings(): void {
     if (!this.editForm.name?.trim()) {
-      Swal.fire({ title: 'Validation', text: 'School name is required.', icon: 'warning', confirmButtonColor: '#4f46e5' });
+      this.toast.warning('Validation', 'School name is required.');
       return;
     }
     this.saving = true;
@@ -103,12 +104,12 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
         this.isEditing = false;
         this.editForm = {};
         this.saving = false;
-        Swal.fire({ title: 'Saved', text: 'School settings updated successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
+        this.toast.success('Saved', 'School settings updated successfully.');
         this.cdr.markForCheck();
       },
       error: (e) => {
         this.logger.error('Failed to save school settings', e);
-        Swal.fire({ title: 'Error', text: 'Failed to save settings. Please try again.', icon: 'error', confirmButtonColor: '#4f46e5' });
+        this.toast.error('Error', 'Failed to save settings. Please try again.');
         this.saving = false;
         this.cdr.markForCheck();
       }
@@ -117,7 +118,7 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
 
   saveRazorpayKeys(): void {
     if (!this.razorpayKeyId.trim() || !this.razorpayKeySecret.trim()) {
-      Swal.fire({ title: 'Validation', text: 'Both Razorpay Key ID and Key Secret are required.', icon: 'warning', confirmButtonColor: '#4f46e5' });
+      this.toast.warning('Validation', 'Both Razorpay Key ID and Key Secret are required.');
       return;
     }
     this.savingRazorpay = true;
@@ -128,12 +129,12 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
           this.razorpayKeySecret = '';
           this.savingRazorpay = false;
           if (this.settings) this.settings.razorpayConfigured = true;
-          Swal.fire({ title: 'Saved', text: 'Razorpay keys updated successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
+          this.toast.success('Saved', 'Razorpay keys updated successfully.');
           this.cdr.markForCheck();
         },
         error: (e) => {
           this.logger.error('Failed to save Razorpay keys', e);
-          Swal.fire({ title: 'Error', text: 'Failed to save Razorpay keys. Please try again.', icon: 'error', confirmButtonColor: '#4f46e5' });
+          this.toast.error('Error', 'Failed to save Razorpay keys. Please try again.');
           this.savingRazorpay = false;
           this.cdr.markForCheck();
         }

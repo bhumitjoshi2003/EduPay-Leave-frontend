@@ -8,7 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, forkJoin, takeUntil } from 'rxjs';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 
 import {
   SchoolService,
@@ -87,7 +87,8 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
   constructor(
     private schoolService: SchoolService,
     private logger: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -119,7 +120,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
           this.logger.error('Failed to load super admin data', err);
           this.loading = false;
           this.cdr.markForCheck();
-          Swal.fire('Error', 'Failed to load dashboard data.', 'error');
+          this.toast.error('Error', 'Failed to load dashboard data.');
         },
       });
   }
@@ -127,7 +128,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
   submitOnboard(): void {
     const error = this.validateOnboardForm();
     if (error) {
-      Swal.fire('Validation Error', error, 'warning');
+      this.toast.warning('Validation Error', error);
       return;
     }
 
@@ -144,18 +145,14 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
           this.onboardForm = this.emptyOnboardForm();
           this.onboarding = false;
           this.cdr.markForCheck();
-          Swal.fire({
-            icon: 'success',
-            title: 'School Onboarded',
-            text: `${school.name} has been successfully onboarded.`,
-          });
+          this.toast.success('School Onboarded', `${school.name} has been successfully onboarded.`);
         },
         error: (err) => {
           this.logger.error('Onboard failed', err);
           this.onboarding = false;
           this.cdr.markForCheck();
           const msg = err?.error?.message ?? err?.error ?? 'Failed to onboard school.';
-          Swal.fire('Error', typeof msg === 'string' ? msg : 'Failed to onboard school.', 'error');
+          this.toast.error('Error', typeof msg === 'string' ? msg : 'Failed to onboard school.');
         },
       });
   }
@@ -229,7 +226,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
 
     const error = this.validateEditForm();
     if (error) {
-      Swal.fire('Validation Error', error, 'warning');
+      this.toast.warning('Validation Error', error);
       return;
     }
 
@@ -256,43 +253,43 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
                   this.saving = false;
                   this.editingSchoolId = null;
                   this.cdr.markForCheck();
-                  Swal.fire('Saved', 'School updated and password reset.', 'success');
+                  this.toast.success('Saved', 'School updated and password reset.');
                 },
                 error: (err) => {
                   this.logger.error('Password reset failed', err);
                   this.saving = false;
                   this.editingSchoolId = null;
                   this.cdr.markForCheck();
-                  Swal.fire('Partial Save', 'School updated, but password reset failed.', 'warning');
+                  this.toast.warning('Partial Save', 'School updated, but password reset failed.');
                 },
               });
           } else {
             this.saving = false;
             this.editingSchoolId = null;
             this.cdr.markForCheck();
-            Swal.fire({ icon: 'success', title: 'Saved', timer: 1500, showConfirmButton: false });
+            this.toast.success('Saved');
           }
         },
         error: (err) => {
           this.logger.error('Save failed', err);
           this.saving = false;
           this.cdr.markForCheck();
-          Swal.fire('Error', 'Failed to save school settings.', 'error');
+          this.toast.error('Error', 'Failed to save school settings.');
         },
       });
   }
 
   confirmToggleActive(school: SchoolSettings): void {
     const action = school.active ? 'deactivate' : 'activate';
-    Swal.fire({
+    this.toast.confirm({
       title: `${action.charAt(0).toUpperCase() + action.slice(1)} School?`,
-      text: `Are you sure you want to ${action} "${school.name}"?`,
+      message: `Are you sure you want to ${action} "${school.name}"?`,
       icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: `Yes, ${action}`,
-      confirmButtonColor: school.active ? '#dc2626' : '#059669',
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+      confirmText: `Yes, ${action}`,
+      cancelText: 'Cancel',
+      danger: school.active,
+    }).then((confirmed) => {
+      if (!confirmed) return;
 
       this.schoolService
         .deleteSchool(school.id)
@@ -303,16 +300,11 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
               s.id === school.id ? { ...s, active: !s.active } : s
             );
             this.cdr.markForCheck();
-            Swal.fire({
-              icon: 'success',
-              title: `School ${action}d`,
-              timer: 1500,
-              showConfirmButton: false,
-            });
+            this.toast.success(`School ${action}d`);
           },
           error: (err) => {
             this.logger.error('Toggle active failed', err);
-            Swal.fire('Error', `Failed to ${action} school.`, 'error');
+            this.toast.error('Error', `Failed to ${action} school.`);
           },
         });
     });

@@ -10,7 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 import { from, concatMap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { LeaveApplication, LeaveService, PaginatedResponse } from '../../services/leave.service';
@@ -59,7 +59,8 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
     private authStateService: AuthStateService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
-    private schoolService: SchoolService
+    private schoolService: SchoolService,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -119,7 +120,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
       next: () => { },
       error: (error: any) => {
         this.logger.error('Error fetching teacher details or leaves:', error);
-        Swal.fire('Error!', 'Failed to load teacher details or leave applications.', 'error');
+        this.toast.error('Error!', 'Failed to load teacher details or leave applications.');
       }
     });
   }
@@ -162,7 +163,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.logger.error('Error loading leave applications:', error);
-          Swal.fire('Error!', 'Failed to load leave applications.', 'error');
+          this.toast.error('Error!', 'Failed to load leave applications.');
           this.filteredLeaves = [];
           this.totalElements = 0;
           this.totalPages = 0;
@@ -213,40 +214,31 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   deleteAllFilteredLeaves(): void {
     const deletable = this.filteredLeaves.filter(l => l.status !== 'APPROVED');
     if (deletable.length === 0) {
-      Swal.fire('Info', 'No deletable leaves on this page (approved leaves cannot be deleted).', 'info');
+      this.toast.info('Info', 'No deletable leaves on this page (approved leaves cannot be deleted).');
       return;
     }
 
-    Swal.fire({
+    this.toast.confirm({
       title: 'Are you sure?',
-      text: `You want to delete ${deletable.length} leave application(s) on this page? Approved leaves will be skipped.`,
+      message: `You want to delete ${deletable.length} leave application(s) on this page? Approved leaves will be skipped.`,
       icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#64748b',
-      confirmButtonText: 'Yes, delete!',
-    }).then((result) => {
-      if (result.isConfirmed) {
+      danger: true,
+      confirmText: 'Yes, delete!',
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (confirmed) {
         from(deletable).pipe(
           concatMap(leave => this.leaveService.deleteLeaveById(leave.id)),
           takeUntil(this.ngUnsubscribe)
         ).subscribe({
           next: () => { },
           complete: () => {
-            Swal.fire(
-              'Deleted!',
-              'All displayed leave applications deleted successfully.',
-              'success'
-            );
+            this.toast.success('Deleted!', 'All displayed leave applications deleted successfully.');
             this.fetchLeaves();
           },
           error: (error) => {
             this.logger.error('Error deleting leaves:', error);
-            Swal.fire(
-              'Error!',
-              'Failed to delete one or more leave applications.',
-              'error'
-            );
+            this.toast.error('Error!', 'Failed to delete one or more leave applications.');
             this.fetchLeaves();
           }
         });
@@ -255,24 +247,23 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   }
 
   deleteLeave(leaveId: number): void {
-    Swal.fire({
+    this.toast.confirm({
       title: 'Are you sure?',
-      text: 'You want to delete this leave application?',
+      message: 'You want to delete this leave application?',
       icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#64748b',
-      confirmButtonText: 'Yes, delete it!',
-    }).then((result) => {
-      if (result.isConfirmed) {
+      danger: true,
+      confirmText: 'Yes, delete it!',
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (confirmed) {
         this.leaveService.deleteLeaveById(leaveId).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
           next: (response) => {
-            Swal.fire('Deleted!', response, 'success');
+            this.toast.success('Deleted!', response);
             this.fetchLeaves();
           },
           error: (error) => {
             this.logger.error('Error deleting leave:', error);
-            Swal.fire('Error!', error?.error || 'Failed to delete the leave application.', 'error');
+            this.toast.error('Error!', error?.error || 'Failed to delete the leave application.');
           }
         });
       }
@@ -280,77 +271,59 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   }
 
   editLeaveStatus(leave: LeaveApplication): void {
-    Swal.fire({
-      title: 'Change Leave Status',
-      text: `${leave.studentName} — ${leave.leaveDate}`,
-      input: 'select',
-      inputOptions: {
-        PENDING: 'Pending',
-        APPROVED: 'Approved',
-        REJECTED: 'Rejected',
-      },
-      inputValue: leave.status ?? 'PENDING',
-      showCancelButton: true,
-      confirmButtonColor: '#1e3a5f',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Update',
-      inputAttributes: { 'aria-label': 'Select new status' },
-    }).then((result) => {
-      if (result.isConfirmed && result.value) {
-        const newStatus = result.value as string;
-        if (newStatus === leave.status) return;
-        this.leaveService.updateLeaveStatus(leave.id, newStatus)
-          .pipe(takeUntil(this.ngUnsubscribe))
-          .subscribe({
-            next: (updated) => {
-              leave.status = updated.status;
-              this.cdr.markForCheck();
-              Swal.fire({
-                title: 'Updated!',
-                text: `Status changed to ${updated.status}.`,
-                icon: 'success',
-                timer: 1800,
-                showConfirmButton: false,
-              });
-            },
-            error: (error) => {
-              this.logger.error('Error updating leave status:', error);
-              Swal.fire('Error!', error?.error || 'Failed to update leave status.', 'error');
-            }
-          });
-      }
+    const newStatus = leave.status === 'APPROVED' ? 'REJECTED' : 'APPROVED';
+    const isApprove = newStatus === 'APPROVED';
+    this.toast.confirm({
+      title: 'Change Leave Status?',
+      html: `Mark <strong>${leave.studentName}</strong> (${leave.leaveDate}) as <strong>${newStatus}</strong>?`,
+      icon: 'question',
+      danger: !isApprove,
+      confirmText: `Yes, mark ${newStatus.toLowerCase()}`,
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (!confirmed) return;
+      this.leaveService.updateLeaveStatus(leave.id, newStatus)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe({
+          next: (updated) => {
+            leave.status = updated.status;
+            this.cdr.markForCheck();
+            this.toast.success('Updated!', `Status changed to ${updated.status}.`);
+          },
+          error: (error) => {
+            this.logger.error('Error updating leave status:', error);
+            this.toast.error('Error!', error?.error || 'Failed to update leave status.');
+          }
+        });
     });
   }
 
   updateLeaveStatus(leave: LeaveApplication, status: 'APPROVED' | 'REJECTED'): void {
     const action = status === 'APPROVED' ? 'approve' : 'reject';
-    Swal.fire({
+    this.toast.confirm({
       title: `${status === 'APPROVED' ? 'Approve' : 'Reject'} Leave?`,
-      text: `${leave.studentName} — ${leave.leaveDate}`,
+      message: `${leave.studentName} — ${leave.leaveDate}`,
       icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: status === 'APPROVED' ? '#198754' : '#dc3545',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: `Yes, ${action} it!`,
-    }).then((result) => {
-      if (result.isConfirmed) {
+      danger: status === 'REJECTED',
+      confirmText: `Yes, ${action} it!`,
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (confirmed) {
         this.leaveService.updateLeaveStatus(leave.id, status)
           .pipe(takeUntil(this.ngUnsubscribe))
           .subscribe({
             next: (updated) => {
               leave.status = updated.status;
               this.cdr.markForCheck();
-              Swal.fire({
-                title: status === 'APPROVED' ? 'Approved!' : 'Rejected!',
-                text: `Leave has been ${status.toLowerCase()}.`,
-                icon: status === 'APPROVED' ? 'success' : 'info',
-                timer: 1800,
-                showConfirmButton: false,
-              });
+              if (status === 'APPROVED') {
+                this.toast.success('Approved!', `Leave has been approved.`);
+              } else {
+                this.toast.info('Rejected!', `Leave has been rejected.`);
+              }
             },
             error: (error) => {
               this.logger.error('Error updating leave status:', error);
-              Swal.fire('Error!', error?.error || 'Failed to update leave status.', 'error');
+              this.toast.error('Error!', error?.error || 'Failed to update leave status.');
             }
           });
       }

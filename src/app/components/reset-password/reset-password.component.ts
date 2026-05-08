@@ -2,8 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestro
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
-import Swal from 'sweetalert2';
-
+import { ToastService } from '../../services/toast.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
@@ -30,7 +29,8 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toast: ToastService
   ) {
     this.resetForm = this.fb.group({
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
@@ -47,11 +47,11 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.resetToken = params['token'];
       if (!this.resetToken) {
-        Swal.fire({
-          icon: 'error',
+        this.toast.confirm({
           title: 'Invalid Reset Link',
-          text: 'The password reset link is invalid or missing.',
-          confirmButtonColor: '#1e3a5f',
+          message: 'The password reset link is invalid or missing.',
+          icon: 'danger',
+          confirmText: 'OK',
         }).then(() => {
           this.router.navigate(['/']);
         });
@@ -73,12 +73,11 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
         next: (response: any) => {
           this.loading = false;
           this.cdr.markForCheck();
-          Swal.fire({
-            icon: 'success',
+          this.toast.confirm({
             title: 'Password Reset Successful',
-            text: response.message || 'Your password has been reset. You can now sign in with your new password.',
-            confirmButtonColor: '#1e3a5f',
-            confirmButtonText: 'Sign In'
+            message: response.message || 'Your password has been reset. You can now sign in with your new password.',
+            icon: 'success',
+            confirmText: 'Sign In',
           }).then(() => {
             this.router.navigate(['/']);
           });
@@ -86,12 +85,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
         error: (error: any) => {
           this.loading = false;
           this.cdr.markForCheck();
-          Swal.fire({
-            icon: 'error',
-            title: 'Password Reset Failed',
-            text: error.error || 'The link may be invalid or expired. Please request a new reset link.',
-            confirmButtonColor: '#1e3a5f'
-          });
+          this.toast.error('Password Reset Failed', error.error || 'The link may be invalid or expired. Please request a new reset link.');
         }
       });
     } else {

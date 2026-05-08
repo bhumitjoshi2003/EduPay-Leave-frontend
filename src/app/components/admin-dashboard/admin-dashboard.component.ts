@@ -9,7 +9,6 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Subject, forkJoin, takeUntil } from 'rxjs';
-import Swal from 'sweetalert2';
 
 import { AuthStateService } from '../../auth/auth-state.service';
 import { AdminService } from '../../services/admin.service';
@@ -19,6 +18,7 @@ import {
 } from '../../services/dashboard-analytics.service';
 import { LeaveService, LeaveApplication } from '../../services/leave.service';
 import { LoggerService } from '../../services/logger.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -43,7 +43,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private analyticsService: DashboardAnalyticsService,
     private leaveService: LeaveService,
     private logger: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -83,7 +84,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
           this.logger.error('Failed to load dashboard stats', err);
           this.isLoading = false;
           this.cdr.markForCheck();
-          Swal.fire('Error', 'Failed to load dashboard data.', 'error');
+          this.toast.error('Error', 'Failed to load dashboard data.');
         },
       });
   }
@@ -101,11 +102,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         next: () => {
           this.recentLeaves = this.recentLeaves.filter((l) => l.id !== leaveId);
           this.cdr.markForCheck();
-          Swal.fire({ icon: 'success', title: 'Approved', timer: 1500, showConfirmButton: false });
+          this.toast.success('Approved', 'Leave has been approved.');
         },
         error: (err) => {
           this.logger.error('Approve failed', err);
-          Swal.fire('Error', 'Failed to approve leave.', 'error');
+          this.toast.error('Error', 'Failed to approve leave.');
         },
       });
   }
@@ -118,11 +119,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         next: () => {
           this.recentLeaves = this.recentLeaves.filter((l) => l.id !== leaveId);
           this.cdr.markForCheck();
-          Swal.fire({ icon: 'info', title: 'Rejected', timer: 1500, showConfirmButton: false });
+          this.toast.info('Rejected', 'Leave has been rejected.');
         },
         error: (err) => {
           this.logger.error('Reject failed', err);
-          Swal.fire('Error', 'Failed to reject leave.', 'error');
+          this.toast.error('Error', 'Failed to reject leave.');
         },
       });
   }

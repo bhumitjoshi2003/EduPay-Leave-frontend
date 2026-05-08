@@ -11,7 +11,7 @@ import { SchoolService } from '../../services/school.service';
 import { LoggerService } from '../../services/logger.service';
 import { TimetableEntry } from '../../interfaces/timetable';
 import { Teacher } from '../../interfaces/teacher';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-timetable',
@@ -77,7 +77,8 @@ export class TimetableComponent implements OnInit, OnDestroy {
     private authStateService: AuthStateService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
-    private schoolService: SchoolService
+    private schoolService: SchoolService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -258,7 +259,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
         this.modalSaving = false;
         this.showModal = false;
         this.loadClassTimetable();
-        Swal.fire({ icon: 'success', title: 'Saved!', timer: 1200, showConfirmButton: false });
+        this.toast.success('Saved!', 'Timetable entry saved successfully.');
       },
       error: (err) => {
         this.modalSaving = false;
@@ -273,25 +274,25 @@ export class TimetableComponent implements OnInit, OnDestroy {
 
   deleteEntry(): void {
     if (!this.modalForm.id) return;
-    Swal.fire({
+    this.toast.confirm({
       title: 'Delete this period?',
-      text: `${this.modalForm.subjectName} — ${this.dayLabels[this.modalForm.day]} Period ${this.modalForm.periodNumber}`,
+      message: `${this.modalForm.subjectName} — ${this.dayLabels[this.modalForm.day]} Period ${this.modalForm.periodNumber}`,
       icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete'
-    }).then(result => {
-      if (!result.isConfirmed) return;
+      danger: true,
+      confirmText: 'Yes, delete',
+      cancelText: 'Cancel',
+    }).then(confirmed => {
+      if (!confirmed) return;
       this.timetableService.deleteEntry(this.modalForm.id!)
         .pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.showModal = false;
             this.loadClassTimetable();
-            Swal.fire({ icon: 'success', title: 'Deleted', timer: 1200, showConfirmButton: false });
+            this.toast.success('Deleted', 'Timetable entry has been deleted.');
           },
           error: (err) => {
             this.logger.error('Failed to delete entry:', err);
-            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete. Please try again.' });
+            this.toast.error('Error', 'Failed to delete. Please try again.');
           }
         });
     });

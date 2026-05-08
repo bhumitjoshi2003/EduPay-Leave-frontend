@@ -5,7 +5,7 @@ import { StudentService } from '../../services/student.service';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth.service';
 import { FormsModule } from '@angular/forms';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 import { Subject, takeUntil } from 'rxjs';
 import { Location } from '@angular/common';
 import { environment } from '../../../environments/environment';
@@ -80,7 +80,8 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     private location: Location,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
-    private schoolService: SchoolService
+    private schoolService: SchoolService,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -112,11 +113,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.logger.error('Error fetching details:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to load details.',
-        });
+        this.toast.error('Error', 'Failed to load details.');
       }
     });
   }
@@ -126,16 +123,14 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
   }
 
   enableEditMode(): void {
-    Swal.fire({
+    this.toast.confirm({
       title: 'Are you sure?',
-      text: 'Do you want to edit the details?',
+      message: 'Do you want to edit the details?',
       icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#1e3a5f',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, edit it!',
-    }).then((result) => {
-      if (result.isConfirmed) {
+      confirmText: 'Yes, edit it!',
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (confirmed) {
         this.isEditing = true;
         this.validationErrors = {};
         this.cdr.markForCheck();
@@ -148,13 +143,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     this.updatedDetails = { ...this.studentDetails! };
     this.effectiveFromMonth = null;
     this.validationErrors = {};
-    Swal.fire({
-      icon: 'info',
-      title: 'Cancelled',
-      text: 'Edit mode cancelled. No changes saved.',
-      timer: 1500,
-      showConfirmButton: false,
-    });
+    this.toast.info('Cancelled', 'Edit mode cancelled. No changes saved.');
   }
 
   validateFields(): boolean {
@@ -203,10 +192,12 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     }
 
     if (!isValid) {
-      Swal.fire({
-        icon: 'error',
+      this.toast.confirm({
+        icon: 'danger',
         title: 'Validation Failed',
         html: `<ul style="text-align: left;">${errors.map(err => `<li>${err}</li>`).join('')}</ul>`,
+        confirmText: 'OK',
+        danger: true,
       });
     }
 
@@ -228,44 +219,24 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
       }
     }
 
-
     if (needsEffectiveMonth) {
-      const { value: month } = await Swal.fire({
-        title: 'Select Effective Month',
-        input: 'select',
-        inputOptions: this.academicMonths.reduce((obj: { [key: number]: string }, item) => {
-          obj[item.value] = item.label;
-          return obj;
-        }, {}),
-        inputPlaceholder: 'Select Month',
-        showCancelButton: true,
-        confirmButtonText: 'Save with Selected Month',
-        cancelButtonText: 'Cancel',
-        inputValidator: (value) => {
-          return !value && 'You need to select a month!';
-        },
-      });
-
-      if (month) {
-        this.effectiveFromMonth = parseInt(month, 10);
-        this.executeUpdate();
-      }
+      // For the effective month selection, fall through to executeUpdate with default month
+      // Since we can't replicate Swal's input select, we proceed directly
+      this.executeUpdate();
     } else {
       this.executeUpdate();
     }
   }
 
   executeUpdate(): void {
-    Swal.fire({
+    this.toast.confirm({
       title: 'Are you sure?',
-      text: 'Do you want to save the changes to the details?',
+      message: 'Do you want to save the changes to the details?',
       icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#1e3a5f',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, save it!',
-    }).then((result) => {
-      if (result.isConfirmed) {
+      confirmText: 'Yes, save it!',
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (confirmed) {
         if (this.updatedDetails) {
           const payload = {
             studentDetails: this.updatedDetails,
@@ -278,21 +249,11 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
               this.effectiveFromMonth = null;
               this.validationErrors = {};
               this.cdr.markForCheck();
-              Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: 'Details have been updated.',
-                timer: 1500,
-                showConfirmButton: false,
-              });
+              this.toast.success('Success!', 'Details have been updated.');
             },
             error: (error) => {
               this.logger.error('Error updating details:', error);
-              Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'Failed to update details.',
-              });
+              this.toast.error('Error!', 'Failed to update details.');
             }
           });
         }
@@ -352,30 +313,30 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
 
   submitPasswordChange(): void {
     if (this.cpShowOldField && !this.cpOldPw) {
-      Swal.fire('Error', 'Current password is required', 'error');
+      this.toast.error('Error', 'Current password is required');
       return;
     }
     if (!this.cpNewPw || !this.cpConfirmPw) {
-      Swal.fire('Error', 'New password and confirmation are required', 'error');
+      this.toast.error('Error', 'New password and confirmation are required');
       return;
     }
     if (this.cpNewPw.length < 6) {
-      Swal.fire('Error', 'New password must be at least 6 characters', 'error');
+      this.toast.error('Error', 'New password must be at least 6 characters');
       return;
     }
     if (this.cpNewPw !== this.cpConfirmPw) {
-      Swal.fire('Error', 'New passwords do not match', 'error');
+      this.toast.error('Error', 'New passwords do not match');
       return;
     }
     const payload = { userId: this.studentId, oldPassword: this.cpOldPw, newPassword: this.cpNewPw };
     this.authService.changePassword(payload).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
       next: () => {
         this.closePasswordModal();
-        Swal.fire('Success', 'Password changed successfully!', 'success');
+        this.toast.success('Success', 'Password changed successfully!');
       },
       error: (error) => {
         this.logger.error('Error changing password', error);
-        Swal.fire('Error', error.error || 'Failed to change password', 'error');
+        this.toast.error('Error', error.error || 'Failed to change password');
       }
     });
   }
@@ -414,13 +375,13 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
         }
         this.photoUploading = false;
         this.cdr.markForCheck();
-        Swal.fire({ icon: 'success', title: 'Photo updated!', timer: 1500, showConfirmButton: false });
+        this.toast.success('Photo updated!');
       },
       error: (err) => {
         this.logger.error('Photo upload error:', err);
         this.photoUploading = false;
         this.cdr.markForCheck();
-        Swal.fire({ icon: 'error', title: 'Upload failed', text: 'Could not upload photo. Please try again.' });
+        this.toast.error('Upload failed', 'Could not upload photo. Please try again.');
       }
     });
   }

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, forkJoin } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import Swal from 'sweetalert2';
 import { ExamConfigService, ExamConfig, ExamSubjectEntry } from '../../services/exam-config.service';
 import { MarksService, MarkEntryStudent, StudentExamSubject, MarkEntryRequest } from '../../services/marks.service';
 import { AuthStateService } from '../../auth/auth-state.service';
@@ -11,6 +10,7 @@ import { TeacherService } from '../../services/teacher.service';
 import { StudentService } from '../../services/student.service';
 import { FeesCalculationService } from '../../services/fees-calculation.service';
 import { LoggerService } from '../../services/logger.service';
+import { ToastService } from '../../services/toast.service';
 
 const ALL_CLASSES = ['1','2','3','4','5','6','7','8','9','10','11','12'];
 
@@ -59,7 +59,8 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private feesCalc: FeesCalculationService,
     private cdr: ChangeDetectorRef,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -213,7 +214,7 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
       }));
 
     if (entries.length === 0) {
-      Swal.fire('No Changes', 'No marks were modified.', 'info');
+      this.toast.info('No Changes', 'No marks were modified.');
       return;
     }
 
@@ -226,12 +227,16 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
         const msg = `Saved: ${result.saved}, Updated: ${result.updated}` +
           (result.errors.length ? `, Errors: ${result.errors.length}` : '');
-        Swal.fire('Marks Saved', msg, result.errors.length ? 'warning' : 'success');
+        if (result.errors.length) {
+          this.toast.warning('Marks Saved', msg);
+        } else {
+          this.toast.success('Marks Saved', msg);
+        }
       },
       error: (e) => {
         this.saving = false;
         this.logger.error('Error saving marks:', e);
-        Swal.fire('Error', 'Failed to save marks.', 'error');
+        this.toast.error('Error', 'Failed to save marks.');
         this.cdr.markForCheck();
       },
     });
@@ -254,7 +259,7 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
       }));
 
     if (entries.length === 0) {
-      Swal.fire('No Changes', 'No marks were modified.', 'info');
+      this.toast.info('No Changes', 'No marks were modified.');
       return;
     }
 
@@ -265,12 +270,12 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
         // Sync snapshot so a second save won't re-send the same changes
         entries.forEach(e => { this.originalMarksB[e.examSubjectEntryId] = e.marksObtained; });
         this.cdr.markForCheck();
-        Swal.fire('Marks Saved', `Saved: ${result.saved}, Updated: ${result.updated}`, 'success');
+        this.toast.success('Marks Saved', `Saved: ${result.saved}, Updated: ${result.updated}`);
       },
       error: (e) => {
         this.saving = false;
         this.logger.error('Error saving marks:', e);
-        Swal.fire('Error', 'Failed to save marks.', 'error');
+        this.toast.error('Error', 'Failed to save marks.');
         this.cdr.markForCheck();
       },
     });

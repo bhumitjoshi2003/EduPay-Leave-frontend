@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { StudentService, PromotionPreviewGroup, PromotionAction, PromotionResult } from '../../services/student.service';
 import { LoggerService } from '../../services/logger.service';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-student-promotion',
@@ -35,7 +35,8 @@ export class StudentPromotionComponent implements OnInit, OnDestroy {
   constructor(
     private studentService: StudentService,
     private logger: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -65,7 +66,7 @@ export class StudentPromotionComponent implements OnInit, OnDestroy {
       error: (e) => {
         this.logger.error('Error loading promotion preview:', e);
         this.isLoading = false;
-        Swal.fire({ title: 'Error', text: 'Failed to load students for promotion.', icon: 'error', confirmButtonColor: '#4f46e5' });
+        this.toast.error('Error', 'Failed to load students for promotion.');
         this.cdr.markForCheck();
       }
     });
@@ -97,25 +98,23 @@ export class StudentPromotionComponent implements OnInit, OnDestroy {
     const detained = this.detainedCount;
     const passedOut = this.passOutCount;
 
-    Swal.fire({
+    this.toast.confirm({
       title: 'Confirm Promotion',
       html: `
         <p style="margin-bottom:12px;color:#374151;">This will update <strong>${total}</strong> students:</p>
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-          <span style="background:#dcfce7;color:#166534;padding:6px 14px;border-radius:20px;font-weight:700;">✓ ${promoted} Promoted</span>
-          <span style="background:#fef9c3;color:#854d0e;padding:6px 14px;border-radius:20px;font-weight:700;">⟳ ${detained} Detained</span>
-          <span style="background:#f0f9ff;color:#0369a1;padding:6px 14px;border-radius:20px;font-weight:700;">🎓 ${passedOut} Passed Out</span>
+          <span style="background:#dcfce7;color:#166534;padding:6px 14px;border-radius:20px;font-weight:700;">${promoted} Promoted</span>
+          <span style="background:#fef9c3;color:#854d0e;padding:6px 14px;border-radius:20px;font-weight:700;">${detained} Detained</span>
+          <span style="background:#f0f9ff;color:#0369a1;padding:6px 14px;border-radius:20px;font-weight:700;">${passedOut} Passed Out</span>
         </div>
         <p style="margin-top:14px;font-size:0.85rem;color:#ef4444;font-weight:600;">This action cannot be undone easily. Please verify before confirming.</p>
       `,
       icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#0f172a',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Yes, Execute Promotion',
-      cancelButtonText: 'Cancel',
-    }).then((result) => {
-      if (result.isConfirmed) {
+      danger: true,
+      confirmText: 'Yes, Execute Promotion',
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (confirmed) {
         this.doExecute();
       }
     });
@@ -136,7 +135,7 @@ export class StudentPromotionComponent implements OnInit, OnDestroy {
       error: (e) => {
         this.logger.error('Error executing promotion:', e);
         this.isExecuting = false;
-        Swal.fire({ title: 'Error', text: 'Promotion failed. Please try again.', icon: 'error', confirmButtonColor: '#4f46e5' });
+        this.toast.error('Error', 'Promotion failed. Please try again.');
         this.cdr.markForCheck();
       }
     });

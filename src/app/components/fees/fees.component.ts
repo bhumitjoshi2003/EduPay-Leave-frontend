@@ -7,7 +7,7 @@ import { FeesService } from '../../services/fees.service';
 import { FeeStructureService } from '../../services/fee-structure.service';
 import { StudentService } from '../../services/student.service';
 import { BusFeesService } from '../../services/bus-fees.service';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 import { PaymentData } from '../../interfaces/payment-data';
 import { StudentFee } from '../../interfaces/student-fee';
 import { AuthStateService } from '../../auth/auth-state.service';
@@ -77,7 +77,8 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     private attendanceService: AttendanceService,
     private authStateService: AuthStateService,
     private feesCalc: FeesCalculationService,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private toast: ToastService
   ) { }
 
   comingSoonConfig = MODULE_MESSAGES.fees;
@@ -420,16 +421,8 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
       this.totalAmountToPay = 0;
       this.cdr.detectChanges();
 
-      Swal.fire({
-        title: '🎉 Payment Successful!',
-        text: 'Your payment has been processed successfully.',
-        icon: 'success',
-        confirmButtonText: 'OK',
-        timer: 3000,
-        timerProgressBar: true,
-      }).then(() => {
-        this.onPaymentProcessCompleted();
-      });
+      this.toast.success('Payment Successful!', 'Your payment has been processed successfully.');
+      this.onPaymentProcessCompleted();
     });
   }
 
@@ -442,20 +435,18 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
 
   markAsManuallyPaid(): void {
     if (this.role !== 'ADMIN' || !this.manualPaymentAmount || !this.selectedMonthsByYear[this.selectedYear]?.length) {
-      Swal.fire({ icon: 'warning', title: 'Warning', text: 'Please select months and enter the amount received.' });
+      this.toast.warning('Warning', 'Please select months and enter the amount received.');
       return;
     }
 
-    Swal.fire({
+    this.toast.confirm({
       title: 'Confirm Manual Payment',
-      text: `Mark selected months as manually paid with a total amount of ₹${this.manualPaymentAmount}?`,
+      message: `Mark selected months as manually paid with a total amount of ₹${this.manualPaymentAmount}?`,
       icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#1e3a5f',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, mark as paid!'
-    }).then((result) => {
-      if (result.isConfirmed) {
+      confirmText: 'Yes, mark as paid!',
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (confirmed) {
         this.feesService.processManualPayment(
           this.studentId,
           this.selectedMonthsByYear,
@@ -469,9 +460,9 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
             this.totalAmountToPay = 0;
             this.manualPaymentAmount = 0;
             this.cdr.detectChanges();
-            Swal.fire('Marked as Paid!', 'The selected months have been marked as paid.', 'success');
+            this.toast.success('Marked as Paid!', 'The selected months have been marked as paid.');
           },
-          error: () => Swal.fire('Error!', 'Failed to record manual payment.', 'error')
+          error: () => this.toast.error('Error!', 'Failed to record manual payment.')
         });
       }
     });

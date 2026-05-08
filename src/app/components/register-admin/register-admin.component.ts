@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { SchoolService, SchoolSettings } from '../../services/school.service';
 import { AuthStateService } from '../../auth/auth-state.service';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 @Component({
@@ -35,7 +35,8 @@ export class RegisterAdminComponent implements OnInit {
     private schoolService: SchoolService,
     private authState: AuthStateService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -51,7 +52,7 @@ export class RegisterAdminComponent implements OnInit {
         error: () => {
           this.schoolsLoading = false;
           this.cdr.markForCheck();
-          Swal.fire('Error', 'Failed to load school list.', 'error');
+          this.toast.error('Error', 'Failed to load school list.');
         }
       });
     }
@@ -64,41 +65,22 @@ export class RegisterAdminComponent implements OnInit {
   onSubmit(form: NgForm): void {
     if (form.invalid) {
       Object.values(form.controls).forEach(control => control.markAsTouched());
-      Swal.fire({
-        icon: 'error',
-        title: 'Form Invalid',
-        text: 'Please fill in all required fields correctly.',
-        confirmButtonColor: '#1f6f8b'
-      });
+      this.toast.error('Form Invalid', 'Please fill in all required fields correctly.');
       return;
     }
 
     if (this.isSuperAdmin && !this.adminData.schoolId) {
-      Swal.fire('Validation Error', 'Please select a school for this admin.', 'warning');
+      this.toast.warning('Validation Error', 'Please select a school for this admin.');
       return;
     }
 
-    Swal.fire({
-      title: 'Registering...',
-      text: 'Creating administrator account...',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
-    });
-
     this.adminService.createAdmin(this.adminData as any).subscribe({
       next: () => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success!',
-          text: 'New Administrator has been registered.',
-          timer: 2000,
-          showConfirmButton: false
-        }).then(() => {
-          this.router.navigate(['/dashboard/admin-list']);
-        });
+        this.toast.success('Success!', 'New Administrator has been registered.');
+        this.router.navigate(['/dashboard/admin-list']);
       },
       error: (err) => {
-        Swal.fire('Error', err.error?.message || 'Failed to register admin. Check if ID/Email exists.', 'error');
+        this.toast.error('Error', err.error?.message || 'Failed to register admin. Check if ID/Email exists.');
       }
     });
   }

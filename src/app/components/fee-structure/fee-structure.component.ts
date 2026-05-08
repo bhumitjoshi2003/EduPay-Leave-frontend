@@ -5,7 +5,7 @@ import { BusFeesComponent } from '../bus-fees/bus-fees.component';
 import { FeeStructure, FeeStructureService } from '../../services/fee-structure.service';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthStateService } from '../../auth/auth-state.service';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 import { LoggerService } from '../../services/logger.service';
 
 @Component({
@@ -31,7 +31,8 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
     private feeStructureService: FeeStructureService,
     private authStateService: AuthStateService,
     private cdr: ChangeDetectorRef,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private toast: ToastService
   ) { }
 
   ngOnDestroy(): void {
@@ -59,7 +60,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
       error: () => {
         this.isLoading = false;
         this.cdr.markForCheck();
-        Swal.fire('Error', 'Failed to load academic years.', 'error');
+        this.toast.error('Error', 'Failed to load academic years.');
       },
     });
   }
@@ -77,24 +78,21 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
       error: () => {
         this.isLoading = false;
         this.cdr.markForCheck();
-        Swal.fire('Error', 'Failed to load fee structures.', 'error');
+        this.toast.error('Error', 'Failed to load fee structures.');
       },
     });
   }
 
   changeSession(session: string): void {
     if (this.isEditing) {
-      Swal.fire({
+      this.toast.confirm({
         title: 'Confirm Navigation',
-        text: 'Unsaved changes will be lost. Do you want to continue?',
+        message: 'Unsaved changes will be lost. Do you want to continue?',
         icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#1e3a5f',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, continue!',
-        cancelButtonText: 'No, stay here',
-      }).then((result) => {
-        if (result.isConfirmed) {
+        confirmText: 'Yes, continue!',
+        cancelText: 'No, stay here',
+      }).then((confirmed) => {
+        if (confirmed) {
           this.currentSession = session;
           this.isEditing = false;
           this.isNewSessionStarted = false;
@@ -111,21 +109,17 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
 
   startNewAcademicYear(): void {
     const nextSession = this.getNextAvailableSession();
-    Swal.fire({
+    this.toast.confirm({
       title: 'Start New Academic Year?',
-      text: `Are you sure to start a new academic year: ${nextSession}?`,
+      message: `Are you sure to start a new academic year: ${nextSession}?`,
       icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#1e3a5f',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Yes, start!',
-      cancelButtonText: 'No, cancel',
-    }).then((result) => {
-      if (result.isConfirmed) {
+      confirmText: 'Yes, start!',
+      cancelText: 'No, cancel',
+    }).then((confirmed) => {
+      if (confirmed) {
         this.isNewSessionStarted = true;
         this.newSessionYear = nextSession;
 
-        const latestSession = this.sessions[this.sessions.length - 1];
         const newFeeStructures = this.feeStructures.map(fee => ({ ...fee, academicYear: nextSession }));
 
         this.sessions.push(nextSession);
@@ -148,71 +142,60 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
   }
 
   edit(): void {
-    Swal.fire({
+    this.toast.confirm({
       title: 'Enable Edit Mode?',
-      text: 'Do you want to enable editing of the fee structure?',
+      message: 'Do you want to enable editing of the fee structure?',
       icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#1e3a5f',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Yes, enable!',
-      cancelButtonText: 'No, cancel',
-    }).then((result) => {
-      if (result.isConfirmed) {
+      confirmText: 'Yes, enable!',
+      cancelText: 'No, cancel',
+    }).then((confirmed) => {
+      if (confirmed) {
         this.isEditing = true;
         this.cdr.markForCheck();
-        //  Swal.fire('Edit Mode Enabled!', '', 'success');
       }
     });
   }
 
   save(): void {
-    Swal.fire({
+    this.toast.confirm({
       title: 'Save Changes?',
-      text: 'Do you want to save the changes you have made?',
+      message: 'Do you want to save the changes you have made?',
       icon: 'question',
-      confirmButtonText: 'Save',
-      cancelButtonText: 'Cancel',
-      showCancelButton: true,
-    }).then((result) => {
-      if (result.isConfirmed) {
+      confirmText: 'Save',
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (confirmed) {
         this.isEditing = false;
         this.isNewSessionStarted = false;
         this.cdr.markForCheck();
         this.feeStructureService.updateFeeStructures(this.currentSession, this.feeStructures).subscribe(() => {
           this.originalFeeStructure = JSON.parse(JSON.stringify(this.feeStructures));
-          Swal.fire('Saved!', `Fee structure for ${this.currentSession} saved successfully.`, 'success');
+          this.toast.success('Saved!', `Fee structure for ${this.currentSession} saved successfully.`);
         }, (error) => {
-          Swal.fire('Error!', 'Failed to save the fee structure.', 'error');
+          this.toast.error('Error!', 'Failed to save the fee structure.');
           this.logger.error('Error saving fee structure:', error);
         });
-      } else if (result.isDenied) {
-        Swal.fire('Changes not saved', '', 'info');
       }
     });
   }
 
   cancel(): void {
     const title = this.isNewSessionStarted ? 'Discard New Session?' : 'Cancel Editing?';
-    const text = this.isNewSessionStarted
+    const message = this.isNewSessionStarted
       ? `Are you sure you want to discard the new academic year (${this.newSessionYear}) setup?`
       : 'Are you sure you want to cancel editing?';
-    const confirmButtonText = 'Yes, discard!';
-    const cancelButtonText = 'No, continue editing!';
 
-    Swal.fire({
-      title: title,
-      text: text,
+    this.toast.confirm({
+      title,
+      message,
       icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: confirmButtonText,
-      cancelButtonText: cancelButtonText,
-    }).then((result) => {
-      if (result.isConfirmed) {
+      confirmText: 'Yes, discard!',
+      cancelText: 'No, continue editing!',
+      danger: true,
+    }).then((confirmed) => {
+      if (confirmed) {
         this.isEditing = false;
-        const wasNewSessionStarted = this.isNewSessionStarted; // Store the value
+        const wasNewSessionStarted = this.isNewSessionStarted;
         this.isNewSessionStarted = false;
 
         if (wasNewSessionStarted) {
@@ -223,7 +206,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
             if (this.sessions.length > 0) {
               this.currentSession = this.sessions[this.sessions.length - 1];
             } else {
-              this.currentSession = ''; // Or a default value
+              this.currentSession = '';
               this.feeStructures = [];
             }
             this.fetchFeeStructures();
@@ -232,7 +215,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
           this.feeStructures = JSON.parse(JSON.stringify(this.originalFeeStructure));
           this.cdr.markForCheck();
         }
-        Swal.fire('Cancelled!', 'Your changes have been discarded.', 'info');
+        this.toast.info('Cancelled!', 'Your changes have been discarded.');
       }
     });
   }

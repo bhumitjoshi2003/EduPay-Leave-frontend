@@ -4,7 +4,7 @@ import { switchMap } from 'rxjs/operators';
 import { LoggerService } from '../../services/logger.service';
 import { RazorpayService, RazorpayOrderResponse, RazorpayPaymentResponse } from '../../services/razorpay.service';
 import { PaymentData } from '../../interfaces/payment-data';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 import { StudentService } from '../../services/student.service';
 
 declare var Razorpay: any;
@@ -22,7 +22,8 @@ export class PaymentComponent {
     private razorpayService: RazorpayService,
     private studentService: StudentService,
     private ngZone: NgZone,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private toast: ToastService
   ) { }
 
   @Input() paymentData: PaymentData = {
@@ -55,13 +56,8 @@ export class PaymentComponent {
   initiatePayment() {
     this.paymentProcessingStarted.emit();
     if (!this.paymentData || !this.paymentData.studentId) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Payment Error',
-        text: 'Payment data or student ID is missing.',
-      }).then(() => {
-        this.paymentProcessCompleted.emit();
-      });
+      this.toast.warning('Payment Error', 'Payment data or student ID is missing.');
+      this.paymentProcessCompleted.emit();
       return;
     }
     this.loadStudentDetails(this.paymentData.studentId);
@@ -72,11 +68,8 @@ export class PaymentComponent {
       switchMap((student) => {
         this.studentDetails = student;
         if (!this.paymentData) {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Payment Error',
-            text: 'Payment data or student details are missing.',
-          }).then(() => this.paymentProcessCompleted.emit());
+          this.toast.warning('Payment Error', 'Payment data or student details are missing.');
+          this.paymentProcessCompleted.emit();
           return EMPTY;
         }
         this.paymentData.totalAmount *= 100;
@@ -104,17 +97,7 @@ export class PaymentComponent {
           modal: {
             ondismiss: () => {
               this.ngZone.run(() => this.paymentProcessCompleted.emit());
-              Swal.fire({
-                icon: 'warning',
-                title: 'Payment Cancelled!',
-                text: 'Please try again if you wish to proceed.',
-                confirmButtonText: 'Okay',
-                confirmButtonColor: '#ff6b6b',
-                background: '#fef2f2',
-                color: '#b91c1c',
-                timer: 4000,
-                timerProgressBar: true
-              });
+              this.toast.warning('Payment Cancelled!', 'Please try again if you wish to proceed.');
             }
           }
         };
@@ -123,11 +106,8 @@ export class PaymentComponent {
       },
       error: (error) => {
         this.logger.error('Error fetching student details for payment:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to load student details for payment.',
-        }).then(() => this.paymentProcessCompleted.emit());
+        this.toast.error('Error', 'Failed to load student details for payment.');
+        this.paymentProcessCompleted.emit();
       }
     });
   }
@@ -138,24 +118,14 @@ export class PaymentComponent {
         if (result.success) {
           this.paymentSuccess.emit(paymentResponse);
         } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Verification Failed!',
-            text: 'Payment could not be verified. Please contact support.',
-          }).then(() => {
-            this.paymentProcessCompleted.emit();
-          });
+          this.toast.error('Verification Failed!', 'Payment could not be verified. Please contact support.');
+          this.paymentProcessCompleted.emit();
         }
       },
       error: (err) => {
         this.logger.error('Error during payment verification:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Verification Error!',
-          text: 'An error occurred during payment verification. Please try again or contact support.',
-        }).then(() => {
-          this.paymentProcessCompleted.emit();
-        });
+        this.toast.error('Verification Error!', 'An error occurred during payment verification. Please try again or contact support.');
+        this.paymentProcessCompleted.emit();
       }
     });
   }

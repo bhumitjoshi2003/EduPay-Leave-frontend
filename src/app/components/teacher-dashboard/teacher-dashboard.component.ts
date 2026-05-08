@@ -9,7 +9,6 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Subject, forkJoin, takeUntil } from 'rxjs';
-import Swal from 'sweetalert2';
 
 import { AuthStateService } from '../../auth/auth-state.service';
 import { TeacherService } from '../../services/teacher.service';
@@ -17,6 +16,7 @@ import { StudentService } from '../../services/student.service';
 import { AttendanceService } from '../../services/attendance.service';
 import { LeaveService, LeaveApplication } from '../../services/leave.service';
 import { LoggerService } from '../../services/logger.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -49,7 +49,8 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
     private attendanceService: AttendanceService,
     private leaveService: LeaveService,
     private logger: LoggerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -81,7 +82,7 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
           this.logger.error('Failed to load teacher', err);
           this.isLoading = false;
           this.cdr.markForCheck();
-          Swal.fire('Error', 'Failed to load teacher profile.', 'error');
+          this.toast.error('Error', 'Failed to load teacher profile.');
         },
       });
   }
@@ -126,7 +127,7 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
           this.logger.error('Failed to load class data', err);
           this.isLoading = false;
           this.cdr.markForCheck();
-          Swal.fire('Error', 'Failed to load class data.', 'error');
+          this.toast.error('Error', 'Failed to load class data.');
         },
       });
   }
@@ -140,11 +141,11 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
           this.recentLeaves = this.recentLeaves.filter((l) => l.id !== leaveId);
           this.pendingLeavesCount = Math.max(0, this.pendingLeavesCount - 1);
           this.cdr.markForCheck();
-          Swal.fire({ icon: 'success', title: 'Approved', timer: 1500, showConfirmButton: false });
+          this.toast.success('Approved', 'Leave has been approved.');
         },
         error: (err) => {
           this.logger.error('Approve failed', err);
-          Swal.fire('Error', 'Failed to approve leave.', 'error');
+          this.toast.error('Error', 'Failed to approve leave.');
         },
       });
   }
@@ -158,11 +159,11 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
           this.recentLeaves = this.recentLeaves.filter((l) => l.id !== leaveId);
           this.pendingLeavesCount = Math.max(0, this.pendingLeavesCount - 1);
           this.cdr.markForCheck();
-          Swal.fire({ icon: 'info', title: 'Rejected', timer: 1500, showConfirmButton: false });
+          this.toast.info('Rejected', 'Leave has been rejected.');
         },
         error: (err) => {
           this.logger.error('Reject failed', err);
-          Swal.fire('Error', 'Failed to reject leave.', 'error');
+          this.toast.error('Error', 'Failed to reject leave.');
         },
       });
   }

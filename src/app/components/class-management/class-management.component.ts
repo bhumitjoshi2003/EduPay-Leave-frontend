@@ -5,7 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { SchoolService, SchoolClass } from '../../services/school.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { LoggerService } from '../../services/logger.service';
-import Swal from 'sweetalert2';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-class-management',
@@ -29,7 +29,8 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
     private schoolService: SchoolService,
     private authStateService: AuthStateService,
     private cdr: ChangeDetectorRef,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -57,7 +58,7 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
       },
       error: (e) => {
         this.logger.error('Failed to load classes', e);
-        Swal.fire({ title: 'Error', text: 'Failed to load classes.', icon: 'error', confirmButtonColor: '#4f46e5' });
+        this.toast.error('Error', 'Failed to load classes.');
         this.isLoading = false;
         this.cdr.markForCheck();
       }
@@ -75,12 +76,12 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
         this.newClassName = '';
         this.addingClass = false;
         this.schoolService.invalidateClasses();
-        Swal.fire({ title: 'Added', text: `"${c.name}" added.`, icon: 'success', timer: 1500, showConfirmButton: false });
+        this.toast.success('Added', `"${c.name}" added.`);
         this.cdr.markForCheck();
       },
       error: (e) => {
         this.logger.error('Failed to add class', e);
-        Swal.fire({ title: 'Error', text: 'Could not add class. It may already exist.', icon: 'error', confirmButtonColor: '#4f46e5' });
+        this.toast.error('Error', 'Could not add class. It may already exist.');
         this.addingClass = false;
         this.cdr.markForCheck();
       }
@@ -88,32 +89,26 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
   }
 
   removeClass(cls: SchoolClass): void {
-    Swal.fire({
+    this.toast.confirm({
       title: `Remove "${cls.name}"?`,
-      text: 'This will remove the class. You can re-add it later.',
+      message: 'This will remove the class. You can re-add it later.',
       icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#dc2626',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Yes, remove',
-      cancelButtonText: 'Cancel',
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+      danger: true,
+      confirmText: 'Yes, remove',
+      cancelText: 'Cancel',
+    }).then((confirmed) => {
+      if (!confirmed) return;
       this.schoolService.deleteClass(cls.id).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           this.classes = this.classes.filter(c => c.id !== cls.id);
           this.schoolService.invalidateClasses();
-          Swal.fire({ title: 'Removed', text: `"${cls.name}" removed.`, icon: 'success', timer: 1500, showConfirmButton: false });
+          this.toast.success('Removed', `"${cls.name}" removed.`);
           this.cdr.markForCheck();
         },
         error: (e) => {
           this.logger.error('Failed to delete class', e);
           const reason = e?.error?.message;
-          if (reason) {
-            Swal.fire({ title: 'Cannot Remove Class', text: reason, icon: 'error', confirmButtonColor: '#4f46e5' });
-          } else {
-            Swal.fire({ title: 'Error', text: 'Could not remove class.', icon: 'error', confirmButtonColor: '#4f46e5' });
-          }
+          this.toast.error('Cannot Remove Class', reason || 'Could not remove class.');
           this.cdr.markForCheck();
         }
       });
@@ -137,12 +132,12 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
       next: () => {
         this.savingOrder = false;
         this.schoolService.invalidateClasses();
-        Swal.fire({ title: 'Saved', text: 'Class order saved.', icon: 'success', timer: 1500, showConfirmButton: false });
+        this.toast.success('Saved', 'Class order saved.');
         this.cdr.markForCheck();
       },
       error: (e) => {
         this.logger.error('Failed to reorder classes', e);
-        Swal.fire({ title: 'Error', text: 'Could not save order.', icon: 'error', confirmButtonColor: '#4f46e5' });
+        this.toast.error('Error', 'Could not save order.');
         this.savingOrder = false;
         this.cdr.markForCheck();
       }
@@ -155,12 +150,12 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
       next: (updated) => {
         this.classes = this.classes.map(c => c.id === updated.id ? updated : c);
         const msg = newValue ? `"${cls.name}" added to stream assignment.` : `"${cls.name}" removed from stream assignment.`;
-        Swal.fire({ title: newValue ? 'Stream On' : 'Stream Off', text: msg, icon: 'success', timer: 1500, showConfirmButton: false });
+        this.toast.success(newValue ? 'Stream On' : 'Stream Off', msg);
         this.cdr.markForCheck();
       },
       error: (e) => {
         this.logger.error('Failed to toggle stream eligibility', e);
-        Swal.fire({ title: 'Error', text: 'Could not update stream eligibility.', icon: 'error', confirmButtonColor: '#4f46e5' });
+        this.toast.error('Error', 'Could not update stream eligibility.');
       }
     });
   }

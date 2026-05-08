@@ -31,6 +31,10 @@ interface OnboardForm {
   adminUserId: string;
   adminEmail: string;
   adminPassword: string;
+  adminName: string;
+  adminPhone: string;
+  adminDob: string;
+  adminGender: string;
 }
 
 interface EditForm {
@@ -121,9 +125,9 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   submitOnboard(): void {
-    const f = this.onboardForm;
-    if (!f.name || !f.slug || !f.adminEmail || !f.adminPassword || !f.adminUserId) {
-      Swal.fire('Validation Error', 'Please fill in all required fields.', 'warning');
+    const error = this.validateOnboardForm();
+    if (error) {
+      Swal.fire('Validation Error', error, 'warning');
       return;
     }
 
@@ -131,7 +135,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
 
     this.schoolService
-      .onboardSchool(f)
+      .onboardSchool(this.onboardForm)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (school) => {
@@ -150,9 +154,46 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
           this.logger.error('Onboard failed', err);
           this.onboarding = false;
           this.cdr.markForCheck();
-          Swal.fire('Error', 'Failed to onboard school.', 'error');
+          const msg = err?.error?.message ?? err?.error ?? 'Failed to onboard school.';
+          Swal.fire('Error', typeof msg === 'string' ? msg : 'Failed to onboard school.', 'error');
         },
       });
+  }
+
+  private validateEditForm(): string | null {
+    const f = this.editForm;
+    const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRx = /^[0-9]{10}$/;
+
+    if (!f.name.trim())                             return 'School name is required.';
+    if (f.email && !emailRx.test(f.email.trim()))   return 'School email is not valid.';
+    if (f.phone && !phoneRx.test(f.phone.trim()))   return 'School phone must be exactly 10 digits.';
+    if (f.newAdminPassword && f.newAdminPassword.length < 6)
+                                                    return 'New admin password must be at least 6 characters.';
+    return null;
+  }
+
+  private validateOnboardForm(): string | null {
+    const f = this.onboardForm;
+    const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRx = /^[0-9]{10}$/;
+    const slugRx  = /^[a-z0-9][a-z0-9-]*$/;
+
+    if (!f.name.trim())                               return 'School name is required.';
+    if (!f.slug.trim())                               return 'Slug is required.';
+    if (!slugRx.test(f.slug.trim()))                  return 'Slug must be lowercase letters, digits, and hyphens only.';
+    if (f.email && !emailRx.test(f.email.trim()))     return 'School email is not valid.';
+    if (f.phone && !phoneRx.test(f.phone.trim()))     return 'School phone must be exactly 10 digits.';
+    if (!f.adminName.trim())                          return 'Admin name is required.';
+    if (!f.adminUserId.trim())                        return 'Admin user ID is required.';
+    if (!f.adminEmail.trim())                         return 'Admin email is required.';
+    if (!emailRx.test(f.adminEmail.trim()))           return 'Admin email is not a valid email address.';
+    if (!f.adminPhone.trim())                         return 'Admin phone is required.';
+    if (!phoneRx.test(f.adminPhone.trim()))           return 'Admin phone must be exactly 10 digits.';
+    if (!f.adminDob)                                  return 'Admin date of birth is required.';
+    if (!f.adminPassword)                             return 'Admin password is required.';
+    if (f.adminPassword.length < 6)                   return 'Admin password must be at least 6 characters.';
+    return null;
   }
 
   startEdit(school: SchoolSettings): void {
@@ -185,6 +226,12 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
 
   saveEdit(): void {
     if (!this.editingSchoolId) return;
+
+    const error = this.validateEditForm();
+    if (error) {
+      Swal.fire('Validation Error', error, 'warning');
+      return;
+    }
 
     this.saving = true;
     this.cdr.markForCheck();
@@ -306,6 +353,10 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
       adminUserId: '',
       adminEmail: '',
       adminPassword: '',
+      adminName: '',
+      adminPhone: '',
+      adminDob: '',
+      adminGender: '',
     };
   }
 

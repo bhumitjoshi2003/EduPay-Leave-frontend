@@ -142,11 +142,12 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
     }).then((result) => {
       if (result.isConfirmed) {
         action.pipe(takeUntil(this.ngUnsubscribe)).subscribe({
-          next: () => {
-            Swal.fire('Saved!', 'Admin details updated successfully.', 'success');
+          next: (savedAdmin) => {
+            this.adminDetails = savedAdmin;
+            this.updatedDetails = { ...savedAdmin };
             this.isEditing = false;
-            this.updatedDetails = { ...this.adminDetails! };
             this.cdr.markForCheck();
+            Swal.fire('Saved!', 'Admin details updated successfully.', 'success');
           },
           error: (err) => Swal.fire('Error', err.error?.message || 'Server error occurred', 'error')
         });
@@ -167,6 +168,7 @@ export class AdminDetailsComponent implements OnInit, OnDestroy {
 
   closePasswordModal(): void {
     this.showPasswordModal = false;
+    this.cdr.markForCheck();
   }
 
   submitPasswordChange(): void {

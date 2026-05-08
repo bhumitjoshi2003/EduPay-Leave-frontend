@@ -8,6 +8,15 @@
         <form #regForm="ngForm" (ngSubmit)="onSubmit(regForm)" novalidate>
             <div class="form-grid">
 
+                <div class="field-group" *ngIf="isSuperAdmin" style="grid-column: 1 / -1;">
+                    <label>School <span class="req">*</span></label>
+                    <select name="schoolId" [(ngModel)]="adminData.schoolId" #schoolField="ngModel" required [disabled]="schoolsLoading">
+                        <option [ngValue]="null" disabled>{{ schoolsLoading ? 'Loading schools…' : '— Select a school —' }}</option>
+                        <option *ngFor="let s of schools" [ngValue]="s.id">{{ schoolLabel(s) }}</option>
+                    </select>
+                    <small class="error-text" *ngIf="schoolField.invalid && schoolField.touched">School is required</small>
+                </div>
+
                 <div class="field-group">
                     <label>Admin ID <span class="req">*</span></label>
                     <input type="text" name="adminId" [(ngModel)]="adminData.adminId" #adminId="ngModel" required

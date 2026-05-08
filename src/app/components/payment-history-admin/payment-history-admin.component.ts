@@ -39,7 +39,7 @@ import { SchoolService } from '../../services/school.service';
 export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
 
   comingSoonConfig = MODULE_MESSAGES.paymentHistory;
-  showFeesModule: boolean = false;
+  showFeesModule: boolean = true;
   filteredPayments: PaymentHistory[] = [];
   classList: string[] = [];
   selectedClass: string = 'all';
@@ -62,7 +62,7 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
       next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-      error: () => {}
+      error: () => { }
     });
 
     this.fetchPaymentHistory();

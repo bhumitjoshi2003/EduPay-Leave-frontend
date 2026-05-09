@@ -15,7 +15,7 @@
       <div class="nb-hero-right">
         <div class="nb-hero-stats" *ngIf="userNotifications.length > 0">
           <div class="nb-hero-stat">
-            <span class="nb-hero-stat-num">{{ userNotifications.length }}</span>
+            <span class="nb-hero-stat-num">{{ userTotalElements }}</span>
             <span class="nb-hero-stat-lbl">Notices</span>
           </div>
           <div class="nb-hero-stat nb-hero-stat-new" *ngIf="unreadCount > 0">
@@ -34,15 +34,21 @@
       </svg>
     </div>
 
+    <!-- Loading state -->
+    <div class="nb-empty-hero" *ngIf="loading">
+      <div class="nb-empty-big-icon" style="animation: spin 1s linear infinite; display:inline-block;">⏳</div>
+      <h3 class="nb-empty-title">Loading notices…</h3>
+    </div>
+
     <!-- Empty state -->
-    <div class="nb-empty-hero" *ngIf="userNotifications.length === 0">
+    <div class="nb-empty-hero" *ngIf="!loading && userNotifications.length === 0">
       <div class="nb-empty-big-icon">📭</div>
       <h3 class="nb-empty-title">All clear!</h3>
       <p class="nb-empty-text">No notices for you right now. Check back later.</p>
     </div>
 
     <!-- Notices grid -->
-    <div class="nb-cards-grid" *ngIf="userNotifications.length > 0">
+    <div class="nb-cards-grid" *ngIf="!loading && userNotifications.length > 0">
       <div *ngFor="let n of userNotifications; let i = index; trackBy: trackById"
         class="nb-card" [class.nb-card-unread]="!n.isRead"
         [style.--accent]="getNoticeAccent(i)">
@@ -83,6 +89,13 @@
 
         </div>
       </div>
+    </div>
+
+    <!-- Load more — student/teacher -->
+    <div class="nb-load-more-wrap" *ngIf="!loading && !userLast">
+      <button class="nb-load-more-btn" (click)="loadMoreUserNotifications()" [disabled]="loadingMoreUser">
+        {{ loadingMoreUser ? 'Loading…' : 'Load more notices' }}
+      </button>
     </div>
 
   </ng-container>
@@ -165,9 +178,9 @@
         <div class="nb-list-header">
           <div>
             <h3 class="nb-list-title">Posted Notices</h3>
-            <p class="nb-list-sub">{{ allNotices.length }} notice{{ allNotices.length !== 1 ? 's' : '' }} published</p>
+            <p class="nb-list-sub">{{ noticesTotalElements }} notice{{ noticesTotalElements !== 1 ? 's' : '' }} published</p>
           </div>
-          <span class="nb-count-chip">{{ allNotices.length }}</span>
+          <span class="nb-count-chip">{{ noticesTotalElements }}</span>
         </div>
 
         <div *ngIf="allNotices.length === 0" class="nb-empty-admin">
@@ -220,6 +233,13 @@
 
           </div>
         </div>
+      </div>
+
+      <!-- Load more — admin -->
+      <div class="nb-load-more-wrap" *ngIf="!noticesLast">
+        <button class="nb-load-more-btn" (click)="loadMoreNotices()" [disabled]="loadingMoreNotices">
+          {{ loadingMoreNotices ? 'Loading…' : 'Load more notices' }}
+        </button>
       </div>
 
     </div>

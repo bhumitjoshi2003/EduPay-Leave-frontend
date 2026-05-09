@@ -109,7 +109,6 @@
 
     <!-- Quick action buttons -->
     <div *ngIf="getUserRole() !== 'STUDENT'" class="actions">
-      <button (click)="viewAttendance()">📅 View Attendance</button>
       <button class="attendance-summary-button" (click)="viewAttendanceSummary()">📊 Attendance Summary</button>
       <button *ngIf="getUserRole() === 'ADMIN'" class="payment-history-button" (click)="viewPaymentHistory()">💳 Payment History</button>
       <button (click)="viewLeaves()" class="view-leaves-button">🌿 View Leaves</button>

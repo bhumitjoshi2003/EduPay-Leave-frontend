@@ -9,7 +9,6 @@ import { PaymentDetailsComponent } from './components/payment-details/payment-de
 import { ApplyLeaveComponent } from './components/apply-leave/apply-leave.component';
 import { authGuard } from './auth/auth.guard';
 import { TeacherAttendanceComponent } from './components/teacher-attendance/teacher-attendance.component';
-import { StudentAttendanceComponent } from './components/student-attendance/student-attendance.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { StudentListComponent } from './components/student-list/student-list.component';
 import { StudentDetailsComponent } from './components/student-details/student-details.component';
@@ -82,14 +81,6 @@ export const routes: Routes = [
       {
         path: 'apply-leave', component: ApplyLeaveComponent,
         canActivate: [roleGuard], data: { roles: ['STUDENT'] }
-      },
-      {
-        path: 'student-attendance', component: StudentAttendanceComponent,
-        canActivate: [roleGuard], data: { roles: ['STUDENT', 'ADMIN'] }
-      },
-      {
-        path: 'student-attendance/:studentId', component: StudentAttendanceComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
       {
         path: 'attendance-summary', component: AttendanceSummaryComponent,

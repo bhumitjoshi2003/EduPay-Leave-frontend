@@ -1,21 +1,52 @@
-<div class="register-container">
-    <div class="form-toggle-nav">
-      <button
-        [ngClass]="{'active': showStudentForm}"
-        (click)="toggleForm('student')"
-      >
-        Register Student
-      </button>
-      <button
-        [ngClass]="{'active': !showStudentForm}"
-        (click)="toggleForm('teacher')"
-      >
-        Register Teacher
-      </button>
+<div class="rg-page">
+
+  <!-- ── Hero ──────────────────────────────────────────────────────── -->
+  <div class="rg-hero">
+    <div class="rg-hero-left">
+      <div class="rg-hero-icon-wrap">
+        <span>📝</span>
+      </div>
+      <div class="rg-hero-text">
+        <p class="rg-eyebrow">People Management</p>
+        <h1 class="rg-hero-title">Register</h1>
+        <p class="rg-hero-sub">Add new students or staff members to the school</p>
+      </div>
     </div>
-  
-    <div class="form-wrapper">
-      <app-register-student *ngIf="showStudentForm"></app-register-student>
-      <app-register-teacher *ngIf="!showStudentForm"></app-register-teacher>
+    <div class="rg-hero-right">
+      <span class="rg-hero-chip">👨‍🎓 Students</span>
+      <span class="rg-hero-chip">👨‍🏫 Teachers</span>
     </div>
+    <div class="rg-blob rg-blob-1"></div>
+    <div class="rg-blob rg-blob-2"></div>
   </div>
+
+  <!-- ── Tab Selector ──────────────────────────────────────────────── -->
+  <div class="rg-tab-row">
+
+    <button class="rg-tab-card" [class.rg-tab-active]="showStudentForm" (click)="toggleForm('student')">
+      <div class="rg-tab-icon">👨‍🎓</div>
+      <div class="rg-tab-body">
+        <span class="rg-tab-title">Register Student</span>
+        </div>
+      <span class="rg-tab-check" *ngIf="showStudentForm">✓</span>
+      <span class="rg-tab-arrow" *ngIf="!showStudentForm">›</span>
+    </button>
+
+    <button class="rg-tab-card" [class.rg-tab-active]="!showStudentForm" (click)="toggleForm('teacher')">
+      <div class="rg-tab-icon">👨‍🏫</div>
+      <div class="rg-tab-body">
+        <span class="rg-tab-title">Register Teacher</span>
+        </div>
+      <span class="rg-tab-check" *ngIf="!showStudentForm">✓</span>
+      <span class="rg-tab-arrow" *ngIf="showStudentForm">›</span>
+    </button>
+
+  </div>
+
+  <!-- ── Form Content ───────────────────────────────────────────────── -->
+  <div class="rg-form-wrap">
+    <app-register-student *ngIf="showStudentForm"></app-register-student>
+    <app-register-teacher *ngIf="!showStudentForm"></app-register-teacher>
+  </div>
+
+</div>

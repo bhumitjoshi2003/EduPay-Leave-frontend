@@ -2,14 +2,49 @@
 .ss-container {
   width: 95%;
   max-width: 100%;
-  margin: auto;
-  background: linear-gradient(135deg, #eaf6f6, #f0f8ff);
-  border-radius: 15px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-  padding: 30px;
+  margin: 0 auto;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn 0.45s ease-out both;
   box-sizing: border-box;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────── */
+.ss-hero {
+  position: relative;
+  background: linear-gradient(135deg, #78350f 0%, #b45309 55%, #fbbf24 100%);
+  border-radius: 16px 16px 0 0;
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: #fff;
+}
+.ss-blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  pointer-events: none;
+}
+.ss-blob-1 { width: 160px; height: 160px; background: #fff; top: -50px; right: -30px; }
+.ss-blob-2 { width: 90px; height: 90px; background: #fde68a; bottom: -25px; left: 40%; }
+.ss-hero-left { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
+.ss-hero-icon {
+  font-size: 1.8rem;
+  background: rgba(255,255,255,0.16);
+  border-radius: 14px;
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.ss-hero-title { font-size: 1.3rem; font-weight: 800; margin: 0 0 3px; color: #fff; letter-spacing: -0.2px; }
+.ss-hero-sub   { font-size: 0.82rem; color: rgba(255,255,255,0.82); margin: 0; font-weight: 500; }
+
+/* ── Card ─────────────────────────────────────────────────────────── */
+.ss-card {
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
 }
 
 .ss-title {
@@ -22,41 +57,41 @@
   font-size: 1.2rem;
 }
 
-.ss-filters {
+/* ── Class nav pills ─────────────────────────────────────────────── */
+.ss-class-nav {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 20px;
   flex-wrap: wrap;
-}
-
-.ss-filters label {
-  font-weight: 700;
-  color: #1f6f8b;
-  font-size: 0.9rem;
-}
-
-.ss-class-toggle {
-  display: flex;
-  border: 2px solid #4fbdbd;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.ss-class-toggle button {
-  padding: 8px 20px;
-  border: none;
+  gap: 8px;
+  padding: 14px 28px;
   background: #fff;
-  color: #1f6f8b;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ss-class-pill {
+  padding: 7px 18px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  font-size: 0.88rem;
-  transition: all 0.2s;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
 }
 
-.ss-class-toggle button.active {
-  background: linear-gradient(135deg, #1f6f8b, #14505d);
+.ss-class-pill:hover {
+  background: #fef3c7;
+  border-color: #b45309;
+  color: #78350f;
+}
+
+.ss-class-pill.active {
+  background: linear-gradient(135deg, #78350f, #b45309);
+  border-color: transparent;
   color: #fff;
+  box-shadow: 0 2px 8px rgba(120, 53, 15, 0.25);
 }
 
 .ss-loading, .ss-empty {

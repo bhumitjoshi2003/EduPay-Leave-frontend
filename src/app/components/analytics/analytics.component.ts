@@ -246,17 +246,17 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
   }
 
   private buildAttendanceTrend(data: AttendanceTrend[]): void {
-    const hasData = data.some(d => d.rate > 0);
+    const hasData = data.some(d => d.attendanceRate > 0);
     const color = '#059669';
     this.attendanceTrendData = {
       labels: data.map(d => d.period),
       datasets: [{
-        data: data.map(d => d.rate),
+        data: data.map(d => d.attendanceRate),
         borderColor: color,
         backgroundColor: hasData ? 'rgba(5,150,105,0.10)' : 'transparent',
         fill: true,
         pointBackgroundColor: data.map(d =>
-          d.rate >= 85 ? '#059669' : d.rate >= 70 ? '#d97706' : d.rate > 0 ? '#dc2626' : '#94a3b8'
+          d.attendanceRate >= 85 ? '#059669' : d.attendanceRate >= 70 ? '#d97706' : d.attendanceRate > 0 ? '#dc2626' : '#94a3b8'
         ),
         pointBorderColor: '#fff',
         pointBorderWidth: 2,

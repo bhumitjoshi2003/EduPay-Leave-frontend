@@ -14,6 +14,7 @@ export interface StudentStreamSelection {
 export interface StudentStreamOverview {
   studentId: string;
   studentName: string;
+  className: string | null;
   streamName: string | null;
   optionalSubjectName: string | null;
 }
@@ -33,11 +34,11 @@ export class StudentStreamService {
     return this.http.get<StudentStreamSelection>(`${this.base}/${studentId}`);
   }
 
-  assignStream(studentId: string, streamId: number, optionalSubjectId: number): Observable<StudentStreamSelection> {
+  assignStream(studentId: string, streamId: number, optionalSubjectId: number | null): Observable<StudentStreamSelection> {
     return this.http.post<StudentStreamSelection>(this.base, { studentId, streamId, optionalSubjectId });
   }
 
-  updateStream(studentId: string, streamId: number, optionalSubjectId: number): Observable<StudentStreamSelection> {
+  updateStream(studentId: string, streamId: number, optionalSubjectId: number | null): Observable<StudentStreamSelection> {
     return this.http.put<StudentStreamSelection>(`${this.base}/${studentId}`, { studentId, streamId, optionalSubjectId });
   }
 

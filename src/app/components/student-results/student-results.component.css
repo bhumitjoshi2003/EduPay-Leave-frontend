@@ -2,13 +2,80 @@
 .sr-container {
   width: 95%;
   max-width: 100%;
-  margin: auto;
+  margin: 0 auto;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn 0.45s ease-out both;
   box-sizing: border-box;
 }
 
-/* ── Header ──────────────────────────────────────────────────────── */
+/* ── Hero ─────────────────────────────────────────────────────────── */
+.sr-hero {
+  position: relative;
+  background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 55%, #8b5cf6 100%);
+  border-radius: 16px 16px 0 0;
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: #fff;
+}
+.sr-blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  pointer-events: none;
+}
+.sr-blob-1 { width: 160px; height: 160px; background: #fff; top: -50px; right: -30px; }
+.sr-blob-2 { width: 90px; height: 90px; background: #ddd6fe; bottom: -25px; left: 40%; }
+.sr-hero-left { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
+.sr-hero-icon {
+  font-size: 1.8rem;
+  background: rgba(255,255,255,0.16);
+  border-radius: 14px;
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sr-hero-title { font-size: 1.3rem; font-weight: 800; margin: 0 0 3px; color: #fff; letter-spacing: -0.2px; }
+.sr-hero-sub   { font-size: 0.82rem; color: rgba(255,255,255,0.82); margin: 0; font-weight: 500; }
+
+/* ── Controls bar ────────────────────────────────────────────────── */
+.sr-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: #fff;
+  padding: 14px 28px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.sr-controls select {
+  padding: 7px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  background: #f8fafc;
+  color: #374151;
+  cursor: pointer;
+  outline: none;
+}
+.sr-controls-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+/* ── Card ─────────────────────────────────────────────────────────── */
+.sr-card {
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+}
+
+/* ── Header (legacy — replaced) ─────────────────────────────────── */
 .sr-header {
   display: flex;
   justify-content: space-between;

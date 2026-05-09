@@ -1,10 +1,51 @@
 /* ── Page wrapper ────────────────────────────────────────────────── */
 .rc-page {
   min-height: 100vh;
-  background: #eaf6f6;
-  padding: 20px 16px 40px;
+  background: #f8fafc;
+  padding: 0 0 40px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────── */
+.rc-hero {
+  position: relative;
+  background: linear-gradient(135deg, #0f4c81 0%, #1565c0 55%, #1e88e5 100%);
+  padding: 20px 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  overflow: hidden;
+  color: #fff;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.rc-blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  pointer-events: none;
+}
+.rc-blob-1 { width: 160px; height: 160px; background: #fff; top: -50px; right: 180px; }
+.rc-blob-2 { width: 90px; height: 90px; background: #bbdefb; bottom: -25px; left: 40%; }
+.rc-hero-left { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
+.rc-hero-icon {
+  font-size: 1.8rem;
+  background: rgba(255,255,255,0.16);
+  border-radius: 14px;
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.rc-hero-title { font-size: 1.3rem; font-weight: 800; margin: 0 0 3px; color: #fff; }
+.rc-hero-sub   { font-size: 0.82rem; color: rgba(255,255,255,0.82); margin: 0; }
+.rc-hero-actions {
+  display: flex;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
 }
 
 /* ── Toolbar ─────────────────────────────────────────────────────── */
@@ -19,27 +60,29 @@
 }
 
 .rc-btn-back {
-  background: #fff;
-  border: 2px solid #4fbdbd;
-  color: #1f6f8b;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.35);
+  color: #fff;
   border-radius: 8px;
-  padding: 9px 20px;
+  padding: 8px 18px;
   font-weight: 600;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  font-family: inherit;
   transition: background 0.15s;
 }
-.rc-btn-back:hover { background: #eaf6f6; }
+.rc-btn-back:hover { background: rgba(255,255,255,0.25); }
 
 .rc-btn-print {
-  background: linear-gradient(135deg, #1f6f8b, #14505d);
-  color: #fff;
+  background: rgba(255,255,255,0.95);
+  color: #1565c0;
   border: none;
   border-radius: 8px;
-  padding: 9px 22px;
-  font-weight: 600;
+  padding: 8px 18px;
+  font-weight: 700;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  font-family: inherit;
   transition: opacity 0.15s;
 }
 .rc-btn-print:hover { opacity: 0.88; }

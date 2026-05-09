@@ -1,18 +1,35 @@
 <div class="ss-container">
-  <h2 class="ss-title">Stream Assignment (Class 11–12)</h2>
 
-  <div class="ss-filters">
-    <label>Class</label>
-    <div class="ss-class-toggle">
-      <button [class.active]="selectedClass === '11'" (click)="selectedClass = '11'; loadStudents()">Class 11</button>
-      <button [class.active]="selectedClass === '12'" (click)="selectedClass = '12'; loadStudents()">Class 12</button>
+  <!-- Hero -->
+  <div class="ss-hero">
+    <div class="ss-hero-left">
+      <div class="ss-hero-icon">🎓</div>
+      <div>
+        <h1 class="ss-hero-title">Stream Assignment</h1>
+        <p class="ss-hero-sub">Assign streams &amp; optional subjects to students in stream-eligible classes</p>
+      </div>
     </div>
+    <div class="ss-blob ss-blob-1"></div>
+    <div class="ss-blob ss-blob-2"></div>
   </div>
 
-  <div *ngIf="loading" class="ss-loading">Loading students…</div>
-  <div *ngIf="!loading && students.length === 0" class="ss-empty">No students found for Class {{ selectedClass }}.</div>
+  <!-- Class pills -->
+  <div class="ss-class-nav" *ngIf="!noEligibleClasses">
+    <button *ngFor="let c of eligibleClasses; trackBy: trackById"
+      class="ss-class-pill" [class.active]="selectedClass === c.name"
+      (click)="onClassSelect(c.name)">{{ c.name }}</button>
+  </div>
 
-  <!-- Desktop / Tablet Table -->
+  <div class="ss-card">
+
+  <div *ngIf="loading" class="ss-loading">Loading students…</div>
+  <div *ngIf="!loading && noEligibleClasses" class="ss-empty">
+    No stream-eligible classes configured yet.<br>
+    <small>Go to <strong>Classes</strong> and enable the <strong>Stream</strong> option on the classes you want to include.</small>
+  </div>
+  <div *ngIf="!loading && !noEligibleClasses && students.length === 0" class="ss-empty">No students found for Class {{ selectedClass }}.</div>
+
+  <!-- Table -->
   <div *ngIf="!loading && students.length > 0" class="ss-table-wrapper">
     <table class="ss-table">
       <thead>
@@ -68,4 +85,6 @@
       </tbody>
     </table>
   </div>
+
+  </div><!-- /.ss-card -->
 </div>

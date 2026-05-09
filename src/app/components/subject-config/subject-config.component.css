@@ -2,14 +2,49 @@
 .sc-container {
   width: 95%;
   max-width: 100%;
-  margin: auto;
-  background: linear-gradient(135deg, #eaf6f6, #f0f8ff);
-  border-radius: 15px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-  padding: 30px;
+  margin: 0 auto;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn 0.45s ease-out both;
   box-sizing: border-box;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────── */
+.sc-hero {
+  position: relative;
+  background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 55%, #6366f1 100%);
+  border-radius: 16px 16px 0 0;
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: #fff;
+}
+.sc-blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  pointer-events: none;
+}
+.sc-blob-1 { width: 160px; height: 160px; background: #fff; top: -50px; right: -30px; }
+.sc-blob-2 { width: 90px; height: 90px; background: #c7d2fe; bottom: -25px; left: 40%; }
+.sc-hero-left { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
+.sc-hero-icon {
+  font-size: 1.8rem;
+  background: rgba(255,255,255,0.16);
+  border-radius: 14px;
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sc-hero-title { font-size: 1.3rem; font-weight: 800; margin: 0 0 3px; color: #fff; letter-spacing: -0.2px; }
+.sc-hero-sub   { font-size: 0.82rem; color: rgba(255,255,255,0.82); margin: 0; font-weight: 500; }
+
+/* ── Card ─────────────────────────────────────────────────────────── */
+.sc-card {
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  overflow: hidden;
 }
 
 .sc-header h2 {
@@ -26,35 +61,42 @@
 .sc-tabs {
   display: flex;
   gap: 8px;
-  margin-bottom: 24px;
+  padding: 16px 24px 0;
+  margin-bottom: 0;
   flex-wrap: wrap;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fff;
 }
 
 .sc-tab {
-  padding: 8px 18px;
-  border: 2px solid #4fbdbd;
-  border-radius: 20px;
+  padding: 9px 18px;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  border-radius: 0;
   background: transparent;
-  color: #1f6f8b;
+  color: #64748b;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: color 0.15s, border-color 0.15s;
   font-size: 0.88rem;
   white-space: nowrap;
+  font-family: inherit;
+  margin-bottom: -1px;
 }
 
 .sc-tab.active,
 .sc-tab:hover {
-  background: linear-gradient(135deg, #1f6f8b, #14505d);
-  color: #fff;
+  color: #4338ca;
+  border-bottom-color: #4338ca;
+  background: transparent;
   border-color: transparent;
 }
 
 /* ── Body ────────────────────────────────────────────────────────── */
 .sc-body {
-  background: rgba(255,255,255,0.95);
-  border-radius: 10px;
-  padding: 20px;
+  background: #fff;
+  border-radius: 0;
+  padding: 24px;
 }
 
 /* ── Controls ────────────────────────────────────────────────────── */

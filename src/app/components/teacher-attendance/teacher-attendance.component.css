@@ -1,411 +1,360 @@
-/* ================= CONTAINER (MATCH STUDENT LIST) ================= */
-
-.student-list-container {
+/* ── Page wrapper ────────────────────────────────────────────────── */
+.ta-container {
   display: flex;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(145deg, #f7faff, #e8f4f8);
-  border-radius: 15px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.8s ease-in-out;
-  padding: 30px;
-  margin: 0 auto;
+  gap: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   width: 95%;
+  margin: 0 auto;
+  animation: ta-fade-up 0.45s ease-out both;
 }
 
-.no-students {
-  text-align: center;
-  padding: 20px;
-  font-style: italic;
-  color: #777;
-}
-
-/* ================= LEFT SIDEBAR ================= */
-
-.left-navigation {
-  width: 180px;
-  margin-right: 30px;
-  padding: 20px 10px;
-  background-color: #f5f5f5;
-  border-radius: 10px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+/* ── Left navigation ─────────────────────────────────────────────── */
+.ta-left-nav {
+  width: 170px;
   flex-shrink: 0;
+  background: linear-gradient(180deg, #064e3b 0%, #065f46 100%);
+  border-radius: 16px 0 0 16px;
+  padding: 20px 12px;
+  box-shadow: 4px 0 20px rgba(6, 78, 59, 0.18);
 }
 
-.left-navigation h2 {
-  text-align: left;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 5px;
-  margin-bottom: 10px;
-  color: #555;
-  font-size: 1.2em;
+.ta-left-nav h2 {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(52, 211, 153, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin: 0 0 14px 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(52, 211, 153, 0.2);
 }
 
-/* CLASS LIST */
-.class-list-vertical {
+.ta-class-list {
   list-style: none;
   padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.class-item-vertical {
-  margin-bottom: 10px;
-  cursor: pointer;
+.ta-class-item { cursor: pointer; }
+
+.ta-class-pill {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.chevron {
-  position: relative;
-  background-color: #a5db67;
-  color: black;
-  padding: 10px 15px;
-  border-radius: 15px 0 0 15px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.08);
-  transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+.ta-class-item:hover .ta-class-pill {
+  background: rgba(52, 211, 153, 0.18);
+  color: #34d399;
+}
+
+.ta-class-item.selected .ta-class-pill {
+  background: rgba(52, 211, 153, 0.25);
+  color: #34d399;
+  box-shadow: inset 0 0 0 1.5px rgba(52, 211, 153, 0.5);
+}
+
+/* ── Main area ───────────────────────────────────────────────────── */
+.ta-main {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────── */
+.ta-hero {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px;
+  background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+  border-radius: 0 16px 0 0;
 }
 
-.class-item-vertical.selected .chevron {
-  background-color: #418f45;
+/* When no left nav (TEACHER role) */
+.ta-container:not(:has(.ta-left-nav)) .ta-hero {
+  border-radius: 16px 16px 0 0;
+}
+
+.ta-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ta-hero-icon {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(52, 211, 153, 0.4));
+}
+
+.ta-hero-text h1 {
+  margin: 0 0 3px;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: #fff;
 }
 
-.chevron::before {
-  content: '';
-  position: absolute;
-  right: -20px;
-  top: 0;
-  border-top: 20px solid transparent;
-  border-left: 20px solid #aed581;
-  border-bottom: 20px solid transparent;
-}
-
-.class-item-vertical.selected .chevron::before {
-  border-left-color: #1f6f8b;
-}
-
-.class-item-vertical:hover .chevron {
-  background-color: #8cbe60;
-  transform: translateX(-5px);
-}
-
-/* ================= RIGHT CONTENT ================= */
-
-.student-list-area {
-  flex-grow: 1;
-  padding: 20px;
-  background-color: rgba(255, 255, 255, 0.85);
-  border-radius: 10px;
-}
-
-/* HEADER */
-.student-list-area h2 {
-  text-align: left;
-  border-bottom: 2px solid #8cbe60;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-  color: #2f4f4f;
-  font-size: 1.5em;
-}
-
-/* ================= TOP SECTION ================= */
-
-.top-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  padding: 15px 0;
-  gap: 20px;
-}
-
-/* DATE PICKER */
-.custom-datepicker {
-  max-width: 280px;
-  width: 100%;
-}
-
-/* ACTION BUTTONS */
-.action-buttons {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-/* SAVE BUTTON */
-.attendance-button.save {
-  background: #1e3a5f;
-  padding: 10px 30px;
-  font-size: 1em;
-  border-radius: 8px;
-}
-
-/* DELETE BUTTON */
-.attendance-button.delete {
-  background: #e74c3c;
-  padding: 10px 30px;
-  font-size: 1em;
-  border-radius: 8px;
-}
-
-/* COMMON BUTTON */
-.attendance-button {
-  border: none;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.attendance-button:hover {
-  transform: scale(1.05);
-}
-
-/* ================= WARNING ================= */
-
-.attendance-restriction-message {
-  background-color: #fff3cd;
-  color: #856404;
-  padding: 12px 16px;
-  border: 1px solid #ffeeba;
-  border-radius: 8px;
-  font-size: 15px;
+.ta-hero-text p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(52, 211, 153, 0.9);
   font-weight: 500;
-  margin: 16px 0;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  animation: fadeIn 0.5s ease-in-out;
 }
 
-/* ================= STUDENT LIST ================= */
-
-.student-list {
-  list-style: none;
-  padding: 0;
+/* ── Controls card ───────────────────────────────────────────────── */
+.ta-controls {
+  background: #fff;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-.student-item {
+.ta-controls-row {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 20px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  border-left: 8px solid transparent;
   flex-wrap: wrap;
-  gap: 15px;
+  align-items: center;
+  gap: 12px;
 }
 
-
-.student-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+.ta-date-field {
+  flex: 1;
+  min-width: 180px;
+  max-width: 260px;
 }
 
-.student-item.absent {
-  border-left-color: #e57373;
-  box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
-  background-color: #ffebee;
+::ng-deep .ta-date-field .mat-mdc-form-field-subscript-wrapper { display: none; }
+::ng-deep .ta-date-field .mat-mdc-text-field-wrapper {
+  border-radius: 10px !important;
+  background: #f8fafc !important;
+}
+::ng-deep .ta-date-field.mat-focused .mdc-notched-outline__leading,
+::ng-deep .ta-date-field.mat-focused .mdc-notched-outline__notch,
+::ng-deep .ta-date-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: #059669 !important;
 }
 
-.student-item:not(.absent) {
-  border-left-color: #a8de66;
-  box-shadow: 0 0 10px rgba(166, 231, 122, 0.5);
-  background-color: #eaf7c2;
-}
-
-.student-info {
-  flex-grow: 1;
-  font-weight: 600;
-  color: #333;
-  font-size: 1.1em;
-  min-width: 100px;
-}
-
-/* BUTTON GROUP */
-.attendance-buttons {
+.ta-action-btns {
   display: flex;
-  gap: 15px;
+  gap: 10px;
+}
+
+.ta-btn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s, transform 0.15s;
+  white-space: nowrap;
+}
+.ta-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.ta-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+
+.ta-btn-save   { background: linear-gradient(135deg, #059669, #34d399); color: #fff; }
+.ta-btn-delete { background: linear-gradient(135deg, #dc2626, #f87171); color: #fff; }
+
+/* ── Warnings ────────────────────────────────────────────────────── */
+.ta-warning {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  padding: 11px 24px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.ta-warning-sunday {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────── */
+.ta-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 72px 20px;
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+  text-align: center;
+}
+
+.ta-container:not(:has(.ta-left-nav)) .ta-empty {
+  border-radius: 0 0 16px 16px;
+}
+
+.ta-empty-icon  { font-size: 2.8rem; margin-bottom: 4px; }
+.ta-empty-title { font-size: 1.05rem; font-weight: 700; color: #374151; margin: 0; }
+.ta-empty-sub   { font-size: 0.82rem; color: #94a3b8; margin: 0; }
+
+/* ── Student list ────────────────────────────────────────────────── */
+.ta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #f8fafc;
+  padding: 16px 24px;
+  border-radius: 0 0 16px 16px;
+  flex-grow: 1;
+}
+
+.ta-container:not(:has(.ta-left-nav)) .ta-list {
+  border-radius: 0 0 16px 16px;
+}
+
+.ta-student-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  border-left: 4px solid #34d399;
+  margin-bottom: 8px;
+  transition: border-left-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.ta-student-card:last-child { margin-bottom: 0; }
+
+.ta-student-card:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.ta-absent {
+  border-left-color: #f87171;
+  background: #fff5f5;
+}
+
+.ta-student-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #059669, #34d399);
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
 
-.attendance-button {
-  width: auto;
-  padding: 8px 13px;
-  border-radius: 8px;
-  border: none;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  font-size: 1em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+.ta-avatar-absent {
+  background: linear-gradient(135deg, #dc2626, #f87171);
+}
+
+.ta-student-name {
+  flex: 1;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.attendance-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+.ta-mark-btn {
+  padding: 7px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s, transform 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ta-mark-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.ta-mark-btn:hover:not(:disabled) { opacity: 0.85; transform: translateY(-1px); }
+
+.ta-mark-absent  { background: linear-gradient(135deg, #dc2626, #f87171); color: #fff; }
+.ta-mark-present { background: linear-gradient(135deg, #059669, #34d399); color: #fff; }
+
+/* ── Animation ───────────────────────────────────────────────────── */
+@keyframes ta-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.attendance-button.absent {
-  background: linear-gradient(135deg, #e57373, #f44336);
-}
-
-.attendance-button.present {
-  background: linear-gradient(135deg, #81c784, #4fbdbd);
-}
-
-.attendance-button[disabled] {
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-/* ================= ANIMATION ================= */
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ================= TABLET ================= */
-
+/* ── Tablet ──────────────────────────────────────────────────────── */
 @media (max-width: 1023px) {
-  .student-list-container {
-    padding: 25px;
-    width: 98%;
-  }
-
-  .left-navigation {
-    width: 160px;
-  }
-
-  .attendance-restriction-message {
-    font-size: 14px;
-    padding: 10px 12px;
-    margin: 12px 0;
-  }
-
-  .student-list-area {
-    padding: 15px;
-  }
-
-  .student-list-area h2 {
-    font-size: 1em;
-  }
-
-  .student-item {
-    padding: 12px;
-  }
-
-  .student-info {
-    font-size: 0.9em;
-    flex-grow: 1;
-    min-width: 80px;
-  }
-
-  .attendance-button.save .attendance-button.delete {
-    width: auto;
-    padding: 10px 25px;
-    font-size: 1em;
-  }
-
-  .attendance-buttons {
-    gap: 8px;
-  }
-
-  .attendance-button {
-    padding: 8px 15px;
-    font-size: 0.9em;
-    width: auto;
-  }
+  .ta-left-nav { width: 150px; padding: 16px 10px; }
+  .ta-hero { padding: 18px 20px; border-radius: 0 12px 0 0; }
+  .ta-hero-text h1 { font-size: 1.1rem; }
+  .ta-controls { padding: 14px 20px; }
+  .ta-list { padding: 14px 20px; }
+  .ta-student-card { padding: 10px 14px; gap: 10px; }
+  .ta-student-avatar { width: 34px; height: 34px; font-size: 0.85rem; }
+  .ta-mark-btn { padding: 6px 12px; font-size: 0.75rem; }
 }
 
-/* ================= MOBILE ================= */
+/* ── Mobile ──────────────────────────────────────────────────────── */
 @media (max-width: 767px) {
-
-  .student-list-container {
+  .ta-container {
     flex-direction: column;
-    padding: 10px;
-    width: 94%;
-  }
-
-  /* TEXT */
-  .student-info {
-    font-size: 12px;
-    /* ✅ smaller */
-    font-weight: 500;
-    min-width: 50px;
-  }
-
-  /* SIDEBAR */
-  .left-navigation {
     width: 100%;
-    margin: auto;
-    margin-bottom: 12px;
   }
 
-  .class-list-vertical {
-    display: flex;
+  .ta-left-nav {
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    padding: 14px 12px;
+  }
+
+  .ta-class-list {
+    flex-direction: row;
     overflow-x: auto;
+    scrollbar-width: none;
     gap: 6px;
+    padding-bottom: 4px;
+  }
+  .ta-class-list::-webkit-scrollbar { display: none; }
+
+  .ta-class-item { flex-shrink: 0; }
+
+  .ta-class-pill { font-size: 0.8rem; padding: 6px 12px; }
+
+  .ta-hero {
+    border-radius: 0;
+    padding: 16px;
   }
 
-  .class-item-vertical {
-    flex-shrink: 0;
+  .ta-container:not(:has(.ta-left-nav)) .ta-hero {
+    border-radius: 16px 16px 0 0;
   }
 
-  .chevron {
-    border-radius: 6px;
-    padding: 5px 8px;
-    /* ✅ smaller */
-    font-size: 12px;
-  }
+  .ta-controls { padding: 12px 16px; }
 
-  .chevron::before {
-    display: none;
-  }
+  .ta-controls-row { gap: 10px; }
 
-  /* 🔥 MAIN FIX: ROW HEIGHT */
-  .student-item {
-    padding: 6px 8px;
-    /* ✅ reduced height */
-    margin-bottom: 8px;
-    border-radius: 8px;
-  }
+  .ta-date-field { max-width: 100%; }
 
-  /* BUTTONS */
-  .attendance-buttons {
-    gap: 5px;
-  }
+  .ta-btn { padding: 8px 16px; font-size: 0.82rem; }
 
-  .attendance-button {
-    padding: 5px 10px;
-    /* ✅ smaller button */
-    font-size: 0.75em;
-    border-radius: 6px;
-  }
+  .ta-list { padding: 12px 16px; }
 
-  /* SAVE / DELETE */
-  .attendance-button.save,
-  .attendance-button.delete {
-    padding: 7px 14px;
-    font-size: 0.8em;
-  }
+  .ta-student-card { padding: 10px 12px; gap: 10px; }
 
-  /* WARNING */
-  .attendance-restriction-message {
-    font-size: 12px;
-    padding: 6px 8px;
-  }
+  .ta-student-name { font-size: 0.85rem; }
+
+  .ta-mark-btn { padding: 6px 11px; font-size: 0.75rem; }
+
+  .ta-empty { padding: 48px 16px; }
 }

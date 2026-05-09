@@ -1,10 +1,24 @@
 <div class="sr-container">
-  <div class="sr-header">
-    <h2>My Results</h2>
-    <div class="sr-header-actions">
-      <select [(ngModel)]="selectedSession" (ngModelChange)="loadResults()">
-        <option *ngFor="let s of sessions; trackBy: trackByIndex" [value]="s">{{ s }}</option>
-      </select>
+
+  <!-- Hero -->
+  <div class="sr-hero">
+    <div class="sr-hero-left">
+      <div class="sr-hero-icon">🏆</div>
+      <div>
+        <h1 class="sr-hero-title">My Results</h1>
+        <p class="sr-hero-sub">Track your academic performance &amp; progress</p>
+      </div>
+    </div>
+    <div class="sr-blob sr-blob-1"></div>
+    <div class="sr-blob sr-blob-2"></div>
+  </div>
+
+  <!-- Controls bar -->
+  <div class="sr-controls">
+    <select [(ngModel)]="selectedSession" (ngModelChange)="loadResults()">
+      <option *ngFor="let s of sessions; trackBy: trackByIndex" [value]="s">{{ s }}</option>
+    </select>
+    <div class="sr-controls-actions">
       <button *ngIf="results.length > 0" class="sr-btn-toggle" [class.active]="showProgress"
         (click)="toggleProgress()">
         {{ showProgress ? '📋 Exam Details' : '📈 Progress Tracker' }}
@@ -14,6 +28,8 @@
       </button>
     </div>
   </div>
+
+  <div class="sr-card">
 
   <div *ngIf="loading" class="sr-loading">Loading results…</div>
 
@@ -153,4 +169,6 @@
       </div>
     </div>
   </ng-container>
+
+  </div><!-- /.sr-card -->
 </div>

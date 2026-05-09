@@ -1,12 +1,25 @@
 <div class="sc-container">
-  <div class="sc-header">
-    <h2>Subject Configuration</h2>
+
+  <!-- Hero -->
+  <div class="sc-hero">
+    <div class="sc-hero-left">
+      <div class="sc-hero-icon">📚</div>
+      <div>
+        <h1 class="sc-hero-title">Subject Configuration</h1>
+        <p class="sc-hero-sub">Manage class subjects, streams &amp; optional groups</p>
+      </div>
+    </div>
+    <div class="sc-blob sc-blob-1"></div>
+    <div class="sc-blob sc-blob-2"></div>
+  </div>
+
+  <!-- Tabs + Content Card -->
+  <div class="sc-card">
     <div class="sc-tabs">
       <button class="sc-tab" [class.active]="activeTab === 'class'" (click)="setTab('class')">Class Subjects</button>
-      <button class="sc-tab" [class.active]="activeTab === 'streams'" (click)="setTab('streams')">Streams (11–12)</button>
+      <button class="sc-tab" [class.active]="activeTab === 'streams'" (click)="setTab('streams')">Streams</button>
       <button class="sc-tab" [class.active]="activeTab === 'optional'" (click)="setTab('optional')">Optional Groups</button>
     </div>
-  </div>
 
   <!-- CLASS SUBJECTS TAB -->
   <div *ngIf="activeTab === 'class'" class="sc-body">
@@ -67,7 +80,7 @@
 
   <!-- OPTIONAL GROUPS TAB -->
   <div *ngIf="activeTab === 'optional'" class="sc-body">
-    <p class="sc-hint">Optional groups let students in Class 11–12 pick one subject from a defined list (e.g. Physical Education, Hindi, or Computer Science).</p>
+    <p class="sc-hint">Optional groups let stream-eligible students pick one subject from a defined list (e.g. Physical Education, Hindi, or Computer Science).</p>
 
     <div class="sc-add-row">
       <input [(ngModel)]="newGroupName" placeholder="Group name (e.g. Elective)" (keyup.enter)="addOptionalGroup()" aria-label="New optional group name" />
@@ -100,4 +113,6 @@
     </div>
     <p *ngIf="optionalGroups.length === 0" class="sc-empty">No optional groups defined yet.</p>
   </div>
+
+  </div><!-- /.sc-card -->
 </div>

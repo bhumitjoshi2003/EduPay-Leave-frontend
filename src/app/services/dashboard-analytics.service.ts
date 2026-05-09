@@ -25,7 +25,7 @@ export interface ClassStats {
 
 export interface AttendanceTrend {
   period: string;
-  rate: number;
+  attendanceRate: number;
 }
 
 @Injectable({ providedIn: 'root' })

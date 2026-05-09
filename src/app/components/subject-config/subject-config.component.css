@@ -1,8 +1,5 @@
 /* ── Base ─────────────────────────────────────────────────────────── */
 .sc-container {
-  width: 95%;
-  max-width: 100%;
-  margin: 0 auto;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   animation: fadeIn 0.45s ease-out both;
   box-sizing: border-box;

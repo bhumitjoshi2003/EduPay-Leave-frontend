@@ -1,7 +1,5 @@
 /* ── Page wrapper ────────────────────────────────────────────────── */
 .sd-page {
-  width: 95%;
-  margin: 0 auto;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   animation: sd-fade-up 0.45s ease-out both;
 }

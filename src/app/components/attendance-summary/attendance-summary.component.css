@@ -1,7 +1,5 @@
 /* ── Page wrapper ────────────────────────────────────────────────── */
 .as-container {
-  width: 95%;
-  margin: 0 auto;
   padding-bottom: 24px;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   display: flex;

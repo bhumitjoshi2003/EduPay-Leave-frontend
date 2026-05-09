@@ -1,7 +1,5 @@
 /* ── Page wrapper ────────────────────────────────────────────────── */
 .ad-page {
-  width: 95%;
-  margin: 0 auto;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   animation: ad-fade-up 0.45s ease-out both;
 }

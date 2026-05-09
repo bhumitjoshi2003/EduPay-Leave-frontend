@@ -1,15 +1,20 @@
 <div *ngIf="showFeesReminderModule; else comingSoonTemplate">
-  <div class="fr-container">
+  <div class="fr-page">
 
-    <!-- ── Header ───────────────────────────────────────────────── -->
-    <div class="fr-page-header">
-      <div>
-        <h2 class="fr-title">Fee Reminders</h2>
-        <p class="fr-subtitle">Students with overdue fee payments</p>
+    <!-- ── Hero ──────────────────────────────────────────────────────── -->
+    <div class="fr-hero">
+      <div class="fr-hero-left">
+        <div class="fr-hero-icon">🔔</div>
+        <div>
+          <h1 class="fr-hero-title">Fee Reminders</h1>
+          <p class="fr-hero-sub">Students with overdue fee payments</p>
+        </div>
       </div>
+      <div class="fr-blob fr-blob-1"></div>
+      <div class="fr-blob fr-blob-2"></div>
     </div>
 
-    <!-- ── Controls ─────────────────────────────────────────────── -->
+    <!-- ── Controls ──────────────────────────────────────────────────── -->
     <div class="fr-controls no-print">
       <div class="fr-controls-row">
 
@@ -38,37 +43,79 @@
           </select>
         </div>
 
+        <div class="fr-control-group">
+          <label class="fr-label" for="fr-months">Unpaid months</label>
+          <select id="fr-months" class="fr-select" [(ngModel)]="minUnpaidMonths" (ngModelChange)="onFilterChange()">
+            <option [value]="0">All</option>
+            <option [value]="1">1+ months</option>
+            <option [value]="2">2+ months</option>
+            <option [value]="3">3+ months</option>
+            <option [value]="6">6+ months</option>
+          </select>
+        </div>
+
       </div>
     </div>
 
-    <!-- ── Loading / Error ──────────────────────────────────────── -->
-    <div class="fr-loading" *ngIf="isLoading">
-      <div class="fr-spinner"></div>
-      <span>Loading overdue fees…</span>
+    <!-- ── Skeleton ────────────────────────────────────────────────── -->
+    <div class="fr-table-wrap" *ngIf="isLoading">
+      <table class="fr-table" aria-hidden="true">
+        <thead>
+          <tr>
+            <th>#</th><th>Student</th><th>Class</th><th>Unpaid Months</th>
+            <th>Amount Due</th><th>Last Payment</th><th>Days Overdue</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let _ of [1,2,3,4,5,6,7,8]">
+            <td><span class="sk-shimmer" style="width:20px;height:12px"></span></td>
+            <td>
+              <span class="sk-shimmer" style="width:88px;height:13px;margin-bottom:5px"></span>
+              <span class="sk-shimmer" style="width:58px;height:10px"></span>
+            </td>
+            <td><span class="sk-shimmer" style="width:48px;height:12px"></span></td>
+            <td>
+              <span class="sk-shimmer" style="width:28px;height:10px;border-radius:10px;margin-bottom:4px"></span>
+              <div style="display:flex;gap:4px">
+                <span class="sk-shimmer" style="width:46px;height:20px;border-radius:12px"></span>
+                <span class="sk-shimmer" style="width:46px;height:20px;border-radius:12px"></span>
+              </div>
+            </td>
+            <td><span class="sk-shimmer" style="width:62px;height:13px"></span></td>
+            <td><span class="sk-shimmer" style="width:78px;height:12px"></span></td>
+            <td><span class="sk-shimmer" style="width:68px;height:22px;border-radius:12px"></span></td>
+            <td><span class="sk-shimmer" style="width:64px;height:30px;border-radius:8px"></span></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <p class="fr-error" *ngIf="error">{{ error }}</p>
 
-    <!-- ── Summary cards ────────────────────────────────────────── -->
+    <!-- ── Summary cards ──────────────────────────────────────────── -->
     <div class="fr-stats" *ngIf="!isLoading && allStudents.length > 0">
-      <div class="fr-stat-card">
+      <div class="fr-stat-card" style="--c1:#dc2626;--c2:#f87171">
         <span class="fr-stat-value">{{ filteredStudents.length }}</span>
         <span class="fr-stat-label">Overdue Students</span>
       </div>
-      <div class="fr-stat-card fr-stat-amount">
-        <span class="fr-stat-value">₹{{ totalDue | number }}</span>
+      <div class="fr-stat-card" style="--c1:#7c3aed;--c2:#a78bfa">
+        <span class="fr-stat-value" style="font-size:1.1rem">₹{{ totalDue | number }}</span>
         <span class="fr-stat-label">Total Due</span>
       </div>
-      <div class="fr-stat-card fr-stat-critical">
+      <div class="fr-stat-card" style="--c1:#b91c1c;--c2:#ef4444">
         <span class="fr-stat-value">{{ criticalCount }}</span>
         <span class="fr-stat-label">Critical (60+ days)</span>
       </div>
-      <div class="fr-stat-card fr-stat-warning">
+      <div class="fr-stat-card" style="--c1:#d97706;--c2:#fbbf24">
         <span class="fr-stat-value">{{ warningCount }}</span>
-        <span class="fr-stat-label">Warning (30-60 days)</span>
+        <span class="fr-stat-label">Warning (30–60 days)</span>
+      </div>
+      <div class="fr-stat-card" style="--c1:#0f766e;--c2:#2dd4bf">
+        <span class="fr-stat-value">{{ defaulterCount }}</span>
+        <span class="fr-stat-label">Defaulters (3+ months)</span>
       </div>
     </div>
 
-    <!-- ── Action bar ────────────────────────────────────────────── -->
+    <!-- ── Action bar ──────────────────────────────────────────────── -->
     <div class="fr-action-bar no-print" *ngIf="!isLoading && filteredStudents.length > 0">
       <div class="fr-action-left">
         <span class="fr-showing">
@@ -87,7 +134,7 @@
       </button>
     </div>
 
-    <!-- ── Table ─────────────────────────────────────────────────── -->
+    <!-- ── Table ──────────────────────────────────────────────────── -->
     <div class="fr-table-wrap" *ngIf="!isLoading && filteredStudents.length > 0">
 
       <!-- Print header -->
@@ -123,6 +170,12 @@
             <td data-label="Class">Class {{ s.className }}</td>
 
             <td data-label="Unpaid Months">
+              <div class="fr-months-header">
+                <span class="fr-months-count"
+                  [class.fr-months-count-high]="s.unpaidMonths.length >= 3">
+                  {{ s.unpaidMonths.length }} month{{ s.unpaidMonths.length !== 1 ? 's' : '' }}
+                </span>
+              </div>
               <div class="fr-months">
                 <span *ngFor="let m of s.unpaidMonths" class="fr-month-tag">{{ m }}</span>
               </div>
@@ -163,18 +216,14 @@
       </table>
     </div>
 
-    <!-- ── Pagination ───────────────────────────────────────────────── -->
+    <!-- ── Pagination ──────────────────────────────────────────────── -->
     <div class="fr-pagination no-print" *ngIf="!isLoading && totalPages > 1">
       <button class="fr-page-btn" (click)="prevPage()" [disabled]="currentPage === 0">&#8249; Prev</button>
-
-      <span class="fr-page-info">
-        Page {{ currentPage + 1 }} of {{ totalPages }}
-      </span>
-
+      <span class="fr-page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
       <button class="fr-page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages - 1">Next &#8250;</button>
     </div>
 
-    <!-- ── Legend ────────────────────────────────────────────────── -->
+    <!-- ── Legend ──────────────────────────────────────────────────── -->
     <div class="fr-legend no-print" *ngIf="!isLoading && filteredStudents.length > 0">
       <span class="fr-legend-item">
         <span class="fr-legend-dot dot-critical"></span> Critical — 60+ days overdue
@@ -187,7 +236,7 @@
       </span>
     </div>
 
-    <!-- ── Empty state ───────────────────────────────────────────── -->
+    <!-- ── Empty state ────────────────────────────────────────────── -->
     <div class="fr-empty" *ngIf="!isLoading && !error && allStudents.length === 0">
       <div class="fr-empty-icon">✅</div>
       <p class="fr-empty-title">All fees are up to date!</p>
@@ -200,7 +249,6 @@
 
   </div>
 </div>
-
 
 <ng-template #comingSoonTemplate>
   <app-coming-soon [title]="comingSoonConfig.title" [message]="comingSoonConfig.message"

@@ -5,14 +5,7 @@ import { EventService } from '../../services/event.service';
 import { CalendarEvent } from '../../interfaces/event-calendar.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SchoolService } from '../../services/school.service';
-
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
+import { ToastService } from '../../services/toast.service';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { Subject, takeUntil } from 'rxjs';
@@ -42,17 +35,7 @@ export const dateRangeValidator: ValidatorFn = (control: AbstractControl): { [ke
   templateUrl: './event-form.component.html',
   styleUrls: ['./event-form.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatSelectModule,
-    MatIconModule
-  ]
+  imports: [CommonModule, ReactiveFormsModule]
 })
 export class EventFormComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -61,9 +44,9 @@ export class EventFormComponent implements OnInit, OnDestroy {
   isEditMode: boolean = false;
   eventId: number | null = null;
 
+  readonly staticAudiences = ['ALL', 'TEACHERS', 'STUDENTS'];
   categories: string[] = ['Academic', 'Sports', 'Cultural', 'Social', 'Holiday', 'Meeting', 'Other'];
-  targetAudiences: string[] = ['ALL', 'TEACHERS', 'STUDENTS'];
-  classList: string[] = [];
+  targetAudiences: string[] = [...this.staticAudiences];
 
   // Image related properties
   selectedFile: File | null = null;
@@ -79,7 +62,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
-    private schoolService: SchoolService
+    private schoolService: SchoolService,
+    private toast: ToastService
   ) {
     this.eventForm = this.fb.group({
       title: ['', Validators.required],
@@ -103,7 +87,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
-      next: classes => { this.classList = classes; this.targetAudiences = ['ALL', 'TEACHERS', 'STUDENTS', ...classes]; this.cdr.markForCheck(); },
+      next: classes => { this.targetAudiences = [...this.staticAudiences, ...classes]; this.cdr.markForCheck(); },
       error: () => {}
     });
 
@@ -272,7 +256,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
           },
           error: (uploadError) => {
             this.logger.error('Error uploading image:', uploadError);
-            alert('Failed to upload image. Event not saved.');
+            this.toast.error('Upload Failed', 'Failed to upload image. Event not saved.');
           }
         });
       } else {
@@ -302,7 +286,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.logger.error('Error updating event:', err);
-          alert('Failed to update event. Please try again.');
+          this.toast.error('Update Failed', 'Failed to update event. Please try again.');
         }
       });
     } else {
@@ -312,10 +296,23 @@ export class EventFormComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.logger.error('Error creating event:', err);
-          alert('Failed to create event. Please try again.');
+          this.toast.error('Create Failed', 'Failed to create event. Please try again.');
         }
       });
     }
+  }
+
+  isAudienceSelected(audience: string): boolean {
+    const current: string[] = this.eventForm.get('targetAudience')?.value || [];
+    return current.includes(audience);
+  }
+
+  onAudienceToggle(audience: string): void {
+    const current: string[] = this.eventForm.get('targetAudience')?.value || [];
+    const updated = current.includes(audience)
+      ? current.filter((a: string) => a !== audience)
+      : [...current, audience];
+    this.eventForm.get('targetAudience')?.setValue(updated);
   }
 
   hasError(controlName: string, errorType: string): boolean | null {

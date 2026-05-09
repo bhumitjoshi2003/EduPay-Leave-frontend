@@ -1,8 +1,6 @@
 :host { display: block; }
 
 .sa-page {
-  max-width: 1080px;
-  margin: 0 auto;
   padding: 0 0 24px;
   font-family: 'Segoe UI', sans-serif;
 }
@@ -110,7 +108,7 @@
 /* ── Stats Grid ──────────────────────────────────────────────────── */
 .sa-stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 14px;
   margin-bottom: 20px;
 }
@@ -401,7 +399,6 @@ select.sa-input { appearance: auto; }
 
 /* ── Responsive ──────────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .sa-stats-grid { grid-template-columns: repeat(2, 1fr); }
   .sa-stat-wide  { grid-column: 1 / -1; }
   .sa-form-grid, .sa-form-grid-3 { grid-template-columns: repeat(2, 1fr); }
 }

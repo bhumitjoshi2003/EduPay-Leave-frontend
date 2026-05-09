@@ -1,8 +1,6 @@
 :host { display: block; }
 
 .ad-page {
-  max-width: 1080px;
-  margin: 0 auto;
   padding: 0 0 24px;
   font-family: 'Segoe UI', sans-serif;
 }
@@ -85,7 +83,7 @@
 /* ── Stat Cards ─────────────────────────────────────────────────── */
 .ad-stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
   margin-bottom: 20px;
 }
@@ -230,11 +228,9 @@
 
 /* ── Responsive ─────────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .ad-stats-grid { grid-template-columns: repeat(2, 1fr); }
   .ad-actions-grid { grid-template-columns: repeat(4, 1fr); }
 }
 @media (max-width: 600px) {
-  .ad-stats-grid { grid-template-columns: repeat(2, 1fr); }
   .ad-actions-grid { grid-template-columns: repeat(3, 1fr); }
   .ad-hero-name { font-size: 1.35rem; }
 }

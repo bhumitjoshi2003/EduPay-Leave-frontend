@@ -1,100 +1,153 @@
-<div class="search-container">
-  <!-- Page Header -->
-  <div class="page-header">
-    <h1 class="page-title">Student Search</h1>
-    <p class="page-sub">Search by name or student ID</p>
+<div class="ss-page">
+
+  <!-- ── Hero ───────────────────────────────────────────────────────── -->
+  <div class="ss-hero">
+    <div class="ss-hero-left">
+      <div class="ss-hero-icon-wrap">🔍</div>
+      <div class="ss-hero-text">
+        <p class="ss-hero-eyebrow">People</p>
+        <h1 class="ss-hero-title">Student Search</h1>
+        <p class="ss-hero-sub">Find any student instantly by name or ID</p>
+      </div>
+    </div>
+    <div class="ss-blob ss-blob-1"></div>
+    <div class="ss-blob ss-blob-2"></div>
   </div>
 
-  <!-- Search Bar -->
-  <div class="search-bar-wrapper">
-    <div class="search-bar">
-      <span class="search-icon">🔍</span>
+  <!-- ── Search Card ────────────────────────────────────────────────── -->
+  <div class="ss-search-card">
+    <div class="ss-search-box" [class.ss-search-active]="query.length > 0">
+      <span class="ss-search-icon">🔍</span>
       <input
+        class="ss-search-input"
         type="text"
-        class="search-input"
         [(ngModel)]="query"
         (ngModelChange)="onQueryChange()"
         placeholder="Type student name or ID…"
         autocomplete="off"
         autofocus
       />
-      <button
-        class="clear-btn"
-        *ngIf="query.length > 0"
-        (click)="clearSearch()"
-        title="Clear search"
-      >✕</button>
+      <span class="ss-search-kbd" *ngIf="query.length === 0">⌘K</span>
+      <button class="ss-clear-btn" *ngIf="query.length > 0" (click)="clearSearch()">✕</button>
     </div>
-    <p class="search-hint" *ngIf="query.length > 0 && query.length < 2">
-      Type at least 2 characters to search
+    <p class="ss-search-hint" *ngIf="query.length > 0 && query.length < 2">
+      Type at least 2 characters to search…
     </p>
   </div>
 
-  <!-- Loading Spinner -->
-  <div class="loading-state" *ngIf="isLoading">
-    <div class="spinner"></div>
-    <p>Searching…</p>
-  </div>
-
-  <!-- Error State -->
-  <div class="error-state" *ngIf="error && !isLoading">
-    <span class="error-icon">⚠️</span>
-    <p>{{ error }}</p>
-  </div>
-
-  <!-- Empty State -->
-  <div class="empty-state" *ngIf="hasSearched && !isLoading && !error && results.length === 0">
-    <span class="empty-icon">🔎</span>
-    <p>No students found for "<strong>{{ query }}</strong>"</p>
-    <span class="empty-sub">Try a different name or ID</span>
-  </div>
-
-  <!-- Results Table -->
-  <div class="results-wrapper" *ngIf="results.length > 0 && !isLoading">
-    <div class="results-header">
-      <span class="results-count">{{ results.length }} result{{ results.length === 1 ? '' : 's' }} found</span>
+  <!-- ── Loading Skeleton ───────────────────────────────────────────── -->
+  <div class="ss-results-card" *ngIf="isLoading">
+    <div class="ss-results-header">
+      <span class="sk-shimmer" style="width:120px;height:13px;border-radius:6px"></span>
     </div>
-    <div class="table-wrapper">
-      <table class="data-table">
+    <div class="ss-sk-row" *ngFor="let _ of [1,2,3,4]">
+      <span class="sk-shimmer" style="width:40px;height:40px;border-radius:50%;flex-shrink:0"></span>
+      <div style="flex:1;display:flex;flex-direction:column;gap:7px">
+        <span class="sk-shimmer" style="width:38%;height:14px;border-radius:6px"></span>
+        <span class="sk-shimmer" style="width:22%;height:11px;border-radius:6px"></span>
+      </div>
+      <span class="sk-shimmer" style="width:60px;height:13px;border-radius:6px"></span>
+      <span class="sk-shimmer" style="width:50px;height:13px;border-radius:6px"></span>
+      <span class="sk-shimmer" style="width:58px;height:22px;border-radius:12px"></span>
+    </div>
+  </div>
+
+  <!-- ── Error ──────────────────────────────────────────────────────── -->
+  <div class="ss-error" *ngIf="error && !isLoading">
+    <span>⚠️</span>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- ── No Results ─────────────────────────────────────────────────── -->
+  <div class="ss-empty" *ngIf="hasSearched && !isLoading && !error && results.length === 0">
+    <div class="ss-empty-icon">🔎</div>
+    <p class="ss-empty-title">No students found for "{{ query }}"</p>
+    <p class="ss-empty-sub">Try checking the spelling or search by student ID instead</p>
+  </div>
+
+  <!-- ── Results ────────────────────────────────────────────────────── -->
+  <div class="ss-results-card" *ngIf="results.length > 0 && !isLoading">
+    <div class="ss-results-header">
+      <span class="ss-results-dot"></span>
+      <span class="ss-results-label">{{ results.length }} result{{ results.length === 1 ? '' : 's' }} found</span>
+    </div>
+
+    <!-- Desktop table -->
+    <div class="ss-table-wrap">
+      <table class="ss-table">
         <thead>
           <tr>
             <th>Student</th>
             <th>Student ID</th>
             <th>Class</th>
             <th>Status</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            *ngFor="let student of results; trackBy: trackByStudentId"
-            class="result-row"
-            (click)="viewStudent(student.studentId)"
-          >
+          <tr *ngFor="let s of results; trackBy: trackByStudentId"
+            class="ss-row" (click)="viewStudent(s.studentId)">
             <td>
-              <div class="student-cell">
-                <div class="avatar">{{ getInitial(student.name) }}</div>
-                <div class="student-info">
-                  <div class="student-name">{{ student.name }}</div>
-                  <div class="student-email" *ngIf="student.email">{{ student.email }}</div>
+              <div class="ss-student-cell">
+                <div class="ss-avatar" [attr.data-status]="s.status?.toUpperCase()">
+                  {{ getInitial(s.name) }}
+                </div>
+                <div class="ss-student-info">
+                  <span class="ss-student-name">{{ s.name }}</span>
+                  <span class="ss-student-email" *ngIf="s.email">{{ s.email }}</span>
                 </div>
               </div>
             </td>
-            <td class="student-id">{{ student.studentId }}</td>
-            <td>{{ student.className }}</td>
+            <td><span class="ss-id-cell">{{ s.studentId }}</span></td>
+            <td><span class="ss-class-cell">{{ s.className }}</span></td>
             <td>
-              <span class="status-badge" [ngClass]="getStatusClass(student.status)">
-                {{ getStatusLabel(student.status) }}
+              <span class="ss-status-pill" [ngClass]="getStatusClass(s.status)">
+                {{ getStatusLabel(s.status) }}
               </span>
             </td>
+            <td class="ss-arrow-cell">›</td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <!-- Mobile cards -->
+    <div class="ss-mobile-list">
+      <div class="ss-m-card" *ngFor="let s of results; trackBy: trackByStudentId"
+        (click)="viewStudent(s.studentId)">
+        <div class="ss-avatar" [attr.data-status]="s.status?.toUpperCase()">{{ getInitial(s.name) }}</div>
+        <div class="ss-m-info">
+          <span class="ss-student-name">{{ s.name }}</span>
+          <span class="ss-id-cell">{{ s.studentId }} · {{ s.className }}</span>
+        </div>
+        <div class="ss-m-right">
+          <span class="ss-status-pill" [ngClass]="getStatusClass(s.status)">{{ getStatusLabel(s.status) }}</span>
+          <span class="ss-m-arrow">›</span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Idle State -->
-  <div class="idle-state" *ngIf="!hasSearched && !isLoading && !error && results.length === 0 && query.length < 2">
-    <span class="idle-icon">👨‍🎓</span>
-    <p>Start typing to search for students</p>
+  <!-- ── Idle State ─────────────────────────────────────────────────── -->
+  <div class="ss-idle" *ngIf="!hasSearched && !isLoading && !error && results.length === 0 && query.length < 2">
+    <p class="ss-idle-label">Search by</p>
+    <div class="ss-hint-grid">
+      <div class="ss-hint-card">
+        <span class="ss-hint-icon">📛</span>
+        <span class="ss-hint-title">Student Name</span>
+        <span class="ss-hint-sub">e.g. "Rohan Sharma"</span>
+      </div>
+      <div class="ss-hint-card">
+        <span class="ss-hint-icon">🪪</span>
+        <span class="ss-hint-title">Student ID</span>
+        <span class="ss-hint-sub">e.g. "STU-2024-001"</span>
+      </div>
+      <div class="ss-hint-card">
+        <span class="ss-hint-icon">🔤</span>
+        <span class="ss-hint-title">Partial Match</span>
+        <span class="ss-hint-sub">Works with 2+ characters</span>
+      </div>
+    </div>
   </div>
+
 </div>

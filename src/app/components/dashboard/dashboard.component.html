@@ -11,6 +11,7 @@
     <!-- Logo row -->
     <div class="sidebar-logo">
       <img src="EdunexifyLogo.png" alt="Edunexify" class="logo-img" />
+      <span class="sidebar-brand-name">Edunexify</span>
       <button class="sidebar-collapse-btn" (click)="toggleSidebar()" title="Collapse sidebar">
         <mat-icon>chevron_left</mat-icon>
       </button>
@@ -316,6 +317,11 @@
       <button class="topbar-hamburger" (click)="toggleSidebar()" title="Toggle sidebar">
         <mat-icon>{{ menuIcon }}</mat-icon>
       </button>
+
+      <div class="topbar-logo-group">
+        <img src="EdunexifyLogo.png" alt="Edunexify" class="topbar-logo-img" />
+        <span class="topbar-brand">Edunexify</span>
+      </div>
 
       <div class="topbar-spacer"></div>
 

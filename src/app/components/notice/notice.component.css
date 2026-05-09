@@ -16,14 +16,14 @@
   overflow: hidden;
   background: linear-gradient(135deg, #1e3a5f 0%, #1f6f8b 45%, #4fbdbd 100%);
   border-radius: 20px;
-  padding: 32px 36px 48px;
-  margin-bottom: 28px;
+  padding: 18px 24px 22px;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 20px;
-  box-shadow: 0 12px 40px rgba(31, 111, 139, 0.35);
+  gap: 12px;
+  box-shadow: 0 6px 24px rgba(31, 111, 139, 0.28);
 }
 
 .nb-hero::before {
@@ -52,10 +52,10 @@
 }
 
 .nb-hero-icon-wrap {
-  font-size: 2.8rem;
+  font-size: 1.7rem;
   background: rgba(255,255,255,0.15);
-  border-radius: 16px;
-  width: 64px; height: 64px;
+  border-radius: 12px;
+  width: 48px; height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,16 +65,16 @@
 
 .nb-hero-title {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: #fff;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.3px;
 }
 
 .nb-hero-sub {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   color: rgba(255,255,255,0.75);
-  font-size: 0.9rem;
+  font-size: 0.78rem;
 }
 
 .nb-hero-right {

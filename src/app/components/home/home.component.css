@@ -1292,3 +1292,216 @@
   .lp-hero-p  { font-size: 0.9rem; }
   .lp-hero-signin, .lp-hero-demo { font-size: 0.9rem; padding: 13px 22px; }
 }
+
+/* ══════════════════════════════════════════════════
+   SCHOOL-BRANDED LOGIN PAGE  (sl- prefix)
+══════════════════════════════════════════════════ */
+
+.sl-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #ede9fe 100%);
+  padding: 24px 16px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.sl-card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+  padding: 40px 36px 32px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── School identity ── */
+.sl-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.sl-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 16px;
+  border: 1.5px solid #e2e8f0;
+  padding: 6px;
+  background: #f8fafc;
+  margin-bottom: 14px;
+}
+
+.sl-initials {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--sl-accent, #0f766e), #2dd4bf);
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.sl-school-name {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.sl-school-meta {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ── Welcome text ── */
+.sl-welcome {
+  font-size: 0.85rem;
+  color: #475569;
+  margin: 0 0 24px;
+  font-weight: 500;
+}
+
+/* ── Form fields ── */
+.sl-field {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.sl-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.sl-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sl-input-ic {
+  position: absolute;
+  left: 12px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.sl-input {
+  width: 100%;
+  padding: 11px 14px 11px 38px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: #1e293b;
+  background: #f8fafc;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.sl-input:focus {
+  outline: none;
+  border-color: var(--sl-accent, #0f766e);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sl-accent, #0f766e) 15%, transparent);
+  background: #fff;
+}
+
+.sl-input-pwd { padding-right: 44px; }
+
+.sl-eye-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+.sl-eye-btn:hover { color: #475569; }
+
+/* ── Sign in button ── */
+.sl-btn {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--sl-accent, #0f766e), color-mix(in srgb, var(--sl-accent, #0f766e) 60%, #2dd4bf));
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--sl-accent, #0f766e) 35%, transparent);
+  font-family: inherit;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.sl-btn:active { opacity: 0.9; transform: scale(0.98); }
+
+/* ── Forgot password ── */
+.sl-forgot {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 14px;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+.sl-forgot:hover { color: var(--sl-accent, #0f766e); }
+
+/* ── Powered by ── */
+.sl-powered {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 28px;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.sl-powered-logo {
+  height: 16px;
+  width: 16px;
+  object-fit: contain;
+}
+
+.sl-powered-name {
+  font-weight: 700;
+  color: #64748b;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .sl-card { padding: 32px 20px 24px; border-radius: 20px; }
+  .sl-school-name { font-size: 1.15rem; }
+}

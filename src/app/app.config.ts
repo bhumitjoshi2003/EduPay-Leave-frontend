@@ -6,6 +6,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { AuthStateService } from './auth/auth-state.service';
 import { GlobalErrorHandler } from './core/global-error-handler';
+import { TenantService } from './services/tenant.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,6 +16,9 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptorsFromDi()),
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
-    provideAppInitializer(() => inject(AuthStateService).loadCurrentUser())
+    provideAppInitializer(() => Promise.all([
+      inject(TenantService).init(),
+      inject(AuthStateService).loadCurrentUser()
+    ]).then(() => {}))
   ]
 };

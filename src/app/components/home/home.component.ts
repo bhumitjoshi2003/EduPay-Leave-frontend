@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { LoggerService } from '../../services/logger.service';
 import { DemoService } from '../../services/demo.service';
 import { ToastService } from '../../services/toast.service';
+import { TenantService } from '../../services/tenant.service';
 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -50,7 +51,8 @@ export class HomeComponent implements OnInit {
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
     private demoService: DemoService,
-    private toast: ToastService
+    private toast: ToastService,
+    public tenantService: TenantService
   ) { }
 
   ngOnInit() {

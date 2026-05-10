@@ -39,7 +39,8 @@ export class AuthInterceptor implements HttpInterceptor {
       request.url.includes('/auth/login') ||
       request.url.includes('/auth/refresh-token') ||
       request.url.includes('/auth/request-password-reset') ||
-      request.url.includes('/auth/reset-password');
+      request.url.includes('/auth/reset-password') ||
+      request.url.includes('/auth/me');  // /auth/me returns 401 on page load (no cookie yet) — don't retry
 
     // Only attach credentials to our own API — not to third-party URLs (e.g. Razorpay CDN)
     const isOwnApi = request.url.startsWith(environment.apiUrl);

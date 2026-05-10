@@ -10,6 +10,7 @@ import {
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { AuthStateService } from './auth-state.service';
+import { TenantService } from '../services/tenant.service';
 import { environment } from '../../environments/environment';
 
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
@@ -28,7 +29,8 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private authStateService: AuthStateService
+    private authStateService: AuthStateService,
+    private tenantService: TenantService
   ) { }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -41,7 +43,21 @@ export class AuthInterceptor implements HttpInterceptor {
 
     // Only attach credentials to our own API — not to third-party URLs (e.g. Razorpay CDN)
     const isOwnApi = request.url.startsWith(environment.apiUrl);
-    const clonedReq = isOwnApi ? request.clone({ withCredentials: true }) : request;
+
+    // Attach credentials + X-School-Slug header so the backend TenantValidationFilter
+    // can enforce that the browser's current school subdomain matches the JWT's schoolId.
+    // The web frontend uses an absolute API URL so the Host header is always the root
+    // domain — the filter relies on this header instead of extracting the subdomain.
+    let clonedReq: HttpRequest<any>;
+    if (isOwnApi) {
+      const slug = this.tenantService.slug;
+      clonedReq = request.clone({
+        withCredentials: true,
+        ...(slug ? { setHeaders: { 'X-School-Slug': slug } } : {}),
+      });
+    } else {
+      clonedReq = request;
+    }
 
     return next.handle(clonedReq).pipe(
       catchError((error: HttpErrorResponse) => {

@@ -57,8 +57,20 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     if (this.authStateService.isLoggedIn()) {
+      const user = this.authStateService.getUser();
+      // School user on the root domain → bounce to their school subdomain.
+      // SUPER_ADMIN has no schoolSlug and stays on the root domain.
+      if (user?.schoolSlug && !this.tenantService.slug) {
+        window.location.href = this.tenantService.buildSchoolUrl(user.schoolSlug, '/dashboard');
+        return;
+      }
       this.authenticated = true;
       this.router.navigate(['/dashboard']);
+    } else if (this.tenantService.slug) {
+      // Not logged in on a school subdomain — login is only on the root domain.
+      // Redirect (e.g. session expired while on subdomain, or direct URL entry).
+      const rootUrl = window.location.origin.replace(`${this.tenantService.slug}.`, '');
+      window.location.href = rootUrl;
     }
   }
 
@@ -84,6 +96,15 @@ export class HomeComponent implements OnInit {
     this.authService.login(this.userId, this.password).subscribe({
       next: (response) => {
         this.authStateService.setUser(response);
+
+        // School user → redirect to their school subdomain for the session.
+        // SUPER_ADMIN has no schoolSlug and stays on the root domain.
+        if (response.schoolSlug) {
+          localStorage.removeItem('redirectUrl');
+          window.location.href = this.tenantService.buildSchoolUrl(response.schoolSlug, '/dashboard');
+          return;
+        }
+
         this.authenticated = true;
         this.showLoginForm = false;
         this.cdr.markForCheck();

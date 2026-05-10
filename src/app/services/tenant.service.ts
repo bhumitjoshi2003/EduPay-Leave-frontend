@@ -63,6 +63,16 @@ export class TenantService {
     return `${environment.apiUrl}${path}`;
   }
 
+  /**
+   * Builds the full URL for a school subdomain.
+   * e.g. buildSchoolUrl('childrens-academy', '/dashboard')
+   *   → 'https://childrens-academy.edunexify.co.in/dashboard'
+   */
+  buildSchoolUrl(slug: string, path = ''): string {
+    const { protocol, port } = window.location;
+    return `${protocol}//${slug}.${this.BASE_DOMAIN}${port ? ':' + port : ''}${path}`;
+  }
+
   private extractSlug(): string | null {
     const hostname = window.location.hostname;
 

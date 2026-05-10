@@ -1505,3 +1505,134 @@
   .sl-card { padding: 32px 20px 24px; border-radius: 20px; }
   .sl-school-name { font-size: 1.15rem; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   SCHOOL NOT FOUND PAGE  (snf-)
+   Shown when a subdomain is detected but no active school
+   matches — blocks login, links back to edunexify.co.in
+   ══════════════════════════════════════════════════════════ */
+
+.snf-page {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #0f766e 100%);
+  overflow: hidden;
+  padding: 24px;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Aurora background blobs */
+.snf-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.25;
+  pointer-events: none;
+}
+.snf-blob1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, #4fbdbd 0%, transparent 70%);
+  top: -120px; left: -100px;
+}
+.snf-blob2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, #0f766e 0%, transparent 70%);
+  bottom: -100px; right: -80px;
+}
+
+/* Card */
+.snf-card {
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  border-radius: 24px;
+  padding: 48px 40px 40px;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+}
+
+/* Icon */
+.snf-icon {
+  font-size: 3.5rem;
+  line-height: 1;
+  margin-bottom: 16px;
+  display: block;
+}
+
+/* Title */
+.snf-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 12px;
+  letter-spacing: -0.4px;
+}
+
+/* Subtitle */
+.snf-sub {
+  font-size: 0.95rem;
+  color: #475569;
+  margin: 0 0 8px;
+  line-height: 1.6;
+}
+
+.snf-url {
+  color: #0f766e;
+  font-weight: 700;
+  word-break: break-all;
+}
+
+/* Hint */
+.snf-hint {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 0 0 28px;
+  line-height: 1.5;
+}
+
+/* CTA button */
+.snf-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #0f766e 0%, #0891b2 100%);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.35);
+  margin-bottom: 28px;
+}
+.snf-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.snf-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+/* Footer brand */
+.snf-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 600;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 20px;
+}
+
+.snf-logo {
+  height: 18px;
+  width: 18px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+@media (max-width: 480px) {
+  .snf-card { padding: 36px 20px 28px; border-radius: 20px; }
+  .snf-title { font-size: 1.35rem; }
+}

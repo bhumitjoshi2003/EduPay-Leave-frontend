@@ -112,10 +112,38 @@
 }
 
 <!-- ══════════════════════════════════════════════════
+     SCHOOL NOT FOUND
+     Shown when a subdomain exists but no active school matches it
+══════════════════════════════════════════════════ -->
+@else if (tenantService.slug) {
+<div class="snf-page">
+  <div class="snf-blob snf-blob1"></div>
+  <div class="snf-blob snf-blob2"></div>
+  <div class="snf-card">
+    <div class="snf-icon">🏫</div>
+    <h1 class="snf-title">School Not Found</h1>
+    <p class="snf-sub">
+      No active school was found at<br>
+      <strong class="snf-url">{{ tenantService.slug }}.edunexify.co.in</strong>
+    </p>
+    <p class="snf-hint">Please check the URL with your school administrator, or visit the main portal to sign in.</p>
+    <a href="https://edunexify.co.in" class="snf-btn">
+      Go to edunexify.co.in
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+    <div class="snf-footer">
+      <img src="assets/EdunexifyLogo.png" alt="Edunexify" class="snf-logo">
+      <span>Edunexify</span>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ══════════════════════════════════════════════════
      MARKETING LANDING PAGE
      Shown on root domain (edunexify.co.in) only
 ══════════════════════════════════════════════════ -->
-@if (!tenantService.isBranded) {
+@else {
 <div class="lp-page">
 
   <!-- ══════════════════════════════════════════════════

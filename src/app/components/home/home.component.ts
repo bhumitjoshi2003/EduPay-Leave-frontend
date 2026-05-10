@@ -57,13 +57,6 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     if (this.authStateService.isLoggedIn()) {
-      const user = this.authStateService.getUser();
-      // School user on the root domain → bounce to their school subdomain.
-      // SUPER_ADMIN has no schoolSlug and stays on the root domain.
-      if (user?.schoolSlug && !this.tenantService.slug) {
-        window.location.href = this.tenantService.buildSchoolUrl(user.schoolSlug, '/dashboard');
-        return;
-      }
       this.authenticated = true;
       this.router.navigate(['/dashboard']);
     } else if (this.tenantService.slug) {

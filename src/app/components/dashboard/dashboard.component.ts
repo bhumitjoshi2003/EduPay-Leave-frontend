@@ -13,6 +13,7 @@ import { TeacherService } from '../../services/teacher.service';
 import { AdminService } from '../../services/admin.service';
 import { NotificationService } from '../../services/notification.service';
 import { SchoolService } from '../../services/school.service';
+import { TenantService } from '../../services/tenant.service';
 import { MatDialog } from '@angular/material/dialog';
 import { WelcomeDialogComponent } from '../welcome-dialog/welcome-dialog.component';
 import { Subject, takeUntil, interval, Subscription } from 'rxjs';
@@ -60,6 +61,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private adminService: AdminService,
     private notificationService: NotificationService,
     private schoolService: SchoolService,
+    public tenantService: TenantService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService

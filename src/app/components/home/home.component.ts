@@ -59,12 +59,10 @@ export class HomeComponent implements OnInit {
     if (this.authStateService.isLoggedIn()) {
       this.authenticated = true;
       this.router.navigate(['/dashboard']);
-    } else if (this.tenantService.slug) {
-      // Not logged in on a school subdomain — login is only on the root domain.
-      // Redirect (e.g. session expired while on subdomain, or direct URL entry).
-      const rootUrl = window.location.origin.replace(`${this.tenantService.slug}.`, '');
-      window.location.href = rootUrl;
     }
+    // If not logged in on a school subdomain, show the branded login — no redirect.
+    // The user has already been here before (logged out or session expired)
+    // so the branded page is the right thing to show.
   }
 
   // ── Login ─────────────────────────────────────────────────
@@ -90,11 +88,20 @@ export class HomeComponent implements OnInit {
       next: (response) => {
         this.authStateService.setUser(response);
 
-        // School user → redirect to their school subdomain for the session.
+        // School user → ensure they're on their school subdomain.
         // SUPER_ADMIN has no schoolSlug and stays on the root domain.
         if (response.schoolSlug) {
           localStorage.removeItem('redirectUrl');
-          window.location.href = this.tenantService.buildSchoolUrl(response.schoolSlug, '/dashboard');
+          if (response.schoolSlug === this.tenantService.slug) {
+            // Already on the correct subdomain — navigate locally, no reload needed.
+            this.authenticated = true;
+            this.showLoginForm = false;
+            this.cdr.markForCheck();
+            this.router.navigateByUrl('/dashboard');
+          } else {
+            // On root domain or wrong subdomain — redirect to their school subdomain.
+            window.location.href = this.tenantService.buildSchoolUrl(response.schoolSlug, '/dashboard');
+          }
           return;
         }
 

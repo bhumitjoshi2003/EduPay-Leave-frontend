@@ -11,7 +11,12 @@
     <!-- Logo row -->
     <div class="sidebar-logo">
       <img src="EdunexifyLogo.png" alt="Edunexify" class="logo-img" />
-      <span class="sidebar-brand-name">Edunexify</span>
+      <div class="sidebar-brand-text">
+        <span class="sidebar-brand-name">Edunexify</span>
+        <span class="sidebar-school-name" *ngIf="!isSuperAdmin() && tenantService.school?.name">
+          {{ tenantService.school!.name }}
+        </span>
+      </div>
       <button class="sidebar-collapse-btn" (click)="toggleSidebar()" title="Collapse sidebar">
         <mat-icon>chevron_left</mat-icon>
       </button>
@@ -308,7 +313,15 @@
 
       <div class="topbar-logo-group">
         <img src="EdunexifyLogo.png" alt="Edunexify" class="topbar-logo-img" />
-        <span class="topbar-brand">Edunexify</span>
+        <div class="topbar-brand-text">
+          <span class="topbar-brand">Edunexify</span>
+          <span class="topbar-school-name" *ngIf="!isSuperAdmin() && tenantService.school?.name">
+            <img *ngIf="tenantService.school?.logoUrl"
+                 [src]="tenantService.getLogoUrl(tenantService.school!.logoUrl!)"
+                 alt="" class="topbar-school-icon" />
+            {{ tenantService.school!.name }}
+          </span>
+        </div>
       </div>
 
       <div class="topbar-spacer"></div>

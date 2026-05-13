@@ -13,12 +13,14 @@
 
     <div class="sl-panel-body">
       <div class="sl-logo-outer">
-        @if (tenantService.school?.logoUrl) {
-          <img [src]="tenantService.getLogoUrl(tenantService.school!.logoUrl!)"
-               [alt]="tenantService.school!.name" class="sl-logo-img">
-        } @else {
-          <div class="sl-logo-initials">{{ tenantService.school?.name?.charAt(0)?.toUpperCase() }}</div>
-        }
+        <div class="sl-logo-wrap">
+          @if (tenantService.school?.logoUrl) {
+            <img [src]="tenantService.getLogoUrl(tenantService.school!.logoUrl!)"
+                 [alt]="tenantService.school!.name" class="sl-logo-img">
+          } @else {
+            <div class="sl-logo-initials">{{ tenantService.school?.name?.charAt(0)?.toUpperCase() }}</div>
+          }
+        </div>
       </div>
 
       <h1 class="sl-school-name">{{ tenantService.school?.name }}</h1>

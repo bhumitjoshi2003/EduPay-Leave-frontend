@@ -1297,6 +1297,19 @@
    SCHOOL-BRANDED LOGIN PAGE — split panel  (sl- prefix)
 ══════════════════════════════════════════════════ */
 
+@keyframes sl-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+@keyframes sl-ring-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes sl-identity-in {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .sl-page {
   min-height: 100dvh;
   display: flex;
@@ -1307,11 +1320,15 @@
 .sl-panel-left {
   width: 44%;
   min-height: 100dvh;
-  background: linear-gradient(
-    145deg,
-    #0f172a 0%,
-    color-mix(in srgb, var(--sl-accent, #0f766e) 38%, #0f172a) 100%
-  );
+  /* Layered radial gradients — same technique as Android app */
+  background:
+    radial-gradient(ellipse 130% 65% at 12% 0%,
+      color-mix(in srgb, var(--sl-accent, #0f766e) 70%, #e0f2f1) 0%, transparent 52%),
+    radial-gradient(ellipse 80% 80% at 88% 100%,
+      color-mix(in srgb, var(--sl-accent, #0f766e) 40%, #0a0f1e) 0%, transparent 58%),
+    radial-gradient(ellipse 100% 50% at 50% 50%,
+      color-mix(in srgb, var(--sl-accent, #0f766e) 55%, #0f172a) 0%, transparent 100%),
+    color-mix(in srgb, var(--sl-accent, #0f766e) 38%, #080d18);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -1321,27 +1338,34 @@
   overflow: hidden;
 }
 
+/* Animated aurora blobs */
 .sl-panel-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(72px);
+  filter: blur(100px);
   pointer-events: none;
 }
 .sl-pb1 {
-  width: 420px; height: 420px;
-  top: -100px; left: -100px;
-  background: color-mix(in srgb, var(--sl-accent, #0f766e) 28%, transparent);
+  width: 380px; height: 380px;
+  top: -100px; right: -80px;
+  background: rgba(255, 255, 255, 0.08);
+  animation: lp-aurora-drift-1 18s ease-in-out infinite;
 }
 .sl-pb2 {
-  width: 320px; height: 320px;
-  bottom: -80px; right: -80px;
-  background: color-mix(in srgb, var(--sl-accent, #0f766e) 20%, transparent);
+  width: 280px; height: 280px;
+  bottom: -70px; left: -60px;
+  background: rgba(255, 255, 255, 0.055);
+  animation: lp-aurora-drift-2 23s ease-in-out infinite;
 }
+
+/* Subtle mesh grid */
 .sl-panel-dots {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size: 32px 32px;
   pointer-events: none;
 }
 
@@ -1354,60 +1378,95 @@
   text-align: center;
   flex: 1;
   justify-content: center;
-  gap: 0;
+  animation: sl-identity-in 0.65s cubic-bezier(.32,.72,0,1) both;
 }
 
-.sl-logo-outer { margin-bottom: 26px; }
+/* ── Logo: float + spinning conic ring (from Android) ── */
+.sl-logo-outer {
+  position: relative;
+  width: 108px; height: 108px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 28px;
+  animation: sl-float 5.5s ease-in-out infinite;
+}
+/* Spinning conic-gradient border ring */
+.sl-logo-outer::before {
+  content: '';
+  position: absolute; inset: -7px;
+  border-radius: 36px;
+  padding: 1.5px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(255,255,255,.7) 20%,
+    transparent 40%,
+    rgba(255,255,255,.25) 70%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: sl-ring-spin 7s linear infinite;
+}
+/* Soft outer glow ring */
+.sl-logo-outer::after {
+  content: '';
+  position: absolute; inset: -12px;
+  border-radius: 40px;
+  border: 1px solid rgba(255,255,255,.07);
+  pointer-events: none;
+}
+
+/* Glassmorphism logo card */
+.sl-logo-wrap {
+  width: 108px; height: 108px;
+  border-radius: 30px;
+  background: rgba(255,255,255,.15);
+  border: 1.5px solid rgba(255,255,255,.25);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow:
+    0 0 0 6px rgba(255,255,255,.04),
+    0 20px 56px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.3);
+}
 
 .sl-logo-img {
-  width: 108px;
-  height: 108px;
+  width: 86px; height: 86px;
+  border-radius: 24px;
   object-fit: contain;
-  border-radius: 22px;
-  background: rgba(255,255,255,0.1);
-  border: 2px solid rgba(255,255,255,0.18);
-  padding: 10px;
-  backdrop-filter: blur(10px);
 }
 
 .sl-logo-initials {
-  width: 108px;
-  height: 108px;
-  border-radius: 22px;
-  background: rgba(255,255,255,0.12);
-  border: 2px solid rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
-  color: #fff;
-  font-size: 2.6rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  letter-spacing: -1px;
+  font-size: 2.5rem; font-weight: 900;
+  color: #fff; letter-spacing: -2px;
+  text-shadow: 0 2px 14px rgba(0,0,0,.35);
 }
 
 .sl-school-name {
-  font-size: clamp(1.35rem, 2vw, 1.8rem);
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
   font-weight: 800;
   color: #fff;
   margin: 0 0 8px;
   letter-spacing: -0.4px;
   line-height: 1.2;
+  text-shadow: 0 2px 12px rgba(0,0,0,.25);
 }
 
 .sl-school-meta {
   font-size: 0.8rem;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,.55);
   font-weight: 500;
-  margin: 0 0 30px;
+  margin: 0 0 28px;
 }
 
 .sl-panel-tagline {
   font-size: 0.88rem;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,.62);
   line-height: 1.65;
-  margin: 0 0 26px;
-  max-width: 280px;
+  margin: 0 0 24px;
+  max-width: 270px;
 }
 
 .sl-panel-chips {
@@ -1417,9 +1476,9 @@
   justify-content: center;
 }
 .sl-panel-chips span {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.16);
-  color: rgba(255,255,255,0.78);
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.16);
+  color: rgba(255,255,255,.78);
   border-radius: 50px;
   padding: 5px 14px;
   font-size: 0.71rem;
@@ -1435,15 +1494,14 @@
   align-items: center;
   gap: 7px;
   font-size: 0.71rem;
-  color: rgba(255,255,255,0.3);
+  color: rgba(255,255,255,.32);
   font-weight: 500;
 }
 .sl-panel-edu-logo {
-  height: 15px;
-  width: 15px;
+  height: 15px; width: 15px;
   object-fit: contain;
   filter: brightness(0) invert(1);
-  opacity: 0.4;
+  opacity: 0.42;
 }
 
 /* ── Right panel — login form ── */
@@ -1454,7 +1512,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 48px;
+  padding: 48px 52px;
+  border-left: 1px solid rgba(0,0,0,.04);
 }
 
 .sl-form-wrap {
@@ -1530,18 +1589,15 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--sl-accent, #0f766e) 14%, transparent);
   background: #fff;
 }
-
 .sl-input-pwd { padding-right: 46px; }
 
 .sl-eye-btn {
   position: absolute;
   right: 11px;
-  background: none;
-  border: none;
+  background: none; border: none;
   cursor: pointer;
   color: #94a3b8;
-  display: flex;
-  align-items: center;
+  display: flex; align-items: center;
   padding: 4px;
   transition: color 0.15s;
 }
@@ -1559,9 +1615,7 @@
   font-weight: 700;
   cursor: pointer;
   margin-top: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   gap: 8px;
   box-shadow: 0 4px 16px color-mix(in srgb, var(--sl-accent, #0f766e) 35%, transparent);
   font-family: inherit;
@@ -1572,11 +1626,9 @@
 
 /* ── Forgot password ── */
 .sl-forgot {
-  background: none;
-  border: none;
+  background: none; border: none;
   color: #94a3b8;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.8rem; font-weight: 600;
   cursor: pointer;
   margin-top: 14px;
   font-family: inherit;
@@ -1585,7 +1637,7 @@
 }
 .sl-forgot:hover { color: var(--sl-accent, #0f766e); }
 
-/* ── Form footer: powered + change school ── */
+/* ── Footer: powered + change school ── */
 .sl-form-footer {
   display: flex;
   align-items: center;
@@ -1596,28 +1648,16 @@
 }
 
 .sl-powered {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.71rem;
-  color: #94a3b8;
-  font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.71rem; color: #94a3b8; font-weight: 500;
 }
-.sl-powered-logo {
-  height: 15px;
-  width: 15px;
-  object-fit: contain;
-}
+.sl-powered-logo { height: 15px; width: 15px; object-fit: contain; }
 .sl-powered-name { font-weight: 700; color: #64748b; }
 
 .sl-change-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  font-size: 0.78rem;
-  font-weight: 600;
+  display: flex; align-items: center; gap: 4px;
+  background: none; border: none;
+  font-size: 0.78rem; font-weight: 600;
   color: #94a3b8;
   cursor: pointer;
   font-family: inherit;
@@ -1635,14 +1675,13 @@
     min-height: auto;
     padding: 40px 28px 32px;
   }
-  .sl-logo-img, .sl-logo-initials {
-    width: 76px; height: 76px;
-    border-radius: 16px;
-    font-size: 2rem;
-    padding: 8px;
-  }
-  .sl-logo-outer { margin-bottom: 18px; }
-  .sl-school-name { font-size: 1.35rem; }
+  .sl-logo-outer { width: 80px; height: 80px; margin-bottom: 20px; }
+  .sl-logo-wrap { width: 80px; height: 80px; border-radius: 22px; }
+  .sl-logo-img { width: 62px; height: 62px; border-radius: 16px; }
+  .sl-logo-initials { font-size: 1.9rem; }
+  .sl-logo-outer::before { border-radius: 28px; inset: -6px; }
+  .sl-logo-outer::after  { border-radius: 32px; inset: -10px; }
+  .sl-school-name { font-size: 1.3rem; }
   .sl-panel-tagline { display: none; }
   .sl-panel-chips { display: none; }
   .sl-panel-powered { padding-top: 24px; }
@@ -1651,6 +1690,8 @@
     min-height: auto;
     padding: 36px 24px 44px;
     align-items: flex-start;
+    border-left: none;
+    border-top: 1px solid #f1f5f9;
   }
   .sl-form-wrap { max-width: 100%; }
   .sl-form-title { font-size: 1.5rem; }

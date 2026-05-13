@@ -25,6 +25,7 @@ export class HomeComponent implements OnInit {
   showLoginForm  = false;
   showForgotForm = false;
   showDemoForm   = false;
+  logoLoadFailed = false;
 
   userId   = '';
   password = '';
@@ -147,6 +148,11 @@ export class HomeComponent implements OnInit {
 
   togglePasswordVisibility() {
     this.hidePassword = !this.hidePassword;
+  }
+
+  onLogoError(): void {
+    this.logoLoadFailed = true;
+    this.cdr.markForCheck();
   }
 
   changeSchool(): void {

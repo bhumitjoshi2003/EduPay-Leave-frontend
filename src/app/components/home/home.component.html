@@ -14,9 +14,9 @@
     <div class="sl-panel-body">
       <div class="sl-logo-outer">
         <div class="sl-logo-wrap">
-          @if (tenantService.school?.logoUrl) {
+          @if (tenantService.school?.logoUrl && !logoLoadFailed) {
           <img [src]="tenantService.getLogoUrl(tenantService.school!.logoUrl!)" [alt]="tenantService.school!.name"
-            class="sl-logo-img">
+            class="sl-logo-img" (error)="onLogoError()">
           } @else {
           <div class="sl-logo-initials">{{ tenantService.school?.name?.charAt(0)?.toUpperCase() }}</div>
           }

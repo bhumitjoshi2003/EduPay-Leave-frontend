@@ -1318,7 +1318,7 @@
 
 /* ── Left panel — school identity ── */
 .sl-panel-left {
-  width: 44%;
+  width: 56%;
   min-height: 100dvh;
   /* Layered radial gradients — same technique as Android app */
   background:
@@ -1508,12 +1508,56 @@
 .sl-panel-right {
   flex: 1;
   min-height: 100dvh;
-  background: #fff;
+  /* Subtle accent-tinted gradient from both corners */
+  background:
+    radial-gradient(ellipse 90% 65% at 110% -10%,
+      color-mix(in srgb, var(--sl-accent, #0f766e) 10%, #dbeafe) 0%, transparent 52%),
+    radial-gradient(ellipse 70% 55% at -10% 110%,
+      color-mix(in srgb, var(--sl-accent, #0f766e) 8%, #d1fae5) 0%, transparent 50%),
+    #f8fafc;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 48px 52px;
-  border-left: 1px solid rgba(0,0,0,.04);
+  border-left: 1px solid rgba(0,0,0,.06);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle dot grid overlay */
+.sl-rp-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(30, 58, 95, 0.033) 1px, transparent 1px);
+  background-size: 26px 26px;
+  pointer-events: none;
+}
+
+/* Decorative concentric rings (top-right + bottom-left) */
+.sl-rp-ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.sl-rp-r1 {
+  width: 400px; height: 400px;
+  top: -140px; right: -140px;
+  border: 1.5px solid color-mix(in srgb, var(--sl-accent, #0f766e) 15%, transparent);
+}
+.sl-rp-r2 {
+  width: 260px; height: 260px;
+  top: -80px; right: -80px;
+  border: 1px solid color-mix(in srgb, var(--sl-accent, #0f766e) 11%, transparent);
+}
+.sl-rp-r3 {
+  width: 320px; height: 320px;
+  bottom: -120px; left: -120px;
+  border: 1.5px solid color-mix(in srgb, var(--sl-accent, #0f766e) 12%, transparent);
+}
+.sl-rp-r4 {
+  width: 200px; height: 200px;
+  bottom: -65px; left: -65px;
+  border: 1px solid color-mix(in srgb, var(--sl-accent, #0f766e) 8%, transparent);
 }
 
 .sl-form-wrap {
@@ -1521,6 +1565,8 @@
   max-width: 380px;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 .sl-form-title {
@@ -1692,7 +1738,9 @@
     align-items: flex-start;
     border-left: none;
     border-top: 1px solid #f1f5f9;
+    background: #f8fafc;
   }
+  .sl-rp-grid, .sl-rp-ring { display: none; }
   .sl-form-wrap { max-width: 100%; }
   .sl-form-title { font-size: 1.5rem; }
 }

@@ -47,7 +47,9 @@ export class TenantService {
     this._slug = slug;
 
     return this.http
-      .get<PublicSchoolInfo>(`${environment.apiUrl}/public/school/${slug}`)
+      .get<PublicSchoolInfo>(`${environment.apiUrl}/public/school/${slug}`, {
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      })
       .toPromise()
       .then(info => { this._school = info ?? null; })
       .catch(() => { this._school = null; });

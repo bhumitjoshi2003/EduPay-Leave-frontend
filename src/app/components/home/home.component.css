@@ -1294,88 +1294,191 @@
 }
 
 /* ══════════════════════════════════════════════════
-   SCHOOL-BRANDED LOGIN PAGE  (sl- prefix)
+   SCHOOL-BRANDED LOGIN PAGE — split panel  (sl- prefix)
 ══════════════════════════════════════════════════ */
 
 .sl-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #ede9fe 100%);
-  padding: 24px 16px;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
-.sl-card {
-  background: #fff;
-  border-radius: 24px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.10);
-  padding: 40px 36px 32px;
-  width: 100%;
-  max-width: 420px;
+/* ── Left panel — school identity ── */
+.sl-panel-left {
+  width: 44%;
+  min-height: 100dvh;
+  background: linear-gradient(
+    145deg,
+    #0f172a 0%,
+    color-mix(in srgb, var(--sl-accent, #0f766e) 38%, #0f172a) 100%
+  );
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
+  padding: 52px 44px 36px;
+  overflow: hidden;
 }
 
-/* ── School identity ── */
-.sl-identity {
+.sl-panel-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+  pointer-events: none;
+}
+.sl-pb1 {
+  width: 420px; height: 420px;
+  top: -100px; left: -100px;
+  background: color-mix(in srgb, var(--sl-accent, #0f766e) 28%, transparent);
+}
+.sl-pb2 {
+  width: 320px; height: 320px;
+  bottom: -80px; right: -80px;
+  background: color-mix(in srgb, var(--sl-accent, #0f766e) 20%, transparent);
+}
+.sl-panel-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+
+.sl-panel-body {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
   text-align: center;
+  flex: 1;
+  justify-content: center;
+  gap: 0;
 }
 
-.sl-logo {
-  width: 80px;
-  height: 80px;
+.sl-logo-outer { margin-bottom: 26px; }
+
+.sl-logo-img {
+  width: 108px;
+  height: 108px;
   object-fit: contain;
-  border-radius: 16px;
-  border: 1.5px solid #e2e8f0;
-  padding: 6px;
-  background: #f8fafc;
-  margin-bottom: 14px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.18);
+  padding: 10px;
+  backdrop-filter: blur(10px);
 }
 
-.sl-initials {
-  width: 80px;
-  height: 80px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, var(--sl-accent, #0f766e), #2dd4bf);
+.sl-logo-initials {
+  width: 108px;
+  height: 108px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.12);
+  border: 2px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
   color: #fff;
-  font-size: 2rem;
+  font-size: 2.6rem;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 14px;
+  letter-spacing: -1px;
 }
 
 .sl-school-name {
-  font-size: 1.3rem;
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
   font-weight: 800;
-  color: #0f172a;
-  margin: 0 0 4px;
-  letter-spacing: -0.3px;
+  color: #fff;
+  margin: 0 0 8px;
+  letter-spacing: -0.4px;
   line-height: 1.2;
 }
 
 .sl-school-meta {
-  font-size: 0.78rem;
-  color: #64748b;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
   font-weight: 500;
-  margin: 0;
+  margin: 0 0 30px;
 }
 
-/* ── Welcome text ── */
-.sl-welcome {
-  font-size: 0.85rem;
-  color: #475569;
-  margin: 0 0 24px;
+.sl-panel-tagline {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.65;
+  margin: 0 0 26px;
+  max-width: 280px;
+}
+
+.sl-panel-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.sl-panel-chips span {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.16);
+  color: rgba(255,255,255,0.78);
+  border-radius: 50px;
+  padding: 5px 14px;
+  font-size: 0.71rem;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+}
+
+.sl-panel-powered {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.71rem;
+  color: rgba(255,255,255,0.3);
   font-weight: 500;
 }
+.sl-panel-edu-logo {
+  height: 15px;
+  width: 15px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.4;
+}
+
+/* ── Right panel — login form ── */
+.sl-panel-right {
+  flex: 1;
+  min-height: 100dvh;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 48px;
+}
+
+.sl-form-wrap {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sl-form-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 7px;
+  letter-spacing: -0.5px;
+}
+.sl-form-sub {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0 0 32px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.sl-form-sub strong { color: #1e3a5f; font-weight: 700; }
 
 /* ── Form fields ── */
 .sl-field {
@@ -1387,9 +1490,10 @@
 }
 
 .sl-label {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: #374151;
+  letter-spacing: 0.1px;
 }
 
 .sl-input-wrap {
@@ -1400,7 +1504,7 @@
 
 .sl-input-ic {
   position: absolute;
-  left: 12px;
+  left: 13px;
   color: #94a3b8;
   display: flex;
   align-items: center;
@@ -1409,29 +1513,29 @@
 
 .sl-input {
   width: 100%;
-  padding: 11px 14px 11px 38px;
+  padding: 12px 14px 12px 40px;
   border: 1.5px solid #e2e8f0;
   border-radius: 12px;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-family: inherit;
   color: #1e293b;
   background: #f8fafc;
   box-sizing: border-box;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
-
+.sl-input::placeholder { color: #94a3b8; }
 .sl-input:focus {
   outline: none;
   border-color: var(--sl-accent, #0f766e);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sl-accent, #0f766e) 15%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sl-accent, #0f766e) 14%, transparent);
   background: #fff;
 }
 
-.sl-input-pwd { padding-right: 44px; }
+.sl-input-pwd { padding-right: 46px; }
 
 .sl-eye-btn {
   position: absolute;
-  right: 10px;
+  right: 11px;
   background: none;
   border: none;
   cursor: pointer;
@@ -1439,18 +1543,19 @@
   display: flex;
   align-items: center;
   padding: 4px;
+  transition: color 0.15s;
 }
 .sl-eye-btn:hover { color: #475569; }
 
 /* ── Sign in button ── */
-.sl-btn {
+.sl-signin-btn {
   width: 100%;
-  padding: 13px;
-  background: linear-gradient(135deg, var(--sl-accent, #0f766e), color-mix(in srgb, var(--sl-accent, #0f766e) 60%, #2dd4bf));
+  padding: 14px;
+  background: linear-gradient(135deg, var(--sl-accent, #0f766e), color-mix(in srgb, var(--sl-accent, #0f766e) 65%, #2dd4bf));
   color: #fff;
   border: none;
-  border-radius: 14px;
-  font-size: 0.95rem;
+  border-radius: 13px;
+  font-size: 0.97rem;
   font-weight: 700;
   cursor: pointer;
   margin-top: 6px;
@@ -1458,52 +1563,102 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--sl-accent, #0f766e) 35%, transparent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--sl-accent, #0f766e) 35%, transparent);
   font-family: inherit;
   transition: opacity 0.15s, transform 0.15s;
 }
-.sl-btn:active { opacity: 0.9; transform: scale(0.98); }
+.sl-signin-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.sl-signin-btn:active { opacity: 0.85; transform: scale(0.98); }
 
 /* ── Forgot password ── */
 .sl-forgot {
   background: none;
   border: none;
-  color: #64748b;
+  color: #94a3b8;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   margin-top: 14px;
   font-family: inherit;
   transition: color 0.15s;
+  align-self: center;
 }
 .sl-forgot:hover { color: var(--sl-accent, #0f766e); }
 
-/* ── Powered by ── */
+/* ── Form footer: powered + change school ── */
+.sl-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
 .sl-powered {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 28px;
-  font-size: 0.72rem;
+  font-size: 0.71rem;
   color: #94a3b8;
   font-weight: 500;
 }
-
 .sl-powered-logo {
-  height: 16px;
-  width: 16px;
+  height: 15px;
+  width: 15px;
   object-fit: contain;
 }
+.sl-powered-name { font-weight: 700; color: #64748b; }
 
-.sl-powered-name {
-  font-weight: 700;
-  color: #64748b;
+.sl-change-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #94a3b8;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 0;
+  transition: color 0.15s;
+}
+.sl-change-btn:hover { color: #475569; }
+
+/* ── Mobile: stacked ── */
+@media (max-width: 820px) {
+  .sl-page { flex-direction: column; }
+
+  .sl-panel-left {
+    width: 100%;
+    min-height: auto;
+    padding: 40px 28px 32px;
+  }
+  .sl-logo-img, .sl-logo-initials {
+    width: 76px; height: 76px;
+    border-radius: 16px;
+    font-size: 2rem;
+    padding: 8px;
+  }
+  .sl-logo-outer { margin-bottom: 18px; }
+  .sl-school-name { font-size: 1.35rem; }
+  .sl-panel-tagline { display: none; }
+  .sl-panel-chips { display: none; }
+  .sl-panel-powered { padding-top: 24px; }
+
+  .sl-panel-right {
+    min-height: auto;
+    padding: 36px 24px 44px;
+    align-items: flex-start;
+  }
+  .sl-form-wrap { max-width: 100%; }
+  .sl-form-title { font-size: 1.5rem; }
 }
 
-/* ── Responsive ── */
 @media (max-width: 480px) {
-  .sl-card { padding: 32px 20px 24px; border-radius: 20px; }
-  .sl-school-name { font-size: 1.15rem; }
+  .sl-panel-left { padding: 32px 20px 28px; }
+  .sl-panel-right { padding: 28px 20px 40px; }
 }
 
 /* ══════════════════════════════════════════════════════════

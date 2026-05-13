@@ -134,6 +134,13 @@ export class HomeComponent implements OnInit {
     this.hidePassword = !this.hidePassword;
   }
 
+  changeSchool(): void {
+    const slug = this.tenantService.slug;
+    if (slug) {
+      window.location.href = window.location.origin.replace(`${slug}.`, '');
+    }
+  }
+
   // ── Forgot Password ──────────────────────────────────────
   forgotPassword() {
     this.showLoginForm  = false;

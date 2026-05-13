@@ -1922,6 +1922,7 @@
   text-align: center;
   flex: 1;
   justify-content: center;
+  margin-bottom: 60px;
   animation: sl-identity-in 0.65s cubic-bezier(.32, .72, 0, 1) both;
 }
 
@@ -1933,7 +1934,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 28px;
+  margin-bottom: 40px;
   animation: sl-float 5.5s ease-in-out infinite;
 }
 
@@ -2056,11 +2057,11 @@
 }
 
 .sl-panel-edu-logo {
-  height: 15px;
-  width: 15px;
+  height: 16px;
+  width: auto;
   object-fit: contain;
   filter: brightness(0) invert(1);
-  opacity: 0.42;
+  opacity: 0.6;
 }
 
 /* ── Right panel — light cream, form ── */
@@ -2139,18 +2140,18 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 
 .sl-form-tag-line {
-  width: 26px;
+  width: 22px;
   height: 1.5px;
   background: #a09487;
   flex-shrink: 0;
 }
 
 .sl-form-tag-text {
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-weight: 700;
   letter-spacing: 2.5px;
   color: #a09487;
@@ -2158,12 +2159,12 @@
 
 .sl-form-title {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 2.6rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #1a1510;
   margin: 0 0 10px;
-  letter-spacing: -0.5px;
-  line-height: 1.1;
+  letter-spacing: -0.4px;
+  line-height: 1.15;
 }
 
 .sl-form-title em {
@@ -2172,9 +2173,9 @@
 }
 
 .sl-form-sub {
-  font-size: 0.92rem;
+  font-size: 0.84rem;
   color: #8a7e72;
-  margin: 0 0 34px;
+  margin: 0 0 24px;
   line-height: 1.55;
 }
 
@@ -2183,12 +2184,12 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 16px;
+  gap: 5px;
+  margin-bottom: 12px;
 }
 
 .sl-label {
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: #2d2a25;
 }
@@ -2201,7 +2202,7 @@
 
 .sl-input-ic {
   position: absolute;
-  left: 15px;
+  left: 13px;
   color: #a09487;
   display: flex;
   align-items: center;
@@ -2211,10 +2212,10 @@
 
 .sl-input {
   width: 100%;
-  padding: 15px 15px 15px 46px;
+  padding: 12px 12px 12px 40px;
   border: 1.5px solid #ddd8ce;
-  border-radius: 14px;
-  font-size: 0.95rem;
+  border-radius: 12px;
+  font-size: 0.88rem;
   font-family: inherit;
   color: #1a1510;
   background: #fff;
@@ -2239,19 +2240,19 @@
 }
 
 .sl-input-pwd {
-  padding-right: 50px;
+  padding-right: 42px;
 }
 
 .sl-eye-btn {
   position: absolute;
-  right: 13px;
+  right: 10px;
   background: none;
   border: none;
   cursor: pointer;
   color: #a09487;
   display: flex;
   align-items: center;
-  padding: 5px;
+  padding: 4px;
   transition: color 0.15s;
 }
 
@@ -2264,7 +2265,7 @@
   display: flex;
   justify-content: flex-end;
   margin-top: 2px;
-  margin-bottom: 26px;
+  margin-bottom: 18px;
 }
 
 .sl-forgot {
@@ -2273,7 +2274,7 @@
   border-bottom: 1.5px solid #2d2a25;
   padding: 0 0 1px;
   line-height: 1.2;
-  font-size: 0.84rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: #2d2a25;
   font-family: inherit;
@@ -2292,19 +2293,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 17px 24px;
+  gap: 8px;
+  padding: 13px 20px;
   border: none;
-  border-radius: 14px;
+  border-radius: 12px;
   background: color-mix(in srgb, var(--sl-accent, #0f766e) 80%, #000 20%);
   color: #fff;
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
   letter-spacing: 0.15px;
-  margin-bottom: 28px;
-  box-shadow: 0 6px 24px color-mix(in srgb, var(--sl-accent, #0f766e) 35%, transparent);
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--sl-accent, #0f766e) 30%, transparent);
   transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
 }
 
@@ -2438,7 +2439,7 @@
   }
 
   .sl-form-title {
-    font-size: 2rem;
+    font-size: 1.65rem;
   }
 }
 

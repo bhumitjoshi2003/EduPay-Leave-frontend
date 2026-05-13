@@ -84,8 +84,16 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    this.authService.login(this.userId, this.password).subscribe({
+    const brandedSlug = this.tenantService.slug;
+    this.authService.login(this.userId, this.password, brandedSlug).subscribe({
       next: (response) => {
+        // Safety net: user is on a branded school page but logged in with a different school's credentials.
+        if (brandedSlug && response.schoolSlug && response.schoolSlug !== brandedSlug) {
+          this.authService.logout().subscribe();
+          this.toast.error('Wrong School', 'This account does not belong to this school. Please use the correct login page for your school.');
+          return;
+        }
+
         this.authStateService.setUser(response);
 
         // School user → ensure they're on their school subdomain.
@@ -99,7 +107,7 @@ export class HomeComponent implements OnInit {
             this.cdr.markForCheck();
             this.router.navigateByUrl('/dashboard');
           } else {
-            // On root domain or wrong subdomain — redirect to their school subdomain.
+            // On root domain — redirect to their school subdomain.
             window.location.href = this.tenantService.buildSchoolUrl(response.schoolSlug, '/dashboard');
           }
           return;
@@ -114,9 +122,16 @@ export class HomeComponent implements OnInit {
         this.router.navigateByUrl(redirectUrl);
       },
       error: (error) => {
-        const text = error.status === 0
-          ? 'Cannot reach the server. Please check your internet connection.'
-          : 'Incorrect User ID or Password.';
+        let text: string;
+        if (error.status === 0) {
+          text = 'Cannot reach the server. Please check your internet connection.';
+        } else if (error.status === 403) {
+          text = typeof error.error === 'string' && error.error.length < 200
+            ? error.error
+            : 'Access denied. Please contact support.';
+        } else {
+          text = 'Incorrect User ID or Password.';
+        }
         this.toast.error('Login Failed', text);
         this.logger.error('Login error:', error);
       }

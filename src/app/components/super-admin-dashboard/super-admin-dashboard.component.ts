@@ -38,6 +38,7 @@ interface OnboardForm {
   adminPhone: string;
   adminDob: string;
   adminGender: string;
+  trialPlanId: number | null;
 }
 
 interface EditForm {
@@ -710,6 +711,38 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     };
   }
 
+  openOnboardForm(): void {
+    this.onboardForm = this.emptyOnboardForm();
+    this.showOnboardForm = true;
+    this.editingSchoolId = null;
+    // Ensure plans are loaded for the trial plan selector
+    if (!this.plans.length) {
+      this.schoolService.getPlans(true).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (plans) => { this.plans = plans; this.cdr.markForCheck(); },
+        error: () => {}
+      });
+    }
+    if (!this.subscriptionConfig) {
+      this.schoolService.getSubscriptionConfig().pipe(takeUntil(this.destroy$)).subscribe({
+        next: (config) => {
+          this.subscriptionConfig = config;
+          this.configForm = { gracePeriodDays: config.gracePeriodDays, defaultTrialDays: config.defaultTrialDays, expiryNotifyDays: config.expiryNotifyDays };
+          this.cdr.markForCheck();
+        },
+        error: () => {}
+      });
+    }
+    this.cdr.markForCheck();
+  }
+
+  applyDefaultTrial(): void {
+    const days = this.subscriptionConfig?.defaultTrialDays ?? 30;
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + days);
+    this.subForm.trialEndsAt = trialEnd.toISOString().substring(0, 10);
+    this.cdr.markForCheck();
+  }
+
   private emptyOnboardForm(): OnboardForm {
     return {
       name: '',
@@ -729,6 +762,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
       adminPhone: '',
       adminDob: '',
       adminGender: '',
+      trialPlanId: null,
     };
   }
 

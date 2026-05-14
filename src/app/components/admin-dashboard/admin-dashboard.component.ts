@@ -17,6 +17,7 @@ import {
   DashboardStats,
 } from '../../services/dashboard-analytics.service';
 import { LeaveService, LeaveApplication } from '../../services/leave.service';
+import { SchoolService, SchoolEntitlementSummary } from '../../services/school.service';
 import { LoggerService } from '../../services/logger.service';
 import { ToastService } from '../../services/toast.service';
 
@@ -36,12 +37,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   today = new Date();
   stats: DashboardStats | null = null;
   recentLeaves: LeaveApplication[] = [];
+  entitlement: SchoolEntitlementSummary | null = null;
 
   constructor(
     private authState: AuthStateService,
     private adminService: AdminService,
     private analyticsService: DashboardAnalyticsService,
     private leaveService: LeaveService,
+    private schoolService: SchoolService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
     private toast: ToastService
@@ -69,14 +72,16 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     forkJoin({
       stats: this.analyticsService.getStats(),
       leaves: this.leaveService.getLeavesPaginated(0, 10),
+      entitlement: this.schoolService.getEntitlement(),
     })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: ({ stats, leaves }) => {
+        next: ({ stats, leaves, entitlement }) => {
           this.stats = stats;
           this.recentLeaves = leaves.content.filter(
             (l) => l.status === 'PENDING'
           );
+          this.entitlement = entitlement;
           this.isLoading = false;
           this.cdr.markForCheck();
         },
@@ -133,6 +138,17 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     if (hour < 12) return 'Good morning';
     if (hour < 17) return 'Good afternoon';
     return 'Good evening';
+  }
+
+  usagePct(current: number, max: number | null): number {
+    if (!max || max <= 0) return 0;
+    return Math.min(100, Math.round((current / max) * 100));
+  }
+
+  usageBarColor(pct: number, softPct: number, hardPct: number): string {
+    if (pct >= hardPct) return '#dc2626';
+    if (pct >= softPct) return '#d97706';
+    return '#059669';
   }
 
   get attendanceColor(): string {

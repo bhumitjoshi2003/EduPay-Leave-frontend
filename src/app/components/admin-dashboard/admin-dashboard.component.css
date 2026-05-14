@@ -236,3 +236,99 @@
   .ad-actions-grid { grid-template-columns: repeat(3, 1fr); }
   .ad-hero-name { font-size: 1.35rem; }
 }
+
+/* ── Plan Usage ─────────────────────────────────────────────────── */
+.ad-plan-badge {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: #e0e7ff;
+  color: #3730a3;
+  font-size: 0.75rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+.ad-plan-status {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  vertical-align: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.ad-status-trial   { background: #dbeafe; color: #1d4ed8; }
+.ad-status-active  { background: #dcfce7; color: #15803d; }
+.ad-status-grace   { background: #fef3c7; color: #b45309; }
+.ad-status-expired { background: #fee2e2; color: #dc2626; }
+
+.ad-usage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.ad-usage-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.ad-usage-card--features {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ad-usage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ad-usage-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.ad-usage-count {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+.ad-usage-bar-track {
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.ad-usage-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s ease, background 0.3s;
+}
+.ad-usage-hint {
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: #dc2626;
+  font-weight: 600;
+}
+.ad-usage-hint--warn { color: #d97706; }
+.ad-usage-feat-hint {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+.ad-usage-settings-link {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #4f46e5;
+  text-decoration: none;
+}
+.ad-usage-settings-link mat-icon { font-size: 14px; height: 14px; width: 14px; line-height: 14px; }

@@ -1,5 +1,6 @@
 import { provideRouter, Routes } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
+import { PricingComponent } from './components/pricing/pricing.component';
 import { PaymentTrackerComponent } from './components/fees/fees.component';
 import { FeeStructureComponent } from './components/fee-structure/fee-structure.component';
 import { PaymentComponent } from './components/payment/payment.component';
@@ -52,6 +53,7 @@ import { StudentSearchComponent } from './components/student-search/student-sear
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
+  { path: 'plans', component: PricingComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
   {
     path: 'dashboard',

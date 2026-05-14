@@ -78,6 +78,28 @@ export interface PlanDetail {
   pendingChanges: PlanFeatureChange[];
 }
 
+export interface SchoolEntitlementSummary {
+  planName: string | null;
+  planTier: string | null;
+  subscriptionStatus: string | null;
+  trialEndsAt: string | null;
+  expiresAt: string | null;
+  graceEndsAt: string | null;
+  maxStudents: number | null;
+  studentSoftLimitPct: number;
+  studentHardLimitPct: number;
+  maxStaff: number | null;
+  staffSoftLimitPct: number;
+  staffHardLimitPct: number;
+  storageGbLimit: number | null;
+  featureCount: number;
+  features: string[];
+  activeStudents: number;
+  totalStaff: number;
+  teachers: number;
+  admins: number;
+}
+
 export interface GlobalSubscriptionConfig {
   gracePeriodDays: number;
   defaultTrialDays: number;
@@ -204,6 +226,10 @@ export class SchoolService {
 
   refreshEntitlement(schoolId: number): Observable<any> {
     return this.http.post<any>(`${this.superAdminUrl}/schools/${schoolId}/subscription/refresh`, {});
+  }
+
+  getEntitlement(): Observable<SchoolEntitlementSummary> {
+    return this.http.get<SchoolEntitlementSummary>(`${this.baseUrl}/entitlement`);
   }
 
   // ── School-level feature overrides (ADMIN) ────────────────────────────────

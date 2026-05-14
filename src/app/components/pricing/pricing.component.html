@@ -1,0 +1,97 @@
+<div class="pr-page">
+
+  <!-- ── Header ─────────────────────────────────────────────────── -->
+  <div class="pr-header">
+    <div class="pr-header-inner">
+      <a class="pr-logo" routerLink="/home">
+        <span class="pr-logo-icon">🎓</span>
+        <span class="pr-logo-name">Edunexify</span>
+      </a>
+      <a class="pr-back-link" routerLink="/home">Back to Home</a>
+    </div>
+    <div class="pr-hero">
+      <h1 class="pr-hero-title">Simple, Transparent Pricing</h1>
+      <p class="pr-hero-sub">Choose the plan that fits your school. Upgrade or downgrade at any time.</p>
+    </div>
+    <div class="pr-blob pr-blob-1"></div>
+    <div class="pr-blob pr-blob-2"></div>
+  </div>
+
+  <!-- ── Loading ─────────────────────────────────────────────────── -->
+  <div class="pr-loading" *ngIf="loading">
+    <div class="pr-spinner"></div>
+    <p>Loading plans…</p>
+  </div>
+
+  <!-- ── Error ───────────────────────────────────────────────────── -->
+  <div class="pr-error" *ngIf="error">
+    <span>⚠️</span>
+    <p>Could not load plans. Please try again later.</p>
+  </div>
+
+  <!-- ── Plans grid ──────────────────────────────────────────────── -->
+  <div class="pr-plans" *ngIf="!loading && !error">
+
+    <div class="pr-empty" *ngIf="plans.length === 0">
+      No public plans available at the moment. Please contact us for pricing.
+    </div>
+
+    <div class="pr-plan-card" *ngFor="let plan of sortedPlans"
+         [class.pr-plan-featured]="plan.tier?.toUpperCase() === 'CAMPUS'">
+
+      <div class="pr-plan-tier" *ngIf="plan.tier">{{ plan.tier }}</div>
+      <div class="pr-plan-featured-badge" *ngIf="plan.tier?.toUpperCase() === 'CAMPUS'">Most Popular</div>
+
+      <h2 class="pr-plan-name">{{ plan.name }}</h2>
+      <div class="pr-plan-price">{{ priceLabel(plan) }}</div>
+      <div class="pr-plan-annual" *ngIf="annualLabel(plan)">{{ annualLabel(plan) }}</div>
+
+      <!-- Limits -->
+      <div class="pr-plan-limits">
+        <div class="pr-plan-limit" *ngIf="plan.maxStudents">
+          <span class="pr-limit-icon">👨‍🎓</span>
+          <span>Up to <strong>{{ plan.maxStudents | number }}</strong> students</span>
+        </div>
+        <div class="pr-plan-limit" *ngIf="!plan.maxStudents">
+          <span class="pr-limit-icon">👨‍🎓</span>
+          <span><strong>Unlimited</strong> students</span>
+        </div>
+        <div class="pr-plan-limit" *ngIf="plan.maxStaff">
+          <span class="pr-limit-icon">👩‍🏫</span>
+          <span>Up to <strong>{{ plan.maxStaff | number }}</strong> staff</span>
+        </div>
+        <div class="pr-plan-limit" *ngIf="!plan.maxStaff">
+          <span class="pr-limit-icon">👩‍🏫</span>
+          <span><strong>Unlimited</strong> staff</span>
+        </div>
+        <div class="pr-plan-limit" *ngIf="plan.storageGbLimit">
+          <span class="pr-limit-icon">💾</span>
+          <span><strong>{{ plan.storageGbLimit }} GB</strong> storage</span>
+        </div>
+        <div class="pr-plan-limit" *ngIf="!plan.storageGbLimit">
+          <span class="pr-limit-icon">💾</span>
+          <span><strong>Unlimited</strong> storage</span>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="pr-plan-features" *ngIf="plan.features?.length">
+        <div class="pr-plan-features-title">Included features</div>
+        <div class="pr-feature-item" *ngFor="let feat of plan.features">
+          <span class="pr-feat-check">✓</span>
+          <span>{{ feat.displayName }}</span>
+        </div>
+      </div>
+
+      <a class="pr-plan-cta" routerLink="/home">Get Started</a>
+    </div>
+
+  </div>
+
+  <!-- ── Footer note ─────────────────────────────────────────────── -->
+  <div class="pr-footer-note" *ngIf="!loading && !error">
+    <p>All plans come with a 30-day free trial. No credit card required.</p>
+    <p>Need a custom plan for a district or group of schools? <a routerLink="/home">Contact us</a>.</p>
+  </div>
+
+</div>

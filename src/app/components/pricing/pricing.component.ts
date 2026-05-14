@@ -68,12 +68,16 @@ export class PricingComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  isFeatured(tier: string): boolean {
+    return tier?.toUpperCase() === 'CAMPUS';
+  }
+
   tierOrder = ['STARTER', 'CAMPUS', 'DISTRICT', 'ENTERPRISE'];
 
   get sortedPlans(): PlanDetail[] {
     return [...this.plans].sort((a, b) => {
-      const ai = this.tierOrder.indexOf(a.tier?.toUpperCase() ?? '');
-      const bi = this.tierOrder.indexOf(b.tier?.toUpperCase() ?? '');
+      const ai = this.tierOrder.indexOf((a.tier ?? '').toUpperCase());
+      const bi = this.tierOrder.indexOf((b.tier ?? '').toUpperCase());
       return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
     });
   }

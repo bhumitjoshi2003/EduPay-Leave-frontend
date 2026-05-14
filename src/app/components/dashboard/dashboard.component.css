@@ -629,7 +629,7 @@
   border: 1px solid #ffc107;
   color: #664d03;
 }
-.sub-warning-banner:has(strong[*ngIf="subscriptionStatus === 'EXPIRED'"]) {
+.sub-warning-banner.sub-warning-expired {
   background: #fde8e8;
   border-color: #ef4444;
   color: #7f1d1d;

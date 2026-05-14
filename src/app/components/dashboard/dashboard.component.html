@@ -374,7 +374,9 @@
     <main class="content-area">
 
       <!-- Subscription expiry warning banner -->
-      <div class="sub-warning-banner" *ngIf="showSubscriptionWarning()">
+      <div class="sub-warning-banner"
+           [class.sub-warning-expired]="subscriptionStatus === 'EXPIRED'"
+           *ngIf="showSubscriptionWarning()">
         <mat-icon class="sub-warn-icon">warning</mat-icon>
         <div class="sub-warn-body">
           <strong *ngIf="subscriptionStatus === 'GRACE'">Subscription Expired — Grace Period Active</strong>

@@ -37,10 +37,10 @@
     </div>
 
     <div class="pr-plan-card" *ngFor="let plan of sortedPlans"
-         [class.pr-plan-featured]="plan.tier?.toUpperCase() === 'CAMPUS'">
+         [class.pr-plan-featured]="isFeatured(plan.tier)">
 
       <div class="pr-plan-tier" *ngIf="plan.tier">{{ plan.tier }}</div>
-      <div class="pr-plan-featured-badge" *ngIf="plan.tier?.toUpperCase() === 'CAMPUS'">Most Popular</div>
+      <div class="pr-plan-featured-badge" *ngIf="isFeatured(plan.tier)">Most Popular</div>
 
       <h2 class="pr-plan-name">{{ plan.name }}</h2>
       <div class="pr-plan-price">{{ priceLabel(plan) }}</div>

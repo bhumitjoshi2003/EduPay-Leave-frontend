@@ -28,6 +28,7 @@ import { RegisterAdminComponent } from './components/register-admin/register-adm
 import { BulkImportComponent } from './components/bulk-import/bulk-import.component';
 import { TeacherBulkImportComponent } from './components/teacher-bulk-import/teacher-bulk-import.component';
 import { roleGuard } from './auth/role.guard';
+import { featureGuard } from './auth/feature.guard';
 import { SubjectConfigComponent } from './components/subject-config/subject-config.component';
 import { ExamConfigComponent } from './components/exam-config/exam-config.component';
 import { StudentStreamComponent } from './components/student-stream/student-stream.component';
@@ -122,11 +123,11 @@ export const routes: Routes = [
       // ── Admin-only routes ─────────────────────────────────────────────
       {
         path: 'payment-history-admin', component: PaymentHistoryAdminComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+        canActivate: [roleGuard, featureGuard], data: { roles: ['ADMIN'], featureKey: 'PAYMENT_COLLECTION' }
       },
       {
         path: 'fee-reminders', component: FeeRemindersComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+        canActivate: [roleGuard, featureGuard], data: { roles: ['ADMIN'], featureKey: 'FEE_MANAGEMENT' }
       },
       {
         path: 'teacher-list', component: TeacherListComponent,
@@ -142,11 +143,11 @@ export const routes: Routes = [
       },
       {
         path: 'student-bulk-import', component: BulkImportComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+        canActivate: [roleGuard, featureGuard], data: { roles: ['ADMIN'], featureKey: 'BULK_IMPORT' }
       },
       {
         path: 'teacher-bulk-import', component: TeacherBulkImportComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+        canActivate: [roleGuard, featureGuard], data: { roles: ['ADMIN'], featureKey: 'BULK_IMPORT' }
       },
 
       // ── Admin + Super Admin routes ─────────────────────────────────────
@@ -164,7 +165,7 @@ export const routes: Routes = [
       },
       {
         path: 'audit-logs', component: AuditLogsComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+        canActivate: [roleGuard, featureGuard], data: { roles: ['ADMIN'], featureKey: 'AUDIT_LOGS' }
       },
       {
         path: 'student-search', component: StudentSearchComponent,
@@ -180,7 +181,7 @@ export const routes: Routes = [
       },
       {
         path: 'student-promotion', component: StudentPromotionComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+        canActivate: [roleGuard, featureGuard], data: { roles: ['ADMIN'], featureKey: 'STUDENT_PROMOTION' }
       },
       {
         path: 'fee-structure', component: FeeStructureComponent,
@@ -198,7 +199,7 @@ export const routes: Routes = [
       },
       {
         path: 'exam-config', component: ExamConfigComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+        canActivate: [roleGuard, featureGuard], data: { roles: ['ADMIN'], featureKey: 'EXAM_MARKS' }
       },
       {
         path: 'student-stream', component: StudentStreamComponent,
@@ -206,7 +207,7 @@ export const routes: Routes = [
       },
       {
         path: 'mark-entry', component: MarkEntryComponent,
-        canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN'] }
+        canActivate: [roleGuard, featureGuard], data: { roles: ['TEACHER', 'ADMIN'], featureKey: 'EXAM_MARKS' }
       },
       {
         path: 'my-results', component: StudentResultsComponent,
@@ -218,7 +219,7 @@ export const routes: Routes = [
       },
       {
         path: 'report-card', component: ReportCardComponent,
-        canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN'] }
+        canActivate: [roleGuard, featureGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN'], featureKey: 'REPORT_CARD' }
       },
 
       // ── Dashboards ────────────────────────────────────────────────────
@@ -242,7 +243,7 @@ export const routes: Routes = [
       // ── Analytics Dashboard ───────────────────────────────────────────
       {
         path: 'analytics', component: AnalyticsComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+        canActivate: [roleGuard, featureGuard], data: { roles: ['ADMIN'], featureKey: 'ANALYTICS' }
       },
 
       // ── Timetable ─────────────────────────────────────────────────────

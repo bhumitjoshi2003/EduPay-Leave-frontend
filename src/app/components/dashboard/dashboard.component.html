@@ -372,6 +372,22 @@
 
     <!-- Content -->
     <main class="content-area">
+
+      <!-- Subscription expiry warning banner -->
+      <div class="sub-warning-banner" *ngIf="showSubscriptionWarning()">
+        <mat-icon class="sub-warn-icon">warning</mat-icon>
+        <div class="sub-warn-body">
+          <strong *ngIf="subscriptionStatus === 'GRACE'">Subscription Expired — Grace Period Active</strong>
+          <strong *ngIf="subscriptionStatus === 'EXPIRED'">Subscription Expired</strong>
+          <span *ngIf="subscriptionStatus === 'GRACE'">
+            Your subscription has expired. You are in the grace period. Please renew immediately to avoid losing access.
+          </span>
+          <span *ngIf="subscriptionStatus === 'EXPIRED'">
+            Your subscription has expired and the grace period has ended. Some features may be unavailable. Contact support to renew.
+          </span>
+        </div>
+      </div>
+
       <router-outlet></router-outlet>
     </main>
   </div>

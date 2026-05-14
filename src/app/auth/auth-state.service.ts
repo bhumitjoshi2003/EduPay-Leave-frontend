@@ -9,6 +9,13 @@ export interface UserInfo {
   name: string | null;
   className: string | null;
   schoolSlug: string | null;
+  // Entitlement fields — null for SUPER_ADMIN or schools with no subscription
+  featureKeys: string[];
+  planTier: string | null;
+  planVersion: string | null;
+  subscriptionStatus: string | null;
+  expiresAt: string | null;
+  graceEndsAt: string | null;
 }
 
 @Injectable({
@@ -53,5 +60,24 @@ export class AuthStateService {
 
   isLoggedIn(): boolean {
     return this.user !== null;
+  }
+
+  /**
+   * Returns true if the school's current subscription includes the given feature.
+   * Frontend check is UX only — backend is always authoritative.
+   */
+  hasFeature(featureKey: string): boolean {
+    return this.user?.featureKeys?.includes(featureKey) ?? false;
+  }
+
+  /** Returns the subscription status string (TRIAL / ACTIVE / GRACE / EXPIRED) or null. */
+  getSubscriptionStatus(): string | null {
+    return this.user?.subscriptionStatus ?? null;
+  }
+
+  /** True if subscription is GRACE or EXPIRED — used to show expiry warning banners. */
+  isSubscriptionWarning(): boolean {
+    const s = this.getSubscriptionStatus();
+    return s === 'GRACE' || s === 'EXPIRED';
   }
 }

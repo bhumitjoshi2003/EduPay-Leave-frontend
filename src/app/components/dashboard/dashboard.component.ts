@@ -203,6 +203,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return this.Role === 'SUPER_ADMIN';
   }
 
+  get subscriptionStatus(): string | null {
+    return this.authStateService.getSubscriptionStatus();
+  }
+
+  showSubscriptionWarning(): boolean {
+    return this.authStateService.isSubscriptionWarning() && !this.isSuperAdmin();
+  }
+
   logout() {
     localStorage.removeItem(this.welcomeMessageKey);
     this.schoolService.invalidateClasses();

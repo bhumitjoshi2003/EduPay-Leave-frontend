@@ -421,12 +421,65 @@
                   {{ sub.status || 'UNKNOWN' }}
                 </span>
                 <span class="sa-sub-meta" *ngIf="sub.planName">Plan: <strong>{{ sub.planName }}</strong></span>
-                <span class="sa-sub-meta" *ngIf="sub.totalFeatures != null">{{ sub.totalFeatures }} features</span>
+                <span class="sa-sub-meta" *ngIf="sub.totalFeatures">{{ sub.totalFeatures }} features</span>
               </div>
               <div class="sa-sub-dates" *ngIf="sub.expiresAt || sub.graceEndsAt || sub.trialEndsAt">
                 <span *ngIf="sub.trialEndsAt" class="sa-date-chip">Trial ends: {{ sub.trialEndsAt | date:'d MMM yyyy' }}</span>
                 <span *ngIf="sub.expiresAt" class="sa-date-chip">Expires: {{ sub.expiresAt | date:'d MMM yyyy' }}</span>
                 <span *ngIf="sub.graceEndsAt" class="sa-date-chip sa-date-grace">Grace ends: {{ sub.graceEndsAt | date:'d MMM yyyy' }}</span>
+              </div>
+
+              <!-- ── Usage bars ─────────────────────────────────────────── -->
+              <div class="sa-usage-section" *ngIf="sub.maxStudents || sub.maxStaff">
+
+                <!-- Students -->
+                <div class="sa-usage-item" *ngIf="sub.maxStudents">
+                  <div class="sa-usage-row">
+                    <span class="sa-usage-label">Students</span>
+                    <span class="sa-usage-count"
+                      [class.sa-usage-warn]="subUsagePctRaw(sub.activeStudents, sub.maxStudents) >= sub.studentSoftLimitPct && subUsagePctRaw(sub.activeStudents, sub.maxStudents) < sub.studentHardLimitPct"
+                      [class.sa-usage-danger]="subUsagePctRaw(sub.activeStudents, sub.maxStudents) >= sub.studentHardLimitPct">
+                      {{ sub.activeStudents }} / {{ sub.maxStudents }}
+                    </span>
+                  </div>
+                  <div class="sa-usage-bar-track">
+                    <div class="sa-usage-bar-fill"
+                      [style.width.%]="subUsagePct(sub.activeStudents, sub.maxStudents)"
+                      [style.background]="subUsageColor(subUsagePctRaw(sub.activeStudents, sub.maxStudents), sub.studentSoftLimitPct, sub.studentHardLimitPct)">
+                    </div>
+                  </div>
+                  <div class="sa-usage-hint sa-usage-hint--danger" *ngIf="subUsagePctRaw(sub.activeStudents, sub.maxStudents) >= sub.studentHardLimitPct">
+                    ⛔ Hard limit reached — registrations blocked for this school.
+                  </div>
+                  <div class="sa-usage-hint sa-usage-hint--warn" *ngIf="subUsagePctRaw(sub.activeStudents, sub.maxStudents) >= sub.studentSoftLimitPct && subUsagePctRaw(sub.activeStudents, sub.maxStudents) < sub.studentHardLimitPct">
+                    ⚠️ Approaching student limit ({{ subUsagePctRaw(sub.activeStudents, sub.maxStudents) }}%).
+                  </div>
+                </div>
+
+                <!-- Staff -->
+                <div class="sa-usage-item" *ngIf="sub.maxStaff">
+                  <div class="sa-usage-row">
+                    <span class="sa-usage-label">Staff</span>
+                    <span class="sa-usage-count"
+                      [class.sa-usage-warn]="subUsagePctRaw(sub.currentStaff, sub.maxStaff) >= sub.staffSoftLimitPct && subUsagePctRaw(sub.currentStaff, sub.maxStaff) < sub.staffHardLimitPct"
+                      [class.sa-usage-danger]="subUsagePctRaw(sub.currentStaff, sub.maxStaff) >= sub.staffHardLimitPct">
+                      {{ sub.currentStaff }} / {{ sub.maxStaff }}
+                    </span>
+                  </div>
+                  <div class="sa-usage-bar-track">
+                    <div class="sa-usage-bar-fill"
+                      [style.width.%]="subUsagePct(sub.currentStaff, sub.maxStaff)"
+                      [style.background]="subUsageColor(subUsagePctRaw(sub.currentStaff, sub.maxStaff), sub.staffSoftLimitPct, sub.staffHardLimitPct)">
+                    </div>
+                  </div>
+                  <div class="sa-usage-hint sa-usage-hint--danger" *ngIf="subUsagePctRaw(sub.currentStaff, sub.maxStaff) >= sub.staffHardLimitPct">
+                    ⛔ Hard limit reached — staff registrations blocked.
+                  </div>
+                  <div class="sa-usage-hint sa-usage-hint--warn" *ngIf="subUsagePctRaw(sub.currentStaff, sub.maxStaff) >= sub.staffSoftLimitPct && subUsagePctRaw(sub.currentStaff, sub.maxStaff) < sub.staffHardLimitPct">
+                    ⚠️ Approaching staff limit ({{ subUsagePctRaw(sub.currentStaff, sub.maxStaff) }}%).
+                  </div>
+                </div>
+
               </div>
             </ng-container>
             <p *ngIf="!schoolSubscriptions.get(school.id)" class="sa-sub-no-sub">

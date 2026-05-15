@@ -115,15 +115,15 @@
             <div class="ad-usage-bar-fill"
               [style.width.%]="usagePct(entitlement.activeStudents, entitlement.maxStudents)"
               [style.background]="usageBarColor(
-                usagePct(entitlement.activeStudents, entitlement.maxStudents),
+                usagePctRaw(entitlement.activeStudents, entitlement.maxStudents),
                 entitlement.studentSoftLimitPct, entitlement.studentHardLimitPct)">
             </div>
           </div>
-          <div class="ad-usage-hint" *ngIf="usagePct(entitlement.activeStudents, entitlement.maxStudents) >= entitlement.studentHardLimitPct">
-            Hard limit reached — new registrations blocked.
+          <div class="ad-usage-hint" *ngIf="usagePctRaw(entitlement.activeStudents, entitlement.maxStudents) >= entitlement.studentHardLimitPct">
+            ⛔ Hard limit reached — new registrations blocked.
           </div>
-          <div class="ad-usage-hint ad-usage-hint--warn" *ngIf="usagePct(entitlement.activeStudents, entitlement.maxStudents) >= entitlement.studentSoftLimitPct && usagePct(entitlement.activeStudents, entitlement.maxStudents) < entitlement.studentHardLimitPct">
-            Approaching student limit.
+          <div class="ad-usage-hint ad-usage-hint--warn" *ngIf="usagePctRaw(entitlement.activeStudents, entitlement.maxStudents) >= entitlement.studentSoftLimitPct && usagePctRaw(entitlement.activeStudents, entitlement.maxStudents) < entitlement.studentHardLimitPct">
+            ⚠️ Approaching student limit — consider upgrading.
           </div>
         </div>
 
@@ -139,15 +139,15 @@
             <div class="ad-usage-bar-fill"
               [style.width.%]="usagePct(entitlement.totalStaff, entitlement.maxStaff)"
               [style.background]="usageBarColor(
-                usagePct(entitlement.totalStaff, entitlement.maxStaff),
+                usagePctRaw(entitlement.totalStaff, entitlement.maxStaff),
                 entitlement.staffSoftLimitPct, entitlement.staffHardLimitPct)">
             </div>
           </div>
-          <div class="ad-usage-hint" *ngIf="usagePct(entitlement.totalStaff, entitlement.maxStaff) >= entitlement.staffHardLimitPct">
-            Hard limit reached — new staff registrations blocked.
+          <div class="ad-usage-hint" *ngIf="usagePctRaw(entitlement.totalStaff, entitlement.maxStaff) >= entitlement.staffHardLimitPct">
+            ⛔ Hard limit reached — new staff registrations blocked.
           </div>
-          <div class="ad-usage-hint ad-usage-hint--warn" *ngIf="usagePct(entitlement.totalStaff, entitlement.maxStaff) >= entitlement.staffSoftLimitPct && usagePct(entitlement.totalStaff, entitlement.maxStaff) < entitlement.staffHardLimitPct">
-            Approaching staff limit.
+          <div class="ad-usage-hint ad-usage-hint--warn" *ngIf="usagePctRaw(entitlement.totalStaff, entitlement.maxStaff) >= entitlement.staffSoftLimitPct && usagePctRaw(entitlement.totalStaff, entitlement.maxStaff) < entitlement.staffHardLimitPct">
+            ⚠️ Approaching staff limit — consider upgrading.
           </div>
         </div>
 

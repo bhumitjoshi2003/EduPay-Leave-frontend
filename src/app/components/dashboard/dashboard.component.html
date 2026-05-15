@@ -385,9 +385,12 @@
             Your subscription has expired. You are in the grace period. Please renew immediately to avoid losing access.
           </span>
           <span *ngIf="subscriptionStatus === 'EXPIRED'">
-            Your subscription has expired and the grace period has ended. Some features may be unavailable. Contact support to renew.
+            Your subscription has expired and the grace period has ended. Some features may be unavailable.
           </span>
         </div>
+        <a *ngIf="isAdmin()" class="sub-warn-renew-btn" routerLink="/dashboard/school-settings">
+          Renew Now
+        </a>
       </div>
 
       <router-outlet></router-outlet>

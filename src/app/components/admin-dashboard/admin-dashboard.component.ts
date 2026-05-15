@@ -140,14 +140,21 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     return 'Good evening';
   }
 
+  /** Bar fill width — capped at 100% for display only. */
   usagePct(current: number, max: number | null): number {
     if (!max || max <= 0) return 0;
     return Math.min(100, Math.round((current / max) * 100));
   }
 
-  usageBarColor(pct: number, softPct: number, hardPct: number): string {
-    if (pct >= hardPct) return '#dc2626';
-    if (pct >= softPct) return '#d97706';
+  /** Raw uncapped percentage — used for threshold comparisons. */
+  usagePctRaw(current: number, max: number | null): number {
+    if (!max || max <= 0) return 0;
+    return Math.round((current / max) * 100);
+  }
+
+  usageBarColor(rawPct: number, softPct: number, hardPct: number): string {
+    if (rawPct >= hardPct) return '#dc2626';
+    if (rawPct >= softPct) return '#d97706';
     return '#059669';
   }
 

@@ -718,6 +718,24 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Bar fill width — capped at 100% for display. */
+  subUsagePct(current: number, max: number | null): number {
+    if (!max || max <= 0) return 0;
+    return Math.min(100, Math.round((current / max) * 100));
+  }
+
+  /** Uncapped percentage — used for threshold comparisons against soft/hard limit pcts. */
+  subUsagePctRaw(current: number, max: number | null): number {
+    if (!max || max <= 0) return 0;
+    return Math.round((current / max) * 100);
+  }
+
+  subUsageColor(rawPct: number, softPct: number, hardPct: number): string {
+    if (rawPct >= hardPct) return '#dc2626';
+    if (rawPct >= softPct) return '#f59e0b';
+    return '#10b981';
+  }
+
   private refreshPlan(_planId: number): void {
     this.schoolService.getPlans(true)
       .pipe(takeUntil(this.destroy$)).subscribe({

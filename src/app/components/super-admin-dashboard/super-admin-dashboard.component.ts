@@ -546,6 +546,28 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  reactivatePlan(plan: PlanDetail): void {
+    this.toast.confirm({
+      title: 'Reactivate Plan?',
+      message: `"${plan.name}" will become available for assignment to new schools again.`,
+      icon: 'info',
+      confirmText: 'Reactivate',
+      cancelText: 'Cancel',
+      danger: false,
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.schoolService.reactivatePlan(plan.id)
+        .pipe(takeUntil(this.destroy$)).subscribe({
+          next: (updated) => {
+            this.plans = this.plans.map(p => p.id === updated.id ? updated : p);
+            this.cdr.markForCheck();
+            this.toast.success('Plan Reactivated', `"${updated.name}" is now active.`);
+          },
+          error: () => this.toast.error('Error', 'Failed to reactivate plan.'),
+        });
+    });
+  }
+
   saveConfig(): void {
     this.schoolService.updateSubscriptionConfig(this.configForm)
       .pipe(takeUntil(this.destroy$)).subscribe({

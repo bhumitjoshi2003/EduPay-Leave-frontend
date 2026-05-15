@@ -560,6 +560,18 @@ select.sa-input { appearance: auto; }
   color: #ef4444;
   font-weight: 600;
 }
+.sa-btn-reactivate {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #86efac;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.sa-btn-reactivate:hover { background: #dcfce7; }
 
 /* Buttons */
 .sa-btn-primary {

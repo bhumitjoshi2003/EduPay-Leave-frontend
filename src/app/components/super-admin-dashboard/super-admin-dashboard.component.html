@@ -574,7 +574,10 @@
           <div class="sa-plan-actions">
             <button class="sa-btn-sm" (click)="openEditPlan(plan)">Edit limits &amp; pricing</button>
             <button *ngIf="plan.isActive" class="sa-btn-danger-sm" (click)="deactivatePlan(plan)">Deactivate</button>
-            <span *ngIf="!plan.isActive" class="sa-inactive-badge">Inactive</span>
+            <ng-container *ngIf="!plan.isActive">
+              <span class="sa-inactive-badge">Inactive</span>
+              <button class="sa-btn-reactivate" (click)="reactivatePlan(plan)">Reactivate</button>
+            </ng-container>
           </div>
 
         </div>

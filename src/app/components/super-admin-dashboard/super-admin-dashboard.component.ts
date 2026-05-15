@@ -354,6 +354,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
 
   // feature removal policy picker
   removingFeatureKey: string | null = null;
+  removingPlanId: number | null = null;
   removalPolicy = 'NEXT_MONTHLY';
   readonly removalPolicies = [
     { value: 'IMMEDIATE',      label: 'Immediately' },
@@ -378,7 +379,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     }).pipe(takeUntil(this.destroy$)).subscribe({
       next: ({ plans, features, config }) => {
         this.plans              = plans;
-        this.allFeatures        = features.filter(f => !f.isAlwaysOn);
+        this.allFeatures        = features;
         this.subscriptionConfig = config;
         this.configForm         = {
           gracePeriodDays:  config.gracePeriodDays,
@@ -468,6 +469,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   togglePlanFeature(plan: PlanDetail, featureKey: string): void {
+    if (this.isAlwaysOnFeature(featureKey)) return;
     const hasIt = plan.features.some(f => f.featureKey === featureKey);
 
     if (!hasIt) {
@@ -478,11 +480,15 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
             this.refreshPlan(plan.id);
             this.toast.success('Feature Added');
           },
-          error: () => this.toast.error('Error', 'Failed to add feature.'),
+          error: (err) => {
+            const msg = err?.error?.message ?? err?.error ?? 'Failed to add feature.';
+            this.toast.error('Error', typeof msg === 'string' ? msg : 'Failed to add feature.');
+          },
         });
     } else {
-      // Show removal policy picker for this feature
+      // Show removal policy picker scoped to this plan
       this.removingFeatureKey = featureKey;
+      this.removingPlanId     = plan.id;
       this.removalPolicy      = 'NEXT_MONTHLY';
       this.cdr.markForCheck();
     }
@@ -492,6 +498,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     if (!this.removingFeatureKey) return;
     const key = this.removingFeatureKey;
     this.removingFeatureKey = null;
+    this.removingPlanId     = null;
     this.cdr.markForCheck();
 
     this.schoolService.removeFeatureFromPlan(plan.id, key, this.removalPolicy)
@@ -500,13 +507,21 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
           this.refreshPlan(plan.id);
           this.toast.success('Feature Scheduled', 'Removal scheduled successfully.');
         },
-        error: () => this.toast.error('Error', 'Failed to schedule feature removal.'),
+        error: (err) => {
+          const msg = err?.error?.message ?? err?.error ?? 'Failed to schedule feature removal.';
+          this.toast.error('Error', typeof msg === 'string' ? msg : 'Failed to schedule feature removal.');
+        },
       });
   }
 
   cancelRemoveFeature(): void {
     this.removingFeatureKey = null;
+    this.removingPlanId     = null;
     this.cdr.markForCheck();
+  }
+
+  isAlwaysOnFeature(featureKey: string): boolean {
+    return this.allFeatures.find(f => f.featureKey === featureKey)?.isAlwaysOn ?? false;
   }
 
   deactivatePlan(plan: PlanDetail): void {

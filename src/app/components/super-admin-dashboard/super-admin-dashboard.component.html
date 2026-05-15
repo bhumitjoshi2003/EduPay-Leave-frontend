@@ -538,20 +538,22 @@
               <div class="sa-feature-category">{{ group.category }}</div>
               <div class="sa-feature-list">
                 <label *ngFor="let f of group.features" class="sa-feature-row"
-                       [class.sa-feature-pending-remove]="isPlanFeaturePendingRemoval(plan, f.featureKey)">
+                       [class.sa-feature-pending-remove]="isPlanFeaturePendingRemoval(plan, f.featureKey)"
+                       [class.sa-feature-always-on]="isAlwaysOnFeature(f.featureKey)">
                   <input type="checkbox"
-                         [checked]="isPlanFeatureActive(plan, f.featureKey)"
-                         [disabled]="!plan.isActive"
+                         [checked]="isPlanFeatureActive(plan, f.featureKey) || isAlwaysOnFeature(f.featureKey)"
+                         [disabled]="isAlwaysOnFeature(f.featureKey)"
                          (change)="togglePlanFeature(plan, f.featureKey)">
                   <span class="sa-feature-name">{{ f.displayName }}</span>
+                  <span *ngIf="isAlwaysOnFeature(f.featureKey)" class="sa-always-on-badge">Always On</span>
                   <span *ngIf="isPlanFeaturePendingRemoval(plan, f.featureKey)" class="sa-removal-badge">removal pending</span>
                 </label>
               </div>
             </div>
           </div>
 
-          <!-- Removal policy picker -->
-          <div *ngIf="removingFeatureKey" class="sa-removal-picker">
+          <!-- Removal policy picker (scoped to this plan) -->
+          <div *ngIf="removingFeatureKey && removingPlanId === plan.id" class="sa-removal-picker">
             <p>When should <strong>{{ removingFeatureKey }}</strong> be removed from <strong>{{ plan.name }}</strong>?</p>
             <select [(ngModel)]="removalPolicy" class="sa-select">
               <option *ngFor="let p of removalPolicies" [value]="p.value">{{ p.label }}</option>

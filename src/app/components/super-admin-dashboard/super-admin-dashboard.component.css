@@ -512,6 +512,16 @@ select.sa-input { appearance: auto; }
 .sa-feature-row input[type="checkbox"] { cursor: pointer; accent-color: #4f46e5; }
 .sa-feature-name   { flex: 1; }
 .sa-feature-pending-remove .sa-feature-name { text-decoration: line-through; color: #9ca3af; }
+.sa-feature-always-on input[type="checkbox"] { cursor: not-allowed; opacity: 0.6; }
+.sa-always-on-badge {
+  font-size: 0.63rem;
+  background: #ede9fe;
+  color: #5b21b6;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
 .sa-removal-badge  {
   font-size: 0.65rem;
   background: #fef3c7;

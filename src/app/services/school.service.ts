@@ -86,11 +86,11 @@ export interface SchoolEntitlementSummary {
   expiresAt: string | null;
   graceEndsAt: string | null;
   maxStudents: number | null;
-  studentSoftLimitPct: number;
-  studentHardLimitPct: number;
+  studentSoftLimitPct: number | null;
+  studentHardLimitPct: number | null;
   maxStaff: number | null;
-  staffSoftLimitPct: number;
-  staffHardLimitPct: number;
+  staffSoftLimitPct: number | null;
+  staffHardLimitPct: number | null;
   storageGbLimit: number | null;
   featureCount: number;
   features: string[];
@@ -171,6 +171,12 @@ export class SchoolService {
     return this.http.put<SchoolSettings>(`${this.baseUrl}/settings`, data);
   }
 
+  uploadLogo(file: File): Observable<{ logoUrl: string }> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<{ logoUrl: string }>(`${this.baseUrl}/logo`, form);
+  }
+
   updateRazorpayKeys(keyId: string, keySecret: string): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/razorpay`, { keyId, keySecret });
   }
@@ -226,6 +232,15 @@ export class SchoolService {
 
   refreshEntitlement(schoolId: number): Observable<any> {
     return this.http.post<any>(`${this.superAdminUrl}/schools/${schoolId}/subscription/refresh`, {});
+  }
+
+  getSuperAdminSchoolFeatures(schoolId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.superAdminUrl}/schools/${schoolId}/features`);
+  }
+
+  setSuperAdminFeatureOverride(schoolId: number, featureKey: string, overrideState: string): Observable<any> {
+    return this.http.put<any>(`${this.superAdminUrl}/schools/${schoolId}/features/${featureKey}/override`,
+      { overrideState });
   }
 
   getEntitlement(): Observable<SchoolEntitlementSummary> {

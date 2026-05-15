@@ -119,10 +119,10 @@
                 entitlement.studentSoftLimitPct, entitlement.studentHardLimitPct)">
             </div>
           </div>
-          <div class="ad-usage-hint" *ngIf="usagePctRaw(entitlement.activeStudents, entitlement.maxStudents) >= entitlement.studentHardLimitPct">
+          <div class="ad-usage-hint" *ngIf="usagePctRaw(entitlement.activeStudents, entitlement.maxStudents) >= (entitlement.studentHardLimitPct ?? 105)">
             ⛔ Hard limit reached — new registrations blocked.
           </div>
-          <div class="ad-usage-hint ad-usage-hint--warn" *ngIf="usagePctRaw(entitlement.activeStudents, entitlement.maxStudents) >= entitlement.studentSoftLimitPct && usagePctRaw(entitlement.activeStudents, entitlement.maxStudents) < entitlement.studentHardLimitPct">
+          <div class="ad-usage-hint ad-usage-hint--warn" *ngIf="usagePctRaw(entitlement.activeStudents, entitlement.maxStudents) >= (entitlement.studentSoftLimitPct ?? 90) && usagePctRaw(entitlement.activeStudents, entitlement.maxStudents) < (entitlement.studentHardLimitPct ?? 105)">
             ⚠️ Approaching student limit — consider upgrading.
           </div>
         </div>
@@ -143,10 +143,10 @@
                 entitlement.staffSoftLimitPct, entitlement.staffHardLimitPct)">
             </div>
           </div>
-          <div class="ad-usage-hint" *ngIf="usagePctRaw(entitlement.totalStaff, entitlement.maxStaff) >= entitlement.staffHardLimitPct">
+          <div class="ad-usage-hint" *ngIf="usagePctRaw(entitlement.totalStaff, entitlement.maxStaff) >= (entitlement.staffHardLimitPct ?? 105)">
             ⛔ Hard limit reached — new staff registrations blocked.
           </div>
-          <div class="ad-usage-hint ad-usage-hint--warn" *ngIf="usagePctRaw(entitlement.totalStaff, entitlement.maxStaff) >= entitlement.staffSoftLimitPct && usagePctRaw(entitlement.totalStaff, entitlement.maxStaff) < entitlement.staffHardLimitPct">
+          <div class="ad-usage-hint ad-usage-hint--warn" *ngIf="usagePctRaw(entitlement.totalStaff, entitlement.maxStaff) >= (entitlement.staffSoftLimitPct ?? 90) && usagePctRaw(entitlement.totalStaff, entitlement.maxStaff) < (entitlement.staffHardLimitPct ?? 105)">
             ⚠️ Approaching staff limit — consider upgrading.
           </div>
         </div>

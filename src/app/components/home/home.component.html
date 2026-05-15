@@ -511,79 +511,78 @@
       <div class="lp-sec-tag">Transparent Pricing</div>
       <h2 class="lp-sec-h2">Plans for Every School</h2>
       <p class="lp-sec-sub">No hidden charges. Cancel anytime. All plans include the mobile app.</p>
+
+      <!-- Billing cycle toggle -->
+      <div class="lp-billing-toggle">
+        <button class="lp-billing-btn" [class.lp-billing-active]="billingCycle === 'monthly'"
+          (click)="billingCycle = 'monthly'">Monthly</button>
+        <button class="lp-billing-btn" [class.lp-billing-active]="billingCycle === 'annual'"
+          (click)="billingCycle = 'annual'">
+          Annual
+          <span class="lp-billing-save">Save ~17%</span>
+        </button>
+      </div>
     </div>
+
+    <!-- Loading state -->
+    @if (plansLoading) {
+    <div class="lp-plans-loading">
+      <div class="lp-plans-spinner"></div>
+      <p>Loading plans…</p>
+    </div>
+    }
+
+    <!-- Dynamic plans from backend -->
+    @if (!plansLoading && plans.length > 0) {
     <div class="lp-plans">
-
-      <!-- Starter -->
-      <div class="lp-plan">
-        <div class="lp-plan-top">
-          <div class="lp-plan-emoji">🌱</div>
-          <p class="lp-plan-name">Starter</p>
-          <div class="lp-plan-price"><span class="lp-psym">₹</span><span class="lp-pnum">999</span><span
-              class="lp-pper">/mo</span></div>
-          <p class="lp-plan-cap">Up to 150 students</p>
-        </div>
-        <ul class="lp-plan-list">
-          <li class="lp-pi lp-yes">Fee Management + Razorpay</li>
-          <li class="lp-pi lp-yes">Attendance Tracking</li>
-          <li class="lp-pi lp-yes">Notice Board</li>
-          <li class="lp-pi lp-yes">Event Calendar</li>
-          <li class="lp-pi lp-yes">Mobile App</li>
-          <li class="lp-pi lp-no">Exam & Results</li>
-          <li class="lp-pi lp-no">Push Notifications</li>
-          <li class="lp-pi lp-no">Analytics Dashboard</li>
-          <li class="lp-pi lp-no">Bulk Import</li>
-        </ul>
-        <button class="lp-plan-btn lp-plan-outline" (click)="openDemo()">Book a Demo →</button>
-      </div>
-
-      <!-- Pro -->
-      <div class="lp-plan lp-plan-pro">
+      @for (plan of plans; track plan.id) {
+      <div class="lp-plan" [class.lp-plan-pro]="isPopularPlan(plan.tier)">
+        @if (isPopularPlan(plan.tier)) {
         <div class="lp-plan-badge">Most Popular</div>
-        <div class="lp-plan-top lp-plan-top-pro">
-          <div class="lp-plan-emoji">🚀</div>
-          <p class="lp-plan-name lp-plan-name-pro">Pro</p>
-          <div class="lp-plan-price"><span class="lp-psym lp-psym-pro">₹</span><span
-              class="lp-pnum lp-pnum-pro">2,499</span><span class="lp-pper lp-pper-pro">/mo</span></div>
-          <p class="lp-plan-cap lp-plan-cap-pro">Up to 500 students</p>
-        </div>
-        <ul class="lp-plan-list">
-          <li class="lp-pi lp-yes">Everything in Starter</li>
-          <li class="lp-pi lp-yes">Exam & Results + Report Cards</li>
-          <li class="lp-pi lp-yes">Push Notifications (FCM)</li>
-          <li class="lp-pi lp-yes">Analytics Dashboard</li>
-          <li class="lp-pi lp-yes">Bulk Student & Teacher Import</li>
-          <li class="lp-pi lp-yes">Leave Management</li>
-          <li class="lp-pi lp-yes">Timetable Management</li>
-          <li class="lp-pi lp-yes">Bus Fee Management</li>
-          <li class="lp-pi lp-yes">Priority Support</li>
-        </ul>
-        <button class="lp-plan-btn lp-plan-fill" (click)="openDemo()">Book a Demo →</button>
-      </div>
+        }
+        <div class="lp-plan-top" [class.lp-plan-top-pro]="isPopularPlan(plan.tier)">
+          <div class="lp-plan-emoji">{{ planEmoji(plan.tier) }}</div>
+          <p class="lp-plan-name" [class.lp-plan-name-pro]="isPopularPlan(plan.tier)">{{ plan.name }}</p>
 
-      <!-- Enterprise -->
-      <div class="lp-plan">
-        <div class="lp-plan-top">
-          <div class="lp-plan-emoji">🏛️</div>
-          <p class="lp-plan-name">Enterprise</p>
-          <div class="lp-plan-price"><span class="lp-price-custom">Custom</span></div>
-          <p class="lp-plan-cap">Unlimited students</p>
+          @if (!planIsContactSales(plan)) {
+          <div class="lp-plan-price">
+            <span class="lp-pnum" [class.lp-pnum-pro]="isPopularPlan(plan.tier)">{{ planPrice(plan) }}</span>
+            <span class="lp-pper" [class.lp-pper-pro]="isPopularPlan(plan.tier)">{{ planPriceSuffix(plan) }}</span>
+          </div>
+          } @else {
+          <div class="lp-plan-price"><span class="lp-price-custom">Contact Us</span></div>
+          }
+
+          <p class="lp-plan-cap" [class.lp-plan-cap-pro]="isPopularPlan(plan.tier)">{{ planStudentLabel(plan) }}</p>
         </div>
+
         <ul class="lp-plan-list">
-          <li class="lp-pi lp-yes">Everything in Pro</li>
-          <li class="lp-pi lp-yes">Multi-branch Support</li>
-          <li class="lp-pi lp-yes">Custom Branding</li>
-          <li class="lp-pi lp-yes">Dedicated Account Manager</li>
-          <li class="lp-pi lp-yes">Priority 24/7 Support</li>
-          <li class="lp-pi lp-yes">API Access</li>
-          <li class="lp-pi lp-yes">SLA Guarantee</li>
-          <li class="lp-pi lp-yes">On-site Training</li>
-          <li class="lp-pi lp-yes">Custom Feature Development</li>
+          @for (feature of sortedFeaturesForPlan(plan); track feature.featureKey) {
+          <li class="lp-pi" [class.lp-yes]="feature.has" [class.lp-no]="!feature.has">
+            {{ feature.displayName }}
+          </li>
+          }
         </ul>
+
+        @if (!planIsContactSales(plan)) {
+        <button class="lp-plan-btn" [class.lp-plan-fill]="isPopularPlan(plan.tier)"
+          [class.lp-plan-outline]="!isPopularPlan(plan.tier)" (click)="openDemo()">Book a Demo →</button>
+        } @else {
         <button class="lp-plan-btn lp-plan-outline" (click)="openDemo()">Contact Sales →</button>
+        }
       </div>
-
+      }
     </div>
+    }
+
+    <!-- Fallback if plans failed to load -->
+    @if (!plansLoading && plans.length === 0) {
+    <p class="lp-plans-fallback">
+      Unable to load plans right now.
+      <button class="lp-link-inline" (click)="loadPlans()">Try again</button>
+      or <button class="lp-link-inline" (click)="openDemo()">book a demo</button> and we'll walk you through pricing.
+    </p>
+    }
   </section>
 
   <!-- ══════════════════════════════════════════════════
@@ -596,7 +595,6 @@
     <div class="lp-el lp-cta-e2" aria-hidden="true">📚</div>
     <div class="lp-el lp-cta-e3" aria-hidden="true">✏️</div>
 
-    <img src="EdunexifyLogo.png" alt="Edunexify" class="lp-cta-logo">
     <h2 class="lp-cta-h2">Ready to Transform<br>Your School?</h2>
     <p class="lp-cta-p">Book a free personalised demo — we'll walk you through everything tailored to your school's
       needs.</p>
@@ -621,7 +619,7 @@
       <span class="lp-footer-name">Edunexify</span>
     </div>
     <p class="lp-footer-tag">Empowering schools. Connecting communities.</p>
-    <p class="lp-footer-copy">© 2025 Edunexify. All rights reserved.</p>
+    <p class="lp-footer-copy">© 2026 Edunexify. All rights reserved.</p>
   </footer>
 
   <!-- ══════════════════════════════════════════════════

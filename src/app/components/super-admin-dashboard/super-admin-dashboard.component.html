@@ -230,7 +230,13 @@
               <option [ngValue]="null">— No trial, assign manually later —</option>
               <option *ngFor="let p of plans" [ngValue]="p.id">{{ p.name }} ({{ p.tier }})</option>
             </select>
-            <small class="sa-field-hint">If selected, a trial subscription will be auto-created using the global default trial duration ({{ subscriptionConfig?.defaultTrialDays ?? 30 }} days).</small>
+            <small class="sa-field-hint" *ngIf="!onboardForm.trialPlanId">Select a plan to auto-create a trial subscription on onboarding.</small>
+          </div>
+          <div class="sa-form-group" *ngIf="onboardForm.trialPlanId">
+            <label>Trial End Date</label>
+            <input class="sa-input" type="date" name="trialEndsAt" [(ngModel)]="onboardForm.trialEndsAt"
+                   [min]="today">
+            <small class="sa-field-hint">Leave blank to use global default ({{ subscriptionConfig?.defaultTrialDays ?? 30 }} days from today).</small>
           </div>
         </div>
         </form>
@@ -528,6 +534,57 @@
                 {{ refreshingSubFor === school.id ? '⟳ Refreshing…' : '⟳ Refresh Entitlement' }}
               </button>
             </div>
+
+            <!-- ── Per-school feature overrides ── -->
+            <div class="sa-section-label sa-mt16">Feature Access Overrides</div>
+            <p class="sa-sub-feature-note">
+              Enable features beyond the plan (e.g. for trial access) or disable features the plan grants.
+              Changes apply immediately after entitlement refresh.
+            </p>
+
+            <div *ngIf="loadingFeaturesFor === school.id" class="sa-sub-loading">
+              <div class="sa-spinner sa-spinner-sm"></div> Loading features…
+            </div>
+
+            <ng-container *ngIf="loadingFeaturesFor !== school.id && schoolFeatures.get(school.id) as features">
+              <ng-container *ngFor="let group of schoolFeaturesByCategory(features)">
+                <div class="sa-feat-category">{{ group.category }}</div>
+                <div class="sa-feat-grid">
+                  <div class="sa-feat-item" *ngFor="let f of group.items"
+                       [class.sa-feat-on]="f.effectivelyOn"
+                       [class.sa-feat-enabled-override]="f.overrideState === 'ENABLED'"
+                       [class.sa-feat-disabled-override]="f.overrideState === 'DISABLED'">
+                    <span class="sa-feat-name">{{ f.displayName }}</span>
+                    <span class="sa-feat-badge" *ngIf="f.overrideState === 'ENABLED'">+SUPER</span>
+                    <span class="sa-feat-badge sa-feat-badge-off" *ngIf="f.overrideState === 'DISABLED'">OFF</span>
+                    <div class="sa-feat-actions">
+                      <button class="sa-feat-btn"
+                              *ngIf="f.overrideState !== 'ENABLED' && !f.planGranted"
+                              [disabled]="savingFeatureFor === school.id + ':' + f.featureKey"
+                              (click)="setSchoolFeatureOverride(school.id, f.featureKey, 'ENABLED')"
+                              title="Enable for this school (beyond plan)">
+                        Enable
+                      </button>
+                      <button class="sa-feat-btn sa-feat-btn-off"
+                              *ngIf="f.overrideState !== 'DISABLED' && (f.planGranted || f.overrideState === 'ENABLED')"
+                              [disabled]="savingFeatureFor === school.id + ':' + f.featureKey"
+                              (click)="setSchoolFeatureOverride(school.id, f.featureKey, 'DISABLED')"
+                              title="Disable for this school">
+                        Disable
+                      </button>
+                      <button class="sa-feat-btn sa-feat-btn-reset"
+                              *ngIf="f.overrideState !== 'DEFAULT'"
+                              [disabled]="savingFeatureFor === school.id + ':' + f.featureKey"
+                              (click)="setSchoolFeatureOverride(school.id, f.featureKey, 'DEFAULT')"
+                              title="Remove override (revert to plan default)">
+                        Reset
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+
           </ng-container>
         </div>
 

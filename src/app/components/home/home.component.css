@@ -939,11 +939,87 @@
   padding: 80px 40px;
 }
 
+/* Billing toggle */
+.lp-billing-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 20px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 4px;
+}
+.lp-billing-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.lp-billing-btn.lp-billing-active {
+  background: #fff;
+  color: #1e3a5f;
+  font-weight: 700;
+  box-shadow: 0 1px 6px rgba(30,58,95,0.10);
+}
+.lp-billing-save {
+  font-size: 11px;
+  font-weight: 700;
+  color: #059669;
+  background: #d1fae5;
+  border-radius: 99px;
+  padding: 2px 7px;
+}
+
+/* Plans loading / fallback */
+.lp-plans-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 0;
+  color: #64748b;
+  font-size: 15px;
+}
+.lp-plans-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #1e3a5f;
+  border-radius: 50%;
+  animation: lp-spin 0.7s linear infinite;
+}
+@keyframes lp-spin { to { transform: rotate(360deg); } }
+.lp-plans-fallback {
+  text-align: center;
+  color: #64748b;
+  font-size: 15px;
+  padding: 40px 0;
+  line-height: 1.8;
+}
+.lp-link-inline {
+  background: none;
+  border: none;
+  color: #1e3a5f;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+  padding: 0;
+}
+
 .lp-plans {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .lp-plan {
@@ -953,6 +1029,8 @@
   padding: 28px 24px;
   position: relative;
   transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 
 .lp-plan:hover {
@@ -1067,6 +1145,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
 }
 
 .lp-pi {
@@ -1094,8 +1173,7 @@
 }
 
 .lp-no {
-  opacity: 0.55;
-  text-decoration: line-through;
+  opacity: 0.38;
 }
 
 .lp-plan-pro .lp-pi {

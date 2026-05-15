@@ -39,6 +39,7 @@ interface OnboardForm {
   adminDob: string;
   adminGender: string;
   trialPlanId: number | null;
+  trialEndsAt: string;
 }
 
 interface EditForm {
@@ -635,6 +636,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
       });
     }
     this.loadSchoolSubscription(school.id);
+    this.loadSchoolFeatures(school.id);
     this.cdr.markForCheck();
   }
 
@@ -708,6 +710,57 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ── Per-school feature overrides ─────────────────────────────────────────
+
+  schoolFeatures = new Map<number, any[]>();
+  loadingFeaturesFor: number | null = null;
+  savingFeatureFor: string | null = null; // `${schoolId}:${featureKey}`
+
+  loadSchoolFeatures(schoolId: number): void {
+    this.loadingFeaturesFor = schoolId;
+    this.cdr.markForCheck();
+    this.schoolService.getSuperAdminSchoolFeatures(schoolId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (features) => {
+        this.schoolFeatures.set(schoolId, features);
+        this.loadingFeaturesFor = null;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.loadingFeaturesFor = null;
+        this.cdr.markForCheck();
+        this.toast.error('Error', 'Failed to load school features.');
+      }
+    });
+  }
+
+  setSchoolFeatureOverride(schoolId: number, featureKey: string, overrideState: string): void {
+    const key = `${schoolId}:${featureKey}`;
+    this.savingFeatureFor = key;
+    this.cdr.markForCheck();
+    this.schoolService.setSuperAdminFeatureOverride(schoolId, featureKey, overrideState)
+      .pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.savingFeatureFor = null;
+          this.loadSchoolFeatures(schoolId); // reload to reflect new state
+        },
+        error: (err) => {
+          this.savingFeatureFor = null;
+          this.cdr.markForCheck();
+          const msg = err?.error ?? 'Failed to update feature.';
+          this.toast.error('Error', typeof msg === 'string' ? msg : 'Failed to update feature.');
+        }
+      });
+  }
+
+  schoolFeaturesByCategory(features: any[]): { category: string; items: any[] }[] {
+    const map = new Map<string, any[]>();
+    for (const f of features) {
+      if (!map.has(f.category)) map.set(f.category, []);
+      map.get(f.category)!.push(f);
+    }
+    return Array.from(map.entries()).map(([category, items]) => ({ category, items }));
+  }
+
   subStatusClass(status: string | null): string {
     switch (status) {
       case 'TRIAL':   return 'sub-status-trial';
@@ -730,9 +783,11 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     return Math.round((current / max) * 100);
   }
 
-  subUsageColor(rawPct: number, softPct: number, hardPct: number): string {
-    if (rawPct >= hardPct) return '#dc2626';
-    if (rawPct >= softPct) return '#f59e0b';
+  subUsageColor(rawPct: number, softPct: number | null, hardPct: number | null): string {
+    const soft = softPct ?? 90;
+    const hard = hardPct ?? 105;
+    if (rawPct >= hard) return '#dc2626';
+    if (rawPct >= soft) return '#f59e0b';
     return '#10b981';
   }
 
@@ -790,6 +845,10 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  get today(): string {
+    return new Date().toISOString().substring(0, 10);
+  }
+
   applyDefaultTrial(): void {
     const days = this.subscriptionConfig?.defaultTrialDays ?? 30;
     const trialEnd = new Date();
@@ -818,6 +877,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
       adminDob: '',
       adminGender: '',
       trialPlanId: null,
+      trialEndsAt: '',
     };
   }
 

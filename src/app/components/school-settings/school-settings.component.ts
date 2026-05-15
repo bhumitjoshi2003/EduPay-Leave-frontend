@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { SchoolService, SchoolSettings, SchoolEntitlementSummary, PlanDetail } from '../../services/school.service';
 import { AuthStateService } from '../../auth/auth-state.service';
+import { TenantService } from '../../services/tenant.service';
 import { LoggerService } from '../../services/logger.service';
 import { ToastService } from '../../services/toast.service';
 
@@ -44,11 +45,17 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
   upgradingPlanId: number | null = null;
   billingCycle: 'MONTHLY' | 'ANNUAL' = 'MONTHLY';
 
+  // Logo upload
+  logoPreviewUrl: string | null = null;
+  logoFile: File | null = null;
+  uploadingLogo = false;
+
   readonly boardTypes = ['CBSE', 'ICSE', 'STATE', 'IB', 'IGCSE', 'OTHER'];
 
   constructor(
     private schoolService: SchoolService,
     private authStateService: AuthStateService,
+    public tenantService: TenantService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
     private toast: ToastService
@@ -231,9 +238,11 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
     return Math.min(100, Math.round((current / max) * 100));
   }
 
-  usageBarColor(pct: number, softPct: number, hardPct: number): string {
-    if (pct >= hardPct) return '#dc2626';
-    if (pct >= softPct) return '#d97706';
+  usageBarColor(pct: number, softPct: number | null, hardPct: number | null): string {
+    const soft = softPct ?? 90;
+    const hard = hardPct ?? 105;
+    if (pct >= hard) return '#dc2626';
+    if (pct >= soft) return '#d97706';
     return '#059669';
   }
 
@@ -330,6 +339,54 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
     });
   }
 
+  onLogoSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      this.toast.warning('Invalid File', 'Please select an image file (JPG, PNG, etc.).');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      this.toast.warning('File Too Large', 'Logo must be under 5 MB.');
+      return;
+    }
+    this.logoFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.logoPreviewUrl = e.target?.result as string;
+      this.cdr.markForCheck();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  cancelLogoUpload(): void {
+    this.logoFile = null;
+    this.logoPreviewUrl = null;
+    this.cdr.markForCheck();
+  }
+
+  uploadLogo(): void {
+    if (!this.logoFile) return;
+    this.uploadingLogo = true;
+    this.cdr.markForCheck();
+    this.schoolService.uploadLogo(this.logoFile).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res) => {
+        if (this.settings) this.settings.logoUrl = res.logoUrl;
+        this.logoFile = null;
+        this.logoPreviewUrl = null;
+        this.uploadingLogo = false;
+        this.toast.success('Logo Updated', 'School logo uploaded successfully.');
+        this.cdr.markForCheck();
+      },
+      error: (e) => {
+        this.logger.error('Failed to upload school logo', e);
+        this.toast.error('Upload Failed', e?.error?.message || 'Could not upload logo. Please try again.');
+        this.uploadingLogo = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   featuresByCategory(): { category: string; features: any[] }[] {
     const map = new Map<string, any[]>();
     for (const f of this.schoolFeatures) {
@@ -341,5 +398,10 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
 
   get isAdmin(): boolean {
     return this.role === 'ADMIN';
+  }
+
+  get schoolInitials(): string {
+    const name = this.settings?.name ?? '';
+    return name.split(' ').slice(0, 2).map(w => w[0] ?? '').join('').toUpperCase() || '?';
   }
 }

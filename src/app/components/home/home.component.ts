@@ -6,6 +6,7 @@ import { LoggerService } from '../../services/logger.service';
 import { DemoService } from '../../services/demo.service';
 import { ToastService } from '../../services/toast.service';
 import { TenantService } from '../../services/tenant.service';
+import { SchoolService, PlanDetail } from '../../services/school.service';
 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -35,6 +36,12 @@ export class HomeComponent implements OnInit {
   forgotEmail   = '';
   sendingReset  = false;
 
+  // Plans
+  plans: PlanDetail[] = [];
+  plansLoading = false;
+  billingCycle: 'monthly' | 'annual' = 'monthly';
+  private _masterFeatureList: { featureKey: string; displayName: string }[] | null = null;
+
   demo = {
     schoolName:  '',
     contactName: '',
@@ -53,7 +60,8 @@ export class HomeComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private demoService: DemoService,
     private toast: ToastService,
-    public tenantService: TenantService
+    public tenantService: TenantService,
+    private schoolService: SchoolService
   ) { }
 
   ngOnInit() {
@@ -61,9 +69,105 @@ export class HomeComponent implements OnInit {
       this.authenticated = true;
       this.router.navigate(['/dashboard']);
     }
-    // If not logged in on a school subdomain, show the branded login — no redirect.
-    // The user has already been here before (logged out or session expired)
-    // so the branded page is the right thing to show.
+    this.loadPlans();
+  }
+
+  loadPlans(): void {
+    this.plansLoading = true;
+    this._masterFeatureList = null;
+    this.schoolService.getPublicPlans().subscribe({
+      next: (plans) => {
+        this.plans = plans;
+        this._masterFeatureList = null; // recompute on next access
+        this.plansLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        // Silently ignore — fallback message shown in the template
+        this.plansLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // ── Plan display helpers ───────────────────────────────────
+  planEmoji(tier: string): string {
+    switch (tier?.toUpperCase()) {
+      case 'CAMPUS':    return '🏫';
+      case 'ACADEMY':   return '🎓';
+      case 'INSTITUTE': return '🏛️';
+      default:          return '📦';
+    }
+  }
+
+  isPopularPlan(tier: string): boolean {
+    return tier?.toUpperCase() === 'ACADEMY';
+  }
+
+  planPrice(plan: PlanDetail): string {
+    const paise = this.billingCycle === 'annual' ? plan.annualPricePaise : plan.monthlyPricePaise;
+    if (!paise || paise <= 0) return 'Contact Us';
+    const rupees = paise / 100;
+    return '₹' + rupees.toLocaleString('en-IN');
+  }
+
+  planPriceSuffix(plan: PlanDetail): string {
+    const paise = this.billingCycle === 'annual' ? plan.annualPricePaise : plan.monthlyPricePaise;
+    if (!paise || paise <= 0) return '';
+    return this.billingCycle === 'annual' ? '/yr' : '/mo';
+  }
+
+  planIsContactSales(plan: PlanDetail): boolean {
+    const paise = this.billingCycle === 'annual' ? plan.annualPricePaise : plan.monthlyPricePaise;
+    return !paise || paise <= 0;
+  }
+
+  planStudentLabel(plan: PlanDetail): string {
+    return plan.maxStudents ? `Up to ${plan.maxStudents.toLocaleString('en-IN')} students` : 'Unlimited students';
+  }
+
+  /**
+   * Union of all features across all plans, sorted by displayName.
+   * Memoized — recomputed only when plans reload.
+   */
+  get masterFeatureList(): { featureKey: string; displayName: string }[] {
+    if (this._masterFeatureList) return this._masterFeatureList;
+    const seen = new Map<string, string>(); // featureKey → displayName
+    for (const plan of this.plans) {
+      for (const f of plan.features) {
+        if (!seen.has(f.featureKey)) seen.set(f.featureKey, f.displayName);
+      }
+    }
+    this._masterFeatureList = Array.from(seen.entries())
+      .map(([featureKey, displayName]) => ({ featureKey, displayName }))
+      .sort((a, b) => a.displayName.localeCompare(b.displayName));
+    return this._masterFeatureList;
+  }
+
+  planHasFeature(plan: PlanDetail, featureKey: string): boolean {
+    return plan.features.some(f => f.featureKey === featureKey);
+  }
+
+  /**
+   * Returns exactly CAP features per card: yes-features first (green), then
+   * no-features (grey). Guarantees at least MIN_NO grey rows when missing
+   * features exist — so higher-tier plans are visibly distinguishable.
+   */
+  sortedFeaturesForPlan(plan: PlanDetail): { featureKey: string; displayName: string; has: boolean }[] {
+    const CAP = 9;
+    const MIN_NO = 2; // always show at least 2 grey rows if any features are missing
+
+    const master = this.masterFeatureList;
+    const yes = master.filter(f =>  this.planHasFeature(plan, f.featureKey)).map(f => ({ ...f, has: true }));
+    const no  = master.filter(f => !this.planHasFeature(plan, f.featureKey)).map(f => ({ ...f, has: false }));
+
+    // Reserve guaranteed no-slots, then fill yes up to the remaining space,
+    // then top up no-slots with whatever remains.
+    const guaranteedNo = no.length > 0 ? Math.min(no.length, MIN_NO) : 0;
+    const actualYes    = Math.min(yes.length, CAP - guaranteedNo);
+    const actualNo     = Math.min(no.length,  CAP - actualYes);
+
+    return [...yes.slice(0, actualYes), ...no.slice(0, actualNo)];
   }
 
   // ── Login ─────────────────────────────────────────────────

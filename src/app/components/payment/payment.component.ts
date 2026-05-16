@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, NgZone } from '@angular/core';
-import { EMPTY } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, Output, NgZone } from '@angular/core';
+import { EMPTY, Subject } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { LoggerService } from '../../services/logger.service';
 import { RazorpayService, RazorpayOrderResponse, RazorpayPaymentResponse } from '../../services/razorpay.service';
 import { PaymentData } from '../../interfaces/payment-data';
@@ -16,7 +16,8 @@ declare var Razorpay: any;
   styleUrl: './payment.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PaymentComponent {
+export class PaymentComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
 
   constructor(
     private razorpayService: RazorpayService,
@@ -25,6 +26,11 @@ export class PaymentComponent {
     private logger: LoggerService,
     private toast: ToastService
   ) { }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   @Input() paymentData: PaymentData = {
     totalAmount: 0,
@@ -65,6 +71,7 @@ export class PaymentComponent {
 
   loadStudentDetails(studentId: string): void {
     this.studentService.getStudent(studentId).pipe(
+      takeUntil(this.destroy$),
       switchMap((student) => {
         this.studentDetails = student;
         if (!this.paymentData) {
@@ -72,8 +79,9 @@ export class PaymentComponent {
           this.paymentProcessCompleted.emit();
           return EMPTY;
         }
-        this.paymentData.totalAmount *= 100;
-        return this.razorpayService.createOrder(this.paymentData);
+        // Use a copy to avoid mutating the @Input across multiple payment attempts
+        const orderData: PaymentData = { ...this.paymentData, totalAmount: this.paymentData.totalAmount * 100 };
+        return this.razorpayService.createOrder(orderData);
       })
     ).subscribe({
       next: (response: RazorpayOrderResponse) => {
@@ -113,7 +121,7 @@ export class PaymentComponent {
   }
 
   verifyPayment(paymentResponse: RazorpayPaymentResponse, orderDetails: RazorpayOrderResponse) {
-    this.razorpayService.verifyPayment(paymentResponse, orderDetails).subscribe({
+    this.razorpayService.verifyPayment(paymentResponse, orderDetails).pipe(takeUntil(this.destroy$)).subscribe({
       next: (result) => {
         if (result.success) {
           this.paymentSuccess.emit(paymentResponse);

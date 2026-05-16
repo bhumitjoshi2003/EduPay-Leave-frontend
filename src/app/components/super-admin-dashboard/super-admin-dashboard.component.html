@@ -34,6 +34,10 @@
               (click)="activeTab = 'plans'; loadPlansTab()">
         Plans &amp; Config
       </button>
+      <button class="sa-tab" [class.sa-tab-active]="activeTab === 'health'"
+              (click)="activeTab = 'health'; loadHealthTab()">
+        Subscription Health
+      </button>
     </div>
 
     <!-- ══════════════ OVERVIEW TAB ══════════════ -->
@@ -796,6 +800,64 @@
 
     </ng-container>
   </ng-container>
+
+    <!-- ══════════════ HEALTH TAB ══════════════ -->
+    <ng-container *ngIf="activeTab === 'health'">
+
+      <div class="sa-section-header">
+        <h2 class="sa-section-title">Subscription Health</h2>
+        <button class="sa-btn-outline sa-btn-sm" (click)="loadHealthTab()">Refresh</button>
+      </div>
+
+      <div class="sa-loading" *ngIf="healthLoading">
+        <div class="sa-spinner"></div>
+        <span>Loading health data…</span>
+      </div>
+
+      <div class="sa-health-table-wrap" *ngIf="!healthLoading">
+        <table class="sa-health-table" *ngIf="healthData.length > 0">
+          <thead>
+            <tr>
+              <th>School</th>
+              <th>Status</th>
+              <th>Plan</th>
+              <th>Tier</th>
+              <th>Key Date</th>
+              <th>Max Students</th>
+              <th>Active</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of healthData" [class.sa-health-row-inactive]="!item.isActive">
+              <td class="sa-health-school-name">{{ item.schoolName }}</td>
+              <td>
+                <span class="sa-health-status {{ healthStatusClass(item.subscriptionStatus) }}">
+                  {{ item.subscriptionStatus || '—' }}
+                </span>
+              </td>
+              <td>{{ item.planName || '—' }}</td>
+              <td>{{ item.planTier || '—' }}</td>
+              <td>
+                <ng-container *ngIf="healthExpiryDate(item)">
+                  {{ healthExpiryDate(item) | date:'d MMM yyyy' }}
+                </ng-container>
+                <ng-container *ngIf="!healthExpiryDate(item)">—</ng-container>
+              </td>
+              <td>{{ item.maxStudents ?? '∞' }}</td>
+              <td>
+                <span class="sa-health-active-dot" [class.sa-health-active-dot--off]="!item.isActive">
+                  {{ item.isActive ? 'Yes' : 'No' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="sa-empty" *ngIf="healthData.length === 0">
+          <p>No subscription data available.</p>
+        </div>
+      </div>
+
+    </ng-container>
 
   </ng-container><!-- end !loading -->
 

@@ -1034,6 +1034,55 @@ select.sa-input { appearance: auto; cursor: pointer; }
 /* ══════════════════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════════════════ */
+/* ── Health Tab ──────────────────────────────────────────────────────── */
+.sa-health-table-wrap {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  margin-bottom: 28px;
+}
+.sa-health-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.sa-health-table th {
+  background: #f8fafc;
+  text-align: left;
+  padding: 10px 14px;
+  font-weight: 700;
+  color: #475569;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.sa-health-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+.sa-health-table tr:last-child td { border-bottom: none; }
+.sa-health-row-inactive td { opacity: 0.5; }
+.sa-health-school-name { font-weight: 600; }
+.sa-health-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.health-status-active  { background: #d1fae5; color: #065f46; }
+.health-status-trial   { background: #ede9fe; color: #5b21b6; }
+.health-status-grace   { background: #fef3c7; color: #92400e; }
+.health-status-expired { background: #fee2e2; color: #991b1b; }
+.health-status-none    { background: #f1f5f9; color: #64748b; }
+.sa-health-active-dot { font-size: 0.8rem; color: #10b981; font-weight: 600; }
+.sa-health-active-dot--off { color: #ef4444; }
+
 @media (max-width: 900px) {
   .sa-stat-wide { grid-column: 1 / -1; }
   .sa-form-grid, .sa-form-grid-3 { grid-template-columns: repeat(2, 1fr); }

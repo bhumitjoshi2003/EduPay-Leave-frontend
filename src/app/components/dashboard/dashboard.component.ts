@@ -179,7 +179,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard/student-dashboard']);
       } else if (this.Role === 'TEACHER') {
         this.router.navigate(['/dashboard/teacher-dashboard']);
-      } else if (this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN' || this.Role === 'SUB_ADMIN') {
+      } else if (this.Role === 'ADMIN' || this.Role === 'SUB_ADMIN') {
         // Redirect expired admins straight to school-settings so they can renew
         if (this.subscriptionStatus === 'EXPIRED') {
           this.router.navigate(['/dashboard/school-settings']);
@@ -201,7 +201,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   isAdmin(): boolean {
-    return this.Role === 'ADMIN' || this.Role === 'SUB-ADMIN';
+    return this.Role === 'ADMIN' || this.Role === 'SUB_ADMIN';
   }
 
   isSuperAdmin(): boolean {

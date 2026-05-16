@@ -100,6 +100,32 @@ export interface SchoolEntitlementSummary {
   admins: number;
 }
 
+export interface SubscriptionHistoryItem {
+  id: number;
+  schoolId: number;
+  eventType: string;
+  planId: number | null;
+  planName: string | null;
+  status: string | null;
+  notes: string | null;
+  performedBy: string | null;
+  occurredAt: string;
+}
+
+export interface SubscriptionHealthItem {
+  schoolId: number;
+  schoolName: string;
+  isActive: boolean;
+  subscriptionStatus: string | null;
+  planName: string | null;
+  planTier: string | null;
+  trialEndsAt: string | null;
+  expiresAt: string | null;
+  graceEndsAt: string | null;
+  maxStudents: number | null;
+  lastRebuiltAt: string | null;
+}
+
 export interface GlobalSubscriptionConfig {
   gracePeriodDays: number;
   defaultTrialDays: number;
@@ -267,6 +293,14 @@ export class SchoolService {
 
   setFeatureOverride(featureKey: string, overrideState: 'DEFAULT' | 'DISABLED'): Observable<any> {
     return this.http.put<any>(`${this.baseUrl}/features/${featureKey}/override`, { overrideState });
+  }
+
+  getSubscriptionHistory(): Observable<SubscriptionHistoryItem[]> {
+    return this.http.get<SubscriptionHistoryItem[]>(`${this.baseUrl}/subscription/history`);
+  }
+
+  getSubscriptionHealth(): Observable<SubscriptionHealthItem[]> {
+    return this.http.get<SubscriptionHealthItem[]>(`${this.superAdminUrl}/subscription-health`);
   }
 
   // ── Plan Management (SUPER_ADMIN) ─────────────────────────────────────────

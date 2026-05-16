@@ -17,6 +17,7 @@ import {
   PlanDetail,
   FeatureCatalogItem,
   GlobalSubscriptionConfig,
+  SubscriptionHealthItem,
 } from '../../services/school.service';
 import { LoggerService } from '../../services/logger.service';
 
@@ -71,7 +72,7 @@ interface EditForm {
 export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  activeTab: 'overview' | 'schools' | 'plans' = 'overview';
+  activeTab: 'overview' | 'schools' | 'plans' | 'health' = 'overview';
   stats: SuperAdminStats | null = null;
   schools: SchoolSettings[] = [];
   loading = false;
@@ -338,6 +339,46 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
 
   get activeCount(): number {
     return this.schools.filter((s) => s.active).length;
+  }
+
+  // ── Health Tab ────────────────────────────────────────────────────────────
+
+  healthData: SubscriptionHealthItem[] = [];
+  healthLoading = false;
+
+  loadHealthTab(): void {
+    if (this.healthLoading) return;
+    this.healthLoading = true;
+    this.cdr.markForCheck();
+    this.schoolService.getSubscriptionHealth().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (data) => {
+        this.healthData = data;
+        this.healthLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.logger.error('Failed to load subscription health', err);
+        this.healthLoading = false;
+        this.cdr.markForCheck();
+        this.toast.error('Error', 'Failed to load subscription health data.');
+      }
+    });
+  }
+
+  healthStatusClass(status: string | null): string {
+    switch (status) {
+      case 'ACTIVE':  return 'health-status-active';
+      case 'TRIAL':   return 'health-status-trial';
+      case 'GRACE':   return 'health-status-grace';
+      case 'EXPIRED': return 'health-status-expired';
+      default:        return 'health-status-none';
+    }
+  }
+
+  healthExpiryDate(item: SubscriptionHealthItem): string | null {
+    if (item.subscriptionStatus === 'TRIAL') return item.trialEndsAt;
+    if (item.subscriptionStatus === 'GRACE') return item.graceEndsAt;
+    return item.expiresAt;
   }
 
   // ── Plans Tab ─────────────────────────────────────────────────────────────

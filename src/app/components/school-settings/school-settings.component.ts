@@ -379,8 +379,8 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
       this.toast.warning('Invalid File', 'Please select an image file (JPG, PNG, etc.).');
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      this.toast.warning('File Too Large', 'Logo must be under 5 MB.');
+    if (file.size > 10 * 1024 * 1024) {
+      this.toast.warning('File Too Large', 'Logo must be under 10 MB.');
       return;
     }
     this.logoFile = file;

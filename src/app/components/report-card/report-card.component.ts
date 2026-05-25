@@ -8,6 +8,7 @@ import { Title } from '@angular/platform-browser';
 import { Subject, takeUntil } from 'rxjs';
 import { MarksService, ExamResult } from '../../services/marks.service';
 import { LoggerService } from '../../services/logger.service';
+import { SchoolService } from '../../services/school.service';
 
 @Component({
   selector: 'app-report-card',
@@ -30,6 +31,7 @@ export class ReportCardComponent implements OnInit, OnDestroy {
   studentName = '';
   className = '';
   loading = true;
+  gradingSystem = 'CBSE';
 
   private originalTitle = '';
 
@@ -39,6 +41,7 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     private location: Location,
     private titleService: Title,
     private marksService: MarksService,
+    private schoolService: SchoolService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
     @Inject(PLATFORM_ID) private platformId: object
@@ -56,6 +59,12 @@ export class ReportCardComponent implements OnInit, OnDestroy {
       this.router.navigate(['/dashboard']);
       return;
     }
+
+    // Load school grading system
+    this.schoolService.getSettings().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (s) => { this.gradingSystem = s.gradingSystem ?? 'CBSE'; this.cdr.markForCheck(); },
+      error: () => {}
+    });
 
     this.marksService.getStudentResults(this.studentId, this.session)
       .pipe(takeUntil(this.destroy$))
@@ -105,18 +114,10 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     return 'Annual Report Card';
   }
 
-  // CBSE-style grading
   getGrade(obtained: number | null, max: number): string {
     if (obtained === null) return 'Ab';
     const pct = (obtained / max) * 100;
-    if (pct >= 91) return 'A1';
-    if (pct >= 81) return 'A2';
-    if (pct >= 71) return 'B1';
-    if (pct >= 61) return 'B2';
-    if (pct >= 51) return 'C1';
-    if (pct >= 41) return 'C2';
-    if (pct >= 33) return 'D';
-    return 'E';
+    return this.gradeFromPct(pct);
   }
 
   getGradeClass(obtained: number | null, max: number): string {
@@ -129,14 +130,33 @@ export class ReportCardComponent implements OnInit, OnDestroy {
   }
 
   getOverallGrade(percentage: number): string {
-    if (percentage >= 91) return 'A1';
-    if (percentage >= 81) return 'A2';
-    if (percentage >= 71) return 'B1';
-    if (percentage >= 61) return 'B2';
-    if (percentage >= 51) return 'C1';
-    if (percentage >= 41) return 'C2';
-    if (percentage >= 33) return 'D';
-    return 'E';
+    return this.gradeFromPct(percentage);
+  }
+
+  private gradeFromPct(pct: number): string {
+    switch (this.gradingSystem) {
+      case 'PERCENTAGE':
+        return `${Math.round(pct)}%`;
+      case 'LETTER':
+        if (pct >= 90) return 'A+';
+        if (pct >= 80) return 'A';
+        if (pct >= 70) return 'B+';
+        if (pct >= 60) return 'B';
+        if (pct >= 50) return 'C+';
+        if (pct >= 40) return 'C';
+        if (pct >= 33) return 'D';
+        return 'F';
+      case 'CBSE':
+      default:
+        if (pct >= 91) return 'A1';
+        if (pct >= 81) return 'A2';
+        if (pct >= 71) return 'B1';
+        if (pct >= 61) return 'B2';
+        if (pct >= 51) return 'C1';
+        if (pct >= 41) return 'C2';
+        if (pct >= 33) return 'D';
+        return 'E';
+    }
   }
 
   print(): void {

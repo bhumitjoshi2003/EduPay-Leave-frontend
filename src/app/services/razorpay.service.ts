@@ -31,7 +31,7 @@ export class RazorpayService {
   constructor(private http: HttpClient) { }
 
   createOrder(paymentData: PaymentData): Observable<RazorpayOrderResponse> {
-    return this.http.post<RazorpayOrderResponse>(`${this.baseUrl}/create`, { paymentData });
+    return this.http.post<RazorpayOrderResponse>(`${this.baseUrl}/create`, paymentData);
   }
 
   verifyPayment(paymentResponse: RazorpayPaymentResponse, orderDetails: RazorpayOrderResponse): Observable<RazorpayVerifyResponse> {

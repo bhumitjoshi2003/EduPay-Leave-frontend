@@ -346,8 +346,13 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
   healthData: SubscriptionHealthItem[] = [];
   healthLoading = false;
 
+  reloadHealthTab(): void {
+    this.healthData = [];
+    this.loadHealthTab();
+  }
+
   loadHealthTab(): void {
-    if (this.healthLoading) return;
+    if (this.healthLoading || this.healthData.length) return;
     this.healthLoading = true;
     this.cdr.markForCheck();
     this.schoolService.getSubscriptionHealth().pipe(takeUntil(this.destroy$)).subscribe({

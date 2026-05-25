@@ -106,7 +106,7 @@ export class PaymentHistoryComponent implements OnInit, OnDestroy {
       this.studentId,
       this.currentPage,
       this.pageSize
-    ).subscribe({
+    ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response: PaginatedResponse<PaymentHistory>) => {
         this.paymentHistory = response.content;
         this.totalElements = response.totalElements;
@@ -154,7 +154,7 @@ export class PaymentHistoryComponent implements OnInit, OnDestroy {
   downloadPaymentReceipt(paymentId: string): void {
     this.loading = true;
     this.error = '';
-    this.paymentHistoryService.downloadPaymentReceipt(paymentId).subscribe({
+    this.paymentHistoryService.downloadPaymentReceipt(paymentId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (data: Blob) => {
         let filename = `receipt_${paymentId}.pdf`;
         saveAs(data, filename);

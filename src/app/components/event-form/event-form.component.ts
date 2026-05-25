@@ -88,7 +88,10 @@ export class EventFormComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
       next: classes => { this.targetAudiences = [...this.staticAudiences, ...classes]; this.cdr.markForCheck(); },
-      error: () => {}
+      error: (err) => {
+        this.logger.error('Failed to load classes:', err);
+        this.toast.error('Error', 'Failed to load class list.');
+      }
     });
 
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
@@ -150,7 +153,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.logger.error('Error loading event for edit:', err);
-        // Handle error, e.g., navigate away or show an error message
+        this.toast.error('Error', 'Failed to load event details.');
       }
     });
   }

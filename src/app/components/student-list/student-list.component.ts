@@ -6,6 +6,7 @@ import { AuthStateService } from '../../auth/auth-state.service';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { LoggerService } from '../../services/logger.service';
+import { ToastService } from '../../services/toast.service';
 import { SchoolService } from '../../services/school.service';
 
 interface Student {
@@ -38,6 +39,7 @@ export class StudentListComponent implements OnInit, OnDestroy {
     private authStateService: AuthStateService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
+    private toast: ToastService,
     private schoolService: SchoolService
   ) { }
 
@@ -64,12 +66,18 @@ export class StudentListComponent implements OnInit, OnDestroy {
             this.cdr.markForCheck();
             this.loadStudents();
           },
-          error: () => {}
+          error: (err) => {
+            this.logger.error('Failed to load classes:', err);
+            this.toast.error('Error', 'Failed to load class list.');
+          }
         });
       } else if (this.loggedInUserRole === 'TEACHER') {
         this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
           next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-          error: () => {}
+          error: (err) => {
+            this.logger.error('Failed to load classes:', err);
+            this.toast.error('Error', 'Failed to load class list.');
+          }
         });
         this.getTeacherClassAndLoadStudents();
       }
@@ -93,22 +101,40 @@ export class StudentListComponent implements OnInit, OnDestroy {
     const classAtRequest = this.selectedClass;
     localStorage.setItem('lastSelectedClass', classAtRequest);
 
-    this.studentService.getActiveStudentsByClass(classAtRequest).pipe(takeUntil(this.destroy$)).subscribe((students) => {
-      if (this.selectedClass !== classAtRequest) return;
-      this.activeStudents = students;
-      this.cdr.markForCheck();
+    this.studentService.getActiveStudentsByClass(classAtRequest).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (students) => {
+        if (this.selectedClass !== classAtRequest) return;
+        this.activeStudents = students;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.logger.error('Failed to load students:', err);
+        this.toast.error('Error', 'Failed to load student list.');
+      }
     });
 
     if (this.loggedInUserRole === 'ADMIN') {
-      this.studentService.getNewStudentsByClass(classAtRequest).pipe(takeUntil(this.destroy$)).subscribe((students) => {
-        if (this.selectedClass !== classAtRequest) return;
-        this.newStudents = students;
-        this.cdr.markForCheck();
+      this.studentService.getNewStudentsByClass(classAtRequest).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (students) => {
+          if (this.selectedClass !== classAtRequest) return;
+          this.newStudents = students;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.logger.error('Failed to load upcoming students:', err);
+          this.toast.error('Error', 'Failed to load student list.');
+        }
       });
-      this.studentService.getInactiveStudentsByClass(classAtRequest).pipe(takeUntil(this.destroy$)).subscribe((students) => {
-        if (this.selectedClass !== classAtRequest) return;
-        this.inactiveStudents = students;
-        this.cdr.markForCheck();
+      this.studentService.getInactiveStudentsByClass(classAtRequest).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (students) => {
+          if (this.selectedClass !== classAtRequest) return;
+          this.inactiveStudents = students;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.logger.error('Failed to load inactive students:', err);
+          this.toast.error('Error', 'Failed to load student list.');
+        }
       });
     }
   }

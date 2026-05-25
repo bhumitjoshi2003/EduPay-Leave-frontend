@@ -47,7 +47,9 @@ export class RegisterTeacherComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
       next: classes => { this.classList = classes; },
-      error: () => {}
+      error: () => {
+        this.toast.error('Error', 'Failed to load class list.');
+      }
     });
   }
 
@@ -79,7 +81,7 @@ export class RegisterTeacherComponent implements OnInit, OnDestroy {
         next: (tempPassword) => {
           this.toast.confirm({
             title: 'Teacher Registered!',
-            html: `Registration complete.<br><br><b>Temporary Password:</b><br><code style="font-size:1.1em;letter-spacing:0.05em">${tempPassword}</code><br><small>Share this with the teacher. They should change it on first login.</small>`,
+            message: `Registration complete. Temporary Password: ${tempPassword} — Share this with the teacher. They should change it on first login.`,
             icon: 'success',
             confirmText: 'Done'
           });

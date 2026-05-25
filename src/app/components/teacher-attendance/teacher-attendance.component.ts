@@ -93,12 +93,18 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
             this.cdr.markForCheck();
             this.loadStudentsAndApplyAttendance();
           },
-          error: () => {}
+          error: (err) => {
+            this.logger.error('Failed to load classes:', err);
+            this.toast.error('Error', 'Failed to load class list.');
+          }
         });
       } else {
         this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
           next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-          error: () => {}
+          error: (err) => {
+            this.logger.error('Failed to load classes:', err);
+            this.toast.error('Error', 'Failed to load class list.');
+          }
         });
         this.getTeacherClassAndLoadStudents();
       }

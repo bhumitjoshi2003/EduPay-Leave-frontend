@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { SchoolService, SchoolSettings, SchoolEntitlementSummary, PlanDetail, SubscriptionHistoryItem } from '../../services/school.service';
 import { AuthStateService } from '../../auth/auth-state.service';
@@ -53,6 +54,18 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
   uploadingLogo = false;
 
   readonly boardTypes = ['CBSE', 'ICSE', 'STATE', 'IB', 'IGCSE', 'OTHER'];
+  readonly gradingSystems = [
+    { value: 'CBSE', label: 'CBSE (A1/A2/B1…)' },
+    { value: 'LETTER', label: 'Letter Grades (A+/A/B+…)' },
+    { value: 'PERCENTAGE', label: 'Percentage Only' },
+  ];
+  readonly monthOptions = [
+    { value: 1, label: 'January' }, { value: 2, label: 'February' }, { value: 3, label: 'March' },
+    { value: 4, label: 'April' },   { value: 5, label: 'May' },       { value: 6, label: 'June' },
+    { value: 7, label: 'July' },    { value: 8, label: 'August' },    { value: 9, label: 'September' },
+    { value: 10, label: 'October' },{ value: 11, label: 'November' }, { value: 12, label: 'December' },
+  ];
+  readonly allDayOptions = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 
   constructor(
     private schoolService: SchoolService,
@@ -60,7 +73,8 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
     public tenantService: TenantService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
-    private toast: ToastService
+    private toast: ToastService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +82,14 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
     this.role = user?.role ?? '';
     this.loadSettings();
     this.loadEntitlement();
+    // Auto-select tab from URL fragment — e.g. navigating from "Upgrade Now" button
+    this.route.fragment.pipe(takeUntil(this.destroy$)).subscribe(frag => {
+      if (frag === 'subscription') {
+        this.activeTab = 'subscription';
+        this.loadAvailablePlans();
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -105,6 +127,10 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
       email: this.settings.email,
       website: this.settings.website,
       boardType: this.settings.boardType,
+      academicYearStartMonth: this.settings.academicYearStartMonth ?? 4,
+      workingDays: this.settings.workingDays ?? 'MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY',
+      periodsPerDay: this.settings.periodsPerDay ?? 8,
+      gradingSystem: this.settings.gradingSystem ?? 'CBSE',
     };
     this.isEditing = true;
   }
@@ -149,6 +175,39 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  get gradingSystemLabel(): string {
+    const found = this.gradingSystems.find(g => g.value === this.settings?.gradingSystem);
+    return found?.label ?? this.settings?.gradingSystem ?? 'CBSE';
+  }
+
+  get academicYearStartLabel(): string {
+    const m = this.settings?.academicYearStartMonth;
+    const found = this.monthOptions.find(o => o.value === m);
+    return found?.label ?? 'April';
+  }
+
+  // ── Working days helpers ─────────────────────────────────────────────────
+
+  isWorkingDay(day: string): boolean {
+    const days = (this.editForm.workingDays ?? '').split(',').map(d => d.trim().toUpperCase());
+    return days.includes(day.toUpperCase());
+  }
+
+  toggleWorkingDay(day: string): void {
+    const days = (this.editForm.workingDays ?? '').split(',').map(d => d.trim().toUpperCase()).filter(d => d);
+    const idx = days.indexOf(day.toUpperCase());
+    if (idx >= 0) {
+      days.splice(idx, 1);
+    } else {
+      // Insert in canonical order
+      const order = this.allDayOptions;
+      const insertAt = order.findIndex(d => !days.includes(d) ? false : d === day || order.indexOf(d) > order.indexOf(day));
+      days.push(day.toUpperCase());
+      days.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+    }
+    this.editForm.workingDays = days.join(',');
   }
 
   saveRazorpayKeys(): void {
@@ -226,7 +285,7 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
         this.entitlement = e;
         this.entitlementLoading = false;
         this.cdr.markForCheck();
-        this.loadSubscriptionHistory();
+        this.loadSubscriptionHistory(force);
       },
       error: (err) => {
         this.logger.error('Failed to load entitlement', err);

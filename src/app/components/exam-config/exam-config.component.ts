@@ -5,8 +5,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { ToastService } from '../../services/toast.service';
 import { ExamConfigService, ExamConfig, ExamSubjectEntry } from '../../services/exam-config.service';
 import { LoggerService } from '../../services/logger.service';
-import { FeesCalculationService } from '../../services/fees-calculation.service';
 import { SchoolService } from '../../services/school.service';
+import { AcademicSessionService } from '../../services/academic-session.service';
 
 @Component({
   selector: 'app-exam-config',
@@ -38,21 +38,23 @@ export class ExamConfigComponent implements OnInit, OnDestroy {
 
   constructor(
     private examService: ExamConfigService,
-    private feesCalc: FeesCalculationService,
     private schoolService: SchoolService,
+    private academicSessionService: AcademicSessionService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
     private toast: ToastService
   ) { }
 
   ngOnInit(): void {
-    this.schoolService.getSettings().pipe(takeUntil(this.destroy$)).subscribe({
-      next: settings => {
-        this.feesCalc.setStartMonth(settings.academicYearStartMonth ?? 4);
-        this.buildSessions();
+    this.academicSessionService.getAllSessions().pipe(takeUntil(this.destroy$)).subscribe({
+      next: sessions => {
+        this.sessions = sessions.map(s => s.label);
+        const current = sessions.find(s => s.current);
+        this.selectedSession = current ? current.label : (this.sessions[0] ?? '');
         this.cdr.markForCheck();
+        if (this.selectedClass) this.loadExams();
       },
-      error: () => this.buildSessions()
+      error: (e) => this.logger.error('Failed to load sessions', e)
     });
     this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
       next: classes => {
@@ -61,7 +63,7 @@ export class ExamConfigComponent implements OnInit, OnDestroy {
           this.selectedClass = classes[0];
         }
         this.cdr.markForCheck();
-        this.loadExams();
+        if (this.selectedSession) this.loadExams();
       },
       error: e => this.logger.error('Failed to load classes', e),
     });
@@ -70,19 +72,6 @@ export class ExamConfigComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  private buildSessions(): void {
-    const today = new Date();
-    const current = this.feesCalc.getAcademicYear(today);
-    const [startStr] = current.split('-');
-    const start = parseInt(startStr);
-    this.sessions = [
-      `${start - 1}-${start}`,
-      current,
-      `${start + 1}-${start + 2}`,
-    ];
-    this.selectedSession = current;
   }
 
   loadExams(): void {

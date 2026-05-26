@@ -8,6 +8,7 @@ import { StudentService } from '../../services/student.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { LoggerService } from '../../services/logger.service';
 import { SchoolService } from '../../services/school.service';
+import { AcademicSessionService } from '../../services/academic-session.service';
 import {
   StudentAttendanceSummary, ClassAttendanceSummary, MonthlyBreakdown,
   DailyDetail, CalendarCell, CellStatus
@@ -78,7 +79,8 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
     private authStateService: AuthStateService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
-    private schoolService: SchoolService
+    private schoolService: SchoolService,
+    private academicSessionService: AcademicSessionService
   ) {}
 
   ngOnInit(): void {
@@ -92,14 +94,15 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
       error: () => {}
     });
 
-    this.schoolService.getSettings().pipe(takeUntil(this.destroy$)).subscribe({
-      next: settings => {
-        this.initSessions(settings.academicYearStartMonth ?? 4);
+    this.academicSessionService.getAllSessions().pipe(takeUntil(this.destroy$)).subscribe({
+      next: sessions => {
+        this.sessions = sessions.map(s => s.label);
+        const current = sessions.find(s => s.current);
+        this.selectedSession = current ? current.label : (this.sessions[0] ?? '');
         this.initYears();
         this.cdr.markForCheck();
       },
       error: () => {
-        this.initSessions();
         this.initYears();
         this.cdr.markForCheck();
       }
@@ -132,18 +135,6 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  private initSessions(academicStartMonth = 4): void {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1;
-    const startYear = month >= academicStartMonth ? year : year - 1;
-    for (let i = 0; i < 3; i++) {
-      const s = startYear - i;
-      this.sessions.push(`${s}-${s + 1}`);
-    }
-    this.selectedSession = this.sessions[0];
   }
 
   private initYears(): void {

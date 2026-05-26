@@ -119,7 +119,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
         this.isNewSessionStarted = true;
         this.newSessionYear = nextSession;
 
-        const newFeeStructures = this.feeStructures.map(fee => ({ ...fee, academicYear: nextSession }));
+        this.feeStructures = this.feeStructures.map(fee => ({ ...fee, academicYear: nextSession }));
 
         this.sessions.push(nextSession);
         this.currentSession = nextSession;
@@ -130,6 +130,10 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
   }
 
   getNextAvailableSession(): string {
+    if (this.sessions.length === 0) {
+      const y = new Date().getFullYear();
+      return `${y}-${y + 1}`;
+    }
     let [startYear, endYear] = this.sessions[this.sessions.length - 1].split('-').map(Number);
 
     while (this.sessions.includes(`${startYear + 1}-${endYear + 1}`)) {

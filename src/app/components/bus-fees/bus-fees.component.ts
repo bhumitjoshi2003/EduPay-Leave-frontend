@@ -122,11 +122,12 @@ export class BusFeesComponent implements OnInit, OnDestroy {
           return;
         }
         this.academicYears.push(newYear);
-        this.cdr.markForCheck();
-        this.fetchBusFees();
         this.currentSession = newYear;
+        this.busFeeStructures = [];
+        this.originalBusFees = [];
         this.isEditing = true;
         this.isNewSession = true;
+        this.cdr.markForCheck();
       }
     });
   }

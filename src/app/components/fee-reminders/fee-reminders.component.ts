@@ -59,8 +59,18 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
       error: () => { }
     });
 
-    this.initSessions();
-    this.loadOverdue();
+    this.schoolService.getSettings().pipe(takeUntil(this.destroy$)).subscribe({
+      next: settings => {
+        this.initSessions(settings.academicYearStartMonth ?? 4);
+        this.loadOverdue();
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.initSessions();
+        this.loadOverdue();
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -68,10 +78,10 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private initSessions(): void {
+  private initSessions(academicStartMonth = 4): void {
     const now = new Date();
     const y = now.getFullYear();
-    const startYear = now.getMonth() + 1 >= 4 ? y : y - 1;
+    const startYear = now.getMonth() + 1 >= academicStartMonth ? y : y - 1;
     for (let i = 0; i < 3; i++) {
       const s = startYear - i;
       this.sessions.push(`${s}-${s + 1}`);

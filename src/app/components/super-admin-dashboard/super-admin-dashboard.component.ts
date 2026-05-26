@@ -142,8 +142,14 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     this.onboarding = true;
     this.cdr.markForCheck();
 
+    const payload = {
+      ...this.onboardForm,
+      trialEndsAt: this.onboardForm.trialEndsAt || null,
+      trialPlanId: this.onboardForm.trialPlanId || null,
+    };
+
     this.schoolService
-      .onboardSchool(this.onboardForm)
+      .onboardSchool(payload)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (school) => {

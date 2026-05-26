@@ -46,7 +46,14 @@ export class ExamConfigComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.buildSessions();
+    this.schoolService.getSettings().pipe(takeUntil(this.destroy$)).subscribe({
+      next: settings => {
+        this.feesCalc.setStartMonth(settings.academicYearStartMonth ?? 4);
+        this.buildSessions();
+        this.cdr.markForCheck();
+      },
+      error: () => this.buildSessions()
+    });
     this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
       next: classes => {
         this.classOptions = classes;

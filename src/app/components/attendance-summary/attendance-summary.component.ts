@@ -92,8 +92,18 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
       error: () => {}
     });
 
-    this.initSessions();
-    this.initYears();
+    this.schoolService.getSettings().pipe(takeUntil(this.destroy$)).subscribe({
+      next: settings => {
+        this.initSessions(settings.academicYearStartMonth ?? 4);
+        this.initYears();
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.initSessions();
+        this.initYears();
+        this.cdr.markForCheck();
+      }
+    });
 
     if (this.role === 'STUDENT') {
       this.selectedStudentId = this.userId;
@@ -124,11 +134,11 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private initSessions(): void {
+  private initSessions(academicStartMonth = 4): void {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
-    const startYear = month >= 4 ? year : year - 1;
+    const startYear = month >= academicStartMonth ? year : year - 1;
     for (let i = 0; i < 3; i++) {
       const s = startYear - i;
       this.sessions.push(`${s}-${s + 1}`);

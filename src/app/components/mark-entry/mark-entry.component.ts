@@ -11,8 +11,7 @@ import { StudentService } from '../../services/student.service';
 import { FeesCalculationService } from '../../services/fees-calculation.service';
 import { LoggerService } from '../../services/logger.service';
 import { ToastService } from '../../services/toast.service';
-
-const ALL_CLASSES = ['1','2','3','4','5','6','7','8','9','10','11','12'];
+import { SchoolService } from '../../services/school.service';
 
 @Component({
   selector: 'app-mark-entry',
@@ -27,7 +26,7 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
 
   mode: 'subject' | 'student' = 'subject';
   role = '';
-  classOptions = ALL_CLASSES;
+  classOptions: string[] = [];
   sessions: string[] = [];
 
   selectedSession = '';
@@ -60,14 +59,33 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
     private feesCalc: FeesCalculationService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
-    private toast: ToastService
+    private toast: ToastService,
+    private schoolService: SchoolService
   ) { }
 
   ngOnInit(): void {
-    this.buildSessions();
     const user = this.authState.getUser();
     this.role = user?.role ?? '';
 
+    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
+      next: classes => { this.classOptions = classes; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+
+    this.schoolService.getSettings().pipe(takeUntil(this.destroy$)).subscribe({
+      next: settings => {
+        this.feesCalc.setStartMonth(settings.academicYearStartMonth ?? 4);
+        this.buildSessions();
+        this.initAfterSettings(user);
+      },
+      error: () => {
+        this.buildSessions();
+        this.initAfterSettings(user);
+      }
+    });
+  }
+
+  private initAfterSettings(user: any): void {
     if (this.role === 'TEACHER') {
       const teacherId = user!.userId;
       this.teacherService.getTeacher(teacherId).pipe(takeUntil(this.destroy$)).subscribe({
@@ -79,7 +97,7 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
         error: (e) => this.logger.error('Error fetching teacher:', e),
       });
     } else {
-      this.selectedClass = '1';
+      this.selectedClass = this.classOptions.length > 0 ? this.classOptions[0] : '1';
       this.loadExams();
     }
   }

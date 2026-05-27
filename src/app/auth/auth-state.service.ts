@@ -17,6 +17,7 @@ export interface UserInfo {
   trialEndsAt: string | null;
   expiresAt: string | null;
   graceEndsAt: string | null;
+  permissionKeys: string[];
 }
 
 @Injectable({
@@ -71,6 +72,17 @@ export class AuthStateService {
     const keys = this.user?.featureKeys;
     if (!keys || keys.length === 0) return true;
     return keys.includes(featureKey);
+  }
+
+  /**
+   * UX-only permission check — backend is always authoritative.
+   * Returns true if the user's role has the given permission key,
+   * or if no permission data is loaded (graceful fallback).
+   */
+  hasPermission(permissionKey: string): boolean {
+    const keys = this.user?.permissionKeys;
+    if (!keys || keys.length === 0) return true;
+    return keys.includes(permissionKey);
   }
 
   /** Returns the subscription status string (TRIAL / ACTIVE / GRACE / EXPIRED) or null. */

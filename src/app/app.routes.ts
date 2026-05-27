@@ -42,6 +42,13 @@ import { TimetableComponent } from './components/timetable/timetable.component';
 import { FeeRemindersComponent } from './components/fee-reminders/fee-reminders.component';
 import { AnalyticsComponent } from './components/analytics/analytics.component';
 import { ClassManagementComponent } from './components/class-management/class-management.component';
+import { HolidayCalendarComponent } from './components/holiday-calendar/holiday-calendar.component';
+import { FeeHeadManagementComponent } from './components/fee-head-management/fee-head-management.component';
+import { FeeRuleConfigComponent } from './components/fee-rule-config/fee-rule-config.component';
+import { InvoiceManagementComponent } from './components/invoice-management/invoice-management.component';
+import { InvoiceDetailComponent } from './components/invoice-detail/invoice-detail.component';
+import { StudentFeeOverviewComponent } from './components/student-fee-overview/student-fee-overview.component';
+import { PaymentRecordComponent } from './components/payment-record/payment-record.component';
 import { SchoolSettingsComponent } from './components/school-settings/school-settings.component';
 import { StudentPromotionComponent } from './components/student-promotion/student-promotion.component';
 import { StudentDashboardComponent } from './components/student-dashboard/student-dashboard.component';
@@ -178,6 +185,10 @@ export const routes: Routes = [
         canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUB_ADMIN'] }
       },
       {
+        path: 'holiday-calendar', component: HolidayCalendarComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
         path: 'school-settings', component: SchoolSettingsComponent,
         canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
@@ -191,6 +202,36 @@ export const routes: Routes = [
       },
       {
         path: 'bus-fees', component: BusFeesComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+
+      // ── New Fee System (invoice-based) ────────────────────────────────
+      {
+        path: 'fee-head-management', component: FeeHeadManagementComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'fee-rule-config', component: FeeRuleConfigComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'invoice-management', component: InvoiceManagementComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'invoice-detail/:invoiceId', component: InvoiceDetailComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'STUDENT'] }
+      },
+      {
+        path: 'student-fees', component: StudentFeeOverviewComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT'] }
+      },
+      {
+        path: 'student-fees/:studentId', component: StudentFeeOverviewComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'payment-record', component: PaymentRecordComponent,
         canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
 

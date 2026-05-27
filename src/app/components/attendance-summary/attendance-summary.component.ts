@@ -138,8 +138,14 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
   }
 
   private initYears(): void {
-    const current = new Date().getFullYear();
-    for (let y = current; y >= current - 3; y--) this.years.push(y);
+    const yearSet = new Set<number>();
+    for (const label of this.sessions) {
+      label.split('-').map(Number).forEach(y => { if (y) yearSet.add(y); });
+    }
+    this.years = [...yearSet].sort((a, b) => b - a);
+    if (this.years.length === 0) {
+      this.years.push(new Date().getFullYear());
+    }
   }
 
   setViewMode(mode: 'student' | 'class'): void {

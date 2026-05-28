@@ -33,6 +33,7 @@ import { featureGuard } from './auth/feature.guard';
 import { SubjectConfigComponent } from './components/subject-config/subject-config.component';
 import { ExamConfigComponent } from './components/exam-config/exam-config.component';
 import { StudentStreamComponent } from './components/student-stream/student-stream.component';
+import { ElectiveAssignmentComponent } from './components/elective-assignment/elective-assignment.component';
 import { MarkEntryComponent } from './components/mark-entry/mark-entry.component';
 import { StudentResultsComponent } from './components/student-results/student-results.component';
 import { ClassResultsComponent } from './components/class-results/class-results.component';
@@ -246,6 +247,10 @@ export const routes: Routes = [
       },
       {
         path: 'student-stream', component: StudentStreamComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'elective-assignment', component: ElectiveAssignmentComponent,
         canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
       {

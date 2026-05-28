@@ -96,7 +96,8 @@ export class MarksService {
   }
 
   // Class-wide results view (teacher / admin)
-  getClassResults(className: string, examConfigId: number): Observable<ClassStudentResult[]> {
-    return this.http.get<ClassStudentResult[]>(`${this.base}/class/${className}/exam/${examConfigId}`);
+  getClassResults(className: string, examConfigId: number, sectionId?: number | null): Observable<ClassStudentResult[]> {
+    const params = sectionId != null ? { params: { sectionId: String(sectionId) } } : {};
+    return this.http.get<ClassStudentResult[]>(`${this.base}/class/${className}/exam/${examConfigId}`, params);
   }
 }

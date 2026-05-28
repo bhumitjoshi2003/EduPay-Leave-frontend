@@ -213,6 +213,10 @@
            (click)="closeSidebarOnMobile()" title="Streams">
           <mat-icon>fork_right</mat-icon><span>Streams</span>
         </a>
+        <a class="nav-item" *ngIf="hasFeature('EXAM_MARKS')" routerLink="/dashboard/elective-assignment" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Electives">
+          <mat-icon>swap_horiz</mat-icon><span>Electives</span>
+        </a>
         <a class="nav-item" routerLink="/dashboard/timetable" routerLinkActive="active"
            (click)="closeSidebarOnMobile()" title="Timetable">
           <mat-icon>schedule</mat-icon><span>Timetable</span>

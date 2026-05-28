@@ -8,7 +8,7 @@
 /* ── Hero ─────────────────────────────────────────────────────────── */
 .ec-hero {
   position: relative;
-  background: linear-gradient(135deg, #881337 0%, #be123c 55%, #f43f5e 100%);
+  background: linear-gradient(135deg, #9f1239 0%, #e11d48 55%, #fb7185 100%);
   border-radius: 16px 16px 0 0;
   padding: 22px 28px;
   display: flex;
@@ -45,10 +45,10 @@
 }
 
 .ec-title {
-  color: #1f6f8b;
+  color: #9f1239;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  border-bottom: 2px solid #4fbdbd;
+  border-bottom: 2px solid #fecdd3;
   padding-bottom: 10px;
   margin-bottom: 20px;
   font-size: 1.2rem;
@@ -72,14 +72,14 @@
 .ec-filter-group label {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #1f6f8b;
+  color: #9f1239;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .ec-filter-group select {
   padding: 8px 12px;
-  border: 1px solid #4fbdbd;
+  border: 1px solid #fecdd3;
   border-radius: 6px;
   font-size: 0.9rem;
   outline: none;
@@ -101,7 +101,7 @@
   min-width: 180px;
   max-width: 320px;
   padding: 8px 12px;
-  border: 1px solid #4fbdbd;
+  border: 1px solid #fecdd3;
   border-radius: 6px;
   font-size: 0.9rem;
   outline: none;
@@ -109,7 +109,7 @@
 
 /* ── Buttons ─────────────────────────────────────────────────────── */
 .btn-primary {
-  background: linear-gradient(135deg, #1f6f8b, #14505d);
+  background: linear-gradient(135deg, #9f1239, #e11d48);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -131,8 +131,8 @@
 
 .btn-outline {
   background: transparent;
-  border: 2px dashed #4fbdbd;
-  color: #1f6f8b;
+  border: 2px dashed #fecdd3;
+  color: #9f1239;
   border-radius: 6px;
   padding: 7px 16px;
   font-weight: 600;
@@ -143,7 +143,7 @@
 }
 
 .btn-outline:hover {
-  background: #eaf6f6;
+  background: #fff1f2;
 }
 
 .btn-delete {
@@ -163,9 +163,9 @@
 }
 
 .btn-edit {
-  background: #e8f4f8;
-  border: 1px solid #4fbdbd;
-  color: #1f6f8b;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #9f1239;
   border-radius: 4px;
   padding: 4px 10px;
   cursor: pointer;
@@ -200,7 +200,7 @@
 /* ── Accordion ───────────────────────────────────────────────────── */
 .ec-accordion {
   margin-bottom: 12px;
-  border: 1px solid #d0eaf0;
+  border: 1px solid #fecdd3;
   border-radius: 10px;
   overflow: hidden;
   background: #fff;
@@ -211,7 +211,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 18px;
-  background: #e8f4f8;
+  background: #fff1f2;
   cursor: pointer;
   user-select: none;
   transition: background 0.2s;
@@ -219,12 +219,12 @@
 }
 
 .ec-accordion-header:hover {
-  background: #d0eaf0;
+  background: #ffe4e6;
 }
 
 .ec-exam-name {
   font-weight: 700;
-  color: #1f6f8b;
+  color: #9f1239;
   font-size: 1rem;
   flex: 1;
   min-width: 0;
@@ -239,7 +239,7 @@
 
 .ec-chevron {
   font-size: 0.75rem;
-  color: #1f6f8b;
+  color: #9f1239;
 }
 
 .ec-accordion-body {
@@ -255,12 +255,12 @@
 }
 
 .ec-table th {
-  background: #e8f4f8;
-  color: #1f6f8b;
+  background: #fff1f2;
+  color: #9f1239;
   padding: 9px 12px;
   text-align: left;
   font-weight: 700;
-  border-bottom: 2px solid #4fbdbd;
+  border-bottom: 2px solid #fecdd3;
   white-space: nowrap;
 }
 
@@ -275,7 +275,7 @@
 }
 
 .ec-table tbody tr:hover td {
-  background: #f5fbff;
+  background: #fff5f5;
 }
 
 .ec-actions {
@@ -288,7 +288,7 @@
 .ec-input {
   width: 160px;
   padding: 5px 8px;
-  border: 1px solid #4fbdbd;
+  border: 1px solid #fecdd3;
   border-radius: 4px;
   font-size: 0.88rem;
 }
@@ -296,7 +296,7 @@
 .ec-input-sm {
   width: 110px;
   padding: 5px 8px;
-  border: 1px solid #4fbdbd;
+  border: 1px solid #fecdd3;
   border-radius: 4px;
   font-size: 0.88rem;
 }
@@ -427,10 +427,10 @@
 
   .ec-table tbody tr {
     display: block;
-    border: 1px solid #d0eaf0;
+    border: 1px solid #fecdd3;
     border-radius: 8px;
     margin-bottom: 10px;
-    background: #f8fdfd;
+    background: #fff8f8;
     overflow: hidden;
   }
 
@@ -444,7 +444,7 @@
     align-items: center;
     padding: 9px 12px;
     border: none;
-    border-bottom: 1px solid #eef8f8;
+    border-bottom: 1px solid #fff1f2;
     font-size: 0.88rem;
     gap: 8px;
   }
@@ -456,7 +456,7 @@
   .ec-table tbody td::before {
     content: attr(data-label);
     font-weight: 700;
-    color: #1f6f8b;
+    color: #9f1239;
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.4px;

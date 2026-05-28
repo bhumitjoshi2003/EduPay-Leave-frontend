@@ -47,9 +47,12 @@
     <small>Go to <strong>Classes</strong> and enable the <strong>Stream</strong> option on the classes you want to include.</small>
   </div>
   <div *ngIf="!loading && !noEligibleClasses && students.length === 0" class="ss-empty">No students found for Class {{ selectedClass }}.</div>
+  <ng-container *ngIf="!loading && students.length > 0 && filteredStudents.length === 0">
+    <div class="ss-empty">No students found in the selected section.</div>
+  </ng-container>
 
   <!-- Table -->
-  <div *ngIf="!loading && students.length > 0" class="ss-table-wrapper">
+  <div *ngIf="!loading && filteredStudents.length > 0" class="ss-table-wrapper">
     <table class="ss-table">
       <thead>
         <tr>
@@ -62,7 +65,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let student of students; trackBy: trackByStudentId">
+        <tr *ngFor="let student of filteredStudents; trackBy: trackByStudentId">
           <!-- View Row -->
           <ng-container *ngIf="editingStudentId !== student.studentId">
             <td data-label="Student ID">{{ student.studentId }}</td>

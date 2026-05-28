@@ -235,6 +235,13 @@ export class StudentStreamComponent implements OnInit, OnDestroy {
     return this.optionalGroups.flatMap(g => g.subjects);
   }
 
+  get filteredStudents(): StudentStreamOverview[] {
+    if (!this.hasSections || !this.bulkSectionId) return this.students;
+    const sectionName = this.sections.find(s => s.id === this.bulkSectionId)?.name;
+    if (!sectionName) return this.students;
+    return this.students.filter(s => s.sectionName === sectionName);
+  }
+
   trackByStudentId(index: number, s: StudentStreamOverview): string { return s.studentId; }
   trackById(index: number, item: { id: number }): number { return item.id; }
   trackBySection(index: number, s: Section): number | undefined { return s.id; }

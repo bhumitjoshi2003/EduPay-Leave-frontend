@@ -4,7 +4,7 @@ import { TeacherService } from '../../services/teacher.service';
 import { Router } from '@angular/router';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { CommonModule } from '@angular/common';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, forkJoin, takeUntil } from 'rxjs';
 import { LoggerService } from '../../services/logger.service';
 import { ToastService } from '../../services/toast.service';
 import { SchoolService, SchoolClass } from '../../services/school.service';
@@ -65,19 +65,22 @@ export class StudentListComponent implements OnInit, OnDestroy {
       this.teacherId = user.userId;
 
       if (this.loggedInUserRole === 'ADMIN') {
-        this.schoolService.getManagedClasses().pipe(takeUntil(this.destroy$)).subscribe({
-          next: classes => { this.managedClasses = classes; },
-          error: () => {}
-        });
-        this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
-          next: classes => {
-            this.classList = classes;
-            this.selectedClass = localStorage.getItem('lastSelectedClass') || this.classList[0];
+        forkJoin({
+          managedClasses: this.schoolService.getManagedClasses(),
+          classList: this.schoolService.getClasses()
+        }).pipe(takeUntil(this.destroy$)).subscribe({
+          next: ({ managedClasses, classList }) => {
+            this.managedClasses = managedClasses;
+            this.classList = classList;
+            this.selectedClass = localStorage.getItem('lastSelectedClass') || this.classList[0] || '';
             this.cdr.markForCheck();
-            if (this.selectedClass) this.loadSectionsForClass(this.selectedClass);
-            this.loadStudents();
+            if (this.selectedClass) {
+              this.loadSectionsForClass(this.selectedClass, () => this.loadStudents());
+            } else {
+              this.loadStudents();
+            }
           },
-          error: (err) => {
+          error: (err: unknown) => {
             this.logger.error('Failed to load classes:', err);
             this.toast.error('Error', 'Failed to load class list.');
           }
@@ -162,16 +165,15 @@ export class StudentListComponent implements OnInit, OnDestroy {
     this.selectedClass = selectedClass;
     this.selectedSectionId = null;
     this.sections = [];
-    this.loadSectionsForClass(selectedClass);
-    this.loadStudents();
+    this.loadSectionsForClass(selectedClass, () => this.loadStudents());
   }
 
-  loadSectionsForClass(className: string): void {
+  loadSectionsForClass(className: string, then?: () => void): void {
     const cls = this.managedClasses.find(c => c.name === className);
-    if (!cls) return;
+    if (!cls) { then?.(); return; }
     this.sectionService.getSectionsForClass(cls.id).pipe(takeUntil(this.destroy$)).subscribe({
-      next: sections => { this.sections = sections; this.cdr.markForCheck(); },
-      error: () => {}
+      next: sections => { this.sections = sections; this.cdr.markForCheck(); then?.(); },
+      error: () => { then?.(); }
     });
   }
 

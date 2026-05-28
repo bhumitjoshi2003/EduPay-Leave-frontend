@@ -173,22 +173,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   handleInitialNavigation(): void {
-    const currentUrl = this.router.url;
-    if (!currentUrl.startsWith('/dashboard/payment-history-details/')) {
-      if (this.Role === 'STUDENT') {
-        this.router.navigate(['/dashboard/student-dashboard']);
-      } else if (this.Role === 'TEACHER') {
-        this.router.navigate(['/dashboard/teacher-dashboard']);
-      } else if (this.Role === 'ADMIN' || this.Role === 'SUB_ADMIN') {
-        // Redirect expired admins straight to school-settings so they can renew
-        if (this.subscriptionStatus === 'EXPIRED') {
-          this.router.navigate(['/dashboard/school-settings']);
-        } else {
-          this.router.navigate(['/dashboard/admin-dashboard']);
-        }
-      } else if (this.Role === 'SUPER_ADMIN') {
-        this.router.navigate(['/dashboard/super-admin-dashboard']);
-      }
+    if (this.Role === 'ADMIN' && this.subscriptionStatus === 'EXPIRED') {
+      this.router.navigate(['/dashboard/school-settings']);
+      return;
+    }
+    const url = this.router.url.split('?')[0];
+    const isBareDashboard = url === '/dashboard' || url === '/dashboard/';
+    if (!isBareDashboard) return;
+    if (this.Role === 'STUDENT') {
+      this.router.navigate(['/dashboard/student-dashboard']);
+    } else if (this.Role === 'TEACHER') {
+      this.router.navigate(['/dashboard/teacher-dashboard']);
+    } else if (this.Role === 'ADMIN' || this.Role === 'SUB_ADMIN') {
+      this.router.navigate(['/dashboard/admin-dashboard']);
+    } else if (this.Role === 'SUPER_ADMIN') {
+      this.router.navigate(['/dashboard/super-admin-dashboard']);
     }
   }
 

@@ -237,5 +237,6 @@ export class StudentStreamComponent implements OnInit, OnDestroy {
 
   trackByStudentId(index: number, s: StudentStreamOverview): string { return s.studentId; }
   trackById(index: number, item: { id: number }): number { return item.id; }
+  trackBySection(index: number, s: Section): number | undefined { return s.id; }
   trackByIndex(index: number): number { return index; }
 }

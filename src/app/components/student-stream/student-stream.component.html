@@ -24,7 +24,7 @@
   <div class="ss-bulk-panel" *ngIf="hasSections && !noEligibleClasses">
     <span class="ss-bulk-label">Bulk assign section:</span>
     <select class="ss-select ss-bulk-select" [(ngModel)]="bulkSectionId">
-      <option *ngFor="let s of sections; trackBy: trackById" [ngValue]="s.id">Section {{ s.name }}</option>
+      <option *ngFor="let s of sections; trackBy: trackBySection" [ngValue]="s.id">Section {{ s.name }}</option>
     </select>
     <select class="ss-select ss-bulk-select" [(ngModel)]="bulkStreamId">
       <option [ngValue]="null">— Stream —</option>

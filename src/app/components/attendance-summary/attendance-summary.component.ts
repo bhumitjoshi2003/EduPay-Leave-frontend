@@ -7,7 +7,9 @@ import { AttendanceService } from '../../services/attendance.service';
 import { StudentService } from '../../services/student.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { LoggerService } from '../../services/logger.service';
-import { SchoolService } from '../../services/school.service';
+import { SchoolService, SchoolClass } from '../../services/school.service';
+import { SectionService } from '../../services/section.service';
+import { Section } from '../../interfaces/section';
 import { AcademicSessionService } from '../../services/academic-session.service';
 import {
   StudentAttendanceSummary, ClassAttendanceSummary, MonthlyBreakdown,
@@ -62,6 +64,9 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
   private dailyDetailCache = new Map<string, DailyDetail>();
 
   classList: string[] = [];
+  managedClasses: SchoolClass[] = [];
+  sections: Section[] = [];
+  selectedSectionId: number | null = null;
   readonly months = [
     { value: 1, label: 'January' }, { value: 2, label: 'February' }, { value: 3, label: 'March' },
     { value: 4, label: 'April' }, { value: 5, label: 'May' }, { value: 6, label: 'June' },
@@ -80,7 +85,8 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
     private schoolService: SchoolService,
-    private academicSessionService: AcademicSessionService
+    private academicSessionService: AcademicSessionService,
+    private sectionService: SectionService
   ) {}
 
   ngOnInit(): void {
@@ -91,6 +97,10 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
 
     this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
       next: classes => { this.classList = classes; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+    this.schoolService.getManagedClasses().pipe(takeUntil(this.destroy$)).subscribe({
+      next: classes => { this.managedClasses = classes; },
       error: () => {}
     });
 
@@ -116,6 +126,7 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
 
     if (this.role === 'TEACHER' && this.userClassName) {
       this.selectedClass = this.userClassName;
+      this.loadSectionsForClass(this.selectedClass);
       this.loadStudentList();
     }
 
@@ -171,6 +182,29 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
     this.studentSummary = null;
     this.classSummary = [];
     this.studentList = [];
+    this.selectedSectionId = null;
+    this.sections = [];
+    this.resetCalendarState();
+    if (this.selectedClass) this.loadSectionsForClass(this.selectedClass);
+    if (this.viewMode === 'student' && this.selectedClass) this.loadStudentList();
+    this.cdr.markForCheck();
+  }
+
+  loadSectionsForClass(className: string): void {
+    const cls = this.managedClasses.find(c => c.name === className);
+    if (!cls) return;
+    this.sectionService.getSectionsForClass(cls.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: sections => { this.sections = sections; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+  }
+
+  onSectionSelect(sectionId: number | null): void {
+    this.selectedSectionId = sectionId;
+    this.selectedStudentId = '';
+    this.studentSummary = null;
+    this.classSummary = [];
+    this.studentList = [];
     this.resetCalendarState();
     if (this.viewMode === 'student' && this.selectedClass) this.loadStudentList();
     this.cdr.markForCheck();
@@ -189,7 +223,8 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
 
   loadStudentList(): void {
     if (!this.selectedClass) return;
-    this.studentService.getActiveStudentsByClass(this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe({
+    const secId = this.selectedSectionId ?? undefined;
+    this.studentService.getActiveStudentsByClass(this.selectedClass, secId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (students) => {
         this.studentList = students;
         this.cdr.markForCheck();

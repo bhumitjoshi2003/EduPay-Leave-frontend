@@ -625,6 +625,35 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
     });
   }
 
+  async deleteSession(session: AcademicSession): Promise<void> {
+    const confirmed = await this.toast.confirm({
+      title: `Delete Session ${session.label}?`,
+      html: `<p>This will permanently delete the academic session <strong>${session.label}</strong> and all associated fee structure rules and student fee configs.</p><p>This action <strong>cannot be undone</strong>.</p>`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      danger: true,
+      icon: 'danger',
+      requiredInput: 'DELETE',
+    });
+    if (!confirmed) return;
+
+    this.sessionsLoading = true;
+    this.cdr.markForCheck();
+    this.academicSessionService.deleteSession(session.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.toast.success('Deleted', `Session ${session.label} has been deleted.`);
+        this.loadSessions();
+      },
+      error: (e) => {
+        this.logger.error('Failed to delete session', e);
+        const msg = typeof e?.error === 'string' ? e.error : e?.error?.message;
+        this.toast.error('Error', msg || 'Failed to delete session.');
+        this.sessionsLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   getChannelLabel(type: string): string {
     const labels: Record<string, string> = { PUSH: 'Push Notifications', SMS: 'SMS', EMAIL: 'Email', WHATSAPP: 'WhatsApp' };
     return labels[type] ?? type;

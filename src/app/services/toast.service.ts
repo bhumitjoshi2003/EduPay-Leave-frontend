@@ -21,6 +21,7 @@ export interface ConfirmDialogData {
   cancelText?: string;
   danger?: boolean;
   icon?: 'warning' | 'question' | 'info' | 'success' | 'danger';
+  requiredInput?: string;
 }
 
 @Injectable({ providedIn: 'root' })

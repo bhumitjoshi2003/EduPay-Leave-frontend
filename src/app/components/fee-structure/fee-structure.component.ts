@@ -228,6 +228,9 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
   }
 
   // ── Fee Head Management ──────────────────────────────────────────
+  editingFeeHeadId: number | null = null;
+  editFeeHeadForm: Partial<FeeHead> = {};
+
   toggleFeeHeadForm(): void {
     this.showFeeHeadForm = !this.showFeeHeadForm;
     if (this.showFeeHeadForm) {
@@ -246,14 +249,9 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
     this.feeHeadService.createFeeHead(fh).pipe(takeUntil(this.destroy$)).subscribe({
       next: (created) => {
         this.feeHeads.push(created);
-        // Add column to grid for all classes
         for (const cls of this.classes) {
-          if (this.feeGrid[cls]) {
-            this.feeGrid[cls][created.id!] = 0;
-          }
-          if (this.originalGrid[cls]) {
-            this.originalGrid[cls][created.id!] = 0;
-          }
+          if (this.feeGrid[cls]) this.feeGrid[cls][created.id!] = 0;
+          if (this.originalGrid[cls]) this.originalGrid[cls][created.id!] = 0;
         }
         this.showFeeHeadForm = false;
         this.newFeeHead = this.defaultFeeHead();
@@ -265,6 +263,73 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
         this.toast.error('Error', 'Failed to create fee head. Code may already exist.');
       }
     });
+  }
+
+  startEditFeeHead(fh: FeeHead): void {
+    this.editingFeeHeadId = fh.id!;
+    this.editFeeHeadForm = { ...fh };
+    this.cdr.markForCheck();
+  }
+
+  cancelEditFeeHead(): void {
+    this.editingFeeHeadId = null;
+    this.editFeeHeadForm = {};
+    this.cdr.markForCheck();
+  }
+
+  saveEditFeeHead(): void {
+    const form = this.editFeeHeadForm as FeeHead;
+    if (!form.name?.trim()) {
+      this.toast.warning('Validation', 'Name is required.');
+      return;
+    }
+    this.feeHeadService.updateFeeHead(this.editingFeeHeadId!, form)
+      .pipe(takeUntil(this.destroy$)).subscribe({
+        next: (updated) => {
+          const idx = this.feeHeads.findIndex(fh => fh.id === updated.id);
+          if (idx >= 0) this.feeHeads[idx] = updated;
+          this.editingFeeHeadId = null;
+          this.editFeeHeadForm = {};
+          this.cdr.markForCheck();
+          this.toast.success('Updated', `Fee head "${updated.name}" updated.`);
+        },
+        error: (err) => {
+          this.logger.error('Error updating fee head:', err);
+          this.toast.error('Error', 'Failed to update fee head.');
+        }
+      });
+  }
+
+  async deleteFeeHead(fh: FeeHead): Promise<void> {
+    const confirmed = await this.toast.confirm({
+      title: `Delete "${fh.name}"?`,
+      message: 'This will remove the fee head. If it is referenced by existing fee rules, it will be deactivated instead of deleted.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      danger: true,
+      icon: 'danger',
+    });
+    if (!confirmed) return;
+
+    this.feeHeadService.deleteFeeHead(fh.id!).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.feeHeads = this.feeHeads.filter(h => h.id !== fh.id);
+        this.cdr.markForCheck();
+        this.toast.success('Deleted', `Fee head "${fh.name}" removed.`);
+      },
+      error: (err) => {
+        this.logger.error('Error deleting fee head:', err);
+        this.toast.error('Error', 'Failed to delete fee head.');
+      }
+    });
+  }
+
+  frequencyLabel(freq: string): string {
+    const labels: Record<string, string> = {
+      MONTHLY: 'Monthly', QUARTERLY: 'Quarterly',
+      SEMI_ANNUAL: 'Semi-Annual', ANNUAL: 'Annual', ONE_TIME: 'One-Time',
+    };
+    return labels[freq] ?? freq;
   }
 
   private defaultFeeHead(): Partial<FeeHead> {

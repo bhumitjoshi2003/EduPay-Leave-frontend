@@ -108,6 +108,36 @@
     <p class="fs-empty-sub">Add fee heads using the button above to define your school's fee structure.</p>
   </div>
 
+  <!-- Fee Head Edit Inline -->
+  <div class="fs-fh-form" *ngIf="editingFeeHeadId !== null && canEdit()">
+    <h3 class="fs-fh-form-title">Edit Fee Head</h3>
+    <div class="fs-fh-form-row">
+      <div class="fs-fh-field">
+        <label class="fs-label">Name</label>
+        <input class="fs-input" type="text" [(ngModel)]="editFeeHeadForm.name" />
+      </div>
+      <div class="fs-fh-field">
+        <label class="fs-label">Code</label>
+        <input class="fs-input" type="text" [value]="editFeeHeadForm.code" disabled />
+      </div>
+      <div class="fs-fh-field">
+        <label class="fs-label">Frequency</label>
+        <select class="fs-select" [(ngModel)]="editFeeHeadForm.frequency">
+          <option value="MONTHLY">Monthly</option>
+          <option value="QUARTERLY">Quarterly</option>
+          <option value="SEMI_ANNUAL">Semi-Annual</option>
+          <option value="ANNUAL">Annual</option>
+          <option value="ONE_TIME">One-Time</option>
+        </select>
+      </div>
+      <div class="fs-fh-field fs-fh-check">
+        <label><input type="checkbox" [(ngModel)]="editFeeHeadForm.optional" /> Optional</label>
+      </div>
+      <button class="fs-btn fs-btn-success" (click)="saveEditFeeHead()">Save</button>
+      <button class="fs-btn fs-btn-danger" (click)="cancelEditFeeHead()">Cancel</button>
+    </div>
+  </div>
+
   <!-- Fee Grid Table -->
   <div class="fs-table-wrap" *ngIf="!isLoading && !rulesLoading && hasData() && feeHeads.length > 0">
     <div class="fs-table-scroll">
@@ -115,7 +145,16 @@
         <thead>
           <tr>
             <th>Class</th>
-            <th *ngFor="let fh of feeHeads; trackBy: trackByFeeHead">{{ fh.name }}</th>
+            <th *ngFor="let fh of feeHeads; trackBy: trackByFeeHead">
+              <div class="fs-th-content">
+                <span>{{ fh.name }}</span>
+                <span class="fs-th-freq">{{ frequencyLabel(fh.frequency) }}</span>
+                <div class="fs-th-actions" *ngIf="canEdit() && !isEditing">
+                  <button class="fs-th-btn" title="Edit" (click)="startEditFeeHead(fh)">✎</button>
+                  <button class="fs-th-btn fs-th-btn-del" title="Delete" (click)="deleteFeeHead(fh)">✕</button>
+                </div>
+              </div>
+            </th>
           </tr>
         </thead>
         <tbody>

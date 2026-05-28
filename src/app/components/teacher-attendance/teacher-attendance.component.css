@@ -302,6 +302,23 @@
 .ta-status-select:focus { border-color: #059669; }
 .ta-status-select:disabled { opacity: 0.45; cursor: not-allowed; }
 
+/* ── Section Chips ──────────────────────────────────────────────── */
+.ta-section-chips {
+  display: flex; gap: 8px; padding: 10px 24px; background: #fff;
+  flex-wrap: wrap; border-bottom: 1px solid #eef0f5;
+}
+.ta-section-chip {
+  padding: 5px 14px; border-radius: 16px; border: 1px solid #d1d5db;
+  background: #f9fafb; font-size: 0.8rem; font-weight: 600;
+  color: #374151; cursor: pointer; transition: all 0.15s ease;
+}
+.ta-section-chip:hover { border-color: #059669; color: #065f46; }
+.ta-section-active {
+  background: linear-gradient(135deg, #059669, #10b981); color: #fff;
+  border-color: transparent;
+}
+.ta-section-active:hover { color: #fff; }
+
 /* ── Animation ───────────────────────────────────────────────────── */
 @keyframes ta-fade-up {
   from { opacity: 0; transform: translateY(12px); }

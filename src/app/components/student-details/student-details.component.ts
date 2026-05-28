@@ -9,12 +9,16 @@ import { ToastService } from '../../services/toast.service';
 import { Subject, takeUntil } from 'rxjs';
 import { Location } from '@angular/common';
 import { environment } from '../../../environments/environment';
-import { SchoolService } from '../../services/school.service';
+import { SchoolService, SchoolClass } from '../../services/school.service';
+import { SectionService } from '../../services/section.service';
+import { Section } from '../../interfaces/section';
 
 interface StudentDetails {
   studentId?: string;
   name?: string;
   className?: string;
+  sectionId?: number | null;
+  sectionName?: string;
   phoneNumber?: string;
   email?: string;
   gender?: string;
@@ -71,6 +75,8 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     { value: 10, label: 'January' }, { value: 11, label: 'February' }, { value: 12, label: 'March' }
   ];
   classList: string[] = [];
+  managedClasses: SchoolClass[] = [];
+  sections: Section[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -81,12 +87,17 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
     private schoolService: SchoolService,
-    private toast: ToastService
+    private toast: ToastService,
+    private sectionService: SectionService
   ) { }
 
   ngOnInit(): void {
     this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
       next: classes => { this.classList = classes; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+    this.schoolService.getManagedClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: classes => { this.managedClasses = classes; },
       error: () => {}
     });
 
@@ -109,6 +120,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
       next: (details) => {
         this.studentDetails = details;
         this.updatedDetails = { ...details };
+        if (details.className) this.loadSectionsForClass(details.className);
         this.cdr.markForCheck();
       },
       error: (error) => {
@@ -380,6 +392,24 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
         this.toast.error('Upload failed', 'Could not upload photo. Please try again.');
       }
     });
+  }
+
+  loadSectionsForClass(className: string): void {
+    const cls = this.managedClasses.find(c => c.name === className);
+    if (!cls) { this.sections = []; return; }
+    this.sectionService.getSectionsForClass(cls.id).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: sections => { this.sections = sections; this.cdr.markForCheck(); },
+      error: () => { this.sections = []; }
+    });
+  }
+
+  onClassChangeInEdit(className: string): void {
+    this.sections = [];
+    if (this.updatedDetails) {
+      this.updatedDetails.sectionId = undefined;
+      this.updatedDetails.sectionName = undefined;
+    }
+    this.loadSectionsForClass(className);
   }
 
   goBack(): void {

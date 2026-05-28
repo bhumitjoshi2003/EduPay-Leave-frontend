@@ -9,11 +9,19 @@
       <p *ngIf="data.message" class="cd-message">{{ data.message }}</p>
     </ng-template>
   </div>
+  <!-- Required input confirmation -->
+  <div class="cd-input-wrap" *ngIf="data.requiredInput">
+    <label class="cd-input-label">Type <strong>{{ data.requiredInput }}</strong> to confirm</label>
+    <input class="cd-input" type="text" [(ngModel)]="confirmInput"
+      [placeholder]="data.requiredInput" autocomplete="off" spellcheck="false" />
+  </div>
+
   <div class="cd-actions" [class.single]="!data.cancelText">
     <button *ngIf="data.cancelText" mat-stroked-button class="cd-btn-cancel" (click)="cancel()">
       {{ data.cancelText }}
     </button>
-    <button mat-flat-button class="cd-btn-confirm" [class.danger]="data.danger" (click)="confirm()">
+    <button mat-flat-button class="cd-btn-confirm" [class.danger]="data.danger"
+      [disabled]="confirmDisabled" (click)="confirm()">
       {{ data.confirmText || 'OK' }}
     </button>
   </div>

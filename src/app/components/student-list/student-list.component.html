@@ -34,6 +34,15 @@
       </button>
     </div>
 
+    <!-- Section filter chips -->
+    <div class="section-chips-wrap" *ngIf="sections.length > 0">
+      <button class="section-chip" [class.section-chip-active]="selectedSectionId === null"
+        (click)="onSectionSelect(null)">All Sections</button>
+      <button *ngFor="let sec of sections" class="section-chip"
+        [class.section-chip-active]="selectedSectionId === sec.id"
+        (click)="onSectionSelect(sec.id!)">{{ sec.name }}</button>
+    </div>
+
     <div *ngIf="(activeStudents.length + inactiveStudents.length + newStudents.length) > 0; else noStudentsContainer"
          class="student-sections">
 

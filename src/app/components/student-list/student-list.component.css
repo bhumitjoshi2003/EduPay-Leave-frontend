@@ -336,6 +336,43 @@
   font-style: italic;
 }
 
+/* ── Section chips ──────────────────────────────────────────────── */
+.section-chips-wrap {
+  display: flex;
+  gap: 8px;
+  padding: 10px 24px;
+  background: #fff;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #eef0f5;
+}
+
+.section-chip {
+  padding: 5px 14px;
+  border-radius: 16px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.section-chip:hover {
+  border-color: #4fbdbd;
+  color: #1e3a5f;
+}
+
+.section-chip-active {
+  background: linear-gradient(135deg, #1e3a5f, #4fbdbd);
+  color: #fff;
+  border-color: transparent;
+}
+
+.section-chip-active:hover {
+  color: #fff;
+}
+
 /* ── Animation ───────────────────────────────────────────────────── */
 @keyframes sl-fade-up {
   from { opacity: 0; transform: translateY(16px); }

@@ -259,6 +259,9 @@
               <button *ngIf="!s.current" class="ss-btn ss-btn-sm" style="margin-left:auto;font-size:0.75rem;" (click)="setCurrentSession(s.id)">
                 Set Current
               </button>
+              <button *ngIf="!s.current" class="ss-btn ss-btn-sm" style="margin-left:8px;font-size:0.75rem;color:#dc2626;border-color:#fecaca;" (click)="deleteSession(s)">
+                Delete
+              </button>
             </div>
           </div>
 

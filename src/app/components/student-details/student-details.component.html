@@ -22,7 +22,7 @@
     <div class="sd-hero-text">
       <span class="sd-hero-badge">Student Profile</span>
       <h1 class="sd-hero-name">{{ studentDetails.name }}</h1>
-      <p class="sd-hero-sub">{{ studentDetails.studentId }}&nbsp;&nbsp;·&nbsp;&nbsp;Class {{ studentDetails.className }}</p>
+      <p class="sd-hero-sub">{{ studentDetails.studentId }}&nbsp;&nbsp;·&nbsp;&nbsp;Class {{ studentDetails.className }}<ng-container *ngIf="studentDetails.sectionName"> - {{ studentDetails.sectionName }}</ng-container></p>
     </div>
 
     <!-- Action buttons -->
@@ -53,10 +53,18 @@
       <div class="detail-item">
         <span class="label">Class</span>
         <span class="value" *ngIf="!isEditing">{{ studentDetails.className }}</span>
-        <select *ngIf="isEditing && getUserRole() === 'ADMIN'" [(ngModel)]="updatedDetails.className" (input)="updateFieldValue('className', $event)" class="form-control">
+        <select *ngIf="isEditing && getUserRole() === 'ADMIN'" [(ngModel)]="updatedDetails.className" (ngModelChange)="onClassChangeInEdit($event)" class="form-control">
           <option *ngFor="let className of classList" [value]="className">{{ className }}</option>
         </select>
         <span class="value" *ngIf="isEditing && getUserRole() !== 'ADMIN'">{{ studentDetails.className }}</span>
+      </div>
+      <div class="detail-item" *ngIf="studentDetails.sectionName || (isEditing && sections.length > 0)">
+        <span class="label">Section</span>
+        <span class="value" *ngIf="!isEditing">{{ studentDetails.sectionName }}</span>
+        <select *ngIf="isEditing" [(ngModel)]="updatedDetails.sectionId" class="form-control">
+          <option [ngValue]="null">-- None --</option>
+          <option *ngFor="let sec of sections" [ngValue]="sec.id">{{ sec.name }}</option>
+        </select>
       </div>
       <div class="detail-item">
         <span class="label">Phone</span>

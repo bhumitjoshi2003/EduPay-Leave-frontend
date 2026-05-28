@@ -75,8 +75,9 @@ export class MarksService {
   constructor(private http: HttpClient) { }
 
   // Mark entry — Mode A: by subject
-  getStudentsForSubject(examSubjectEntryId: number): Observable<MarkEntryStudent[]> {
-    return this.http.get<MarkEntryStudent[]>(`${this.base}/exam/${examSubjectEntryId}/students`);
+  getStudentsForSubject(examSubjectEntryId: number, sectionId?: number | null): Observable<MarkEntryStudent[]> {
+    const params = sectionId != null ? { params: { sectionId: String(sectionId) } } : {};
+    return this.http.get<MarkEntryStudent[]>(`${this.base}/exam/${examSubjectEntryId}/students`, params);
   }
 
   // Mark entry — Mode B: by student

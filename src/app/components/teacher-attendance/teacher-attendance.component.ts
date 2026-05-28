@@ -222,7 +222,7 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
           });
           this.cdr.markForCheck();
         } else {
-          this.leaveService.getLeavesByDateAndClass(formattedDate, classAtRequest).subscribe({
+          this.leaveService.getLeavesByDateAndClass(formattedDate, classAtRequest).pipe(takeUntil(this.destroy$)).subscribe({
             next: (leaves) => {
               if (this.selectedClass !== classAtRequest || this.attendanceDate !== dateAtRequest) return;
               this.absentStudents = leaves;
@@ -245,7 +245,7 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.logger.error('Error loading attendance data:', error);
-        this.leaveService.getLeavesByDateAndClass(formattedDate, classAtRequest).subscribe({
+        this.leaveService.getLeavesByDateAndClass(formattedDate, classAtRequest).pipe(takeUntil(this.destroy$)).subscribe({
           next: (leaves) => {
             if (this.selectedClass !== classAtRequest || this.attendanceDate !== dateAtRequest) return;
             this.absentStudents = leaves;

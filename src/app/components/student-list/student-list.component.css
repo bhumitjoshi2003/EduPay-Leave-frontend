@@ -310,6 +310,31 @@
   transform: translateY(-1px);
 }
 
+/* ── Loading skeleton ──────────────────────────────────────────────── */
+.sl-skeleton {
+  background: #fff;
+  border-radius: 0 12px 12px 0;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.sl-skeleton-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sk-shimmer {
+  display: inline-block; border-radius: 4px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.4s infinite;
+}
+@keyframes sk-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* ── Empty state ─────────────────────────────────────────────────── */
 .no-students {
   text-align: center;

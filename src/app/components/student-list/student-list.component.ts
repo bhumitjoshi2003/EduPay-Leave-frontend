@@ -26,6 +26,7 @@ interface Student {
 
 export class StudentListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  isLoading = false;
   activeStudents: Student[] = [];
   newStudents: Student[] = [];
   inactiveStudents: Student[] = [];
@@ -120,11 +121,14 @@ export class StudentListComponent implements OnInit, OnDestroy {
       next: (students) => {
         if (this.selectedClass !== classAtRequest) return;
         this.activeStudents = students;
+        this.isLoading = false;
         this.cdr.markForCheck();
       },
       error: (err) => {
+        this.isLoading = false;
         this.logger.error('Failed to load students:', err);
         this.toast.error('Error', 'Failed to load student list.');
+        this.cdr.markForCheck();
       }
     });
 
@@ -165,6 +169,11 @@ export class StudentListComponent implements OnInit, OnDestroy {
     this.selectedClass = selectedClass;
     this.selectedSectionId = null;
     this.sections = [];
+    this.activeStudents = [];
+    this.newStudents = [];
+    this.inactiveStudents = [];
+    this.isLoading = true;
+    this.cdr.markForCheck();
     this.loadSectionsForClass(selectedClass, () => this.loadStudents());
   }
 

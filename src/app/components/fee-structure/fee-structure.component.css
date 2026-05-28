@@ -93,18 +93,21 @@ input[type="number"]::-webkit-inner-spin-button {
   background: #f0f9ff;
   color: #0369a1;
   padding: 11px 14px;
-  text-align: left;
+  text-align: center;
   font-size: 0.72rem; font-weight: 700;
   letter-spacing: 0.4px; text-transform: uppercase;
   white-space: nowrap;
   border-bottom: 2px solid #bae6fd;
 }
+.fs-table th:first-child { text-align: left; }
 
 .fs-table td {
   padding: 11px 14px;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
+  text-align: center;
 }
+.fs-table td:first-child { text-align: left; }
 .fs-table tbody tr:last-child td { border-bottom: none; }
 .fs-table tbody tr:nth-child(even) { background: #fafbfc; }
 .fs-table tbody tr:hover td { background: #f0f9ff; }

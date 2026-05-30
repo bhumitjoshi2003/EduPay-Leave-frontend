@@ -43,8 +43,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   align-items: flex-end;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  border-radius: 12px;
+  padding: 14px 18px;
 }
 .ea-filter-group {
   display: flex;
@@ -60,12 +64,17 @@
 }
 .ea-filter-group select {
   padding: 8px 12px;
-  border: 1px solid #ddd6fe;
-  border-radius: 6px;
+  border: 1.5px solid #c4b5fd;
+  border-radius: 8px;
   font-size: 0.9rem;
   background: #fff;
   min-width: 130px;
   outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.ea-filter-group select:focus {
+  border-color: #7c3aed;
 }
 
 /* ── Section chips ──────────────────────────────────────────────── */

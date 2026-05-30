@@ -101,24 +101,32 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
+  background: #f0fdfa;
+  border: 1px solid #99f6e4;
+  border-radius: 12px;
+  padding: 14px 18px;
 }
 
 .sc-controls label {
-  font-weight: 600;
-  color: #0d9488;
+  font-weight: 700;
+  color: #0f766e;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 .sc-controls select,
 .sc-add-row input {
   padding: 8px 12px;
-  border: 1px solid #5eead4;
-  border-radius: 6px;
+  border: 1.5px solid #5eead4;
+  border-radius: 8px;
   font-size: 0.9rem;
   outline: none;
   transition: border-color 0.2s;
   background: #fff;
+  font-family: inherit;
 }
 
 .sc-controls select:focus,
@@ -133,6 +141,10 @@
   margin-bottom: 16px;
   align-items: center;
   flex-wrap: wrap;
+  background: #f0fdfa;
+  border: 1px solid #99f6e4;
+  border-radius: 12px;
+  padding: 14px 18px;
 }
 
 .sc-add-row input {

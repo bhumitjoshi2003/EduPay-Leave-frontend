@@ -32,19 +32,19 @@
 
 /* ── Controls Card ──────────────────────────────────────────────── */
 .fr-controls {
-  background: #fff; border-radius: 16px; padding: 16px 18px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  background: #fef2f2; border-radius: 12px; padding: 16px 18px;
+  border: 1px solid #fecaca;
 }
 .fr-controls-row {
   display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px;
 }
 .fr-control-group { display: flex; flex-direction: column; gap: 5px; }
 .fr-label {
-  font-size: 0.7rem; font-weight: 700; color: #64748b;
+  font-size: 0.7rem; font-weight: 700; color: #dc2626;
   text-transform: uppercase; letter-spacing: 0.4px;
 }
 .fr-select {
-  padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px;
+  padding: 9px 12px; border: 1.5px solid #fecaca; border-radius: 8px;
   font-size: 0.85rem; background: #f8fafc; color: #374151;
   cursor: pointer; min-width: 150px; transition: border-color 0.15s; font-family: inherit;
 }

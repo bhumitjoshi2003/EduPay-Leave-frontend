@@ -36,8 +36,10 @@
     </div>
 
     <div *ngIf="!loading && electiveGroups.length === 0" class="ea-empty">
-      No elective subjects defined for Class {{ selectedClass }}.<br>
-      Go to <strong>Subject Configuration</strong> and mark subjects as electives first.
+      <div class="ea-empty-icon">📚</div>
+      <p class="ea-empty-title">No elective subjects</p>
+      <p class="ea-empty-sub">No elective subjects defined for Class {{ selectedClass }}.<br>
+      Go to <strong>Subject Configuration</strong> and mark subjects as electives first.</p>
     </div>
 
     <div *ngIf="!loading && electiveGroups.length > 0">

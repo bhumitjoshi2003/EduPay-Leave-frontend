@@ -224,7 +224,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   showSubscriptionWarning(): boolean {
-    return this.authStateService.isSubscriptionWarning() && !this.isSuperAdmin();
+    return this.authStateService.isSubscriptionWarning() && this.isAdmin();
   }
 
   logout() {

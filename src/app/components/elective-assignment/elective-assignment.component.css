@@ -240,12 +240,23 @@
 .ea-btn-save:hover { background: linear-gradient(135deg, #6d28d9, #5b21b6); }
 .ea-btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.ea-loading, .ea-empty {
+.ea-loading {
   text-align: center;
   padding: 30px;
   color: #6b7280;
   font-style: italic;
 }
+.ea-empty {
+  text-align: center;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.ea-empty-icon { font-size: 2.5rem; margin-bottom: 4px; }
+.ea-empty-title { font-size: 1rem; font-weight: 700; color: #374151; margin: 0; }
+.ea-empty-sub { font-size: 0.85rem; color: #9ca3af; margin: 0; font-style: italic; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-8px); }

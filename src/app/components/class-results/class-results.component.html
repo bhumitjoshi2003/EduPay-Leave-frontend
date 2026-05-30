@@ -54,7 +54,9 @@
   <div *ngIf="loading" class="cr-loading">Loading results…</div>
 
   <div *ngIf="!loading && selectedExamId && results.length === 0" class="cr-empty">
-    No marks entered yet for this exam.
+    <div class="cr-empty-icon">📊</div>
+    <p class="cr-empty-title">No marks entered</p>
+    <p class="cr-empty-sub">No marks have been entered for this exam yet.</p>
   </div>
 
   <div *ngIf="!loading && results.length > 0" class="cr-table-wrapper">
@@ -105,7 +107,11 @@
     </table>
   </div>
 
-  <p *ngIf="!selectedExamId" class="cr-empty">Select a session, class, and exam to view results.</p>
+  <div *ngIf="!selectedExamId" class="cr-empty">
+    <div class="cr-empty-icon">🔍</div>
+    <p class="cr-empty-title">View class results</p>
+    <p class="cr-empty-sub">Select a session, class, and exam to view results.</p>
+  </div>
 
   </div><!-- /.cr-card -->
 </div>

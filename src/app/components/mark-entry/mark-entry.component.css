@@ -255,11 +255,16 @@
 .me-mark-input:focus { border-color: #ea580c; box-shadow: 0 0 0 3px rgba(234,88,12,0.1); }
 
 .me-empty {
-  color: #888;
-  font-style: italic;
-  padding: 20px 0;
   text-align: center;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
+.me-empty-icon { font-size: 2.5rem; margin-bottom: 4px; }
+.me-empty-title { font-size: 1rem; font-weight: 700; color: #374151; margin: 0; }
+.me-empty-sub { font-size: 0.85rem; color: #9ca3af; margin: 0; font-style: italic; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-8px); }

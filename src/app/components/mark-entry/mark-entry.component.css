@@ -86,8 +86,19 @@
 }
 
 /* ── Section Chips ───────────────────────────────────────────────── */
+.section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #c2410c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  align-self: center;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
 .me-section-chips {
-  display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+  display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
 }
 .me-sec-chip {
   padding: 5px 14px; border-radius: 16px; border: 1px solid #d1d5db;

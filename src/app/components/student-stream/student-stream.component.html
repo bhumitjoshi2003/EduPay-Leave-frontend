@@ -15,6 +15,7 @@
 
   <!-- Class pills -->
   <div class="ss-class-nav" *ngIf="!noEligibleClasses">
+    <span class="class-label">Class</span>
     <button *ngFor="let c of eligibleClasses; trackBy: trackById"
       class="ss-class-pill" [class.active]="selectedClass === c.name"
       (click)="onClassSelect(c.name)">{{ c.name }}</button>

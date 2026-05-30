@@ -303,9 +303,20 @@
 .ta-status-select:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* ── Section Chips ──────────────────────────────────────────────── */
+.section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #059669;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  align-self: center;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
 .ta-section-chips {
   display: flex; gap: 8px; padding: 10px 24px; background: #fff;
-  flex-wrap: wrap; border-bottom: 1px solid #eef0f5;
+  flex-wrap: wrap; border-bottom: 1px solid #eef0f5; align-items: center;
 }
 .ta-section-chip {
   padding: 5px 14px; border-radius: 16px; border: 1px solid #d1d5db;

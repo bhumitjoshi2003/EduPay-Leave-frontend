@@ -43,6 +43,7 @@
 
   <!-- Section chips — only shown when the class has sections -->
   <div class="cr-section-chips" *ngIf="sections.length > 0">
+    <span class="section-label">Sections</span>
     <button class="cr-sec-chip" [class.cr-sec-active]="selectedSectionId === null"
       (click)="onSectionSelect(null)">All Sections</button>
     <button *ngFor="let sec of sections" class="cr-sec-chip"

@@ -369,6 +369,7 @@
   background: #fff;
   flex-wrap: wrap;
   border-bottom: 1px solid #eef0f5;
+  align-items: center;
 }
 
 .section-chip {

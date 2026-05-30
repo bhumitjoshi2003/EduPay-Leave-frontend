@@ -78,10 +78,22 @@
 }
 
 /* ── Class nav pills ─────────────────────────────────────────────── */
+.class-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #065f46;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  align-self: center;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
 .ss-class-nav {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  align-items: center;
   padding: 14px 28px;
   background: #fff;
   border-bottom: 1px solid #f1f5f9;

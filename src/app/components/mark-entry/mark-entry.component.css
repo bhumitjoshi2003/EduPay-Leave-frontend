@@ -149,22 +149,25 @@
 
 /* ── Table Wrapper ───────────────────────────────────────────────── */
 .me-table-wrapper {
-  background: rgba(255,255,255,0.95);
-  border-radius: 10px;
-  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 0;
   margin-top: 10px;
+  border: 1px solid #fed7aa;
+  overflow: hidden;
 }
 
 .me-table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  padding: 14px 18px;
   font-weight: 700;
   color: #c2410c;
   font-size: 0.95rem;
   gap: 12px;
   flex-wrap: wrap;
+  border-bottom: 1px solid #fed7aa;
 }
 
 /* ── Buttons ─────────────────────────────────────────────────────── */
@@ -191,18 +194,22 @@
 }
 
 .me-table th {
-  background: #fff7ed;
-  color: #c2410c;
-  padding: 10px 12px;
+  background: linear-gradient(135deg, #c2410c 0%, #ea580c 100%);
+  color: #fff;
+  padding: 11px 14px;
   text-align: left;
   font-weight: 700;
-  border-bottom: 2px solid #fed7aa;
+  border-bottom: none;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
 }
 
 .me-table td {
-  padding: 8px 12px;
-  border-bottom: 1px solid #eef;
-  color: #333;
+  padding: 11px 14px;
+  border-bottom: 1px solid #ffedd5;
+  color: #1c1917;
 }
 
 .me-table tbody tr:last-child td { border-bottom: none; }
@@ -210,15 +217,16 @@
 
 .me-mark-input {
   width: 90px;
-  padding: 6px 10px;
-  border: 1px solid #fed7aa;
-  border-radius: 5px;
+  padding: 7px 10px;
+  border: 1.5px solid #fed7aa;
+  border-radius: 8px;
   font-size: 0.9rem;
   text-align: center;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fffbf5;
 }
-.me-mark-input:focus { border-color: #c2410c; }
+.me-mark-input:focus { border-color: #ea580c; box-shadow: 0 0 0 3px rgba(234,88,12,0.1); }
 
 .me-empty {
   color: #888;
@@ -238,7 +246,8 @@
   .me-filters { gap: 10px; }
   .me-filter-group select { min-width: 130px; }
   .me-mark-input { width: 80px; }
-  .me-table-wrapper { padding: 14px; }
+  .me-table { font-size: 0.85rem; }
+  .me-table th, .me-table td { padding: 8px 10px; }
 }
 
 /* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
@@ -279,6 +288,7 @@
 
   .me-table-wrapper {
     overflow-x: hidden;
+    border: none;
   }
 
   .me-table-header {
@@ -303,9 +313,9 @@
   .me-table tbody tr {
     display: block;
     background: #fff;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     border: 1px solid #fed7aa;
     overflow: hidden;
   }
@@ -316,10 +326,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 14px;
+    padding: 11px 14px;
     border: none;
-    border-bottom: 1px solid #fff7ed;
+    border-bottom: 1px solid #ffedd5;
     font-size: 0.9rem;
+    gap: 8px;
   }
 
   .me-table tbody td:last-child { border-bottom: none; }
@@ -328,11 +339,11 @@
     content: attr(data-label);
     font-weight: 700;
     color: #c2410c;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.4px;
     flex-shrink: 0;
-    margin-right: 10px;
+    min-width: 90px;
   }
 
   .me-mark-input {

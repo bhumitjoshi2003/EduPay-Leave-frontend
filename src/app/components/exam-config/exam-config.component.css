@@ -168,9 +168,10 @@
 .ec-accordion {
   margin-bottom: 12px;
   border: 1px solid #fecdd3;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
 .ec-accordion-header {
@@ -178,13 +179,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 18px;
-  background: #fff1f2;
+  background: linear-gradient(135deg, rgba(159,18,57,0.06) 0%, rgba(225,29,72,0.08) 100%);
   cursor: pointer;
   user-select: none;
   transition: background 0.2s;
   gap: 10px;
+  border-bottom: 1px solid #fecdd3;
 }
-.ec-accordion-header:hover { background: #ffe4e6; }
+.ec-accordion-header:hover { background: linear-gradient(135deg, rgba(159,18,57,0.1) 0%, rgba(225,29,72,0.12) 100%); }
 
 .ec-exam-name {
   font-weight: 700;
@@ -291,18 +293,29 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
-  border-bottom: 1px solid #f3f4f6;
+  padding: 10px 14px;
+  border-bottom: 1px solid #fef2f2;
+  border-left: 3px solid transparent;
   gap: 10px;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, background 0.15s, border-color 0.15s;
+  border-radius: 2px;
 }
 
 .ec-subject-row:last-child {
   border-bottom: none;
 }
 
+.ec-subject-row:hover {
+  background: #fff5f7;
+  border-left-color: #e11d48;
+}
+
 .ec-row-unchecked {
-  opacity: 0.5;
+  opacity: 0.45;
+}
+
+.ec-row-unchecked:hover {
+  opacity: 0.65;
 }
 
 .ec-check-label {

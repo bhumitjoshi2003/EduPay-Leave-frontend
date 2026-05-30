@@ -42,11 +42,11 @@
   </div>
 
   <!-- Section chips — only shown when the class has sections -->
-  <div class="me-section-chips" *ngIf="sections.length > 0">
-    <button class="me-sec-chip" [class.me-sec-active]="selectedSectionId === null"
+  <div class="cr-section-chips" *ngIf="sections.length > 0">
+    <button class="cr-sec-chip" [class.cr-sec-active]="selectedSectionId === null"
       (click)="onSectionSelect(null)">All Sections</button>
-    <button *ngFor="let sec of sections" class="me-sec-chip"
-      [class.me-sec-active]="selectedSectionId === sec.id"
+    <button *ngFor="let sec of sections" class="cr-sec-chip"
+      [class.cr-sec-active]="selectedSectionId === sec.id"
       (click)="onSectionSelect(sec.id!)">{{ sec.name }}</button>
   </div>
 

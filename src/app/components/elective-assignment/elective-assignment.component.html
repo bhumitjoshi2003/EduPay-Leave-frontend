@@ -72,17 +72,18 @@
               <td [attr.colspan]="2 + electiveGroups.length" class="ea-loading">Loading…</td>
             </tr>
             <tr *ngFor="let student of students; trackBy: trackByStudentId">
-              <td class="ea-cell-name">
+              <td class="ea-cell-name" data-label="Student">
                 <div class="ea-student-name">{{ student.studentName }}</div>
                 <div class="ea-student-id">{{ student.studentId }}</div>
               </td>
-              <td *ngFor="let g of electiveGroups; trackBy: trackByGroup" class="ea-cell-select">
+              <td *ngFor="let g of electiveGroups; trackBy: trackByGroup" class="ea-cell-select"
+                  [attr.data-label]="g.groupName">
                 <select [(ngModel)]="student.selections[g.groupName]" class="ea-subject-select">
                   <option value="">— None —</option>
                   <option *ngFor="let s of g.subjects; trackBy: trackByIndex" [value]="s">{{ s }}</option>
                 </select>
               </td>
-              <td class="ea-cell-action">
+              <td class="ea-cell-action" data-label="Action">
                 <button class="ea-btn-save" (click)="saveStudent(student)"
                   [disabled]="student.saving || !isDirty(student)">
                   {{ student.saving ? '…' : 'Save' }}

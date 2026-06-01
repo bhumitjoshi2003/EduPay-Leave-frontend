@@ -168,7 +168,8 @@
             <div class="as-cal-legend no-print">
               <span class="as-legend-item"><span class="as-legend-dot dot-present"></span> Present</span>
               <span class="as-legend-item"><span class="as-legend-dot dot-absent"></span> Absent</span>
-              <span class="as-legend-item"><span class="as-legend-dot dot-closed"></span> Holiday / No school</span>
+              <span class="as-legend-item"><span class="as-legend-dot dot-holiday"></span> Holiday</span>
+              <span class="as-legend-item"><span class="as-legend-dot dot-closed"></span> No school</span>
             </div>
             <!-- Day-of-week header -->
             <div class="as-cal-header">
@@ -179,7 +180,7 @@
               <div *ngFor="let cell of week; trackBy: trackByIndex"
                 class="as-cal-cell"
                 [ngClass]="'cell-' + cell.status"
-                [attr.title]="cell.date">
+                [attr.title]="cell.holidayName || cell.date">
                 <span *ngIf="cell.day !== null">{{ cell.day }}</span>
               </div>
             </div>
@@ -253,7 +254,8 @@
                         <div class="as-cal-legend no-print">
                           <span class="as-legend-item"><span class="as-legend-dot dot-present"></span> Present</span>
                           <span class="as-legend-item"><span class="as-legend-dot dot-absent"></span> Absent</span>
-                          <span class="as-legend-item"><span class="as-legend-dot dot-closed"></span> Holiday / No school</span>
+                          <span class="as-legend-item"><span class="as-legend-dot dot-holiday"></span> Holiday</span>
+                          <span class="as-legend-item"><span class="as-legend-dot dot-closed"></span> No school</span>
                         </div>
                         <div class="as-cal-header">
                           <span *ngFor="let d of dayNames; trackBy: trackByIndex">{{ d }}</span>
@@ -262,7 +264,7 @@
                           <div *ngFor="let cell of week; trackBy: trackByIndex"
                             class="as-cal-cell"
                             [ngClass]="'cell-' + cell.status"
-                            [attr.title]="cell.date">
+                            [attr.title]="cell.holidayName || cell.date">
                             <span *ngIf="cell.day !== null">{{ cell.day }}</span>
                           </div>
                         </div>

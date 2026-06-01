@@ -16,6 +16,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { SchoolService, SchoolClass } from '../../services/school.service';
 import { SectionService } from '../../services/section.service';
 import { Section } from '../../interfaces/section';
+import { SchoolHolidayService } from '../../services/school-holiday.service';
 
 interface Student {
   studentId: string;
@@ -65,7 +66,8 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private schoolService: SchoolService,
     private toast: ToastService,
-    private sectionService: SectionService
+    private sectionService: SectionService,
+    private holidayService: SchoolHolidayService
   ) { }
 
   ngOnDestroy(): void {
@@ -165,6 +167,36 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const dateStr = formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en');
+    this.holidayService.getHolidaysByRange(dateStr, dateStr)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: async (holidays) => {
+          if (holidays.length > 0) {
+            const holidayName = holidays[0].name;
+            const confirmed = await this.toast.confirm({
+              title: 'Holiday: ' + holidayName,
+              message: `This date is marked as a holiday (${holidayName}). Do you still want to mark attendance?`,
+              confirmText: 'Yes, continue',
+              cancelText: 'Cancel',
+            });
+            if (!confirmed) {
+              this.students = [];
+              this.hasStudents = false;
+              this.cdr.markForCheck();
+              return;
+            }
+          }
+          this.doLoadStudents();
+        },
+        error: () => {
+          // If holiday check fails, proceed anyway
+          this.doLoadStudents();
+        }
+      });
+  }
+
+  private doLoadStudents(): void {
     const classAtRequest = this.selectedClass;
     const dateAtRequest = this.attendanceDate;
 

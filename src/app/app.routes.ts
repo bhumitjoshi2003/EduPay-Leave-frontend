@@ -187,7 +187,7 @@ export const routes: Routes = [
       },
       {
         path: 'holiday-calendar', component: HolidayCalendarComponent,
-        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'TEACHER', 'STUDENT'] }
       },
       {
         path: 'school-settings', component: SchoolSettingsComponent,

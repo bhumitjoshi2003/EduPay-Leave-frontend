@@ -48,6 +48,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   unreadNotificationCount: number = 0;
   sidebarCollapsed: boolean = false;
   mobileSidebarOpen: boolean = false;
+  showUpdateBanner = false;
+  latestAppVersion = '';
   private ngUnsubscribe = new Subject<void>();
   private welcomeMessageKey = 'hasShownWelcome';
   private pollingIntervalSubscription: Subscription | undefined;
@@ -81,6 +83,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.pollingIntervalSubscription = interval(60000)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => this.fetchUnreadCount());
+    this.checkForAppUpdate();
+    this.onVisibilityChange = this.onVisibilityChange.bind(this);
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
   }
 
   ngOnDestroy(): void {
@@ -88,6 +93,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
     if (this.pollingIntervalSubscription) {
       this.pollingIntervalSubscription.unsubscribe();
+    }
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
+  }
+
+  private onVisibilityChange(): void {
+    if (document.visibilityState === 'visible') {
+      this.authStateService.loadCurrentUser().then(() => {
+        this.cdr.markForCheck();
+      });
     }
   }
 
@@ -225,6 +239,40 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   showSubscriptionWarning(): boolean {
     return this.authStateService.isSubscriptionWarning() && this.isAdmin();
+  }
+
+  private checkForAppUpdate(): void {
+    const cap = (window as any).Capacitor;
+    if (!cap || !cap.isNativePlatform || !cap.isNativePlatform()) return;
+    const mod = '@capawesome/capacitor-app-update';
+    (Function('m', 'return import(m)')(mod) as Promise<any>).then(({ AppUpdate, AppUpdateAvailability }: any) => {
+      AppUpdate.getAppUpdateInfo().then((info: any) => {
+        if (info.updateAvailability === AppUpdateAvailability.UPDATE_AVAILABLE) {
+          this.latestAppVersion = info.availableVersionName ?? '';
+          this.showUpdateBanner = true;
+          this.cdr.markForCheck();
+        }
+      }).catch(() => {});
+    }).catch(() => {});
+  }
+
+  openPlayStore(): void {
+    const cap = (window as any).Capacitor;
+    if (cap && cap.isNativePlatform && cap.isNativePlatform()) {
+      const mod = '@capawesome/capacitor-app-update';
+      (Function('m', 'return import(m)')(mod) as Promise<any>).then(({ AppUpdate }: any) => {
+        AppUpdate.openAppStore().catch(() => {
+          window.open('https://play.google.com/store/apps/details?id=in.edunexify.app', '_system');
+        });
+      }).catch(() => {
+        window.open('https://play.google.com/store/apps/details?id=in.edunexify.app', '_system');
+      });
+    }
+  }
+
+  dismissUpdateBanner(): void {
+    this.showUpdateBanner = false;
+    this.cdr.markForCheck();
   }
 
   logout() {

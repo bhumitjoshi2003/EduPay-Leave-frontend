@@ -33,6 +33,11 @@ export class HolidayCalendarComponent implements OnInit, OnDestroy {
   editingId: number | null = null;
   form: SchoolHoliday = this.emptyForm();
 
+  private readonly monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
   readonly holidayTypes = [
     { value: 'NATIONAL', label: 'National Holiday' },
     { value: 'REGIONAL', label: 'Regional Holiday' },
@@ -159,6 +164,21 @@ export class HolidayCalendarComponent implements OnInit, OnDestroy {
           }
         });
       }
+    });
+  }
+
+  get groupedHolidays(): { monthName: string; holidays: SchoolHoliday[] }[] {
+    const groups = new Map<string, SchoolHoliday[]>();
+    for (const h of this.holidays) {
+      const d = new Date(h.date);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      const monthLabel = `${this.monthNames[d.getMonth()]} ${d.getFullYear()}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(h);
+    }
+    return Array.from(groups.entries()).map(([key, holidays]) => {
+      const d = new Date(holidays[0].date);
+      return { monthName: `${this.monthNames[d.getMonth()]} ${d.getFullYear()}`, holidays };
     });
   }
 

@@ -325,7 +325,14 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
           next: ([detail, holidays]) => {
             this.dailyDetailCache.set(key, detail);
             const hMap = new Map<string, string>();
-            holidays.forEach(h => hMap.set(h.date, h.name));
+            holidays.forEach(h => {
+              const d = new Date(h.startDate);
+              const end = new Date(h.endDate);
+              while (d <= end) {
+                hMap.set(d.toISOString().slice(0, 10), h.name);
+                d.setDate(d.getDate() + 1);
+              }
+            });
             this.holidayCache.set(key, hMap);
             this.currentCalendarWeeks = this.buildCalendarCells(this.selectedYear, this.selectedMonth, detail, hMap);
             this.calendarLoading = false;
@@ -394,7 +401,14 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
         next: ([detail, holidays]) => {
           this.dailyDetailCache.set(key, detail);
           const hMap = new Map<string, string>();
-          holidays.forEach(h => hMap.set(h.date, h.name));
+          holidays.forEach(h => {
+            const d = new Date(h.startDate);
+            const end = new Date(h.endDate);
+            while (d <= end) {
+              hMap.set(d.toISOString().slice(0, 10), h.name);
+              d.setDate(d.getDate() + 1);
+            }
+          });
           this.holidayCache.set(key, hMap);
           this.rowCalendarWeeks.set(key, this.buildCalendarCells(row.year, monthNum, detail, hMap));
           this.rowCalendarLoading.delete(key);

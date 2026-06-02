@@ -59,23 +59,46 @@
         <div class="hc-card" *ngFor="let holiday of group.holidays"
              [ngClass]="'hc-card--' + holiday.holidayType.toLowerCase()">
           <div class="hc-card-accent"></div>
-          <div class="hc-card-date">
-            <span class="hc-date-day">{{ holiday.date | date:'dd' }}</span>
-            <span class="hc-date-weekday">{{ holiday.date | date:'EEE' }}</span>
-          </div>
+
+          <!-- Single day -->
+          <ng-container *ngIf="!isMultiDay(holiday)">
+            <div class="hc-card-date">
+              <span class="hc-date-day">{{ holiday.startDate | date:'dd' }}</span>
+              <span class="hc-date-weekday">{{ holiday.startDate | date:'EEE' }}</span>
+            </div>
+          </ng-container>
+
+          <!-- Multi-day range -->
+          <ng-container *ngIf="isMultiDay(holiday)">
+            <div class="hc-card-date-range">
+              <div class="hc-range-from">
+                <span class="hc-date-day">{{ holiday.startDate | date:'dd' }}</span>
+                <span class="hc-date-weekday">{{ holiday.startDate | date:'MMM' }}</span>
+              </div>
+              <span class="hc-range-arrow">→</span>
+              <div class="hc-range-to">
+                <span class="hc-date-day">{{ holiday.endDate | date:'dd' }}</span>
+                <span class="hc-date-weekday">{{ holiday.endDate | date:'MMM' }}</span>
+              </div>
+            </div>
+          </ng-container>
+
           <div class="hc-card-divider"></div>
           <div class="hc-card-info">
             <span class="hc-card-name">{{ holiday.name }}</span>
-            <span class="hc-card-type-badge" [ngClass]="'hc-type--' + holiday.holidayType.toLowerCase()">
-              {{ getTypeLabel(holiday.holidayType) }}
-            </span>
+            <div class="hc-card-meta">
+              <span class="hc-card-type-badge" [ngClass]="'hc-type--' + holiday.holidayType.toLowerCase()">
+                {{ getTypeLabel(holiday.holidayType) }}
+              </span>
+              <span class="hc-card-days" *ngIf="isMultiDay(holiday)">{{ getDayCount(holiday) }} days</span>
+            </div>
           </div>
           <div class="hc-card-actions" *ngIf="isAdmin">
             <button class="hc-action-btn hc-action-edit" (click)="openEditForm(holiday)" title="Edit">
-              <span class="material-symbols-rounded hc-action-icon">edit</span>
+              <span class="material-icons hc-action-icon">edit</span>
             </button>
             <button class="hc-action-btn hc-action-delete" (click)="deleteHoliday(holiday)" title="Delete">
-              <span class="material-symbols-rounded hc-action-icon">delete</span>
+              <span class="material-icons hc-action-icon">delete</span>
             </button>
           </div>
         </div>
@@ -89,7 +112,7 @@
       <div class="hc-form-header">
         <h3 class="hc-form-title">{{ editingId ? 'Edit Holiday' : 'Add Holiday' }}</h3>
         <button class="hc-form-close" (click)="cancelForm()">
-          <span class="material-symbols-rounded">close</span>
+          <span class="material-icons">close</span>
         </button>
       </div>
 
@@ -98,10 +121,16 @@
         <input class="hc-input" [(ngModel)]="form.name" placeholder="e.g. Republic Day" />
       </label>
 
-      <label class="hc-label">
-        <span class="hc-label-text">Date</span>
-        <input class="hc-input" type="date" [(ngModel)]="form.date" />
-      </label>
+      <div class="hc-date-row">
+        <label class="hc-label hc-label-half">
+          <span class="hc-label-text">Start Date</span>
+          <input class="hc-input" type="date" [(ngModel)]="form.startDate" />
+        </label>
+        <label class="hc-label hc-label-half">
+          <span class="hc-label-text">End Date <span class="hc-optional">(optional)</span></span>
+          <input class="hc-input" type="date" [(ngModel)]="form.endDate" [min]="form.startDate" />
+        </label>
+      </div>
 
       <label class="hc-label">
         <span class="hc-label-text">Type</span>

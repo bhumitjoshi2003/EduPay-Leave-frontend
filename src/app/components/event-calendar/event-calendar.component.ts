@@ -635,4 +635,25 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
   trackByEvent(index: number, ev: CalendarEvent): any {
     return ev.id ?? index;
   }
+
+  getCellStatusClass(date: Date | null): string {
+    if (!date) return '';
+    const key = this.getDateKey(date);
+    const status = this.attendanceMap[key];
+    if (status === 'P') return 'cell-present';
+    if (status === 'A') return 'cell-absent';
+    if (status === 'H') return 'cell-holiday';
+    return '';
+  }
+
+  isMissingAttendance(date: Date | null): boolean {
+    if (!date || this.currentUserRole !== 'STUDENT') return false;
+    const key = this.getDateKey(date);
+    if (this.attendanceMap[key]) return false; // has P, A, or H
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (date > today) return false; // future
+    if (date.getDay() === 0) return false; // Sunday
+    return true;
+  }
 }

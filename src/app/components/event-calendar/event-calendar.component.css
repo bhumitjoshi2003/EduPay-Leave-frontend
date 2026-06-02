@@ -290,6 +290,93 @@
     border: 1px solid #fdba74;
 }
 
+.attendance-circle.nodata {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: 1.5px dashed #cbd5e1;
+}
+
+/* ── Cell tinted backgrounds ────────────────────────────────────── */
+.calendar-day.cell-present {
+    background: #f0fdf4;
+}
+.calendar-day.cell-present:hover {
+    background: #dcfce7;
+}
+.calendar-day.cell-absent {
+    background: #fef2f2;
+}
+.calendar-day.cell-absent:hover {
+    background: #fee2e2;
+}
+.calendar-day.cell-holiday {
+    background: #fff7ed;
+}
+.calendar-day.cell-holiday:hover {
+    background: #ffedd5;
+}
+.calendar-day.cell-missing {
+    background: #fafafa;
+    border: 1.5px dashed #e2e8f0;
+}
+.calendar-day.cell-missing:hover {
+    background: #f5f5f5;
+}
+
+/* ── Holiday name chip ──────────────────────────────────────────── */
+.holiday-chip {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+    font-size: 0.62rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 6px;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-align: left;
+    line-height: 1.3;
+    box-sizing: border-box;
+}
+
+/* ── Attendance legend ──────────────────────────────────────────── */
+.ec-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #f1f5f9;
+    flex-wrap: wrap;
+}
+.ec-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.ec-legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+.ec-legend-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #64748b;
+}
+.ec-legend-present { background: #dcfce7; border: 1px solid #86efac; }
+.ec-legend-absent { background: #fee2e2; border: 1px solid #fca5a5; }
+.ec-legend-holiday { background: #ffedd5; border: 1px solid #fdba74; }
+.ec-legend-today { background: rgba(79, 189, 189, 0.2); border: 1px solid #4fbdbd; }
+.ec-legend-nodata { background: #f1f5f9; border: 1.5px dashed #cbd5e1; }
+
 /* ── Day popover ─────────────────────────────────────────────────── */
 .day-popover {
     display: none;
@@ -840,6 +927,24 @@
         width: 20px;
         height: 20px;
         font-size: 9px;
+    }
+
+    /* Holiday chip — hide on mobile list view since space is tight */
+    .holiday-chip {
+        display: none;
+    }
+
+    /* Legend — compact on mobile */
+    .ec-legend {
+        gap: 10px;
+        padding: 6px 10px;
+    }
+    .ec-legend-label {
+        font-size: 0.62rem;
+    }
+    .ec-legend-dot {
+        width: 10px;
+        height: 10px;
     }
 
     .event-sidebar {

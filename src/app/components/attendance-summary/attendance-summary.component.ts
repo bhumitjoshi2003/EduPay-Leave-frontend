@@ -444,8 +444,10 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
       let status: CellStatus;
       let holidayName: string | undefined;
       if (schoolDaySet.has(dateStr)) {
+        // Attendance was marked — P/A wins (class was working even if it's a school holiday)
         status = absentDaySet.has(dateStr) ? 'absent' : 'present';
       } else if (holidays.has(dateStr)) {
+        // No attendance marked and it's a holiday
         status = 'holiday';
         holidayName = holidays.get(dateStr);
       } else {

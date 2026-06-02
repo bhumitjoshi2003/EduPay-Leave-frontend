@@ -453,11 +453,19 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
       cells.push({ date: null, day: null, status: 'empty' });
     }
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const cellDate = new Date(year, month - 1, d);
       let status: CellStatus;
       let holidayName: string | undefined;
-      if (schoolDaySet.has(dateStr)) {
+
+      if (cellDate > today) {
+        // Future date — show nothing
+        status = 'closed';
+      } else if (schoolDaySet.has(dateStr)) {
         // Attendance was marked — P/A wins (class was working even if it's a school holiday)
         status = absentDaySet.has(dateStr) ? 'absent' : 'present';
       } else if (holidays.has(dateStr)) {

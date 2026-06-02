@@ -590,6 +590,11 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
           const cellDate = new Date(dateStr);
 
           if (cellDate > today) {
+            // Future date — only show H for holidays, no P/A
+            if (holidaySet.has(dateStr)) {
+              this.attendanceMap[dateStr] = 'H';
+              this.holidayMap[dateStr] = holidaySet.get(dateStr)!;
+            }
             return;
           }
 

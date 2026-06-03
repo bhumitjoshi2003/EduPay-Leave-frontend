@@ -92,6 +92,10 @@
            (click)="closeSidebarOnMobile()" title="Dashboard">
           <mat-icon>home</mat-icon><span>Dashboard</span>
         </a>
+        <a class="nav-item" routerLink="/dashboard/teacher-checkin" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="My Check-in">
+          <mat-icon>fingerprint</mat-icon><span>My Check-in</span>
+        </a>
 
         <div class="nav-section-label">My Class</div>
 
@@ -197,6 +201,10 @@
         <a class="nav-item" routerLink="/dashboard/view-leaves" routerLinkActive="active"
            (click)="closeSidebarOnMobile()" title="Leave Requests">
           <mat-icon>event_available</mat-icon><span>Leave Requests</span>
+        </a>
+        <a class="nav-item" routerLink="/dashboard/staff-attendance" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Staff Attendance">
+          <mat-icon>badge</mat-icon><span>Staff Attendance</span>
         </a>
 
         <div class="nav-section-label">Academics</div>

@@ -1069,3 +1069,133 @@ select.ss-input { appearance: auto; cursor: pointer; }
 @media (max-width: 360px) {
   .ss-plans-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Staff Attendance Tab ──────────────────────────────────────────── */
+.ss-sa-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+.ss-sa-banner-warn {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+}
+.ss-sa-banner-ok {
+  background: #ecfdf5;
+  border: 1px solid #10b981;
+}
+.ss-sa-banner-icon { font-size: 24px; flex-shrink: 0; }
+.ss-sa-banner strong { display: block; margin-bottom: 2px; font-size: 15px; }
+.ss-sa-banner p { margin: 0; font-size: 13px; color: #64748b; }
+
+.ss-sa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.ss-sa-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+.ss-sa-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.ss-sa-value {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.ss-sa-section {
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.ss-sa-section:last-of-type { border-bottom: none; }
+.ss-sa-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 4px;
+}
+.ss-sa-section-desc {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 16px;
+}
+
+.ss-sa-form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.ss-sa-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ss-sa-field-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+.ss-sa-input {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+.ss-sa-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.ss-sa-location-btn {
+  margin-top: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.ss-sa-location-btn:hover { opacity: 0.9; }
+.ss-sa-location-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ss-sa-radius-hint {
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: #eff6ff;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #1e40af;
+}
+
+.ss-sa-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+@media (max-width: 640px) {
+  .ss-sa-grid { grid-template-columns: 1fr; }
+  .ss-sa-form-row { flex-direction: column; }
+}

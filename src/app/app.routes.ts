@@ -57,6 +57,8 @@ import { TeacherDashboardComponent } from './components/teacher-dashboard/teache
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { SuperAdminDashboardComponent } from './components/super-admin-dashboard/super-admin-dashboard.component';
 import { StudentSearchComponent } from './components/student-search/student-search.component';
+import { TeacherCheckinComponent } from './components/teacher-checkin/teacher-checkin.component';
+import { StaffAttendanceComponent } from './components/staff-attendance/staff-attendance.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -188,6 +190,14 @@ export const routes: Routes = [
       {
         path: 'holiday-calendar', component: HolidayCalendarComponent,
         canActivate: [roleGuard], data: { roles: ['ADMIN', 'TEACHER', 'STUDENT'] }
+      },
+      {
+        path: 'teacher-checkin', component: TeacherCheckinComponent,
+        canActivate: [roleGuard], data: { roles: ['TEACHER'] }
+      },
+      {
+        path: 'staff-attendance', component: StaffAttendanceComponent,
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
       {
         path: 'school-settings', component: SchoolSettingsComponent,

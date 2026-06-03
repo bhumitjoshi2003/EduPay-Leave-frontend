@@ -252,6 +252,7 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
           this.loadAttendance();
         } else {
           this.attendanceMap = {};
+          this.loadHolidaysOnly();
         }
 
       },
@@ -621,6 +622,33 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  private loadHolidaysOnly(): void {
+    const monthStart = format(startOfMonth(this.currentDate), 'yyyy-MM-dd');
+    const monthEnd = format(endOfMonth(this.currentDate), 'yyyy-MM-dd');
+
+    this.holidayService.getHolidaysByRange(monthStart, monthEnd)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (holidays) => {
+          this.holidayMap = {};
+          this.attendanceMap = {};
+
+          holidays.forEach(h => {
+            const d = new Date(h.startDate);
+            const end = new Date(h.endDate);
+            while (d <= end) {
+              const dateStr = d.toISOString().slice(0, 10);
+              this.attendanceMap[dateStr] = 'H';
+              this.holidayMap[dateStr] = h.name;
+              d.setDate(d.getDate() + 1);
+            }
+          });
+          this.cdr.markForCheck();
+        },
+        error: (err) => this.logger.error('Error loading holidays:', err)
+      });
   }
 
   getDateKey(date: Date | null): string {

@@ -49,18 +49,18 @@ interface OnboardForm {
 interface EditForm {
   name: string;
   slug: string;
-  address: string;
-  city: string;
-  state: string;
-  pincode: string;
-  phone: string;
-  email: string;
-  website: string;
-  contactPersonName: string;
-  boardType: string;
-  plan: string;
-  maxStudents: number;
-  expiryDate: string;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  pincode: string | null;
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  contactPersonName: string | null;
+  boardType: string | null;
+  plan: string | null;
+  maxStudents: number | null;
+  expiryDate: string | null;
   newAdminPassword: string;
 }
 

@@ -310,6 +310,24 @@
   transform: translateY(-1px);
 }
 
+/* ── Alumni (Graduated) ──────────────────────────────────────────── */
+.alumni-header { border-bottom-color: #f59e0b; }
+.alumni-badge { background: rgba(245, 158, 11, 0.12); color: #92400e; }
+.alumni-student-item       { background: #fffbeb; border-color: #fef3c7; }
+.alumni-student-item:hover { background: #fef9e7; border-color: rgba(245, 158, 11, 0.25); }
+.alumni-avatar { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+.alumni-btn { background: linear-gradient(135deg, #92400e, #d97706); }
+
+/* ── Left (Transferred / Withdrawn) ──────────────────────────────── */
+.left-header { border-bottom-color: #94a3b8; }
+.left-badge { background: rgba(148, 163, 184, 0.12); color: #64748b; }
+.left-student-item       { background: #f8fafc; border-color: #e2e8f0; }
+.left-student-item:hover { background: #f1f5f9; border-color: rgba(148, 163, 184, 0.25); }
+.left-avatar { background: linear-gradient(135deg, #94a3b8, #cbd5e1); }
+.left-student-item .student-name { color: #666; }
+.left-student-item .student-id   { color: #94a3b8; }
+.left-btn { background: linear-gradient(135deg, #64748b, #94a3b8); }
+
 /* ── Loading skeleton ──────────────────────────────────────────────── */
 .sl-skeleton {
   background: #fff;

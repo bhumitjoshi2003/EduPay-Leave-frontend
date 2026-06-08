@@ -26,7 +26,7 @@
           <h1 *ngIf="loggedInUserRole === 'TEACHER'">Students of Class {{ selectedClass }}</h1>
           <h1 *ngIf="loggedInUserRole === 'ADMIN' && selectedClass">Students of Class {{ selectedClass }}</h1>
           <h1 *ngIf="loggedInUserRole === 'ADMIN' && !selectedClass">Select a Class</h1>
-          <p>{{ (activeStudents.length + newStudents.length + inactiveStudents.length) }} student{{ (activeStudents.length + newStudents.length + inactiveStudents.length) !== 1 ? 's' : '' }} total</p>
+          <p>{{ (activeStudents.length + newStudents.length + alumniStudents.length + leftStudents.length) }} student{{ (activeStudents.length + newStudents.length + alumniStudents.length + leftStudents.length) !== 1 ? 's' : '' }} total</p>
         </div>
       </div>
       <button *ngIf="loggedInUserRole === 'ADMIN'" class="bulk-import-btn" (click)="navigateToBulkImport()">
@@ -55,7 +55,7 @@
       </div>
     </div>
 
-    <div *ngIf="!isLoading && (activeStudents.length + inactiveStudents.length + newStudents.length) > 0; else noStudentsContainerWrap"
+    <div *ngIf="!isLoading && (activeStudents.length + alumniStudents.length + leftStudents.length + newStudents.length) > 0; else noStudentsContainerWrap"
          class="student-sections">
 
       <!-- Active Students -->
@@ -98,22 +98,42 @@
         </ul>
       </div>
 
-      <!-- Inactive Students -->
-      <div *ngIf="inactiveStudents.length > 0" class="student-section">
-        <div class="section-header inactive-header">
-          <span class="section-label">Inactive Students</span>
-          <span class="section-badge inactive-badge">{{ inactiveStudents.length }}</span>
+      <!-- Alumni (Graduated) -->
+      <div *ngIf="alumniStudents.length > 0" class="student-section">
+        <div class="section-header alumni-header">
+          <span class="section-label">Alumni</span>
+          <span class="section-badge alumni-badge">{{ alumniStudents.length }}</span>
         </div>
         <ul class="student-list">
-          <li *ngFor="let student of inactiveStudents; trackBy: trackByStudentId"
-              class="student-item inactive-student-item"
+          <li *ngFor="let student of alumniStudents; trackBy: trackByStudentId"
+              class="student-item alumni-student-item"
               (click)="viewStudentDetails(student.studentId)">
-            <div class="student-avatar inactive-avatar">{{ student.name.charAt(0).toUpperCase() }}</div>
+            <div class="student-avatar alumni-avatar">{{ student.name.charAt(0).toUpperCase() }}</div>
             <div class="student-info">
               <span class="student-name">{{ student.name }}</span>
               <span class="student-id">{{ student.studentId }}</span>
             </div>
-            <button class="inactive-view-details-button" (click)="viewStudentDetails(student.studentId)">View Details</button>
+            <button class="view-details-button alumni-btn" (click)="viewStudentDetails(student.studentId)">View Details</button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Left (Transferred / Withdrawn) -->
+      <div *ngIf="leftStudents.length > 0" class="student-section">
+        <div class="section-header left-header">
+          <span class="section-label">Left</span>
+          <span class="section-badge left-badge">{{ leftStudents.length }}</span>
+        </div>
+        <ul class="student-list">
+          <li *ngFor="let student of leftStudents; trackBy: trackByStudentId"
+              class="student-item left-student-item"
+              (click)="viewStudentDetails(student.studentId)">
+            <div class="student-avatar left-avatar">{{ student.name.charAt(0).toUpperCase() }}</div>
+            <div class="student-info">
+              <span class="student-name">{{ student.name }}</span>
+              <span class="student-id">{{ student.studentId }}</span>
+            </div>
+            <button class="view-details-button left-btn" (click)="viewStudentDetails(student.studentId)">View Details</button>
           </li>
         </ul>
       </div>

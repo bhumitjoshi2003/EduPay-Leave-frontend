@@ -188,7 +188,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   handleInitialNavigation(): void {
     if (this.Role === 'ADMIN' && this.subscriptionStatus === 'EXPIRED') {
-      this.router.navigate(['/dashboard/school-settings']);
+      this.router.navigate(['/dashboard/school-settings'], { queryParams: { tab: 'subscription' } });
       return;
     }
     const url = this.router.url.split('?')[0];

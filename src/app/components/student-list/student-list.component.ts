@@ -29,7 +29,8 @@ export class StudentListComponent implements OnInit, OnDestroy {
   isLoading = false;
   activeStudents: Student[] = [];
   newStudents: Student[] = [];
-  inactiveStudents: Student[] = [];
+  alumniStudents: Student[] = [];
+  leftStudents: Student[] = [];
   teacherId: string = '';
   loggedInUserRole: string = '';
   selectedClass: string = '';
@@ -144,15 +145,24 @@ export class StudentListComponent implements OnInit, OnDestroy {
           this.toast.error('Error', 'Failed to load student list.');
         }
       });
-      this.studentService.getInactiveStudentsByClass(classAtRequest, secId).pipe(takeUntil(this.destroy$)).subscribe({
+      this.studentService.getAlumniByClass(classAtRequest, secId).pipe(takeUntil(this.destroy$)).subscribe({
         next: (students) => {
           if (this.selectedClass !== classAtRequest) return;
-          this.inactiveStudents = students;
+          this.alumniStudents = students;
           this.cdr.markForCheck();
         },
         error: (err) => {
-          this.logger.error('Failed to load inactive students:', err);
-          this.toast.error('Error', 'Failed to load student list.');
+          this.logger.error('Failed to load alumni students:', err);
+        }
+      });
+      this.studentService.getLeftStudentsByClass(classAtRequest, secId).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (students) => {
+          if (this.selectedClass !== classAtRequest) return;
+          this.leftStudents = students;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.logger.error('Failed to load left students:', err);
         }
       });
     }
@@ -171,7 +181,8 @@ export class StudentListComponent implements OnInit, OnDestroy {
     this.sections = [];
     this.activeStudents = [];
     this.newStudents = [];
-    this.inactiveStudents = [];
+    this.alumniStudents = [];
+    this.leftStudents = [];
     this.isLoading = true;
     this.cdr.markForCheck();
     this.loadSectionsForClass(selectedClass, () => this.loadStudents());

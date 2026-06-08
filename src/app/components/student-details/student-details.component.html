@@ -23,6 +23,7 @@
       <span class="sd-hero-badge">Student Profile</span>
       <h1 class="sd-hero-name">{{ studentDetails.name }}</h1>
       <p class="sd-hero-sub">{{ studentDetails.studentId }}&nbsp;&nbsp;·&nbsp;&nbsp;Class {{ studentDetails.className }}<ng-container *ngIf="studentDetails.sectionName"> - {{ studentDetails.sectionName }}</ng-container></p>
+      <span *ngIf="isExitStatus()" class="sd-hero-chip sd-chip-exit">{{ studentDetails.status }}</span>
     </div>
 
     <!-- Action buttons -->
@@ -35,6 +36,8 @@
         <button class="sd-btn sd-btn-cancel-edit" (click)="cancelEditMode()">Cancel</button>
       </ng-container>
       <button *ngIf="getUserRole() !== 'TEACHER'" class="sd-btn sd-btn-pwd" (click)="openPasswordModal()">Change Password</button>
+      <button *ngIf="getUserRole() === 'ADMIN' && studentDetails.status === 'ACTIVE' && !isEditing" class="sd-btn sd-btn-exit" (click)="openExitModal()">Mark as Left</button>
+      <button *ngIf="getUserRole() === 'ADMIN' && isExitStatus() && !isEditing" class="sd-btn sd-btn-save" (click)="readmitStudent()">Re-admit</button>
     </div>
   </div>
 
@@ -115,6 +118,38 @@
       </div>
     </div>
 
+    <!-- Exit Details (shown when student has exited) -->
+    <div class="exit-info-section" *ngIf="isExitStatus()">
+      <h3 class="section-title">Exit Details</h3>
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="label">Exit Type</span>
+          <span class="value sd-exit-badge"
+            [class.sd-badge-graduated]="studentDetails.status === 'GRADUATED'"
+            [class.sd-badge-transferred]="studentDetails.status === 'TRANSFERRED'"
+            [class.sd-badge-withdrawn]="studentDetails.status === 'WITHDRAWN'">
+            {{ studentDetails.status }}
+          </span>
+        </div>
+        <div class="detail-item" *ngIf="studentDetails.leavingDate">
+          <span class="label">Leaving Date</span>
+          <span class="value">{{ studentDetails.leavingDate | date }}</span>
+        </div>
+        <div class="detail-item detail-item-wide" *ngIf="studentDetails.reasonForLeaving">
+          <span class="label">Reason</span>
+          <span class="value">{{ studentDetails.reasonForLeaving }}</span>
+        </div>
+        <div class="detail-item" *ngIf="studentDetails.conductAtLeaving">
+          <span class="label">Conduct</span>
+          <span class="value">{{ studentDetails.conductAtLeaving }}</span>
+        </div>
+        <div class="detail-item detail-item-wide" *ngIf="studentDetails.exitRemarks">
+          <span class="label">Remarks</span>
+          <span class="value">{{ studentDetails.exitRemarks }}</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Quick action buttons -->
     <div *ngIf="getUserRole() !== 'STUDENT'" class="actions">
       <button class="attendance-summary-button" (click)="viewAttendanceSummary()">📊 Attendance Summary</button>
@@ -172,6 +207,60 @@
     <div class="cp-actions">
       <button class="cp-btn-cancel" (click)="closePasswordModal()">Cancel</button>
       <button class="cp-btn-submit" (click)="submitPasswordChange()">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Exit Student Modal ─────────────────────────────────────────── -->
+<div class="cp-overlay" *ngIf="showExitModal" (click)="closeExitModal()">
+  <div class="cp-modal exit-modal" (click)="$event.stopPropagation()">
+    <h3 class="cp-title">Mark Student as Left</h3>
+
+    <div *ngIf="pendingDues?.hasPendingDues" class="exit-dues-warning">
+      This student has <strong>{{ pendingDues!.unpaidMonths }} unpaid month(s)</strong> of fees.
+      You can still proceed, but consider collecting dues first.
+    </div>
+
+    <div class="cp-field">
+      <label class="cp-label">Exit Type *</label>
+      <select class="cp-input" [(ngModel)]="exitRequest.exitType">
+        <option value="GRADUATED">Graduated</option>
+        <option value="TRANSFERRED">Transferred</option>
+        <option value="WITHDRAWN">Withdrawn</option>
+      </select>
+    </div>
+
+    <div class="cp-field">
+      <label class="cp-label">Reason for Leaving *</label>
+      <select class="cp-input" [(ngModel)]="exitRequest.reasonForLeaving">
+        <option value="" disabled>Select reason...</option>
+        <option *ngFor="let r of exitReasons" [value]="r">{{ r }}</option>
+      </select>
+    </div>
+
+    <div class="cp-field">
+      <label class="cp-label">Conduct at Leaving</label>
+      <select class="cp-input" [(ngModel)]="exitRequest.conductAtLeaving">
+        <option value="">-- Optional --</option>
+        <option *ngFor="let c of conductOptions" [value]="c">{{ c }}</option>
+      </select>
+    </div>
+
+    <div class="cp-field">
+      <label class="cp-label">Leaving Date *</label>
+      <input type="date" class="cp-input" [(ngModel)]="exitRequest.leavingDate">
+    </div>
+
+    <div class="cp-field">
+      <label class="cp-label">Remarks</label>
+      <textarea class="cp-input exit-remarks" [(ngModel)]="exitRequest.exitRemarks" rows="2" placeholder="Optional remarks..."></textarea>
+    </div>
+
+    <div class="cp-actions">
+      <button class="cp-btn-cancel" (click)="closeExitModal()">Cancel</button>
+      <button class="cp-btn-submit exit-submit-btn" (click)="submitExit()" [disabled]="exitLoading">
+        {{ exitLoading ? 'Processing...' : 'Confirm Exit' }}
+      </button>
     </div>
   </div>
 </div>

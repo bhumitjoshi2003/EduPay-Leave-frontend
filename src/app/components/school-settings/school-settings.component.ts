@@ -110,17 +110,17 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const user = this.authStateService.getUser();
     this.role = user?.role ?? '';
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    if (tab === 'subscription' || tab === 'features' || tab === 'razorpay' || tab === 'channels' || tab === 'staff-attendance') {
+      this.activeTab = tab;
+    }
+
     this.loadSettings();
     this.loadEntitlement();
     this.loadSessions();
-    // Auto-select tab from URL fragment — e.g. navigating from "Upgrade Now" button
-    this.route.fragment.pipe(takeUntil(this.destroy$)).subscribe(frag => {
-      if (frag === 'subscription') {
-        this.activeTab = 'subscription';
-        this.loadAvailablePlans();
-        this.cdr.markForCheck();
-      }
-    });
+    if (this.activeTab === 'subscription') {
+      this.loadAvailablePlans();
+    }
   }
 
   ngOnDestroy(): void {

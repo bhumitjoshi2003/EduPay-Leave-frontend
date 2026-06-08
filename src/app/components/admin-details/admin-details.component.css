@@ -380,7 +380,7 @@
   .ad-page { width: 100%; }
 
   .ad-hero {
-    border-radius: 0;
+    border-radius: 20px 20px 0 0;
     padding: 20px 16px;
     flex-direction: column;
     align-items: flex-start;
@@ -392,7 +392,7 @@
   .ad-hero-actions { width: 100%; }
   .ad-btn { flex: 1; text-align: center; padding: 10px 12px; }
 
-  .ad-card { border-radius: 0; padding: 16px 14px; }
+  .ad-card { border-radius: 0 0 20px 20px; padding: 16px 14px; }
 
   .details-grid { grid-template-columns: 1fr; gap: 10px; }
 

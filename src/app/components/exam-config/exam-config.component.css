@@ -507,7 +507,7 @@
 
 /* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .ec-container { width: 98%; padding: 14px; }
+  .ec-container { width: 100%; padding: 10px; }
   .ec-filters { flex-direction: column; gap: 12px; }
   .ec-filter-group { width: 100%; }
   .ec-filter-group select { width: 100%; min-width: unset; font-size: 1rem; padding: 10px 12px; box-sizing: border-box; }

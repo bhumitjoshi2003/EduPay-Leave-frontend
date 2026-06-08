@@ -53,11 +53,11 @@ export class PaymentComponent implements OnDestroy {
   };
 
   @Input() disabled: boolean = false;
-  @Output() paymentSuccess = new EventEmitter<any>();
+  @Output() paymentSuccess = new EventEmitter<RazorpayPaymentResponse>();
   @Output() paymentProcessingStarted = new EventEmitter<void>();
   @Output() paymentProcessCompleted = new EventEmitter<void>();
 
-  studentDetails: any;
+  studentDetails: { name: string; email?: string; phoneNumber?: string } | null = null;
 
   initiatePayment() {
     this.paymentProcessingStarted.emit();
@@ -93,9 +93,9 @@ export class PaymentComponent implements OnDestroy {
           description: 'Edunexify Fee Payment',
           order_id: response.orderId,
           prefill: {
-            name: this.studentDetails.name || '',
-            email: this.studentDetails.email || '',
-            contact: this.studentDetails.phoneNumber || ''
+            name: this.studentDetails?.name || '',
+            email: this.studentDetails?.email || '',
+            contact: this.studentDetails?.phoneNumber || ''
           },
           theme: { color: '#4fbdbd' },
           method: { netbanking: true, card: true, upi: true, wallet: false },

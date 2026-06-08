@@ -18,6 +18,8 @@ import {
   FeatureCatalogItem,
   GlobalSubscriptionConfig,
   SubscriptionHealthItem,
+  SchoolFeature,
+  SchoolSubscription,
 } from '../../services/school.service';
 import { LoggerService } from '../../services/logger.service';
 
@@ -691,7 +693,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     if (!this.plans.length) {
       this.schoolService.getPlans(true).pipe(takeUntil(this.destroy$)).subscribe({
         next: (plans) => { this.plans = plans; this.cdr.markForCheck(); },
-        error: () => {}
+        error: (err) => this.logger.error('Failed to load plans', err)
       });
     }
     this.loadSchoolSubscription(school.id);
@@ -736,7 +738,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
       ? this.schoolService.updateSchoolSubscription(schoolId, this.subForm)
       : this.schoolService.assignSubscription(schoolId, this.subForm);
     req$.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (sub) => {
+      next: (sub: SchoolSubscription) => {
         this.schoolSubscriptions.set(schoolId, sub);
         this.savingSubFor = null;
         this.cdr.markForCheck();
@@ -771,7 +773,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
 
   // ── Per-school feature overrides ─────────────────────────────────────────
 
-  schoolFeatures = new Map<number, any[]>();
+  schoolFeatures = new Map<number, SchoolFeature[]>();
   loadingFeaturesFor: number | null = null;
   savingFeatureFor: string | null = null; // `${schoolId}:${featureKey}`
 
@@ -811,8 +813,8 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
       });
   }
 
-  schoolFeaturesByCategory(features: any[]): { category: string; items: any[] }[] {
-    const map = new Map<string, any[]>();
+  schoolFeaturesByCategory(features: SchoolFeature[]): { category: string; items: SchoolFeature[] }[] {
+    const map = new Map<string, SchoolFeature[]>();
     for (const f of features) {
       if (!map.has(f.category)) map.set(f.category, []);
       map.get(f.category)!.push(f);
@@ -888,7 +890,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     if (!this.plans.length) {
       this.schoolService.getPlans(true).pipe(takeUntil(this.destroy$)).subscribe({
         next: (plans) => { this.plans = plans; this.cdr.markForCheck(); },
-        error: () => {}
+        error: (err) => this.logger.error('Failed to load plans', err)
       });
     }
     if (!this.subscriptionConfig) {
@@ -898,7 +900,7 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
           this.configForm = { gracePeriodDays: config.gracePeriodDays, defaultTrialDays: config.defaultTrialDays, expiryNotifyDays: config.expiryNotifyDays };
           this.cdr.markForCheck();
         },
-        error: () => {}
+        error: (err) => this.logger.error('Failed to load subscription config', err)
       });
     }
     this.cdr.markForCheck();

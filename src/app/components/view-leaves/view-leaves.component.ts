@@ -66,7 +66,7 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
       next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-      error: () => {}
+      error: (err) => this.logger.error('Failed to load classes', err)
     });
 
     this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {

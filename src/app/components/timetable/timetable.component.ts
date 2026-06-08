@@ -111,7 +111,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
         }
         this.cdr.markForCheck();
       },
-      error: () => {}
+      error: (err) => this.logger.error('Failed to load timetable', err)
     });
 
     if (this.isAdmin()) {

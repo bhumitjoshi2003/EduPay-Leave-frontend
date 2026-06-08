@@ -69,7 +69,7 @@ export class NoticeComponent implements OnInit, OnDestroy {
     this.role = user?.role ?? '';
     this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
       next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-      error: () => {}
+      error: (err) => this.logger.error('Failed to load classes', err)
     });
 
     this.loadData();

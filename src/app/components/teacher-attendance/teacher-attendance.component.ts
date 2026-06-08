@@ -79,7 +79,7 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
     this.attendanceDate = this.getTodayDateWithoutTime();
     this.schoolService.getManagedClasses().pipe(takeUntil(this.destroy$)).subscribe({
       next: classes => { this.managedClasses = classes; },
-      error: () => {}
+      error: (err) => this.logger.error('Failed to load managed classes', err)
     });
     this.getUserRoleAndLoadData();
   }
@@ -151,7 +151,7 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
     if (!cls) return;
     this.sectionService.getSectionsForClass(cls.id).pipe(takeUntil(this.destroy$)).subscribe({
       next: sections => { this.sections = sections; this.cdr.markForCheck(); },
-      error: () => {}
+      error: (err) => this.logger.error('Failed to load sections', err)
     });
   }
 

@@ -273,7 +273,7 @@
 
 /* ── Tablet (≤ 768px) ────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .me-container { padding: 18px; border-radius: 10px; }
+  .me-container { padding: 14px; border-radius: 10px; }
   .me-filters { gap: 10px; }
   .me-filter-group select { min-width: 130px; }
   .me-mark-input { width: 80px; }
@@ -284,8 +284,8 @@
 /* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .me-container {
-    width: 98%;
-    padding: 14px;
+    width: 100%;
+    padding: 10px;
   }
 
   .me-mode-toggle {

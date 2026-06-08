@@ -66,7 +66,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
       next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-      error: () => {}
+      error: (err) => this.logger.error('Failed to load classes', err)
     });
 
     this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
@@ -186,9 +186,9 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  updateFieldValue(field: keyof TeacherDetails, event: any): void {
+  updateFieldValue(field: keyof TeacherDetails, event: Event): void {
     if (this.updatedDetails) {
-      this.updatedDetails[field] = event.target.value;
+      this.updatedDetails[field] = (event.target as HTMLInputElement).value;
     }
   }
 

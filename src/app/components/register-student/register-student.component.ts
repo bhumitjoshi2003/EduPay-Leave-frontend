@@ -69,7 +69,7 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
     });
     this.schoolService.getManagedClasses().pipe(takeUntil(this.destroy$)).subscribe({
       next: classes => { this.managedClasses = classes; },
-      error: () => {}
+      error: (err) => this.logger.error('Failed to load managed classes', err)
     });
     // Load sections when class changes
     this.studentForm.get('className')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(className => {
@@ -80,7 +80,7 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
       if (cls) {
         this.sectionService.getSectionsForClass(cls.id).pipe(takeUntil(this.destroy$)).subscribe({
           next: sections => { this.sections = sections; this.cdr.markForCheck(); },
-          error: () => {}
+          error: (err) => this.logger.error('Failed to load sections', err)
         });
       }
     });
@@ -99,7 +99,7 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
     if (this.studentForm.valid) {
       this.studentService.addStudent(this.studentForm.value).pipe(
         takeUntil(this.destroy$),
-        switchMap((response: any) => {
+        switchMap((response: { studentId: string }) => {
           const tempPassword = this.generateTempPassword();
           return this.authService.register({
             userId: response.studentId,

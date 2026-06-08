@@ -94,11 +94,11 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
       next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-      error: () => {}
+      error: (err) => this.logger.error('Failed to load classes', err)
     });
     this.schoolService.getManagedClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
       next: classes => { this.managedClasses = classes; },
-      error: () => {}
+      error: (err) => this.logger.error('Failed to load managed classes', err)
     });
 
     this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params) => {
@@ -273,10 +273,10 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  updateFieldValue(field: keyof StudentDetails, event: any): void {
+  updateFieldValue(field: keyof StudentDetails, event: Event): void {
     if (this.updatedDetails) {
-      const value = (field === 'takesBus') ? event.target.checked : event.target.value;
-      this.updatedDetails[field] = value;
+      const target = event.target as HTMLInputElement;
+      (this.updatedDetails as Record<string, unknown>)[field] = (field === 'takesBus') ? target.checked : target.value;
 
       // Clear error immediately when user fixes the field
       if (this.validationErrors[field]) {

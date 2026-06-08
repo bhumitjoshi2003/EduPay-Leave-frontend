@@ -63,7 +63,7 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     // Load school grading system
     this.schoolService.getSettings().pipe(takeUntil(this.destroy$)).subscribe({
       next: (s) => { this.gradingSystem = s.gradingSystem ?? 'CBSE'; this.cdr.markForCheck(); },
-      error: () => {}
+      error: (err) => this.logger.error('Failed to load school settings', err)
     });
 
     this.marksService.getStudentResults(this.studentId, this.session)

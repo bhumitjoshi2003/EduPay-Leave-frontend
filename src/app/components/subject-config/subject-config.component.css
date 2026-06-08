@@ -300,8 +300,8 @@
 /* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .sc-container {
-    width: 98%;
-    padding: 14px;
+    width: 100%;
+    padding: 10px;
   }
 
   .sc-header h2 { font-size: 1rem; }

@@ -6,55 +6,70 @@
 
 /* ── Hero banner ─────────────────────────────────────────────────── */
 .tl-hero {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 24px 28px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
-  border-radius: 16px 16px 0 0;
+  gap: 14px;
+  padding: 24px 20px 28px;
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 55%, #14b8a6 100%);
+  border-radius: 20px;
+  overflow: hidden;
+  color: #fff;
   flex-wrap: wrap;
 }
+
+.tl-blob { position: absolute; border-radius: 50%; opacity: 0.12; pointer-events: none; }
+.tl-blob-1 { width: 120px; height: 120px; background: #fff;    top: -30px; right: -20px; }
+.tl-blob-2 { width: 80px;  height: 80px;  background: #5eead4; bottom: -20px; left: 40%; }
 
 .tl-hero-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
+  flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .tl-hero-icon {
-  font-size: 2.2rem;
-  line-height: 1;
-  filter: drop-shadow(0 2px 6px rgba(79, 189, 189, 0.4));
+  font-size: 1.6rem;
+  background: rgba(255,255,255,0.18);
+  border-radius: 14px;
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 
 .tl-hero-text h1 {
-  margin: 0 0 4px;
-  font-size: 1.4rem;
-  font-weight: 700;
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
   color: #fff;
-  letter-spacing: 0.3px;
+  letter-spacing: -0.3px;
 }
 
 .tl-hero-text p {
-  margin: 0;
-  font-size: 0.85rem;
-  color: rgba(79, 189, 189, 0.85);
-  font-weight: 500;
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.78);
 }
 
 .bulk-import-btn {
-  background: rgba(79, 189, 189, 0.18);
-  color: #4fbdbd;
-  border: 1.5px solid rgba(79, 189, 189, 0.4);
-  border-radius: 8px;
-  padding: 9px 18px;
-  font-size: 0.82rem;
-  font-weight: 600;
+  position: relative;
+  z-index: 1;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  font-family: inherit;
+  transition: background 0.15s;
 }
 
 .bulk-import-btn:hover {
@@ -191,7 +206,7 @@
 @media (max-width: 1023px) {
   .teacher-list-container { width: 98%; }
 
-  .tl-hero { padding: 20px 20px; border-radius: 12px 12px 0 0; }
+  .tl-hero { padding: 20px 18px 24px; border-radius: 16px; }
 
   .tl-hero-text h1 { font-size: 1.2rem; }
 
@@ -207,8 +222,8 @@
   .teacher-list-container { width: 100%; }
 
   .tl-hero {
-    padding: 16px;
-    border-radius: 0;
+    padding: 20px 16px 24px;
+    border-radius: 20px;
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;

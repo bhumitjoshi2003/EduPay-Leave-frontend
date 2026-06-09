@@ -9,12 +9,12 @@
   position: relative;
   background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 55%, #f87171 100%);
   border-radius: 20px;
-  padding: 22px 24px;
+  padding: 24px 20px 28px;
   display: flex; align-items: center; gap: 14px;
   overflow: hidden; color: #fff;
 }
 .fr-blob { position: absolute; border-radius: 50%; opacity: 0.12; pointer-events: none; }
-.fr-blob-1 { width: 140px; height: 140px; background: #fff;    top: -40px; right: -20px; }
+.fr-blob-1 { width: 120px; height: 120px; background: #fff;    top: -30px; right: -20px; }
 .fr-blob-2 { width: 80px;  height: 80px;  background: #fca5a5; bottom: -20px; left: 40%; }
 
 .fr-hero-left {
@@ -22,13 +22,13 @@
   flex: 1; position: relative; z-index: 1;
 }
 .fr-hero-icon {
-  font-size: 1.7rem;
+  font-size: 1.6rem;
   background: rgba(255,255,255,0.18); border-radius: 14px;
   width: 52px; height: 52px;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.fr-hero-title { margin: 0; font-size: 1.25rem; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
-.fr-hero-sub   { margin: 2px 0 0; font-size: 0.78rem; color: rgba(255,255,255,0.78); }
+.fr-hero-title { margin: 0; font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+.fr-hero-sub   { margin: 2px 0 0; font-size: 0.75rem; color: rgba(255,255,255,0.78); }
 
 /* ── Controls Card ──────────────────────────────────────────────── */
 .fr-controls {

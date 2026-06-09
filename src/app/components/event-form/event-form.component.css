@@ -10,25 +10,25 @@
   position: relative;
   background: linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #22d3ee 100%);
   border-radius: 20px;
-  padding: 22px 24px;
+  padding: 24px 20px 32px;
   overflow: hidden; color: #fff;
   display: flex; align-items: center;
 }
 .ef-blob { position: absolute; border-radius: 50%; opacity: 0.12; pointer-events: none; }
-.ef-blob-1 { width: 160px; height: 160px; background: #fff;    top: -50px; right: -30px; }
-.ef-blob-2 { width: 90px;  height: 90px;  background: #a5f3fc; bottom: -25px; left: 50%; }
+.ef-blob-1 { width: 140px; height: 140px; background: #fff;    top: -40px; right: -30px; }
+.ef-blob-2 { width: 90px;  height: 90px;  background: #a5f3fc; bottom: -25px; left: 30%; }
 
 .ef-hero-left {
   display: flex; align-items: center; gap: 14px;
   position: relative; z-index: 1;
 }
 .ef-hero-icon {
-  font-size: 1.7rem; flex-shrink: 0;
+  font-size: 1.6rem; flex-shrink: 0;
   background: rgba(255,255,255,0.18); border-radius: 14px;
   width: 52px; height: 52px;
   display: flex; align-items: center; justify-content: center;
 }
-.ef-hero-title { font-size: 1.25rem; font-weight: 800; margin: 0 0 2px; color: #fff; letter-spacing: -0.2px; }
+.ef-hero-title { font-size: 1.2rem; font-weight: 800; margin: 0 0 2px; color: #fff; letter-spacing: -0.2px; }
 .ef-hero-sub   { font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.8); margin: 0; }
 
 /* ── Card ──────────────────────────────────────────────────────────── */

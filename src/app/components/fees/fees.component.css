@@ -9,20 +9,20 @@
   position: relative;
   background: linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 55%, #3b82f6 100%);
   border-radius: 20px;
-  padding: 22px 24px;
+  padding: 24px 20px 28px;
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
   overflow: hidden; color: #fff;
 }
 .pt-blob { position: absolute; border-radius: 50%; opacity: 0.12; pointer-events: none; }
-.pt-blob-1 { width: 140px; height: 140px; background: #fff;    top: -40px; right: -20px; }
+.pt-blob-1 { width: 130px; height: 130px; background: #fff;    top: -30px; right: -20px; }
 .pt-blob-2 { width: 80px;  height: 80px;  background: #bfdbfe; bottom: -20px; left: 35%; }
 
 .pt-hero-left {
   display: flex; align-items: center; gap: 14px;
   position: relative; z-index: 1;
 }
-.pt-hero-icon  { font-size: 1.7rem; flex-shrink: 0; }
-.pt-hero-title { font-size: 1.25rem; font-weight: 800; margin: 0; color: #fff; letter-spacing: -0.2px; }
+.pt-hero-icon  { font-size: 2rem; flex-shrink: 0; }
+.pt-hero-title { font-size: 1.5rem; font-weight: 800; margin: 0; color: #fff; letter-spacing: -0.3px; line-height: 1.2; }
 .pt-hero-sub   { font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.8); margin: 2px 0 0; }
 
 .pt-hero-session { display: flex; flex-direction: column; gap: 4px; position: relative; z-index: 1; }

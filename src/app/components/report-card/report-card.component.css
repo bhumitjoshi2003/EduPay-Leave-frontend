@@ -11,15 +11,16 @@
 .rc-hero {
   position: relative;
   background: linear-gradient(135deg, #0f4c81 0%, #1565c0 55%, #1e88e5 100%);
-  padding: 20px 5%;
+  border-radius: 20px;
+  padding: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
   overflow: hidden;
   color: #fff;
   flex-wrap: wrap;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 .rc-blob {
   position: absolute;
@@ -27,19 +28,19 @@
   opacity: 0.1;
   pointer-events: none;
 }
-.rc-blob-1 { width: 160px; height: 160px; background: #fff; top: -50px; right: 180px; }
-.rc-blob-2 { width: 90px; height: 90px; background: #bbdefb; bottom: -25px; left: 40%; }
+.rc-blob-1 { width: 130px; height: 130px; background: #fff; top: -35px; right: 100px; }
+.rc-blob-2 { width: 80px; height: 80px; background: #bbdefb; bottom: -20px; left: 40%; }
 .rc-hero-left { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
 .rc-hero-icon {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   background: rgba(255,255,255,0.16);
   border-radius: 14px;
   width: 52px; height: 52px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.rc-hero-title { font-size: 1.3rem; font-weight: 800; margin: 0 0 3px; color: #fff; }
-.rc-hero-sub   { font-size: 0.82rem; color: rgba(255,255,255,0.82); margin: 0; }
+.rc-hero-title { font-size: 1.2rem; font-weight: 800; margin: 0 0 2px; color: #fff; }
+.rc-hero-sub   { font-size: 0.76rem; color: rgba(255,255,255,0.82); margin: 0; }
 .rc-hero-actions {
   display: flex;
   gap: 10px;

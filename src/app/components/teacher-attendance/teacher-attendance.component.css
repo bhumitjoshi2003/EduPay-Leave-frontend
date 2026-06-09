@@ -72,44 +72,57 @@
 
 /* ── Hero ─────────────────────────────────────────────────────────── */
 .ta-hero {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 22px 24px;
-  background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+  gap: 14px;
+  padding: 24px 20px 28px;
+  background: linear-gradient(135deg, #064e3b 0%, #059669 55%, #34d399 100%);
   border-radius: 0 16px 0 0;
+  overflow: hidden;
+  color: #fff;
 }
 
 /* When no left nav (TEACHER role) */
 .ta-container:not(:has(.ta-left-nav)) .ta-hero {
-  border-radius: 16px 16px 0 0;
+  border-radius: 20px;
 }
+
+.ta-blob { position: absolute; border-radius: 50%; opacity: 0.12; pointer-events: none; }
+.ta-blob-1 { width: 120px; height: 120px; background: #fff;    top: -30px; right: -20px; }
+.ta-blob-2 { width: 80px;  height: 80px;  background: #6ee7b7; bottom: -20px; left: 40%; }
 
 .ta-hero-left {
   display: flex;
   align-items: center;
   gap: 14px;
+  flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .ta-hero-icon {
-  font-size: 2rem;
-  line-height: 1;
-  filter: drop-shadow(0 2px 6px rgba(52, 211, 153, 0.4));
+  font-size: 1.6rem;
+  background: rgba(255,255,255,0.18);
+  border-radius: 14px;
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 
 .ta-hero-text h1 {
-  margin: 0 0 3px;
-  font-size: 1.25rem;
-  font-weight: 700;
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
   color: #fff;
+  letter-spacing: -0.3px;
 }
 
 .ta-hero-text p {
-  margin: 0;
-  font-size: 0.82rem;
-  color: rgba(52, 211, 153, 0.9);
-  font-weight: 500;
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.78);
 }
 
 /* ── Controls card ───────────────────────────────────────────────── */
@@ -339,8 +352,8 @@
 /* ── Tablet ──────────────────────────────────────────────────────── */
 @media (max-width: 1023px) {
   .ta-left-nav { width: 150px; padding: 16px 10px; }
-  .ta-hero { padding: 18px 20px; border-radius: 0 12px 0 0; }
-  .ta-hero-text h1 { font-size: 1.1rem; }
+  .ta-hero { padding: 20px 18px 24px; border-radius: 0 12px 0 0; }
+  .ta-hero-text h1 { font-size: 1.2rem; }
   .ta-controls { padding: 14px 20px; }
   .ta-list { padding: 14px 20px; }
   .ta-student-card { padding: 10px 14px; gap: 10px; }
@@ -375,12 +388,12 @@
   .ta-class-pill { font-size: 0.8rem; padding: 6px 12px; }
 
   .ta-hero {
-    border-radius: 0;
-    padding: 16px;
+    border-radius: 20px;
+    padding: 20px 16px 24px;
   }
 
   .ta-container:not(:has(.ta-left-nav)) .ta-hero {
-    border-radius: 16px 16px 0 0;
+    border-radius: 20px;
   }
 
   .ta-controls { padding: 12px 16px; }

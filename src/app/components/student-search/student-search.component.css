@@ -13,17 +13,17 @@
   position: relative;
   background: linear-gradient(135deg, #1e3a5f 0%, #0f766e 55%, #2dd4bf 100%);
   border-radius: 20px;
-  padding: 28px 32px;
+  padding: 28px 24px 36px;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   overflow: hidden;
   color: #fff;
 }
 
 .ss-blob { position: absolute; border-radius: 50%; opacity: 0.12; pointer-events: none; }
-.ss-blob-1 { width: 200px; height: 200px; background: #fff; top: -60px; right: -40px; }
-.ss-blob-2 { width: 110px; height: 110px; background: #99f6e4; bottom: -30px; left: 45%; }
+.ss-blob-1 { width: 140px; height: 140px; background: #fff;    top: -40px; right: -30px; }
+.ss-blob-2 { width: 90px;  height: 90px;  background: #99f6e4; bottom: -25px; left: 30%; }
 
 .ss-hero-left {
   display: flex;
@@ -34,10 +34,10 @@
 }
 
 .ss-hero-icon-wrap {
-  font-size: 2rem;
+  font-size: 1.6rem;
   background: rgba(255,255,255,0.15);
-  border-radius: 18px;
-  width: 60px; height: 60px;
+  border-radius: 14px;
+  width: 52px; height: 52px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
@@ -53,10 +53,10 @@
 
 .ss-hero-title {
   margin: 0 0 4px;
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   font-weight: 800;
   color: #fff;
-  letter-spacing: -0.3px;
+  letter-spacing: 0.01em;
   line-height: 1.15;
 }
 

@@ -6,41 +6,52 @@
 
 /* ── Hero banner ─────────────────────────────────────────────────── */
 .al-hero {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 24px 28px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  border-radius: 16px 16px 0 0;
+  gap: 14px;
+  padding: 24px 20px 28px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #334155 100%);
+  border-radius: 20px;
+  overflow: hidden;
+  color: #fff;
   flex-wrap: wrap;
 }
+
+.al-blob { position: absolute; border-radius: 50%; opacity: 0.12; pointer-events: none; }
+.al-blob-1 { width: 130px; height: 130px; background: #fff;    top: -30px; right: -20px; }
+.al-blob-2 { width: 80px;  height: 80px;  background: #94a3b8; bottom: -20px; left: 40%; }
 
 .al-hero-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
 }
 
 .al-hero-icon {
-  font-size: 2.2rem;
-  line-height: 1;
-  filter: drop-shadow(0 2px 6px rgba(79, 189, 189, 0.4));
+  font-size: 1.6rem;
+  background: rgba(255,255,255,0.18);
+  border-radius: 14px;
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 
-.al-hero-text h1 {
-  margin: 0 0 4px;
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.3px;
-}
-
-.al-hero-text p {
+.al-hero-title {
   margin: 0;
-  font-size: 0.85rem;
-  color: rgba(79, 189, 189, 0.85);
-  font-weight: 500;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.3px;
+}
+
+.al-hero-sub {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.78);
 }
 
 .create-admin-button {
@@ -73,7 +84,7 @@
 /* ── List area ───────────────────────────────────────────────────── */
 .admin-list-area {
   background: #fff;
-  border-radius: 0 0 16px 16px;
+  border-radius: 18px;
   box-shadow: 0 8px 32px rgba(15, 23, 42, 0.10);
   padding: 24px;
 }

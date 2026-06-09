@@ -24,8 +24,8 @@
 }
 
 .al-blob { position: absolute; border-radius: 50%; opacity: 0.12; pointer-events: none; }
-.al-blob-1 { width: 160px; height: 160px; background: #fff;    top: -50px; right: -40px; }
-.al-blob-2 { width: 100px; height: 100px; background: #99f6e4; bottom: -25px; left: 38%; }
+.al-blob-1 { width: 140px; height: 140px; background: #fff;    top: -40px; right: -30px; }
+.al-blob-2 { width: 90px;  height: 90px;  background: #99f6e4; bottom: -20px; left: 30%; }
 
 .al-hero-left {
   display: flex;

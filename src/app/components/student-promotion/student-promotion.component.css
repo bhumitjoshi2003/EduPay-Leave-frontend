@@ -12,7 +12,7 @@
   position: relative;
   background: linear-gradient(135deg, #14532d 0%, #15803d 55%, #4ade80 100%);
   border-radius: 20px;
-  padding: 22px 24px;
+  padding: 22px 20px 26px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -28,8 +28,8 @@
   opacity: 0.12;
   pointer-events: none;
 }
-.sp-blob-1 { width: 160px; height: 160px; background: #fff;    top: -50px; right: -30px; }
-.sp-blob-2 { width: 90px;  height: 90px;  background: #a7f3d0; bottom: -25px; left: 30%; }
+.sp-blob-1 { width: 140px; height: 140px; background: #fff;    top: -35px; right: -25px; }
+.sp-blob-2 { width: 80px;  height: 80px;  background: #a7f3d0; bottom: -20px; left: 30%; }
 
 .sp-hero-left {
   display: flex;
@@ -40,7 +40,7 @@
 }
 
 .sp-hero-icon {
-  font-size: 1.7rem;
+  font-size: 1.6rem;
   background: rgba(255,255,255,0.18);
   border-radius: 14px;
   width: 52px; height: 52px;
@@ -48,7 +48,7 @@
   flex-shrink: 0;
 }
 
-.sp-hero-title { font-size: 1.25rem; font-weight: 800; margin: 0; color: #fff; letter-spacing: -0.2px; }
+.sp-hero-title { font-size: 1.3rem; font-weight: 800; margin: 0; color: #fff; letter-spacing: -0.3px; }
 .sp-hero-sub   { font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.85); margin: 3px 0 0; }
 
 .sp-hero-stats {

@@ -75,15 +75,16 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 22px 24px;
+  gap: 14px;
+  padding: 24px 20px 28px;
   background: linear-gradient(135deg, #134e4a 0%, #0f766e 55%, #2dd4bf 100%);
   border-radius: 0 16px 0 0;
   overflow: hidden;
+  color: #fff;
 }
 
 .vl-container:not(:has(.vl-left-nav)) .vl-hero {
-  border-radius: 16px 16px 0 0;
+  border-radius: 20px;
 }
 
 /* Decorative blobs */
@@ -109,16 +110,17 @@
   font-size: 1.6rem;
   background: rgba(255, 255, 255, 0.16);
   border-radius: 14px;
-  width: 50px; height: 50px;
+  width: 52px; height: 52px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
 
 .vl-hero-text h1 {
-  margin: 0 0 3px;
-  font-size: 1.22rem;
-  font-weight: 700;
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
   color: #fff;
+  letter-spacing: -0.3px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -141,10 +143,9 @@
 }
 
 .vl-hero-text p {
-  margin: 0;
-  font-size: 0.82rem;
+  margin: 2px 0 0;
+  font-size: 0.78rem;
   color: rgba(153, 246, 228, 0.9);
-  font-weight: 500;
   position: relative;
   z-index: 1;
 }
@@ -491,7 +492,7 @@
 /* ── Tablet ──────────────────────────────────────────────────────── */
 @media (max-width: 1023px) {
   .vl-left-nav { width: 150px; padding: 16px 10px; }
-  .vl-hero { padding: 18px 20px; border-radius: 0 12px 0 0; }
+  .vl-hero { padding: 20px 18px 24px; border-radius: 0 12px 0 0; }
   .vl-hero-text h1 { font-size: 1.05rem; }
   .vl-filter-card { padding: 14px 20px; }
   .vl-list { padding: 14px 20px; }
@@ -518,8 +519,8 @@
   .vl-class-item { flex-shrink: 0; }
   .vl-class-pill { font-size: 0.8rem; padding: 6px 12px; }
 
-  .vl-hero { border-radius: 0; padding: 16px; }
-  .vl-container:not(:has(.vl-left-nav)) .vl-hero { border-radius: 16px 16px 0 0; }
+  .vl-hero { border-radius: 20px; padding: 20px 16px 24px; }
+  .vl-container:not(:has(.vl-left-nav)) .vl-hero { border-radius: 20px; }
 
   .vl-filter-card { padding: 12px 16px; }
 

@@ -371,8 +371,9 @@
   .ta-left-nav {
     width: 100%;
     border-radius: 0;
-    padding: 8px 8px 6px;
-    background: linear-gradient(135deg, #064e3b, #065f46);
+    padding: 0;
+    background: none;
+    box-shadow: none;
   }
 
   .ta-left-nav h2 { display: none; }
@@ -381,14 +382,35 @@
     flex-direction: row;
     overflow-x: auto;
     scrollbar-width: none;
-    gap: 6px;
-    padding-bottom: 2px;
+    gap: 8px;
+    padding: 4px 2px 8px;
   }
   .ta-class-list::-webkit-scrollbar { display: none; }
 
   .ta-class-item { flex-shrink: 0; }
 
-  .ta-class-pill { font-size: 0.8rem; padding: 6px 12px; }
+  .ta-class-pill {
+    font-size: 0.8rem;
+    padding: 7px 14px;
+    border-radius: 20px;
+    background: #fff;
+    color: #64748b;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: none;
+  }
+
+  .ta-class-item:hover .ta-class-pill {
+    border-color: #34d399;
+    color: #059669;
+    background: #ecfdf5;
+  }
+
+  .ta-class-item.selected .ta-class-pill {
+    background: linear-gradient(135deg, #059669, #34d399);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+  }
 
   .ta-hero {
     border-radius: 0;

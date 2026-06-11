@@ -214,10 +214,10 @@
 
 .vl-btn-clear {
   padding: 9px 16px;
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid #99f6e4;
   border-radius: 10px;
-  background: #f8fafc;
-  color: #64748b;
+  background: #f0fdfa;
+  color: #0f766e;
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
@@ -225,7 +225,7 @@
   transition: background 0.15s, border-color 0.15s;
   white-space: nowrap;
 }
-.vl-btn-clear:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.vl-btn-clear:hover { background: #ccfbf1; border-color: #2dd4bf; }
 
 .vl-btn-delete-all {
   padding: 9px 16px;
@@ -508,8 +508,9 @@
   .vl-left-nav {
     width: 100%;
     border-radius: 0;
-    padding: 8px 8px 6px;
-    background: linear-gradient(135deg, #134e4a, #0f766e);
+    padding: 0;
+    background: none;
+    box-shadow: none;
   }
 
   .vl-left-nav h2 { display: none; }
@@ -518,13 +519,35 @@
     flex-direction: row;
     overflow-x: auto;
     scrollbar-width: none;
-    gap: 6px;
-    padding-bottom: 2px;
+    gap: 8px;
+    padding: 4px 2px 8px;
   }
   .vl-class-list::-webkit-scrollbar { display: none; }
 
   .vl-class-item { flex-shrink: 0; }
-  .vl-class-pill { font-size: 0.8rem; padding: 6px 12px; }
+
+  .vl-class-pill {
+    font-size: 0.8rem;
+    padding: 7px 16px;
+    border-radius: 20px;
+    background: #fff;
+    color: #64748b;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: none;
+  }
+
+  .vl-class-item:hover .vl-class-pill {
+    border-color: #2dd4bf;
+    color: #0f766e;
+    background: #f0fdfa;
+  }
+
+  .vl-class-item.selected .vl-class-pill {
+    background: linear-gradient(135deg, #0f766e, #2dd4bf);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(15, 118, 110, 0.3);
+  }
 
   .vl-hero { border-radius: 0; padding: 14px 12px; }
   .vl-hero-icon { width: 44px; height: 44px; font-size: 1.4rem; border-radius: 12px; }
@@ -543,15 +566,39 @@
   .vl-date-badge { width: 40px; height: 40px; border-radius: 8px; }
   .vl-date-day { font-size: 1rem; }
 
+  .vl-card { flex-wrap: nowrap; }
+
   .vl-card-right {
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
   }
 
   .vl-card-name { font-size: 0.88rem; }
+
+  /* Icon-only action buttons on mobile (match android) */
+  .vl-btn-approve,
+  .vl-btn-reject,
+  .vl-btn-edit,
+  .vl-btn-del {
+    width: 30px; height: 30px;
+    padding: 0;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    overflow: hidden;
+    text-indent: -9999px;
+  }
+
+  .vl-btn-approve { background: #dcfce7; color: #15803d; }
+  .vl-btn-reject  { background: #fee2e2; color: #dc2626; }
+  .vl-btn-edit    { background: #e0f2fe; color: #0369a1; }
+  .vl-btn-del     { background: #f0fdfa; color: #2dd4bf; font-size: 0.75rem; }
+
+  .vl-btn-approve::after { content: '✓'; text-indent: 0; display: flex; align-items: center; justify-content: center; }
+  .vl-btn-reject::after  { content: '✕'; text-indent: 0; display: flex; align-items: center; justify-content: center; }
+  .vl-btn-edit::after    { content: '✎'; text-indent: 0; display: flex; align-items: center; justify-content: center; }
+  .vl-btn-del::after     { content: '🗑'; text-indent: 0; display: flex; align-items: center; justify-content: center; }
 
   .vl-pagination { padding: 10px 10px; gap: 4px; }
   .vl-page-btn  { padding: 6px 12px; font-size: 0.78rem; }

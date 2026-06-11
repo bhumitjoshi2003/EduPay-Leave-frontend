@@ -63,7 +63,7 @@
         </div>
 
         <div class="vl-filter-actions">
-          <button class="vl-btn-clear" (click)="clearFilter()">× Clear</button>
+          <button class="vl-btn-clear" (click)="clearFilter()">Clear</button>
           <button *ngIf="loggedInUserRole === 'ADMIN'" class="vl-btn-delete-all"
             (click)="deleteAllFilteredLeaves()">🗑 Delete Leaves</button>
         </div>
@@ -71,11 +71,6 @@
 
       <div class="vl-filter-meta" *ngIf="totalElements > 0">
         <span class="vl-meta-count">{{ totalElements }} results</span>
-        <span class="vl-meta-sep">·</span>
-        <label class="vl-meta-label">Per page:</label>
-        <select class="vl-page-size-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
-          <option *ngFor="let s of pageSizes; trackBy: trackByIndex" [ngValue]="s">{{ s }}</option>
-        </select>
       </div>
     </div>
 

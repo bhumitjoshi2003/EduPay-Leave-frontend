@@ -505,32 +505,43 @@
 @media (max-width: 767px) {
   .vl-container { flex-direction: column; width: 100%; }
 
-  .vl-left-nav { width: 100%; border-radius: 16px 16px 0 0; padding: 14px 12px; }
+  .vl-left-nav {
+    width: 100%;
+    border-radius: 0;
+    padding: 8px 8px 6px;
+    background: linear-gradient(135deg, #134e4a, #0f766e);
+  }
+
+  .vl-left-nav h2 { display: none; }
 
   .vl-class-list {
     flex-direction: row;
     overflow-x: auto;
     scrollbar-width: none;
     gap: 6px;
-    padding-bottom: 4px;
+    padding-bottom: 2px;
   }
   .vl-class-list::-webkit-scrollbar { display: none; }
 
   .vl-class-item { flex-shrink: 0; }
   .vl-class-pill { font-size: 0.8rem; padding: 6px 12px; }
 
-  .vl-hero { border-radius: 20px; padding: 20px 16px 24px; }
-  .vl-container:not(:has(.vl-left-nav)) .vl-hero { border-radius: 20px; }
+  .vl-hero { border-radius: 0; padding: 14px 12px; }
+  .vl-hero-icon { width: 44px; height: 44px; font-size: 1.4rem; border-radius: 12px; }
+  .vl-container:not(:has(.vl-left-nav)) .vl-hero { border-radius: 16px; }
 
-  .vl-filter-card { padding: 12px 16px; }
+  .vl-filter-card { padding: 10px 10px; }
 
   .vl-filter-group { flex: none; width: 100%; max-width: 100%; }
   .vl-filter-actions { width: 100%; }
   .vl-btn-clear, .vl-btn-delete-all { flex: 1; text-align: center; }
 
-  .vl-list { padding: 12px 16px; }
+  .vl-list { padding: 8px 8px 14px; }
 
   .vl-card { padding: 10px 12px; gap: 10px; flex-wrap: wrap; }
+
+  .vl-date-badge { width: 40px; height: 40px; border-radius: 8px; }
+  .vl-date-day { font-size: 1rem; }
 
   .vl-card-right {
     width: 100%;
@@ -542,9 +553,9 @@
 
   .vl-card-name { font-size: 0.88rem; }
 
-  .vl-pagination { padding: 12px 16px; gap: 4px; }
+  .vl-pagination { padding: 10px 10px; gap: 4px; }
   .vl-page-btn  { padding: 6px 12px; font-size: 0.78rem; }
   .vl-page-num  { width: 32px; height: 32px; font-size: 0.78rem; }
 
-  .vl-empty { padding: 48px 16px; }
+  .vl-empty { padding: 48px 12px; border-radius: 0 0 16px 16px; }
 }

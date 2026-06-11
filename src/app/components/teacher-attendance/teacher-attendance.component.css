@@ -370,16 +370,19 @@
 
   .ta-left-nav {
     width: 100%;
-    border-radius: 16px 16px 0 0;
-    padding: 14px 12px;
+    border-radius: 0;
+    padding: 8px 8px 6px;
+    background: linear-gradient(135deg, #064e3b, #065f46);
   }
+
+  .ta-left-nav h2 { display: none; }
 
   .ta-class-list {
     flex-direction: row;
     overflow-x: auto;
     scrollbar-width: none;
     gap: 6px;
-    padding-bottom: 4px;
+    padding-bottom: 2px;
   }
   .ta-class-list::-webkit-scrollbar { display: none; }
 
@@ -388,29 +391,37 @@
   .ta-class-pill { font-size: 0.8rem; padding: 6px 12px; }
 
   .ta-hero {
-    border-radius: 16px;
-    padding: 18px 16px 22px;
+    border-radius: 0;
+    padding: 14px 12px;
   }
+
+  .ta-hero-icon { width: 44px; height: 44px; font-size: 1.4rem; border-radius: 12px; }
 
   .ta-container:not(:has(.ta-left-nav)) .ta-hero {
-    border-radius: 20px;
+    border-radius: 16px;
   }
 
-  .ta-controls { padding: 12px 16px; }
+  .ta-controls { padding: 10px 10px; border-radius: 0; }
 
-  .ta-controls-row { gap: 10px; }
+  .ta-controls-row { gap: 8px; }
 
   .ta-date-field { max-width: 100%; }
 
-  .ta-btn { padding: 8px 16px; font-size: 0.82rem; }
+  .ta-btn { padding: 8px 14px; font-size: 0.82rem; }
 
-  .ta-list { padding: 12px 16px; }
+  .ta-warning { padding: 10px 12px; }
+
+  .ta-section-chips { padding: 8px 10px; }
+
+  .ta-list { padding: 8px 8px 14px; }
 
   .ta-student-card { padding: 10px 12px; gap: 10px; }
+
+  .ta-student-avatar { width: 34px; height: 34px; font-size: 0.85rem; }
 
   .ta-student-name { font-size: 0.85rem; }
 
   .ta-mark-btn { padding: 6px 11px; font-size: 0.75rem; }
 
-  .ta-empty { padding: 48px 16px; }
+  .ta-empty { padding: 48px 12px; border-radius: 0 0 16px 16px; }
 }

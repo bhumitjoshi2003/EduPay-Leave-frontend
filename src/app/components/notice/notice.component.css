@@ -52,10 +52,10 @@
 }
 
 .nb-hero-icon-wrap {
-  font-size: 1.4rem;
+  font-size: 1.7rem;
   background: rgba(255,255,255,0.15);
-  border-radius: 10px;
-  width: 40px; height: 40px;
+  border-radius: 14px;
+  width: 52px; height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,7 +65,7 @@
 
 .nb-hero-title {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.2px;
@@ -74,7 +74,7 @@
 .nb-hero-sub {
   margin: 2px 0 0;
   color: rgba(255,255,255,0.75);
-  font-size: 0.74rem;
+  font-size: 0.78rem;
 }
 
 .nb-hero-right {
@@ -153,9 +153,9 @@
   border-radius: 20px;
   border: 2px dashed #d0dfe8;
 }
-.nb-empty-big-icon { font-size: 3.5rem; margin-bottom: 14px; }
-.nb-empty-title { margin: 0 0 8px; font-size: 1.3rem; font-weight: 700; color: #333; }
-.nb-empty-text { margin: 0; color: #888; font-size: 0.95rem; }
+.nb-empty-big-icon { font-size: 2.5rem; margin-bottom: 14px; }
+.nb-empty-title { margin: 0 0 8px; font-size: 1rem; font-weight: 700; color: #333; }
+.nb-empty-text { margin: 0; color: #888; font-size: 1rem; }
 
 /* ─────────────────────────────────────────────────────────────────
    STUDENT / TEACHER — Notice cards grid
@@ -729,8 +729,8 @@
     align-items: flex-start;
   }
   .nb-hero-left { gap: 12px; }
-  .nb-hero-icon-wrap { width: 40px; height: 40px; font-size: 1.4rem; }
-  .nb-hero-title { font-size: 1.1rem; }
+  .nb-hero-icon-wrap { width: 44px; height: 44px; font-size: 1.4rem; }
+  .nb-hero-title { font-size: 1.15rem; }
   .nb-hero-right { width: 100%; flex-direction: column; align-items: flex-start; gap: 12px; }
   .nb-hero-stats { gap: 10px; }
   .nb-mark-all-btn { width: 100%; text-align: center; }

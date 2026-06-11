@@ -77,7 +77,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 24px 20px 28px;
+  padding: 22px 24px;
   background: linear-gradient(135deg, #064e3b 0%, #059669 55%, #34d399 100%);
   border-radius: 0 16px 0 0;
   overflow: hidden;
@@ -90,7 +90,7 @@
 }
 
 .ta-blob { position: absolute; border-radius: 50%; opacity: 0.12; pointer-events: none; }
-.ta-blob-1 { width: 120px; height: 120px; background: #fff;    top: -30px; right: -20px; }
+.ta-blob-1 { width: 130px; height: 130px; background: #fff;    top: -30px; right: -20px; }
 .ta-blob-2 { width: 80px;  height: 80px;  background: #6ee7b7; bottom: -20px; left: 40%; }
 
 .ta-hero-left {
@@ -103,7 +103,7 @@
 }
 
 .ta-hero-icon {
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   background: rgba(255,255,255,0.18);
   border-radius: 14px;
   width: 52px; height: 52px;
@@ -113,7 +113,7 @@
 
 .ta-hero-text h1 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.3px;
@@ -210,9 +210,9 @@
   border-radius: 0 0 16px 16px;
 }
 
-.ta-empty-icon  { font-size: 2.8rem; margin-bottom: 4px; }
-.ta-empty-title { font-size: 1.05rem; font-weight: 700; color: #374151; margin: 0; }
-.ta-empty-sub   { font-size: 0.82rem; color: #94a3b8; margin: 0; }
+.ta-empty-icon  { font-size: 2.5rem; margin-bottom: 4px; }
+.ta-empty-title { font-size: 1rem; font-weight: 700; color: #374151; margin: 0; }
+.ta-empty-sub   { font-size: 0.85rem; color: #94a3b8; margin: 0; }
 
 /* ── Student list ────────────────────────────────────────────────── */
 .ta-list {
@@ -388,8 +388,8 @@
   .ta-class-pill { font-size: 0.8rem; padding: 6px 12px; }
 
   .ta-hero {
-    border-radius: 20px;
-    padding: 20px 16px 24px;
+    border-radius: 16px;
+    padding: 18px 16px 22px;
   }
 
   .ta-container:not(:has(.ta-left-nav)) .ta-hero {

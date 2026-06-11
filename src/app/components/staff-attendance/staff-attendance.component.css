@@ -12,7 +12,7 @@
   position: relative;
   background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
   border-radius: 20px;
-  padding: 32px 28px;
+  padding: 22px 24px;
   margin-bottom: 24px;
   overflow: hidden;
   color: #fff;
@@ -23,17 +23,17 @@
   opacity: 0.12;
   background: #fff;
 }
-.sa-blob-1 { width: 200px; height: 200px; top: -60px; right: -40px; }
-.sa-blob-2 { width: 120px; height: 120px; bottom: -30px; left: -20px; }
+.sa-blob-1 { width: 130px; height: 130px; top: -60px; right: -40px; }
+.sa-blob-2 { width: 80px; height: 80px; bottom: -30px; left: -20px; }
 .sa-hero-content {
   position: relative;
   display: flex;
   align-items: center;
   gap: 16px;
 }
-.sa-hero-icon { font-size: 40px; }
-.sa-hero-title { font-size: 24px; font-weight: 700; margin: 0; }
-.sa-hero-sub { font-size: 14px; opacity: 0.85; margin: 4px 0 0; }
+.sa-hero-icon { font-size: 1.7rem; }
+.sa-hero-title { font-size: 1.25rem; font-weight: 800; margin: 0; }
+.sa-hero-sub { font-size: 0.78rem; opacity: 0.85; margin: 4px 0 0; }
 
 /* ── View Toggle ──────────────────────────────────────── */
 .sa-view-toggle {
@@ -49,7 +49,7 @@
   border: none;
   background: transparent;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 0.88rem;
   font-weight: 500;
   color: #64748b;
   cursor: pointer;
@@ -72,12 +72,12 @@
   flex-wrap: wrap;
 }
 .sa-date-group { display: flex; flex-direction: column; gap: 6px; }
-.sa-date-label { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+.sa-date-label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
 .sa-date-input {
   padding: 10px 14px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 0.88rem;
   background: #fff;
 }
 .sa-date-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
@@ -88,7 +88,7 @@
   color: #fff;
   border: none;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s;
@@ -113,14 +113,14 @@
 .sa-sum-present { border-top-color: #059669; }
 .sa-sum-late { border-top-color: #d97706; }
 .sa-sum-absent { border-top-color: #dc2626; }
-.sa-sum-num { display: block; font-size: 28px; font-weight: 700; color: #1e293b; }
-.sa-sum-label { font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+.sa-sum-num { display: block; font-size: 1.75rem; font-weight: 700; color: #1e293b; }
+.sa-sum-label { font-size: 0.75rem; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
 
 /* ── Loading / Empty ──────────────────────────────────── */
-.sa-loading { text-align: center; padding: 40px; color: #94a3b8; font-size: 14px; }
+.sa-loading { text-align: center; padding: 40px; color: #94a3b8; font-size: 0.88rem; }
 .sa-empty { text-align: center; padding: 48px 20px; color: #94a3b8; }
-.sa-empty-icon { font-size: 48px; margin-bottom: 12px; }
-.sa-empty p { margin: 0; font-size: 15px; }
+.sa-empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.sa-empty p { margin: 0; font-size: 0.94rem; }
 
 /* ── Teacher List ─────────────────────────────────────── */
 .sa-teacher-list {
@@ -146,7 +146,7 @@
   border-radius: 50%;
   background: linear-gradient(135deg, #3b82f6, #60a5fa);
   color: #fff;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -162,13 +162,13 @@
 }
 
 .sa-teacher-info { flex: 1; min-width: 0; }
-.sa-teacher-name { display: block; font-size: 15px; font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sa-teacher-meta { font-size: 12px; color: #94a3b8; }
+.sa-teacher-name { display: block; font-size: 0.94rem; font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sa-teacher-meta { font-size: 0.75rem; color: #94a3b8; }
 
 .sa-badge {
   padding: 5px 12px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
   flex-shrink: 0;
@@ -187,14 +187,14 @@
   align-items: center;
   margin-bottom: 20px;
 }
-.sa-month-title { font-size: 18px; font-weight: 600; color: #1e293b; margin: 0; }
+.sa-month-title { font-size: 1.12rem; font-weight: 600; color: #1e293b; margin: 0; }
 .sa-month-nav {
   background: #f1f5f9;
   border: none;
   border-radius: 8px;
   width: 36px;
   height: 36px;
-  font-size: 18px;
+  font-size: 1.12rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -212,7 +212,7 @@
 .sa-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 0.88rem;
 }
 .sa-table th {
   background: #f8fafc;
@@ -220,7 +220,7 @@
   text-align: left;
   font-weight: 600;
   color: #64748b;
-  font-size: 12px;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 1px solid #e2e8f0;
@@ -259,11 +259,11 @@
   padding: 20px 24px;
   border-bottom: 1px solid #e2e8f0;
 }
-.sa-dialog-header h3 { margin: 0; font-size: 18px; font-weight: 600; }
+.sa-dialog-header h3 { margin: 0; font-size: 1.12rem; font-weight: 600; }
 .sa-dialog-close {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 1.5rem;
   color: #94a3b8;
   cursor: pointer;
   line-height: 1;
@@ -285,7 +285,7 @@
   padding: 10px 12px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 0.88rem;
   background: #fff;
   box-sizing: border-box;
 }
@@ -307,7 +307,7 @@
   border: 1px solid #d1d5db;
   background: #fff;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 0.88rem;
   cursor: pointer;
 }
 .sa-dialog-submit {
@@ -316,7 +316,7 @@
   color: #fff;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
 }
@@ -326,12 +326,12 @@
 @media (max-width: 640px) {
   .sa-page { padding: 0 8px 40px; max-width: 100%; }
   .sa-hero { padding: 24px 16px; border-radius: 16px; }
-  .sa-hero-title { font-size: 20px; }
+  .sa-hero-title { font-size: 1.15rem; }
   .sa-summary-row { grid-template-columns: repeat(2, 1fr); }
   .sa-sum-num { font-size: 22px; }
   .sa-controls { flex-direction: column; align-items: stretch; }
   .sa-mark-btn { text-align: center; }
-  .sa-table { font-size: 12px; }
+  .sa-table { font-size: 0.75rem; }
   .sa-table th, .sa-table td { padding: 8px 10px; }
 }
 

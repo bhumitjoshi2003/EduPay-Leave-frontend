@@ -12,7 +12,7 @@
   position: relative;
   background: linear-gradient(135deg, #0f4c81 0%, #1565c0 55%, #1e88e5 100%);
   border-radius: 20px;
-  padding: 20px;
+  padding: 22px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -39,7 +39,7 @@
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.rc-hero-title { font-size: 1.2rem; font-weight: 800; margin: 0 0 2px; color: #fff; }
+.rc-hero-title { font-size: 1.25rem; font-weight: 800; margin: 0 0 2px; color: #fff; }
 .rc-hero-sub   { font-size: 0.76rem; color: rgba(255,255,255,0.82); margin: 0; }
 .rc-hero-actions {
   display: flex;

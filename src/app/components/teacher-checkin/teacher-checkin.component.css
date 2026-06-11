@@ -1,6 +1,6 @@
 /* ── Base ──────────────────────────────────────────────── */
 .tc-page {
-  max-width: 680px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 0 16px 40px;
   font-family: 'Segoe UI', -apple-system, sans-serif;
@@ -11,7 +11,7 @@
   position: relative;
   background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%);
   border-radius: 20px;
-  padding: 32px 28px;
+  padding: 22px 24px;
   margin-bottom: 24px;
   overflow: hidden;
   color: #fff;
@@ -22,8 +22,8 @@
   opacity: 0.12;
   background: #fff;
 }
-.tc-blob-1 { width: 200px; height: 200px; top: -60px; right: -40px; }
-.tc-blob-2 { width: 120px; height: 120px; bottom: -30px; left: -20px; }
+.tc-blob-1 { width: 130px; height: 130px; top: -60px; right: -40px; }
+.tc-blob-2 { width: 80px; height: 80px; bottom: -30px; left: -20px; }
 .tc-hero-content {
   position: relative;
   display: flex;
@@ -33,17 +33,17 @@
   gap: 12px;
 }
 .tc-hero-greeting {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 800;
   margin: 0 0 4px;
 }
 .tc-hero-date {
-  font-size: 14px;
+  font-size: 0.78rem;
   opacity: 0.85;
   margin: 0;
 }
 .tc-hero-clock {
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 1px;
@@ -323,13 +323,13 @@
 
 /* ── Responsive ───────────────────────────────────────── */
 @media (max-width: 640px) {
-  .tc-hero { padding: 24px 20px; border-radius: 16px; }
-  .tc-hero-greeting { font-size: 20px; }
-  .tc-hero-clock { font-size: 24px; }
-  .tc-checkin-btn { width: 150px; height: 150px; font-size: 18px; }
+  .tc-hero { padding: 18px 16px 22px; border-radius: 16px; }
+  .tc-hero-greeting { font-size: 1.3rem; }
+  .tc-hero-clock { font-size: 1.5rem; }
+  .tc-checkin-btn { width: 150px; height: 150px; font-size: 1.1rem; }
   .tc-stats-row { grid-template-columns: repeat(2, 1fr); }
-  .tc-stat-num { font-size: 22px; }
-  .tc-cal-day { font-size: 12px; }
+  .tc-stat-num { font-size: 1.4rem; }
+  .tc-cal-day { font-size: 0.75rem; }
   .tc-cal-legend { gap: 10px; }
 }
 

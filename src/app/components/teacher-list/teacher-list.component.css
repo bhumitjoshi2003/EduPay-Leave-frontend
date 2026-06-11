@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 24px 20px 28px;
+  padding: 22px 24px;
   background: linear-gradient(135deg, #0f766e 0%, #0d9488 55%, #14b8a6 100%);
   border-radius: 20px;
   overflow: hidden;
@@ -20,7 +20,7 @@
 }
 
 .tl-blob { position: absolute; border-radius: 50%; opacity: 0.12; pointer-events: none; }
-.tl-blob-1 { width: 120px; height: 120px; background: #fff;    top: -30px; right: -20px; }
+.tl-blob-1 { width: 130px; height: 130px; background: #fff;    top: -30px; right: -20px; }
 .tl-blob-2 { width: 80px;  height: 80px;  background: #5eead4; bottom: -20px; left: 40%; }
 
 .tl-hero-left {
@@ -43,7 +43,7 @@
 
 .tl-hero-text h1 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.3px;

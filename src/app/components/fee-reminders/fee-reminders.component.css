@@ -9,7 +9,7 @@
   position: relative;
   background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 55%, #f87171 100%);
   border-radius: 20px;
-  padding: 24px 20px 28px;
+  padding: 22px 24px;
   display: flex; align-items: center; gap: 14px;
   overflow: hidden; color: #fff;
 }
@@ -27,8 +27,8 @@
   width: 52px; height: 52px;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.fr-hero-title { margin: 0; font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
-.fr-hero-sub   { margin: 2px 0 0; font-size: 0.75rem; color: rgba(255,255,255,0.78); }
+.fr-hero-title { margin: 0; font-size: 1.25rem; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+.fr-hero-sub   { margin: 2px 0 0; font-size: 0.78rem; color: rgba(255,255,255,0.78); }
 
 /* ── Controls Card ──────────────────────────────────────────────── */
 .fr-controls {
@@ -219,9 +219,9 @@
   padding: 60px 20px; background: #fff; border-radius: 18px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06); text-align: center;
 }
-.fr-empty-icon  { font-size: 2.8rem; margin-bottom: 4px; }
+.fr-empty-icon  { font-size: 2.5rem; margin-bottom: 4px; }
 .fr-empty-title { font-size: 1rem; font-weight: 700; color: #374151; margin: 0; }
-.fr-empty-sub   { font-size: 0.8rem; color: #94a3b8; margin: 0; }
+.fr-empty-sub   { font-size: 0.85rem; color: #94a3b8; margin: 0; }
 
 /* ── Print ──────────────────────────────────────────────────────── */
 .fr-print-header { display: none; }

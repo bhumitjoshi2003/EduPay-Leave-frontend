@@ -27,7 +27,7 @@
   content: '';
   position: absolute;
   top: -60px; right: -60px;
-  width: 200px; height: 200px;
+  width: 130px; height: 130px;
   border-radius: 50%;
   background: rgba(79, 189, 189, 0.08);
   pointer-events: none;
@@ -36,7 +36,7 @@
   content: '';
   position: absolute;
   bottom: -40px; left: 40%;
-  width: 140px; height: 140px;
+  width: 80px; height: 80px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.04);
   pointer-events: none;
@@ -124,7 +124,7 @@
 
 .td-hero-name {
   margin: 0 0 6px;
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: #fff;
   line-height: 1.15;
@@ -133,7 +133,7 @@
 
 .td-hero-sub {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.6);
   font-weight: 500;
 }

@@ -364,10 +364,10 @@
 
 /* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .rc-page { padding: 12px 8px 32px; }
+  .rc-page { padding: 0 0 32px; }
 
   .rc-card {
-    padding: 18px 16px 20px;
+    padding: 14px 10px 20px;
     border-radius: 8px;
   }
 

@@ -273,7 +273,7 @@
 
 /* ── Tablet (≤ 768px) ────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .ss-container { padding: 18px; border-radius: 10px; }
+  .ss-container { padding: 0; border-radius: 10px; }
   .ss-table { font-size: 0.85rem; }
   .ss-table th, .ss-table td { padding: 8px 10px; }
   .ss-select { min-width: 100px; }
@@ -283,9 +283,11 @@
 @media (max-width: 600px) {
   .ss-container {
     width: 100%;
-    padding: 10px;
+    padding: 0;
   }
 
+  .ss-card { padding: 14px 12px; }
+  .ss-class-nav { padding: 10px 12px; }
   .ss-title { font-size: 1rem; }
 
   .ss-filters { gap: 10px; }

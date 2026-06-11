@@ -299,7 +299,7 @@
 
 /* ── Tablet (≤ 768px) ────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .sc-container { padding: 18px; border-radius: 10px; }
+  .sc-container { padding: 0; border-radius: 10px; }
   .sc-tab { padding: 7px 14px; font-size: 0.85rem; }
   .sc-body { padding: 16px; }
   .sc-add-row input { max-width: 100%; }
@@ -309,7 +309,7 @@
 @media (max-width: 600px) {
   .sc-container {
     width: 100%;
-    padding: 10px;
+    padding: 0;
   }
 
   .sc-header h2 { font-size: 1rem; }
@@ -324,7 +324,7 @@
     border-radius: 16px;
   }
 
-  .sc-body { padding: 14px; border-radius: 8px; }
+  .sc-body { padding: 10px; border-radius: 8px; }
 
   .sc-controls {
     flex-direction: column;

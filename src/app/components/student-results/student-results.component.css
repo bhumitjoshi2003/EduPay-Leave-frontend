@@ -319,15 +319,19 @@
 /* ── Mobile (≤ 600px) ────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .sr-container {
-    width: 98%;
+    width: 100%;
+    padding: 0;
   }
+
+  .sr-controls { padding: 10px 12px; }
+  .sr-card { padding: 14px 12px; }
 
   .sr-header {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
     margin-bottom: 12px;
-    padding: 14px 16px;
+    padding: 14px 12px;
   }
 
   .sr-header h2 { font-size: 1rem; }

@@ -472,26 +472,44 @@
   .left-navigation {
     order: 1;
     width: 100%;
-    border-radius: 0;
-    padding: 0;
-    background: none;
-    box-shadow: none;
+    border-radius: 14px;
+    padding: 10px 10px;
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f1f5f9;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
   }
 
-  .left-navigation h2 { display: none; }
+  .left-navigation h2 {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0369a1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 4px 0 0;
+    padding: 0;
+    border: none;
+    white-space: nowrap;
+  }
 
   .student-list-area { display: contents; }
 
   .sl-hero { order: 0; }
-  .student-sections, .no-students, .sl-skeleton { order: 2; }
+  .section-chips-wrap { order: 2; }
+  .student-sections, .no-students, .sl-skeleton { order: 3; }
 
   .class-list-vertical {
     flex-direction: row;
     overflow-x: auto;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-    padding: 4px 2px 8px;
+    padding: 0;
     gap: 8px;
+    align-items: center;
   }
 
   .class-list-vertical::-webkit-scrollbar { display: none; }
@@ -535,7 +553,13 @@
 
   .student-sections { border-radius: 0 0 16px 16px; padding: 10px 8px 14px; }
 
-  .section-chips-wrap { padding: 8px 10px; }
+  .section-chips-wrap {
+    padding: 10px 10px;
+    border-radius: 14px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border-bottom: none;
+  }
 
   .student-list { gap: 8px; }
 

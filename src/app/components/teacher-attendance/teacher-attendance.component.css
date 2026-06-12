@@ -369,6 +369,7 @@
   }
 
   .ta-left-nav {
+    order: 1;
     width: 100%;
     border-radius: 0;
     padding: 0;
@@ -377,6 +378,15 @@
   }
 
   .ta-left-nav h2 { display: none; }
+
+  .ta-main { display: contents; }
+
+  .ta-hero { order: 0; }
+  .ta-controls { order: 2; }
+  .ta-warning { order: 2; }
+  .ta-section-chips { order: 2; }
+  .ta-list { order: 2; }
+  .ta-empty { order: 2; }
 
   .ta-class-list {
     flex-direction: row;
@@ -413,15 +423,13 @@
   }
 
   .ta-hero {
-    border-radius: 0;
-    padding: 14px 12px;
+    border-radius: 16px;
+    padding: 18px 14px;
   }
 
   .ta-hero-icon { width: 44px; height: 44px; font-size: 1.4rem; border-radius: 12px; }
 
-  .ta-container:not(:has(.ta-left-nav)) .ta-hero {
-    border-radius: 16px;
-  }
+  /* hero already has border-radius: 16px on mobile for all cases */
 
   .ta-controls { padding: 10px 10px; border-radius: 0; }
 

@@ -506,6 +506,7 @@
   .vl-container { flex-direction: column; width: 100%; }
 
   .vl-left-nav {
+    order: 1;
     width: 100%;
     border-radius: 0;
     padding: 0;
@@ -514,6 +515,14 @@
   }
 
   .vl-left-nav h2 { display: none; }
+
+  .vl-main { display: contents; }
+
+  .vl-hero { order: 0; }
+  .vl-filter-card { order: 2; }
+  .vl-list { order: 2; }
+  .vl-empty { order: 2; }
+  .vl-pagination { order: 2; }
 
   .vl-class-list {
     flex-direction: row;
@@ -549,9 +558,9 @@
     box-shadow: 0 2px 8px rgba(15, 118, 110, 0.3);
   }
 
-  .vl-hero { border-radius: 0; padding: 14px 12px; }
+  .vl-hero { border-radius: 16px; padding: 18px 14px; }
   .vl-hero-icon { width: 44px; height: 44px; font-size: 1.4rem; border-radius: 12px; }
-  .vl-container:not(:has(.vl-left-nav)) .vl-hero { border-radius: 16px; }
+  /* hero already has border-radius: 16px on mobile for all cases */
 
   .vl-filter-card { padding: 10px 10px; }
 

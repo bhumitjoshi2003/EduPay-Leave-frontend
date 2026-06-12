@@ -470,7 +470,7 @@
   }
 
   .left-navigation {
-    order: 0;
+    order: 1;
     width: 100%;
     border-radius: 0;
     padding: 0;
@@ -480,7 +480,10 @@
 
   .left-navigation h2 { display: none; }
 
-  .student-list-area { order: 1; border-radius: 0; }
+  .student-list-area { display: contents; }
+
+  .sl-hero { order: 0; }
+  .student-sections, .no-students, .sl-skeleton { order: 2; }
 
   .class-list-vertical {
     flex-direction: row;
@@ -519,8 +522,8 @@
   }
 
   .sl-hero {
-    border-radius: 0;
-    padding: 14px 12px;
+    border-radius: 16px;
+    padding: 18px 14px;
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;

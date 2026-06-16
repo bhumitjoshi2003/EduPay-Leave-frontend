@@ -315,7 +315,10 @@ export const routes: Routes = [
         path: 'notice', component: NoticeComponent,
         canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN'] }
       },
-      { path: 'event-calendar', component: EventCalendarComponent },
+      {
+        path: 'event-calendar', component: EventCalendarComponent,
+        canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUB_ADMIN'] }
+      },
       { path: 'payment', component: PaymentComponent },
     ],
   },

@@ -247,7 +247,7 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
       });
   }
 
-  saveMarksA(): void {
+  async saveMarksA(): Promise<void> {
     if (!this.selectedSubjectEntryId) return;
 
     // Only send entries where the mark has actually changed from the loaded value
@@ -267,6 +267,15 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
       this.toast.info('No Changes', 'No marks were modified.');
       return;
     }
+
+    const confirmed = await this.toast.confirm({
+      title: 'Save Marks',
+      message: `You are about to save marks for ${entries.length} students. This cannot be easily undone.`,
+      confirmText: 'Yes, Save',
+      cancelText: 'Cancel',
+      danger: false,
+    });
+    if (!confirmed) return;
 
     this.saving = true;
     this.marksService.saveBulkMarks(entries).pipe(takeUntil(this.destroy$)).subscribe({
@@ -292,7 +301,7 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
     });
   }
 
-  saveMarksB(): void {
+  async saveMarksB(): Promise<void> {
     if (!this.selectedStudentId) return;
 
     // Only send subjects where the mark has actually changed from the loaded value
@@ -312,6 +321,15 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
       this.toast.info('No Changes', 'No marks were modified.');
       return;
     }
+
+    const confirmed = await this.toast.confirm({
+      title: 'Save Marks',
+      message: `You are about to save marks for ${entries.length} subjects. This cannot be easily undone.`,
+      confirmText: 'Yes, Save',
+      cancelText: 'Cancel',
+      danger: false,
+    });
+    if (!confirmed) return;
 
     this.saving = true;
     this.marksService.saveBulkMarks(entries).pipe(takeUntil(this.destroy$)).subscribe({

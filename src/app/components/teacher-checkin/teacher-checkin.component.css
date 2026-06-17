@@ -388,18 +388,23 @@
 
 /* ── Mobile ──────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .tc-hero { padding: 14px 12px; border-radius: 16px; flex-wrap: wrap; }
-  .tc-hero-icon { width: 44px; height: 44px; font-size: 1.4rem; border-radius: 12px; }
-  .tc-hero-text h1 { font-size: 1.05rem; }
-  .tc-hero-clock-wrap { padding: 6px 12px; border-radius: 10px; }
-  .tc-hero-clock { font-size: 1rem; }
+  .tc-hero { padding: 18px 18px; border-radius: 16px; gap: 10px; }
+  .tc-hero-left { gap: 12px; min-width: 0; }
+  .tc-hero-icon { width: 44px; height: 44px; font-size: 1.5rem; border-radius: 12px; }
+  .tc-hero-text { min-width: 0; }
+  .tc-hero-text h1 { font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tc-hero-text p { font-size: 0.72rem; white-space: nowrap; }
+  .tc-hero-clock-wrap { padding: 8px 14px; border-radius: 12px; }
+  .tc-hero-clock { font-size: 1.05rem; letter-spacing: 0.5px; }
 
-  .tc-action-card { padding: 20px 14px; border-radius: 14px; }
-  .tc-checkin-btn { width: 150px; height: 150px; font-size: 1.05rem; }
+  .tc-action-card { padding: 20px 18px; border-radius: 14px; }
+  .tc-checkin-btn { width: 140px; height: 140px; font-size: 1rem; gap: 6px; }
   .tc-btn-icon { font-size: 1.6rem; }
 
-  .tc-stat-num { font-size: 1.3rem; }
-  .tc-stat-card { padding: 14px 12px; }
+  .tc-stat-num { font-size: 1.2rem; }
+  .tc-stat-card { padding: 12px 12px; border-radius: 14px; }
+  .tc-stat-icon { font-size: 1.2rem; }
+  .tc-stat-label { font-size: 0.6rem; }
 
   .tc-calendar-card { padding: 14px 12px; border-radius: 14px; }
   .tc-cal-day { font-size: 0.75rem; }
@@ -408,7 +413,5 @@
 }
 
 @media (max-width: 380px) {
-  .tc-hero { flex-direction: column; text-align: center; }
-  .tc-hero-left { flex-direction: column; }
   .tc-stats-row { gap: 8px; }
 }

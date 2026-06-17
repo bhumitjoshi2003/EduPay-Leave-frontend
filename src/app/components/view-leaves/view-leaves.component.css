@@ -343,6 +343,13 @@
   gap: 3px;
 }
 
+.vl-card-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
 .vl-card-name {
   font-size: 0.95rem;
   font-weight: 700;
@@ -352,24 +359,7 @@
   text-overflow: ellipsis;
 }
 
-.vl-card-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.vl-class-tag {
-  font-size: 0.72rem;
-  font-weight: 700;
-  background: #f0fdfa;
-  color: #0f766e;
-  padding: 2px 8px;
-  border-radius: 20px;
-}
-
-.vl-dot    { color: #cbd5e1; font-size: 0.75rem; }
-.vl-card-id { font-size: 0.75rem; color: #94a3b8; font-weight: 500; }
+.vl-card-id { font-size: 0.78rem; color: #94a3b8; font-weight: 500; white-space: nowrap; }
 
 .vl-card-reason {
   font-size: 0.78rem;

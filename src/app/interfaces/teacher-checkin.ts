@@ -7,6 +7,13 @@ export interface AdminMarkRequest {
   teacherId: string;
   date: string;       // yyyy-MM-dd
   status: string;
+  checkInTime?: string;   // HH:mm
+  checkOutTime?: string;  // HH:mm
+}
+
+export interface SchoolTiming {
+  startTime: string | null;   // HH:mm
+  lateThresholdMinutes: number;
 }
 
 export interface TeacherAttendanceRecord {
@@ -30,6 +37,7 @@ export interface TeacherAttendanceSummary {
   presentDays: number;
   lateDays: number;
   absentDays: number;
+  halfDayDays: number;
   onLeaveDays: number;
   onTimePercentage: number;
   records: TeacherAttendanceRecord[];

@@ -125,11 +125,11 @@ export const routes: Routes = [
       },
       {
         path: 'event-new', component: EventFormComponent,
-        canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN'] }
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
       {
         path: 'event-edit/:id', component: EventFormComponent,
-        canActivate: [roleGuard], data: { roles: ['TEACHER', 'ADMIN'] }
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
 
       // ── Admin-only routes ─────────────────────────────────────────────

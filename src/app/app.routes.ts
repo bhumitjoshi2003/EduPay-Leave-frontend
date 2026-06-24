@@ -137,6 +137,28 @@ export const routes: Routes = [
         canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
 
+      // ── Exams & Assessment ────────────────────────────────────────────
+      {
+        path: 'assessment-groups',
+        loadComponent: () => import('./components/assessment-group-config/assessment-group-config.component').then(m => m.AssessmentGroupConfigComponent),
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'report-card-templates',
+        loadComponent: () => import('./components/report-card-template-config/report-card-template-config.component').then(m => m.ReportCardTemplateConfigComponent),
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
+      {
+        path: 'report-card-remarks',
+        loadComponent: () => import('./components/remarks-entry/remarks-entry.component').then(m => m.RemarksEntryComponent),
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'TEACHER'] }
+      },
+      {
+        path: 'bulk-report-cards',
+        loadComponent: () => import('./components/bulk-report-card/bulk-report-card.component').then(m => m.BulkReportCardComponent),
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'TEACHER'] }
+      },
+
       // ── Admin-only routes ─────────────────────────────────────────────
       {
         path: 'payment-history-admin',

@@ -1,0 +1,109 @@
+<div class="brc-page">
+
+  <!-- ── Hero ──────────────────────────────────────────────────────── -->
+  <div class="brc-hero">
+    <div class="brc-hero-left">
+      <div class="brc-hero-icon">
+        <mat-icon>picture_as_pdf</mat-icon>
+      </div>
+      <div>
+        <h1 class="brc-hero-title">Bulk Report Cards</h1>
+        <p class="brc-hero-sub">Download all student PDFs as a ZIP</p>
+      </div>
+    </div>
+    <button class="brc-btn-back" (click)="goBack()">&#8592; Back</button>
+    <div class="brc-blob brc-blob-1"></div>
+    <div class="brc-blob brc-blob-2"></div>
+  </div>
+
+  <!-- ── Selection Card ────────────────────────────────────────────── -->
+  <div class="brc-card">
+
+    <h2 class="brc-card-title">Select Options</h2>
+    <p class="brc-card-sub">
+      Choose the class, template, and session to generate report cards for all active students.
+    </p>
+
+    <!-- Mobile warning -->
+    <div class="brc-native-warn" *ngIf="isNative">
+      <mat-icon>info_outline</mat-icon>
+      <span>Bulk PDF download requires the web version. You can still configure and view individual report cards here.</span>
+    </div>
+
+    <div class="brc-form">
+
+      <!-- Class -->
+      <div class="brc-field">
+        <label class="brc-label">Class</label>
+        <div class="brc-select-wrap">
+          <select class="brc-select" [(ngModel)]="selectedClass" [disabled]="loadingClasses">
+            <option value="">{{ loadingClasses ? 'Loading…' : '— Select class —' }}</option>
+            <option *ngFor="let cls of classes" [value]="cls">{{ cls }}</option>
+          </select>
+          <mat-icon class="brc-select-icon">expand_more</mat-icon>
+        </div>
+      </div>
+
+      <!-- Session -->
+      <div class="brc-field">
+        <label class="brc-label">Academic Session</label>
+        <div class="brc-select-wrap">
+          <select class="brc-select" [(ngModel)]="selectedSession">
+            <option *ngFor="let s of sessions" [value]="s">{{ s }}</option>
+          </select>
+          <mat-icon class="brc-select-icon">expand_more</mat-icon>
+        </div>
+      </div>
+
+      <!-- Template -->
+      <div class="brc-field brc-field--full">
+        <label class="brc-label">Report Card Template</label>
+        <div class="brc-select-wrap">
+          <select class="brc-select" [(ngModel)]="selectedTemplateId" [disabled]="loadingTemplates">
+            <option [ngValue]="null">{{ loadingTemplates ? 'Loading…' : '— Select template —' }}</option>
+            <option *ngFor="let t of templates" [ngValue]="t.id">
+              {{ t.name }}{{ t.isDefault ? ' (Default)' : '' }}
+            </option>
+          </select>
+          <mat-icon class="brc-select-icon">expand_more</mat-icon>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Summary row -->
+    <div class="brc-summary" *ngIf="selectedClass && selectedTemplateId && selectedSession">
+      <div class="brc-summary-chip">
+        <mat-icon>class</mat-icon>
+        <span>{{ selectedClass }}</span>
+      </div>
+      <div class="brc-summary-chip">
+        <mat-icon>calendar_today</mat-icon>
+        <span>{{ selectedSession }}</span>
+      </div>
+      <div class="brc-summary-chip">
+        <mat-icon>description</mat-icon>
+        <span>{{ selectedTemplateName }}</span>
+      </div>
+    </div>
+
+    <!-- Download button -->
+    <button
+      class="brc-btn-download"
+      [class.brc-btn--loading]="downloading"
+      [disabled]="!canDownload"
+      (click)="downloadAll()">
+      <mat-icon *ngIf="!downloading">download</mat-icon>
+      <mat-icon *ngIf="downloading" class="brc-spin">autorenew</mat-icon>
+      <span>{{ downloading ? 'Generating PDFs…' : 'Download All PDFs (ZIP)' }}</span>
+    </button>
+
+    <!-- Info -->
+    <div class="brc-info-row" *ngIf="!isNative">
+      <mat-icon>info_outline</mat-icon>
+      <span>Only <strong>active</strong> students are included. Students with missing data are skipped automatically.</span>
+    </div>
+
+  </div>
+
+</div>

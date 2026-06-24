@@ -622,3 +622,124 @@
 
   .vl-empty { padding: 48px 12px; border-radius: 0 0 16px 16px; }
 }
+
+/* ── NEW HTML STRUCTURE — appended to match rewritten template ──── */
+
+/* Root wrapper renamed from vl-container to vl-page */
+.vl-page {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  animation: vl-fade-up 0.45s ease-out both;
+}
+
+/* Hero title + sub (previously h1/p inside .vl-hero-text) */
+.vl-hero-title {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.3px;
+}
+.vl-hero-sub {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.8);
+}
+
+/* Hero stat (total count on the right) */
+.vl-hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 12px;
+  padding: 8px 16px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.vl-hero-num {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+.vl-hero-lbl {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Class + section chips */
+.vl-chips-wrap {
+  background: #fff;
+  padding: 10px 20px;
+  border-bottom: 1px solid #eef0f5;
+  display: flex;
+  align-items: center;
+}
+.vl-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.vl-chip {
+  padding: 5px 14px;
+  border-radius: 16px;
+  border: 1.5px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+.vl-chip:hover { border-color: #0f766e; color: #0f766e; background: #f0fdfa; }
+.vl-chip.vl-chip-active {
+  background: linear-gradient(135deg, #134e4a, #0f766e);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(15,118,110,0.25);
+}
+.vl-chip.vl-chip-active:hover { color: #fff; }
+
+/* Section wrapper */
+.vl-section {
+  background: #f8fafc;
+  padding: 10px 20px 16px;
+}
+.vl-section:last-of-type { border-radius: 0 0 16px 16px; }
+
+/* Skeleton shimmer */
+.sk-shimmer {
+  display: inline-block;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.4s infinite;
+}
+@keyframes sk-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Date/ID filter fields using outline appearance */
+.vl-date-field,
+.vl-id-field {
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  .vl-page { width: 100%; }
+  .vl-chips-wrap { padding: 10px 12px; }
+  .vl-section { padding: 8px 12px 14px; }
+  .vl-hero-stat { padding: 6px 12px; }
+  .vl-hero-num { font-size: 1.1rem; }
+}

@@ -567,3 +567,313 @@
 
   .back-button { width: 100%; text-align: center; }
 }
+
+/* ── NEW HTML STRUCTURE — appended to match rewritten template ──── */
+
+/* Decorative blobs (previously ::before/::after on sd-hero) */
+.sd-blob { position: absolute; border-radius: 50%; pointer-events: none; }
+.sd-blob-1 { width: 120px; height: 120px; background: rgba(255,255,255,0.07); top: -30px; right: -20px; }
+.sd-blob-2 { width: 70px;  height: 70px;  background: rgba(255,255,255,0.05); bottom: -15px; left: 38%; }
+
+/* Hero bar (top row: back button + action buttons) */
+.sd-hero-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.sd-back-icon {
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 7px;
+  cursor: pointer;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.sd-back-icon:hover { background: rgba(255,255,255,0.22); }
+
+.sd-hero-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Pill buttons in hero */
+.sd-pill {
+  padding: 6px 14px;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.sd-pill:hover { background: rgba(255,255,255,0.22); }
+.sd-pill-green { background: rgba(5,150,105,0.45); border-color: rgba(52,211,153,0.5); }
+.sd-pill-green:hover { background: rgba(5,150,105,0.6); }
+.sd-pill-red   { background: rgba(185,28,28,0.45); border-color: rgba(248,113,113,0.5); }
+.sd-pill-red:hover   { background: rgba(185,28,28,0.6); }
+.sd-pill-exit  { background: rgba(185,28,28,0.45); border-color: rgba(248,113,113,0.5); }
+.sd-pill-exit:hover  { background: rgba(185,28,28,0.6); }
+.sd-pill-icon {
+  width: 34px; height: 34px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.sd-pill-icon:hover { background: rgba(255,255,255,0.2); }
+
+/* Hero center (photo + name + chips) */
+.sd-hero-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* Photo ring */
+.sd-photo-ring {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1f6f8b, #4fbdbd);
+  border: 3px solid rgba(255,255,255,0.35);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+  position: relative;
+  cursor: default;
+}
+.sd-photo-ring.uploadable { cursor: pointer; }
+
+.sd-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.sd-initials {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; font-weight: 800; color: #fff;
+  user-select: none;
+}
+
+.sd-photo-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: #fff; font-size: 0.7rem; font-weight: 600; gap: 3px;
+  opacity: 0; transition: opacity 0.2s;
+}
+.sd-photo-ring.uploadable:hover .sd-photo-overlay { opacity: 1; }
+
+.sd-photo-uploading {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.sd-spinner {
+  width: 26px; height: 26px;
+  border: 3px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+/* Hero chips (class, ID, status) */
+.sd-hero-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.sd-hero-chip {
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+/* ── Info sections ────────────────────────────────────────────────── */
+.sd-section {
+  background: #fff;
+  padding: 18px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.sd-section:last-child {
+  border-bottom: none;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+}
+.sd-exit-info { border-left: 4px solid #f59e0b; }
+
+.sd-section-title {
+  margin: 0 0 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #64748b;
+}
+
+/* ── Data grid ────────────────────────────────────────────────────── */
+.sd-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.sd-item {
+  background: #f8faff;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid #eef0f5;
+}
+.sd-item-wide   { grid-column: span 2; }
+.sd-item-parent { border-left: 3px solid #f97316; }
+
+.sd-item-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+}
+
+.sd-item-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+  word-break: break-word;
+}
+
+.sd-item-input {
+  padding: 7px 10px;
+  border: 1.5px solid #d0dfe8;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  background: #fff;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  outline: none;
+}
+.sd-item-input:focus {
+  border-color: #0369a1;
+  box-shadow: 0 0 0 3px rgba(3,105,161,0.12);
+}
+
+.sd-checkbox-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+.sd-checkbox-wrap input[type="checkbox"] {
+  transform: scale(1.3);
+  accent-color: #0369a1;
+}
+
+/* ── Quick actions grid ──────────────────────────────────────────── */
+.sd-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.sd-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+  transition: all 0.15s ease;
+}
+.sd-action-btn:hover {
+  background: #f0f9ff;
+  border-color: #0369a1;
+  color: #0369a1;
+  box-shadow: 0 2px 8px rgba(3,105,161,0.10);
+  transform: translateY(-1px);
+}
+.sd-action-icon { font-size: 1.4rem; }
+
+/* ── Loading state ─────────────────────────────────────────────── */
+.sd-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+}
+.sd-spinner-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  color: #94a3b8;
+}
+.sd-spin {
+  width: 36px; height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #0369a1;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* ── Dues warning in exit modal ──────────────────────────────────── */
+.dues-warning {
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  color: #92400e;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+.dues-warning label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+.dues-warning input[type="checkbox"] { flex-shrink: 0; margin-top: 2px; }
+
+/* ── Mobile additions ────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .sd-grid         { grid-template-columns: 1fr; }
+  .sd-item-wide    { grid-column: auto; }
+  .sd-actions-grid { grid-template-columns: repeat(2, 1fr); }
+  .sd-hero-center  { gap: 8px; }
+  .sd-photo-ring   { width: 76px; height: 76px; }
+  .sd-hero-chips   { gap: 6px; }
+}

@@ -301,3 +301,10 @@
     font-weight: 600; color: #64748b; font-size: 0.78rem; margin-bottom: 1px;
   }
 }
+
+/* ── Failed reminder state ───────────────────────────────────────── */
+.fr-remind-failed {
+  background: #fff1f2 !important;
+  color: #be123c !important;
+  border-color: #fecdd3 !important;
+}

@@ -1,8 +1,7 @@
-/* ── Base ─────────────────────────────────────────────────────────── */
-.cr-container {
+/* ── Page ─────────────────────────────────────────────────────────── */
+.cr-page {
+  padding-bottom: 16px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  animation: fadeIn 0.45s ease-out both;
-  box-sizing: border-box;
 }
 
 /* ── Hero ─────────────────────────────────────────────────────────── */
@@ -27,31 +26,21 @@
 .cr-blob-1 { width: 130px; height: 130px; background: #fff; top: -30px; right: -20px; }
 .cr-blob-2 { width: 80px; height: 80px; background: #a5f3fc; bottom: -20px; left: 35%; }
 .cr-hero-left { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
-.cr-hero-icon {
-  font-size: 1.6rem;
-  background: rgba(255,255,255,0.18);
-  border-radius: 14px;
-  width: 52px; height: 52px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.cr-hero-title { font-size: 1.25rem; font-weight: 800; margin: 0; color: #fff; letter-spacing: -0.3px; }
-.cr-hero-sub   { font-size: 0.78rem; color: rgba(255,255,255,0.78); margin: 2px 0 0; }
+.cr-hero-icon { font-size: 2rem; flex-shrink: 0; }
+.cr-hero-title { font-size: 1.5rem; font-weight: 800; margin: 0; color: #fff; letter-spacing: -0.3px; line-height: 1.2; }
+.cr-hero-sub { font-size: 0.75rem; font-weight: 500; color: rgba(255,255,255,0.8); margin: 3px 0 0; }
 
 /* ── Card ─────────────────────────────────────────────────────────── */
 .cr-card {
   background: #fff;
-  border-radius: 0 0 16px 16px;
-  padding: 24px 28px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  border-radius: 18px;
+  padding: 20px 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 
+/* ── Legacy (keep for inner elements) ────────────────────────────── */
 .cr-title {
-  color: #1f6f8b;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  border-bottom: 2px solid #4fbdbd;
-  padding-bottom: 10px;
+  display: none;
   margin-bottom: 20px;
   font-size: 1.2rem;
 }

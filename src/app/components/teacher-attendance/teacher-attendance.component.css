@@ -1,95 +1,28 @@
-/* ── Page wrapper ────────────────────────────────────────────────── */
-.ta-container {
-  display: flex;
-  gap: 0;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  animation: ta-fade-up 0.45s ease-out both;
-}
-
-/* ── Left navigation ─────────────────────────────────────────────── */
-.ta-left-nav {
-  width: 170px;
-  flex-shrink: 0;
-  background: linear-gradient(180deg, #064e3b 0%, #065f46 100%);
-  border-radius: 16px 0 0 16px;
-  padding: 20px 12px;
-  box-shadow: 4px 0 20px rgba(6, 78, 59, 0.18);
-}
-
-.ta-left-nav h2 {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: rgba(52, 211, 153, 0.8);
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  margin: 0 0 14px 4px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(52, 211, 153, 0.2);
-}
-
-.ta-class-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.ta-class-item { cursor: pointer; }
-
-.ta-class-pill {
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: background 0.2s, color 0.2s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ta-class-item:hover .ta-class-pill {
-  background: rgba(52, 211, 153, 0.18);
-  color: #34d399;
-}
-
-.ta-class-item.selected .ta-class-pill {
-  background: rgba(52, 211, 153, 0.25);
-  color: #34d399;
-  box-shadow: inset 0 0 0 1.5px rgba(52, 211, 153, 0.5);
-}
-
-/* ── Main area ───────────────────────────────────────────────────── */
-.ta-main {
-  flex-grow: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
+.ta-page {
+  padding-bottom: 16px;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 /* ── Hero ─────────────────────────────────────────────────────────── */
 .ta-hero {
   position: relative;
+  background: linear-gradient(135deg, #064e3b 0%, #059669 55%, #34d399 100%);
+  border-radius: 20px;
+  padding: 22px 24px;
+  margin: 0 0 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 14px;
-  padding: 22px 24px;
-  background: linear-gradient(135deg, #064e3b 0%, #059669 55%, #34d399 100%);
-  border-radius: 0 16px 0 0;
   overflow: hidden;
   color: #fff;
 }
 
-/* When no left nav (TEACHER role) */
-.ta-container:not(:has(.ta-left-nav)) .ta-hero {
-  border-radius: 20px;
+.ta-blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.12;
+  pointer-events: none;
 }
-
-.ta-blob { position: absolute; border-radius: 50%; opacity: 0.12; pointer-events: none; }
 .ta-blob-1 { width: 130px; height: 130px; background: #fff;    top: -30px; right: -20px; }
 .ta-blob-2 { width: 80px;  height: 80px;  background: #6ee7b7; bottom: -20px; left: 40%; }
 
@@ -111,7 +44,7 @@
   flex-shrink: 0;
 }
 
-.ta-hero-text h1 {
+.ta-hero-title {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 800;
@@ -119,17 +52,78 @@
   letter-spacing: -0.3px;
 }
 
-.ta-hero-text p {
+.ta-hero-sub {
   margin: 2px 0 0;
   font-size: 0.78rem;
   color: rgba(255,255,255,0.78);
 }
 
-/* ── Controls card ───────────────────────────────────────────────── */
+/* ── Class Chips ──────────────────────────────────────────────────── */
+.ta-chips-wrap {
+  margin: 0 0 14px;
+  overflow: hidden;
+}
+
+.section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #059669;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  align-self: center;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+.ta-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  align-items: center;
+}
+.ta-chips::-webkit-scrollbar { display: none; }
+
+.ta-chip {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.ta-chip-active {
+  background: linear-gradient(135deg, #059669, #34d399);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(5,150,105,0.3);
+}
+
+/* ── Controls Card ────────────────────────────────────────────────── */
 .ta-controls {
   background: #fff;
-  padding: 16px 24px;
-  border-bottom: 1px solid #f1f5f9;
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.ta-class-title {
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
 
 .ta-controls-row {
@@ -141,8 +135,7 @@
 
 .ta-date-field {
   flex: 1;
-  min-width: 180px;
-  max-width: 260px;
+  min-width: 160px;
 }
 
 ::ng-deep .ta-date-field .mat-mdc-form-field-subscript-wrapper { display: none; }
@@ -158,32 +151,34 @@
 
 .ta-action-btns {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .ta-btn {
-  padding: 10px 22px;
+  padding: 9px 18px;
   border: none;
   border-radius: 10px;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  transition: opacity 0.15s, transform 0.15s;
+  transition: opacity 0.15s;
   white-space: nowrap;
 }
 .ta-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.ta-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+.ta-btn:hover:not(:disabled) { opacity: 0.88; }
 
 .ta-btn-save   { background: linear-gradient(135deg, #059669, #34d399); color: #fff; }
 .ta-btn-delete { background: linear-gradient(135deg, #dc2626, #f87171); color: #fff; }
 
-/* ── Warnings ────────────────────────────────────────────────────── */
+/* ── Warnings ─────────────────────────────────────────────────────── */
 .ta-warning {
   background: #fef3c7;
   color: #92400e;
   border: 1px solid #fde68a;
-  padding: 11px 24px;
+  border-radius: 12px;
+  padding: 11px 16px;
+  margin-bottom: 16px;
   font-size: 0.85rem;
   font-weight: 500;
 }
@@ -194,59 +189,40 @@
   border-color: #bae6fd;
 }
 
-/* ── Empty state ─────────────────────────────────────────────────── */
+/* ── Empty ────────────────────────────────────────────────────────── */
 .ta-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 72px 20px;
+  padding: 60px 20px;
   background: #fff;
-  border-radius: 0 0 16px 16px;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   text-align: center;
 }
-
-.ta-container:not(:has(.ta-left-nav)) .ta-empty {
-  border-radius: 0 0 16px 16px;
-}
-
 .ta-empty-icon  { font-size: 2.5rem; margin-bottom: 4px; }
 .ta-empty-title { font-size: 1rem; font-weight: 700; color: #374151; margin: 0; }
 .ta-empty-sub   { font-size: 0.85rem; color: #94a3b8; margin: 0; }
 
-/* ── Student list ────────────────────────────────────────────────── */
+/* ── Student List ─────────────────────────────────────────────────── */
 .ta-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  background: #f8fafc;
-  padding: 16px 24px;
-  border-radius: 0 0 16px 16px;
-  flex-grow: 1;
-}
-
-.ta-container:not(:has(.ta-left-nav)) .ta-list {
-  border-radius: 0 0 16px 16px;
+  gap: 8px;
 }
 
 .ta-student-card {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 16px;
+  gap: 12px;
+  padding: 11px 14px;
   background: #fff;
-  border-radius: 12px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   border: 1px solid #f1f5f9;
   border-left: 4px solid #34d399;
-  margin-bottom: 8px;
-  transition: border-left-color 0.15s, box-shadow 0.15s;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-}
-
-.ta-student-card:last-child { margin-bottom: 0; }
-
-.ta-student-card:hover {
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transition: border-left-color 0.15s;
 }
 
 .ta-absent {
@@ -255,11 +231,11 @@
 }
 
 .ta-student-avatar {
-  width: 38px; height: 38px;
+  width: 36px; height: 36px;
   border-radius: 50%;
   background: linear-gradient(135deg, #059669, #34d399);
   color: #fff;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 700;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
@@ -271,7 +247,7 @@
 
 .ta-student-name {
   flex: 1;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: #1a1a2e;
   min-width: 0;
@@ -281,19 +257,19 @@
 }
 
 .ta-mark-btn {
-  padding: 7px 16px;
+  padding: 6px 14px;
   border: none;
   border-radius: 8px;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  transition: opacity 0.15s, transform 0.15s;
+  transition: opacity 0.15s;
   white-space: nowrap;
   flex-shrink: 0;
 }
 .ta-mark-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.ta-mark-btn:hover:not(:disabled) { opacity: 0.85; transform: translateY(-1px); }
+.ta-mark-btn:hover:not(:disabled) { opacity: 0.85; }
 
 .ta-mark-absent  { background: linear-gradient(135deg, #dc2626, #f87171); color: #fff; }
 .ta-mark-present { background: linear-gradient(135deg, #059669, #34d399); color: #fff; }
@@ -315,166 +291,16 @@
 .ta-status-select:focus { border-color: #059669; }
 .ta-status-select:disabled { opacity: 0.45; cursor: not-allowed; }
 
-/* ── Section Chips ──────────────────────────────────────────────── */
-.section-label {
-  font-size: 0.78rem;
+/* ── Already Marked Badge ──────────────────────────────────────── */
+.attendance-marked-badge {
+  display: inline-block;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.72rem;
   font-weight: 700;
-  color: #059669;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  align-self: center;
-  margin-right: 4px;
-  white-space: nowrap;
-}
-
-.ta-section-chips {
-  display: flex; gap: 8px; padding: 10px 24px; background: #fff;
-  flex-wrap: wrap; border-bottom: 1px solid #eef0f5; align-items: center;
-}
-.ta-section-chip {
-  padding: 5px 14px; border-radius: 16px; border: 1px solid #d1d5db;
-  background: #f9fafb; font-size: 0.8rem; font-weight: 600;
-  color: #374151; cursor: pointer; transition: all 0.15s ease;
-}
-.ta-section-chip:hover { border-color: #059669; color: #065f46; }
-.ta-section-active {
-  background: linear-gradient(135deg, #059669, #10b981); color: #fff;
-  border-color: transparent;
-}
-.ta-section-active:hover { color: #fff; }
-
-/* ── Animation ───────────────────────────────────────────────────── */
-@keyframes ta-fade-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── Tablet ──────────────────────────────────────────────────────── */
-@media (max-width: 1023px) {
-  .ta-left-nav { width: 150px; padding: 16px 10px; }
-  .ta-hero { padding: 20px 18px 24px; border-radius: 0 12px 0 0; }
-  .ta-hero-text h1 { font-size: 1.2rem; }
-  .ta-controls { padding: 14px 20px; }
-  .ta-list { padding: 14px 20px; }
-  .ta-student-card { padding: 10px 14px; gap: 10px; }
-  .ta-student-avatar { width: 34px; height: 34px; font-size: 0.85rem; }
-  .ta-mark-btn { padding: 6px 12px; font-size: 0.75rem; }
-}
-
-/* ── Mobile ──────────────────────────────────────────────────────── */
-@media (max-width: 767px) {
-  .ta-container {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .ta-left-nav {
-    order: 1;
-    width: 100%;
-    border-radius: 14px;
-    padding: 10px 10px;
-    background: #fff;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-    border: 1px solid #f1f5f9;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .ta-left-nav h2 {
-    display: block;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: #059669;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0 4px 0 0;
-    padding: 0;
-    border: none;
-    white-space: nowrap;
-  }
-
-  .ta-main { display: contents; }
-
-  .ta-hero { order: 0; }
-  .ta-section-chips { order: 2; }
-  .ta-controls { order: 3; }
-  .ta-warning { order: 3; }
-  .ta-list { order: 3; }
-  .ta-empty { order: 3; }
-
-  .ta-class-list {
-    flex-direction: row;
-    overflow-x: auto;
-    scrollbar-width: none;
-    gap: 8px;
-    padding: 0;
-    align-items: center;
-  }
-  .ta-class-list::-webkit-scrollbar { display: none; }
-
-  .ta-class-item { flex-shrink: 0; }
-
-  .ta-class-pill {
-    font-size: 0.8rem;
-    padding: 7px 14px;
-    border-radius: 20px;
-    background: #fff;
-    color: #64748b;
-    border: 1.5px solid #e2e8f0;
-    box-shadow: none;
-  }
-
-  .ta-class-item:hover .ta-class-pill {
-    border-color: #34d399;
-    color: #059669;
-    background: #ecfdf5;
-  }
-
-  .ta-class-item.selected .ta-class-pill {
-    background: linear-gradient(135deg, #059669, #34d399);
-    color: #fff;
-    border-color: transparent;
-    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
-  }
-
-  .ta-hero {
-    border-radius: 16px;
-    padding: 18px 14px;
-  }
-
-  .ta-hero-icon { width: 44px; height: 44px; font-size: 1.4rem; border-radius: 12px; }
-
-  /* hero already has border-radius: 16px on mobile for all cases */
-
-  .ta-controls { padding: 10px 10px; border-radius: 0; }
-
-  .ta-controls-row { gap: 8px; }
-
-  .ta-date-field { max-width: 100%; }
-
-  .ta-btn { padding: 8px 14px; font-size: 0.82rem; }
-
-  .ta-warning { padding: 10px 12px; }
-
-  .ta-section-chips {
-    padding: 10px 10px;
-    border-radius: 14px;
-    border: 1px solid #f1f5f9;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-    border-bottom: none;
-  }
-
-  .ta-list { padding: 8px 8px 14px; }
-
-  .ta-student-card { padding: 10px 12px; gap: 10px; }
-
-  .ta-student-avatar { width: 34px; height: 34px; font-size: 0.85rem; }
-
-  .ta-student-name { font-size: 0.85rem; }
-
-  .ta-mark-btn { padding: 6px 11px; font-size: 0.75rem; }
-
-  .ta-empty { padding: 48px 12px; border-radius: 0 0 16px 16px; }
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
 }

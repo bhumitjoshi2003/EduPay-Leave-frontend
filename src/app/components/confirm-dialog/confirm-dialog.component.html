@@ -1,14 +1,20 @@
-<div class="cd-root">
+<div class="cd-root" aria-describedby="confirm-dialog-message">
+  <!-- Icon -->
   <div class="cd-icon-wrap">
     <span class="material-icons cd-icon" [ngClass]="iconClass">{{ iconName }}</span>
   </div>
+
+  <!-- Title -->
   <h2 class="cd-title">{{ data.title }}</h2>
-  <div class="cd-body">
+
+  <!-- Body: HTML or plain text -->
+  <div class="cd-body" id="confirm-dialog-message">
     <div *ngIf="sanitizedHtml; else plainMsg" [innerHTML]="sanitizedHtml"></div>
     <ng-template #plainMsg>
       <p *ngIf="data.message" class="cd-message">{{ data.message }}</p>
     </ng-template>
   </div>
+
   <!-- Required input confirmation -->
   <div class="cd-input-wrap" *ngIf="data.requiredInput">
     <label class="cd-input-label">Type <strong>{{ data.requiredInput }}</strong> to confirm</label>
@@ -16,12 +22,22 @@
       [placeholder]="data.requiredInput" autocomplete="off" spellcheck="false" />
   </div>
 
+  <!-- Actions -->
   <div class="cd-actions" [class.single]="!data.cancelText">
-    <button *ngIf="data.cancelText" mat-stroked-button class="cd-btn-cancel" (click)="cancel()">
+    <button
+      *ngIf="data.cancelText"
+      #cancelBtn
+      mat-stroked-button
+      class="cd-btn-cancel"
+      (click)="cancel()">
       {{ data.cancelText }}
     </button>
-    <button mat-flat-button class="cd-btn-confirm" [class.danger]="data.danger"
-      [disabled]="confirmDisabled" (click)="confirm()">
+    <button
+      mat-flat-button
+      class="cd-btn-confirm"
+      [class.danger]="data.danger"
+      [disabled]="confirmDisabled"
+      (click)="confirm()">
       {{ data.confirmText || 'OK' }}
     </button>
   </div>

@@ -39,6 +39,7 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
   editingRecordId: number | null = null;
   markForm = { teacherId: '', date: '', status: 'ON_TIME', checkInTime: '', checkOutTime: '' };
   isMarking = false;
+  formDirty = false;
 
   // School timing for auto-status
   schoolTiming: SchoolTiming | null = null;
@@ -188,6 +189,7 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
   openMarkDialog(): void {
     this.isEditMode = false;
     this.editingRecordId = null;
+    this.formDirty = false;
     this.markForm = { teacherId: '', date: this.selectedDate, status: 'ON_TIME', checkInTime: '', checkOutTime: '' };
     this.showMarkDialog = true;
   }
@@ -195,9 +197,10 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
   openEditDialog(record: TeacherAttendanceRecord): void {
     this.isEditMode = true;
     this.editingRecordId = record.id;
+    this.formDirty = false;
     this.markForm = {
       teacherId: record.teacherId,
-      date: record.date,
+      date: record.date, // CRITICAL: set from record, not from selectedDate
       status: record.status,
       checkInTime: record.checkInTime ? this.extractTime(record.checkInTime) : '',
       checkOutTime: record.checkOutTime ? this.extractTime(record.checkOutTime) : '',
@@ -205,10 +208,21 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
     this.showMarkDialog = true;
   }
 
-  closeMarkDialog(): void {
+  async closeMarkDialog(): Promise<void> {
+    if (this.formDirty) {
+      const discard = await this.toast.confirm({
+        title: 'Unsaved Changes',
+        message: 'You have unsaved changes. Are you sure you want to close?',
+        confirmText: 'Discard',
+        cancelText: 'Keep Editing',
+        danger: true,
+      });
+      if (!discard) return;
+    }
     this.showMarkDialog = false;
     this.isEditMode = false;
     this.editingRecordId = null;
+    this.formDirty = false;
   }
 
   onCheckInTimeChange(): void {
@@ -229,11 +243,30 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
     return inMinutes > startMinutes ? 'LATE' : 'ON_TIME';
   }
 
-  submitAdminMark(): void {
+  async submitAdminMark(): Promise<void> {
     if (!this.markForm.teacherId || !this.markForm.date || !this.markForm.status) {
       this.toast.warning('Validation', 'Please fill all required fields.');
       return;
     }
+
+    if (['ON_TIME', 'LATE'].includes(this.markForm.status) && !this.markForm.checkInTime) {
+      this.toast.warning('Required', 'Check-in time is required when status is On Time or Late.');
+      return;
+    }
+
+    const selectedDate = new Date(this.markForm.date);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    if (selectedDate < thirtyDaysAgo) {
+      const proceed = await this.toast.confirm({
+        title: 'Old Date Selected',
+        message: 'You are marking attendance for a date more than 30 days ago. Continue?',
+        confirmText: 'Yes, Continue',
+        cancelText: 'Cancel',
+      });
+      if (!proceed) return;
+    }
+
     this.isMarking = true;
     this.cdr.markForCheck();
 
@@ -254,6 +287,7 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
           this.showMarkDialog = false;
           this.isEditMode = false;
           this.editingRecordId = null;
+          this.formDirty = false;
           this.loadDailyRecords();
           this.cdr.markForCheck();
         },
@@ -268,11 +302,9 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
 
   // ── Helpers ──
 
-  get presentCount(): number { return this.records.filter(r => r.status === 'ON_TIME' || r.status === 'LATE').length; }
-  get lateCount(): number { return this.records.filter(r => r.status === 'LATE').length; }
-  get absentCount(): number { return this.records.filter(r => r.status === 'ABSENT').length; }
-  get halfDayCount(): number { return this.records.filter(r => r.status === 'HALF_DAY').length; }
-  get onLeaveCount(): number { return this.records.filter(r => r.status === 'ON_LEAVE').length; }
+  get todayStr(): string {
+    return new Date().toISOString().split('T')[0];
+  }
 
   /** Get unique teachers not already having a record for the selected date */
   get availableTeachers(): Teacher[] {
@@ -285,6 +317,12 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
     const d = new Date(isoTime);
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   }
+
+  get presentCount(): number { return this.records.filter(r => r.status === 'ON_TIME' || r.status === 'LATE').length; }
+  get lateCount(): number { return this.records.filter(r => r.status === 'LATE').length; }
+  get absentCount(): number { return this.records.filter(r => r.status === 'ABSENT').length; }
+  get halfDayCount(): number { return this.records.filter(r => r.status === 'HALF_DAY').length; }
+  get onLeaveCount(): number { return this.records.filter(r => r.status === 'ON_LEAVE').length; }
 
   getStatusClass(status: string): string {
     switch (status) {
@@ -327,5 +365,35 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
     if (meters == null) return '—';
     if (meters >= 1000) return (meters / 1000).toFixed(1) + ' km';
     return meters.toFixed(0) + ' m';
+  }
+
+  get groupedRecords(): { date: string; displayDate: string; records: TeacherAttendanceRecord[] }[] {
+    if (!this.monthlySummary?.records.length) return [];
+    const map = new Map<string, TeacherAttendanceRecord[]>();
+    for (const r of this.monthlySummary.records) {
+      const list = map.get(r.date) ?? [];
+      list.push(r);
+      map.set(r.date, list);
+    }
+    return Array.from(map.entries())
+      .sort(([a], [b]) => b.localeCompare(a))
+      .map(([date, records]) => ({
+        date,
+        displayDate: new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }),
+        records
+      }));
+  }
+
+  trackByDate(_: number, group: { date: string }): string { return group.date; }
+  trackByRecordId(_: number, record: TeacherAttendanceRecord): number { return record.id; }
+
+  getBorderClass(status: string): string {
+    switch (status) {
+      case 'LATE': return 'sa-card-late';
+      case 'ABSENT': return 'sa-card-absent';
+      case 'ON_LEAVE': return 'sa-card-leave';
+      case 'HALF_DAY': return 'sa-card-halfday';
+      default: return '';
+    }
   }
 }

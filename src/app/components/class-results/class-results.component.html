@@ -1,12 +1,12 @@
-<div class="cr-container">
+<div class="cr-page">
 
-  <!-- Hero -->
+  <!-- ── Hero ──────────────────────────────────────────────────────── -->
   <div class="cr-hero">
     <div class="cr-hero-left">
       <div class="cr-hero-icon">🏅</div>
       <div>
         <h1 class="cr-hero-title">Class Results</h1>
-        <p class="cr-hero-sub">View ranked exam results for your class</p>
+        <p class="cr-hero-sub">Exam rankings &amp; marks overview</p>
       </div>
     </div>
     <div class="cr-blob cr-blob-1"></div>
@@ -14,7 +14,6 @@
   </div>
 
   <div class="cr-card">
-
   <div class="cr-filters">
     <div class="cr-filter-group">
       <label>Session</label>
@@ -22,7 +21,7 @@
         <option *ngFor="let s of sessions; trackBy: trackByIndex" [value]="s">{{ s }}</option>
       </select>
     </div>
-    <div class="cr-filter-group" *ngIf="role === 'ADMIN'">
+    <div class="cr-filter-group" *ngIf="showClassDropdown">
       <label>Class</label>
       <select [(ngModel)]="selectedClass" (ngModelChange)="loadExams()">
         <option *ngFor="let c of classOptions; trackBy: trackByIndex" [value]="c">Class {{ c }}</option>
@@ -112,6 +111,5 @@
     <p class="cr-empty-title">View class results</p>
     <p class="cr-empty-sub">Select a session, class, and exam to view results.</p>
   </div>
-
   </div><!-- /.cr-card -->
-</div>
+</div><!-- /.cr-page -->

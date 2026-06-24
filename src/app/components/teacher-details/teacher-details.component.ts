@@ -6,9 +6,9 @@ import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
-import { SchoolService } from '../../services/school.service';
 import { ToastService } from '../../services/toast.service';
 import { environment } from '../../../environments/environment';
+import { SchoolService } from '../../services/school.service';
 
 interface TeacherDetails {
   teacherId?: string;
@@ -59,16 +59,15 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
-    private schoolService: SchoolService,
-    private toast: ToastService
+    private toast: ToastService,
+    private schoolService: SchoolService
   ) { }
 
   ngOnInit(): void {
-    this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
-      next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-      error: (err) => this.logger.error('Failed to load classes', err)
+    this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe(classes => {
+      this.classList = classes;
+      this.cdr.markForCheck();
     });
-
     this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
       this.teacherId = params['teacherId'];
       if (this.teacherId) {
@@ -105,9 +104,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     this.toast.confirm({
       title: 'Are you sure?',
       message: 'Do you want to edit the teacher details?',
-      icon: 'warning',
       confirmText: 'Yes, edit it!',
-      cancelText: 'Cancel',
     }).then((confirmed) => {
       if (confirmed) {
         this.isEditing = true;
@@ -148,14 +145,8 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
 
       errorMessages += '</ul>';
 
-      // 3. Show detailed error dialog
-      this.toast.confirm({
-        title: 'Oops... Invalid Details',
-        html: errorMessages,
-        icon: 'danger',
-        danger: true,
-        confirmText: 'OK',
-      });
+      // 3. Show detailed toast
+      this.toast.error('Oops... Invalid Details', errorMessages);
       return;
     }
 
@@ -163,9 +154,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     this.toast.confirm({
       title: 'Are you sure?',
       message: 'Do you want to save the changes?',
-      icon: 'question',
       confirmText: 'Yes, save it!',
-      cancelText: 'Cancel',
     }).then((confirmed) => {
       if (confirmed) {
         if (this.updatedDetails) {
@@ -216,6 +205,12 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
     const file = input.files[0];
     input.value = '';
 
+    // Issue #58: File size check
+    if (file.size > 5 * 1024 * 1024) {
+      this.toast.error('File Too Large', 'Profile photo must be less than 5MB.');
+      return;
+    }
+
     this.photoUploading = true;
     this.cdr.markForCheck();
 
@@ -226,7 +221,7 @@ export class TeacherDetailsComponent implements OnInit, OnDestroy {
         }
         this.photoUploading = false;
         this.cdr.markForCheck();
-        this.toast.success('Photo updated!', 'Profile photo has been updated.');
+        this.toast.success('Photo updated!');
       },
       error: (err) => {
         this.logger.error('Photo upload error:', err);

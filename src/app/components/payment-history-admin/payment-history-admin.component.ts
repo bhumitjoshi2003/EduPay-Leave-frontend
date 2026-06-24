@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { PaymentHistoryService, PaginatedResponse } from '../../services/payment-history.service';
+import { SchoolService } from '../../services/school.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
@@ -10,13 +11,14 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ToastService } from '../../services/toast.service';
+import { AuthStateService } from '../../auth/auth-state.service';
+import { Capacitor } from '@capacitor/core';
 import { PaymentHistory } from '../../interfaces/payment-history';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { saveAs } from 'file-saver';
 import { MODULE_MESSAGES } from '../../config/module-messages.config';
 import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
-import { SchoolService } from '../../services/school.service';
 
 @Component({
   selector: 'app-payment-history-admin',
@@ -57,14 +59,18 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
   totalPages: number = 0;
   pageSizes: number[] = [5, 10, 20, 50];
 
-  constructor(private router: Router, private paymentHistoryService: PaymentHistoryService, private datePipe: DatePipe, private logger: LoggerService, private cdr: ChangeDetectorRef, private schoolService: SchoolService, private toast: ToastService) { }
+  constructor(private router: Router, private paymentHistoryService: PaymentHistoryService, private datePipe: DatePipe, private logger: LoggerService, private cdr: ChangeDetectorRef, private toast: ToastService, private schoolService: SchoolService, private authStateService: AuthStateService) { }
 
   ngOnInit(): void {
-    this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
-      next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-      error: () => { }
+    const role = this.authStateService.getUserRole();
+    if (role !== 'ADMIN') {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+    this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe(classes => {
+      this.classList = classes;
+      this.cdr.markForCheck();
     });
-
     this.fetchPaymentHistory();
 
     this.studentIdInputSubject.pipe(
@@ -150,6 +156,10 @@ export class PaymentHistoryAdminComponent implements OnInit, OnDestroy {
 
   downloadPaymentReceipt(paymentId: string, event: Event): void {
     event.stopPropagation();
+    if (Capacitor.isNativePlatform()) {
+      this.toast.info('Not Available', 'Downloading receipts is not supported on the mobile app. Please use the web version.');
+      return;
+    }
     this.loading = true;
     this.error = '';
     this.paymentHistoryService.downloadPaymentReceipt(paymentId).subscribe({

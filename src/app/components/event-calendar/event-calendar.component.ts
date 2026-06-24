@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { isPlatformBrowser } from '@angular/common';
+import { Capacitor } from '@capacitor/core';
 import { EventService } from '../../services/event.service';
 import { AuthService } from '../../auth/auth.service';
 import { StudentService } from '../../services/student.service';
@@ -15,7 +16,8 @@ import { CalendarEvent } from '../../interfaces/event-calendar.component';
 import { AttendanceService } from '../../services/attendance.service';
 import { SchoolHolidayService } from '../../services/school-holiday.service';
 import { SchoolHoliday } from '../../interfaces/school-holiday';
-import { forkJoin, Subject, takeUntil } from 'rxjs';
+import { forkJoin, Subject, takeUntil, debounceTime, fromEvent } from 'rxjs';
+import { ToastService } from '../../services/toast.service';
 
 interface DayCell {
   date: Date | null;
@@ -82,7 +84,8 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
     private attendanceService: AttendanceService,
     private holidayService: SchoolHolidayService,
     @Inject(PLATFORM_ID) private platformId: Object,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private toast: ToastService
   ) {
     // Initialize eventForm here with all controls, including imageUrl
     this.eventForm = this.fb.group({
@@ -101,12 +104,11 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
     });
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: UIEvent) {
-    this.checkMobileView();
-  }
-
   ngOnInit(): void {
+    fromEvent(window, 'resize').pipe(
+      debounceTime(300),
+      takeUntil(this.destroy$)
+    ).subscribe(() => this.checkMobileView());
     this.currentUserRole = this.authService.getUserRole();
     this.initCategoryColors();
     this.checkMobileView();
@@ -139,8 +141,8 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
     } else if (this.currentUserRole === 'TEACHER') {
       if (userId) {
         this.teacherService.getTeacher(userId).pipe(takeUntil(this.destroy$)).subscribe({
-          next: (teachertDetails) => {
-            this.currentUserClass = teachertDetails.classTeacher ?? null;
+          next: (teacherDetails) => {
+            this.currentUserClass = teacherDetails.classTeacher ?? null;
             loadEventsAfterDetails();
           },
           error: (err) => {
@@ -156,6 +158,14 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
       }
     } else {
       loadEventsAfterDetails();
+    }
+  }
+
+  openExternalLink(url: string): void {
+    if (Capacitor.isNativePlatform()) {
+      window.open(url, '_system');
+    } else {
+      window.open(url, '_blank');
     }
   }
 
@@ -627,14 +637,12 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
   private loadHolidaysOnly(): void {
     const monthStart = format(startOfMonth(this.currentDate), 'yyyy-MM-dd');
     const monthEnd = format(endOfMonth(this.currentDate), 'yyyy-MM-dd');
-
     this.holidayService.getHolidaysByRange(monthStart, monthEnd)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (holidays) => {
           this.holidayMap = {};
           this.attendanceMap = {};
-
           holidays.forEach(h => {
             const d = new Date(h.startDate);
             const end = new Date(h.endDate);
@@ -674,14 +682,37 @@ export class EventCalendarComponent implements OnInit, OnDestroy {
     return '';
   }
 
+  async deleteCurrentEvent(): Promise<void> {
+    if (!this.selectedEvent?.id) return;
+    const confirmed = await this.toast.confirm({
+      title: 'Delete Event?',
+      message: `Delete "${this.selectedEvent.title}"? This cannot be undone.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      danger: true,
+    });
+    if (!confirmed) return;
+    this.eventService.deleteEvent(this.selectedEvent.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.toast.success('Deleted', 'Event has been removed.');
+          this.selectedEvent = null;
+          this.closeSidebar();
+          this.loadEvents();
+        },
+        error: () => this.toast.error('Error', 'Failed to delete event.')
+      });
+  }
+
   isMissingAttendance(date: Date | null): boolean {
     if (!date || this.currentUserRole !== 'STUDENT') return false;
     const key = this.getDateKey(date);
-    if (this.attendanceMap[key]) return false; // has P, A, or H
+    if (this.attendanceMap[key]) return false;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (date > today) return false; // future
-    if (date.getDay() === 0) return false; // Sunday
+    if (date > today) return false;
+    if (date.getDay() === 0) return false;
     return true;
   }
 }

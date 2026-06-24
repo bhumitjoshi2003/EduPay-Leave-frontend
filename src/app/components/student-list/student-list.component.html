@@ -1,152 +1,156 @@
-<div class="student-list-container">
+<div class="sl-page">
 
-  <!-- Left class navigation (Admin only) -->
-  <div *ngIf="loggedInUserRole === 'ADMIN'" class="left-navigation">
-    <h2>Classes</h2>
-    <ul class="class-list-vertical">
-      <li *ngFor="let className of classList; trackBy: trackByClass"
-          (click)="onClassSelect(className)"
-          [class.selected]="className === selectedClass"
-          class="class-item-vertical">
-        <div class="class-pill">
-          <span>{{ className }}</span>
-        </div>
-      </li>
-    </ul>
+  <!-- ── Hero ─────────────────────────────────────────────────────── -->
+  <div class="sl-hero">
+    <div class="sl-hero-left">
+      <div class="sl-hero-icon">👨‍🎓</div>
+      <div>
+        <h1 class="sl-hero-title">Students</h1>
+        <p class="sl-hero-sub">
+          Class {{ selectedClass }}
+        </p>
+      </div>
+    </div>
+    <div class="sl-hero-right" *ngIf="loggedInUserRole === 'ADMIN'">
+      <button class="sl-import-btn" (click)="navigateToBulkImport()">⬆ Bulk Import</button>
+    </div>
+    <div class="sl-blob sl-blob-1"></div>
+    <div class="sl-blob sl-blob-2"></div>
   </div>
 
-  <!-- Main content area -->
-  <div class="student-list-area">
-
-    <!-- Hero banner -->
-    <div class="sl-hero">
-      <div class="sl-hero-left">
-        <div class="sl-hero-icon">🎓</div>
-        <div class="sl-hero-text">
-          <h1 *ngIf="loggedInUserRole === 'TEACHER'">Students of Class {{ selectedClass }}</h1>
-          <h1 *ngIf="loggedInUserRole === 'ADMIN' && selectedClass">Students of Class {{ selectedClass }}</h1>
-          <h1 *ngIf="loggedInUserRole === 'ADMIN' && !selectedClass">Select a Class</h1>
-          <p>{{ (activeStudents.length + newStudents.length + alumniStudents.length + leftStudents.length) }} student{{ (activeStudents.length + newStudents.length + alumniStudents.length + leftStudents.length) !== 1 ? 's' : '' }} total</p>
-        </div>
-      </div>
-      <button *ngIf="loggedInUserRole === 'ADMIN'" class="bulk-import-btn" (click)="navigateToBulkImport()">
-        &#8679; Bulk Import
-      </button>
-      <div class="sl-blob sl-blob-1"></div>
-      <div class="sl-blob sl-blob-2"></div>
+  <!-- ── Class Chips (Admin only) ──────────────────────────────────── -->
+  <div class="sl-chips-wrap" *ngIf="loggedInUserRole === 'ADMIN'">
+    <div class="sl-chips">
+      <button *ngFor="let c of classList; trackBy: trackByClass"
+        class="sl-chip" [class.sl-chip-active]="selectedClass === c"
+        (click)="onClassSelect(c)">{{ c }}</button>
     </div>
+  </div>
 
-    <!-- Section filter chips -->
-    <div class="section-chips-wrap" *ngIf="sections.length > 0">
+  <!-- ── Section Chips ────────────────────────────────────────────── -->
+  <div class="sl-chips-wrap" *ngIf="sections.length > 0">
+    <div class="sl-chips">
       <span class="section-label">Sections</span>
-      <button class="section-chip" [class.section-chip-active]="selectedSectionId === null"
+      <button class="sl-chip sl-chip-section" [class.sl-chip-active]="selectedSectionId === null"
         (click)="onSectionSelect(null)">All Sections</button>
-      <button *ngFor="let sec of sections" class="section-chip"
-        [class.section-chip-active]="selectedSectionId === sec.id"
+      <button *ngFor="let sec of sections" class="sl-chip sl-chip-section"
+        [class.sl-chip-active]="selectedSectionId === sec.id"
         (click)="onSectionSelect(sec.id!)">{{ sec.name }}</button>
     </div>
+  </div>
 
-    <!-- Loading skeleton -->
-    <div *ngIf="isLoading" class="sl-skeleton">
-      <div class="sl-skeleton-item" *ngFor="let _ of [1,2,3,4,5]">
-        <div class="sk-shimmer" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;"></div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
-          <div class="sk-shimmer" style="width:55%;height:13px;border-radius:6px;"></div>
-          <div class="sk-shimmer" style="width:30%;height:11px;border-radius:6px;"></div>
+  <!-- ── Skeleton ─────────────────────────────────────────────────────── -->
+  <div *ngIf="isLoading">
+    <div class="sl-section" *ngFor="let _ of [1,2]">
+      <div class="sl-section-header">
+        <span class="sk-shimmer" style="width:10px;height:10px;border-radius:50%"></span>
+        <span class="sk-shimmer" style="width:55px;height:13px"></span>
+        <span class="sk-shimmer" style="width:22px;height:13px"></span>
+      </div>
+      <div class="sl-list">
+        <div class="sl-card" *ngFor="let __ of [1,2,3,4]" style="cursor:default;pointer-events:none">
+          <div class="sk-shimmer" style="width:42px;height:42px;border-radius:50%;flex-shrink:0"></div>
+          <div class="sl-card-info" style="flex:1;gap:6px">
+            <span class="sk-shimmer" style="width:55%;height:13px"></span>
+            <span class="sk-shimmer" style="width:38%;height:10px"></span>
+          </div>
+          <span class="sk-shimmer" style="width:16px;height:16px;border-radius:4px"></span>
         </div>
       </div>
     </div>
+  </div>
 
-    <div *ngIf="!isLoading && (activeStudents.length + alumniStudents.length + leftStudents.length + newStudents.length) > 0; else noStudentsContainerWrap"
-         class="student-sections">
+  <!-- ── Empty ──────────────────────────────────────────────────────── -->
+  <div class="sl-empty"
+    *ngIf="!isLoading && activeStudents.length === 0 && newStudents.length === 0 && alumniStudents.length === 0 && leftStudents.length === 0">
+    <div class="sl-empty-icon">🔍</div>
+    <p class="sl-empty-title">No students found</p>
+    <p class="sl-empty-sub">{{ classList.length === 0 ? 'No classes configured yet. Go to School Settings → Classes to add them first.' : 'No students found for the selected class.' }}</p>
+  </div>
 
-      <!-- Active Students -->
-      <div *ngIf="activeStudents.length > 0" class="student-section">
-        <div class="section-header active-header">
-          <span class="section-label">Active Students</span>
-          <span class="section-badge active-badge">{{ activeStudents.length }}</span>
-        </div>
-        <ul class="student-list">
-          <li *ngFor="let student of activeStudents; trackBy: trackByStudentId"
-              class="student-item active-student-item"
-              (click)="viewStudentDetails(student.studentId)">
-            <div class="student-avatar active-avatar">{{ student.name.charAt(0).toUpperCase() }}</div>
-            <div class="student-info">
-              <span class="student-name">{{ student.name }}</span>
-              <span class="student-id">{{ student.studentId }}</span>
-            </div>
-            <button class="view-details-button" (click)="viewStudentDetails(student.studentId)">View Details</button>
-          </li>
-        </ul>
-      </div>
-
-      <!-- New Students -->
-      <div *ngIf="newStudents.length > 0" class="student-section">
-        <div class="section-header new-header">
-          <span class="section-label">New Admissions</span>
-          <span class="section-badge new-badge">{{ newStudents.length }}</span>
-        </div>
-        <ul class="student-list">
-          <li *ngFor="let student of newStudents; trackBy: trackByStudentId"
-              class="student-item new-student-item"
-              (click)="viewStudentDetails(student.studentId)">
-            <div class="student-avatar new-avatar">{{ student.name.charAt(0).toUpperCase() }}</div>
-            <div class="student-info">
-              <span class="student-name">{{ student.name }}</span>
-              <span class="student-id">{{ student.studentId }}</span>
-            </div>
-            <button class="view-details-button new-btn" (click)="viewStudentDetails(student.studentId)">View Details</button>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Alumni (Graduated) -->
-      <div *ngIf="alumniStudents.length > 0" class="student-section">
-        <div class="section-header alumni-header">
-          <span class="section-label">Alumni</span>
-          <span class="section-badge alumni-badge">{{ alumniStudents.length }}</span>
-        </div>
-        <ul class="student-list">
-          <li *ngFor="let student of alumniStudents; trackBy: trackByStudentId"
-              class="student-item alumni-student-item"
-              (click)="viewStudentDetails(student.studentId)">
-            <div class="student-avatar alumni-avatar">{{ student.name.charAt(0).toUpperCase() }}</div>
-            <div class="student-info">
-              <span class="student-name">{{ student.name }}</span>
-              <span class="student-id">{{ student.studentId }}</span>
-            </div>
-            <button class="view-details-button alumni-btn" (click)="viewStudentDetails(student.studentId)">View Details</button>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Left (Transferred / Withdrawn) -->
-      <div *ngIf="leftStudents.length > 0" class="student-section">
-        <div class="section-header left-header">
-          <span class="section-label">Left</span>
-          <span class="section-badge left-badge">{{ leftStudents.length }}</span>
-        </div>
-        <ul class="student-list">
-          <li *ngFor="let student of leftStudents; trackBy: trackByStudentId"
-              class="student-item left-student-item"
-              (click)="viewStudentDetails(student.studentId)">
-            <div class="student-avatar left-avatar">{{ student.name.charAt(0).toUpperCase() }}</div>
-            <div class="student-info">
-              <span class="student-name">{{ student.name }}</span>
-              <span class="student-id">{{ student.studentId }}</span>
-            </div>
-            <button class="view-details-button left-btn" (click)="viewStudentDetails(student.studentId)">View Details</button>
-          </li>
-        </ul>
-      </div>
-
+  <!-- ── Active Students ───────────────────────────────────────────── -->
+  <div class="sl-section" *ngIf="activeStudents.length > 0">
+    <div class="sl-section-header">
+      <span class="sl-section-dot sl-dot-active"></span>
+      <h2 class="sl-section-title">Active</h2>
+      <span class="sl-section-count">{{ activeStudents.length }}</span>
     </div>
-    <ng-template #noStudentsContainerWrap>
-      <div *ngIf="!isLoading" class="no-students">
-        <span class="no-icon">🔍</span>
-        <p>No students found for the selected class.</p>
+    <div class="sl-list">
+      <div class="sl-card" *ngFor="let s of activeStudents; trackBy: trackByStudentId"
+        (click)="viewStudentDetails(s.studentId)">
+        <div class="sl-avatar sl-avatar-active">{{ s.name.charAt(0).toUpperCase() }}</div>
+        <div class="sl-card-info">
+          <span class="sl-card-name">{{ s.name }}</span>
+          <span class="sl-card-id">{{ s.studentId }}</span>
+        </div>
+        <span *ngIf="isReadmitted(s)" class="sl-badge-readmit">Re-admitted</span>
+        <span class="sl-arrow">›</span>
       </div>
-    </ng-template>
+    </div>
+  </div>
+
+  <!-- ── New Students ──────────────────────────────────────────────── -->
+  <div class="sl-section" *ngIf="newStudents.length > 0">
+    <div class="sl-section-header">
+      <span class="sl-section-dot sl-dot-new"></span>
+      <h2 class="sl-section-title">New</h2>
+      <span class="sl-section-count sl-count-new">{{ newStudents.length }}</span>
+    </div>
+    <div class="sl-list">
+      <div class="sl-card sl-card-new" *ngFor="let s of newStudents; trackBy: trackByStudentId"
+        (click)="viewStudentDetails(s.studentId)">
+        <div class="sl-avatar sl-avatar-new">{{ s.name.charAt(0).toUpperCase() }}</div>
+        <div class="sl-card-info">
+          <span class="sl-card-name">{{ s.name }}</span>
+          <span class="sl-card-id">{{ s.studentId }}</span>
+        </div>
+        <span class="sl-new-tag">NEW</span>
+        <span class="sl-arrow">›</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Alumni (Graduated) ──────────────────────────────────────────── -->
+  <div class="sl-section" *ngIf="alumniStudents.length > 0">
+    <div class="sl-section-header">
+      <span class="sl-section-dot sl-dot-alumni"></span>
+      <h2 class="sl-section-title">Alumni</h2>
+      <span class="sl-section-count sl-count-alumni">{{ alumniStudents.length }}</span>
+    </div>
+    <div class="sl-list">
+      <div class="sl-card sl-card-alumni" *ngFor="let s of alumniStudents; trackBy: trackByStudentId"
+        (click)="viewStudentDetails(s.studentId)">
+        <div class="sl-avatar sl-avatar-alumni">{{ s.name.charAt(0).toUpperCase() }}</div>
+        <div class="sl-card-info">
+          <span class="sl-card-name">{{ s.name }}</span>
+          <span class="sl-card-id">{{ s.studentId }}</span>
+        </div>
+        <span class="sl-alumni-tag">GRADUATED</span>
+        <span *ngIf="s.status" class="sl-exit-badge" [class]="getExitBadgeClass(s.status)">{{ s.status }}</span>
+        <span class="sl-arrow">›</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Left (Transferred / Withdrawn) ────────────────────────────── -->
+  <div class="sl-section" *ngIf="leftStudents.length > 0">
+    <div class="sl-section-header">
+      <span class="sl-section-dot sl-dot-left"></span>
+      <h2 class="sl-section-title">Left</h2>
+      <span class="sl-section-count sl-count-left">{{ leftStudents.length }}</span>
+    </div>
+    <div class="sl-list">
+      <div class="sl-card sl-card-left" *ngFor="let s of leftStudents; trackBy: trackByStudentId"
+        (click)="viewStudentDetails(s.studentId)">
+        <div class="sl-avatar sl-avatar-left">{{ s.name.charAt(0).toUpperCase() }}</div>
+        <div class="sl-card-info">
+          <span class="sl-card-name sl-name-left">{{ s.name }}</span>
+          <span class="sl-card-id">{{ s.studentId }}</span>
+        </div>
+        <span *ngIf="s.status" class="sl-exit-badge" [class]="getExitBadgeClass(s.status)">{{ s.status }}</span>
+        <span class="sl-arrow">›</span>
+      </div>
+    </div>
   </div>
 
 </div>

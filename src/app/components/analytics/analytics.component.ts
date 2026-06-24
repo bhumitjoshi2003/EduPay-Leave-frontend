@@ -16,7 +16,7 @@ import { LoggerService } from '../../services/logger.service';
 Chart.register(...registerables);
 
 const PALETTE = [
-  '#4fbdbd', '#0891b2', '#059669', '#d97706',
+  '#6366f1', '#0891b2', '#059669', '#d97706',
   '#dc2626', '#7c3aed', '#db2777', '#0284c7',
   '#65a30d', '#ea580c', '#0d9488', '#8b5cf6',
 ];
@@ -34,32 +34,9 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 
   isLoading = true;
   error = '';
+  hasData: boolean = false;
+  analyticsError: string | null = null;
   today = new Date();
-
-  // ── Raw data for summary stats ────────────────────────────────
-  private rawClassStats: ClassStats[] = [];
-  private rawFeeTrend: FeeTrend[] = [];
-
-  get totalStudents(): number {
-    return this.rawClassStats.reduce((s, c) => s + c.studentCount, 0);
-  }
-  get avgAttendance(): number {
-    if (!this.rawClassStats.length) return 0;
-    return this.rawClassStats.reduce((s, c) => s + c.attendanceRate, 0) / this.rawClassStats.length;
-  }
-  get totalClasses(): number { return this.rawClassStats.length; }
-  get latestMonthFee(): number {
-    return this.rawFeeTrend.length ? this.rawFeeTrend[this.rawFeeTrend.length - 1].amount : 0;
-  }
-  get latestMonth(): string {
-    return this.rawFeeTrend.length ? this.rawFeeTrend[this.rawFeeTrend.length - 1].month : '';
-  }
-  get attendanceCardStyle(): string {
-    const r = this.avgAttendance;
-    if (r >= 85) return '--c1:#059669;--c2:#34d399';
-    if (r >= 70) return '--c1:#d97706;--c2:#fbbf24';
-    return '--c1:#dc2626;--c2:#f87171';
-  }
 
   // ── Fee trend (bar) ───────────────────────────────────────────
   feeTrendData: ChartData<'bar'> = { labels: [], datasets: [] };
@@ -113,6 +90,31 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
     },
     cutout: '62%',
   };
+
+  // ── Raw data for summary stats ────────────────────────────────
+  private rawClassStats: ClassStats[] = [];
+  private rawFeeTrend: FeeTrend[] = [];
+
+  get totalStudents(): number {
+    return this.rawClassStats.reduce((s, c) => s + c.studentCount, 0);
+  }
+  get avgAttendance(): number {
+    if (!this.rawClassStats.length) return 0;
+    return this.rawClassStats.reduce((s, c) => s + c.attendanceRate, 0) / this.rawClassStats.length;
+  }
+  get totalClasses(): number { return this.rawClassStats.length; }
+  get latestMonthFee(): number {
+    return this.rawFeeTrend.length ? this.rawFeeTrend[this.rawFeeTrend.length - 1].amount : 0;
+  }
+  get latestMonth(): string {
+    return this.rawFeeTrend.length ? this.rawFeeTrend[this.rawFeeTrend.length - 1].month : '';
+  }
+  get attendanceCardStyle(): string {
+    const r = this.avgAttendance;
+    if (r >= 85) return '--c1:#059669;--c2:#34d399';
+    if (r >= 70) return '--c1:#d97706;--c2:#fbbf24';
+    return '--c1:#dc2626;--c2:#f87171';
+  }
 
   // ── Attendance trend (line) ───────────────────────────────────
   classList: string[] = [];
@@ -176,12 +178,19 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
         this.buildFeeTrend(feeTrend);
         this.buildAttendance(classStats);
         this.buildDistribution(classStats);
+        this.hasData = (feeTrend?.length > 0 || classStats?.length > 0);
+        if (!this.hasData) {
+          this.analyticsError = 'No analytics data available yet. Create classes and record transactions to see insights.';
+        } else {
+          this.analyticsError = null;
+        }
         this.isLoading = false;
         this.cdr.markForCheck();
       },
       error: e => {
         this.logger.error('Analytics load error:', e);
         this.error = 'Failed to load analytics data. Please refresh.';
+        this.analyticsError = 'Failed to load analytics data. Please try refreshing the page.';
         this.isLoading = false;
         this.cdr.markForCheck();
       }
@@ -195,8 +204,8 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
       datasets: [{
         data: data.map(d => d.amount),
         backgroundColor: data.map((_, i) =>
-          `rgba(79,189,189,${0.4 + (i / Math.max(data.length - 1, 1)) * 0.55})`),
-        borderColor: '#4fbdbd',
+          `rgba(99,102,241,${0.4 + (i / Math.max(data.length - 1, 1)) * 0.55})`),
+        borderColor: '#6366f1',
         borderWidth: 2,
         borderRadius: 8,
         borderSkipped: false,
@@ -276,4 +285,5 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
       }]
     };
   }
+
 }

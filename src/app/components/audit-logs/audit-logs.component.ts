@@ -3,6 +3,8 @@ import { AuditLog, AuditFilters, AuditService } from '../../services/audit.servi
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthStateService } from '../../auth/auth-state.service';
 
 @Component({
   selector: 'app-audit-logs',
@@ -65,7 +67,14 @@ export class AuditLogsComponent implements OnInit, OnDestroy {
   selectedParsed: any = null;
   selectedParsedLabel = '';
 
-  constructor(private auditService: AuditService, private cdr: ChangeDetectorRef) { }
+  isLoading = false;
+
+  constructor(
+    private auditService: AuditService,
+    private cdr: ChangeDetectorRef,
+    private authState: AuthStateService,
+    private router: Router,
+  ) { }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -73,16 +82,30 @@ export class AuditLogsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    const role = this.authState.getUser()?.role;
+    if (role !== 'ADMIN') {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
     this.loadLogs();
   }
 
   loadLogs() {
+    this.isLoading = true;
+    this.cdr.markForCheck();
     this.auditService.getAuditLogs(this.page, this.size, this.filters)
       .pipe(takeUntil(this.destroy$))
-      .subscribe(res => {
-        this.logs = res.content;
-        this.totalPages = res.totalPages;
-        this.cdr.markForCheck();
+      .subscribe({
+        next: (res) => {
+          this.logs = res.content;
+          this.totalPages = res.totalPages;
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        }
       });
   }
 

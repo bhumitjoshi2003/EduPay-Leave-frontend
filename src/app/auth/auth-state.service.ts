@@ -10,14 +10,14 @@ export interface UserInfo {
   className: string | null;
   schoolSlug: string | null;
   // Entitlement fields — null for SUPER_ADMIN or schools with no subscription
-  featureKeys: string[];
+  featureKeys: string[] | null;
   planTier: string | null;
   planVersion: string | null;
   subscriptionStatus: string | null;
   trialEndsAt: string | null;
   expiresAt: string | null;
   graceEndsAt: string | null;
-  permissionKeys: string[];
+  permissionKeys: string[] | null;
 }
 
 @Injectable({
@@ -35,7 +35,9 @@ export class AuthStateService {
         this.http.get<UserInfo>(`${this.apiUrl}/me`, { withCredentials: true })
       );
       this.user = userInfo;
-    } catch {
+    } catch (err) {
+      // Expected on app start when no valid session exists (e.g. first visit, expired token)
+      console.warn('[AuthStateService] Could not load current user — treating as logged out:', err);
       this.user = null;
     }
   }
@@ -64,28 +66,23 @@ export class AuthStateService {
     return this.user !== null;
   }
 
-  /**
-   * Returns true if the school's current subscription includes the given feature.
-   * Frontend check is UX only — backend is always authoritative.
-   */
+  /** UX-only feature check — backend is always authoritative. */
   hasFeature(featureKey: string): boolean {
     const keys = this.user?.featureKeys;
-    if (!keys || keys.length === 0) return true;
+    if (!keys || keys.length === 0) return false;
     return keys.includes(featureKey);
   }
 
   /**
    * UX-only permission check — backend is always authoritative.
-   * Returns true if the user's role has the given permission key,
-   * or if no permission data is loaded (graceful fallback).
+   * Returns false if no permission data is loaded (deny by default).
    */
   hasPermission(permissionKey: string): boolean {
     const keys = this.user?.permissionKeys;
-    if (!keys || keys.length === 0) return true;
+    if (!keys || keys.length === 0) return false;
     return keys.includes(permissionKey);
   }
 
-  /** Returns the subscription status string (TRIAL / ACTIVE / GRACE / EXPIRED) or null. */
   getSubscriptionStatus(): string | null {
     return this.user?.subscriptionStatus ?? null;
   }

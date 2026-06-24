@@ -41,12 +41,24 @@
         <div class="td-stat-bg">🎓</div>
       </div>
 
-      <div class="td-stat-card"
+      <!-- Absent Today card — 3 states -->
+      <a *ngIf="absentCardState === 'not-marked'" routerLink="/dashboard/teacher-attendance" class="td-action-link">
+        <div class="td-stat-card td-card-clickable"
+          style="--c1:#b45309;--c2:#fbbf24">
+          <div class="td-stat-icon">⏳</div>
+          <div class="td-stat-info">
+            <span class="td-stat-value td-stat-value--sm">Not Marked</span>
+            <span class="td-stat-label">Absent Today</span>
+            <span class="td-action-hint">Mark Now →</span>
+          </div>
+          <div class="td-stat-bg">📋</div>
+        </div>
+      </a>
+      <div class="td-stat-card" *ngIf="absentCardState !== 'not-marked'"
         [style]="absentCardState === 'marked'     ? '--c1:#dc2626;--c2:#f87171' :
-                 absentCardState === 'not-marked'  ? '--c1:#b45309;--c2:#fbbf24' :
                                                      '--c1:#475569;--c2:#94a3b8'">
         <div class="td-stat-icon">
-          {{ absentCardState === 'weekend' ? '🏖️' : absentCardState === 'not-marked' ? '⏳' : '😔' }}
+          {{ absentCardState === 'weekend' ? '🏖️' : '😔' }}
         </div>
         <div class="td-stat-info">
           <span class="td-stat-value" *ngIf="absentCardState === 'marked'">{{ todayAbsent }}</span>
@@ -73,7 +85,7 @@
                                        '--c1:#dc2626;--c2:#f87171'">
         <div class="td-stat-icon">📊</div>
         <div class="td-stat-info">
-          <span class="td-stat-value">{{ monthlyAttendanceRate | number:'1.0-1' }}%</span>
+          <span class="td-stat-value">{{ monthlyAttendanceRate }}%</span>
           <span class="td-stat-label">Monthly Attendance</span>
         </div>
         <div class="td-stat-bg">📈</div>
@@ -160,7 +172,7 @@
             <div class="td-action-icon" style="background:#f0fdf4;color:#15803d">
               <mat-icon>event</mat-icon>
             </div>
-            <span>Events</span>
+            <span>Event Calendar</span>
           </a>
           <a class="td-action-card" routerLink="/dashboard/attendance-summary">
             <div class="td-action-icon" style="background:#ecfdf5;color:#065f46">

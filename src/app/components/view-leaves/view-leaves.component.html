@@ -1,88 +1,99 @@
-<div class="vl-container">
+<div class="vl-page">
 
-  <!-- ── Left class navigation (Admin only) ──────────────────────── -->
-  <div *ngIf="loggedInUserRole === 'ADMIN'" class="vl-left-nav">
-    <h2>Classes</h2>
-    <ul class="vl-class-list">
-      <li (click)="onClassSelect('all')"
-          [class.selected]="selectedClass === 'all'"
-          class="vl-class-item">
-        <div class="vl-class-pill">All Leaves</div>
-      </li>
-      <li *ngFor="let c of classList; trackBy: trackByClass"
-          (click)="onClassSelect(c)"
-          [class.selected]="selectedClass === c"
-          class="vl-class-item">
-        <div class="vl-class-pill">{{ c }}</div>
-      </li>
-    </ul>
+  <!-- ── Hero ─────────────────────────────────────────────────────── -->
+  <div class="vl-hero">
+    <div class="vl-hero-left">
+      <div class="vl-hero-icon">📋</div>
+      <div>
+        <h1 class="vl-hero-title">Leave Applications</h1>
+        <p class="vl-hero-sub" *ngIf="loggedInUserRole === 'TEACHER'">Class {{ loggedInUserClass }}</p>
+        <p class="vl-hero-sub" *ngIf="loggedInUserRole === 'ADMIN'">
+          {{ selectedClass === 'all' ? 'All Classes' : 'Class ' + selectedClass }}
+        </p>
+      </div>
+    </div>
+    <div class="vl-hero-stat" *ngIf="totalElements > 0">
+      <span class="vl-hero-num">{{ totalElements }}</span>
+      <span class="vl-hero-lbl">Leaves</span>
+    </div>
+    <div class="vl-blob vl-blob-1"></div>
+    <div class="vl-blob vl-blob-2"></div>
   </div>
 
-  <!-- ── Main content area ─────────────────────────────────────────── -->
-  <div class="vl-main">
+  <!-- ── Class Chips (Admin only) ──────────────────────────────────── -->
+  <div class="vl-chips-wrap" *ngIf="loggedInUserRole === 'ADMIN'">
+    <div class="vl-chips">
+      <button class="vl-chip" [class.vl-chip-active]="selectedClass === 'all'"
+        (click)="onClassSelect('all')">All</button>
+      <button *ngFor="let c of classList; trackBy: trackByClass"
+        class="vl-chip" [class.vl-chip-active]="selectedClass === c"
+        (click)="onClassSelect(c)">{{ c }}</button>
+    </div>
+  </div>
 
-    <!-- Hero -->
-    <div class="vl-hero">
-      <div class="vl-hero-left">
-        <div class="vl-hero-icon">📋</div>
-        <div class="vl-hero-text">
-          <h1>Leave Applications
-            <span class="vl-hero-count" *ngIf="totalElements > 0">{{ totalElements }}</span>
-          </h1>
-          <p *ngIf="loggedInUserRole === 'TEACHER'">Class {{ loggedInUserClass }}</p>
-          <p *ngIf="loggedInUserRole === 'ADMIN'">
-            {{ selectedClass === 'all' ? 'All Classes' : 'Class ' + selectedClass }}
-          </p>
-        </div>
+  <!-- ── Filters Card ───────────────────────────────────────────────── -->
+  <div class="vl-filter-card">
+    <div class="vl-filter-row">
+      <div class="vl-filter-group">
+        <label class="vl-filter-label">Filter by Date</label>
+        <mat-form-field appearance="outline" class="vl-date-field">
+          <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate"
+            (ngModelChange)="onDateSelect()" placeholder="Pick a date">
+          <mat-datepicker-toggle matSuffix [for]="picker">
+            <mat-icon>calendar_today</mat-icon>
+          </mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
       </div>
-      <div class="vl-blob vl-blob-1"></div>
-      <div class="vl-blob vl-blob-2"></div>
+
+      <div class="vl-filter-group">
+        <label class="vl-filter-label">Filter by Student ID</label>
+        <mat-form-field appearance="outline" class="vl-id-field">
+          <input matInput [(ngModel)]="studentIdFilter" (input)="onStudentIdInput()"
+            placeholder="Enter student ID">
+        </mat-form-field>
+      </div>
     </div>
 
-    <!-- Filters -->
-    <div class="vl-filter-card">
-      <div class="vl-filter-row">
-        <div class="vl-filter-group">
-          <label class="vl-filter-label">Filter by Date</label>
-          <mat-form-field appearance="outline" class="vl-mat-field">
-            <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate"
-              (ngModelChange)="onDateSelect()" placeholder="Pick a date">
-            <mat-datepicker-toggle matSuffix [for]="picker">
-              <mat-icon>calendar_today</mat-icon>
-            </mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-          </mat-form-field>
-        </div>
-
-        <div class="vl-filter-group">
-          <label class="vl-filter-label">Filter by Student ID</label>
-          <mat-form-field appearance="outline" class="vl-mat-field">
-            <input matInput [(ngModel)]="studentIdFilter" (input)="onStudentIdInput()"
-              placeholder="Enter student ID">
-          </mat-form-field>
-        </div>
-
-        <div class="vl-filter-actions">
-          <button class="vl-btn-clear" (click)="clearFilter()">Clear</button>
-          <button *ngIf="loggedInUserRole === 'ADMIN'" class="vl-btn-delete-all"
-            (click)="deleteAllFilteredLeaves()">🗑 Delete Leaves</button>
-        </div>
-      </div>
-
+    <div class="vl-filter-actions">
+      <button class="vl-btn-clear" (click)="clearFilter()">Clear</button>
       <div class="vl-filter-meta" *ngIf="totalElements > 0">
-        <span class="vl-meta-count">{{ totalElements }} results</span>
+        <span>{{ totalElements }} results</span>
+      </div>
+      <button *ngIf="loggedInUserRole === 'ADMIN'" class="vl-btn-delete-all"
+        [disabled]="allApproved"
+        (click)="deleteAllFilteredLeaves()">🗑 Delete Leaves</button>
+    </div>
+  </div>
+
+  <!-- ── Skeleton ─────────────────────────────────────────────────── -->
+  <div class="vl-section" *ngIf="isLoading">
+    <div class="vl-list">
+      <div class="vl-card" *ngFor="let _ of [1,2,3,4,5]" style="pointer-events:none">
+        <div class="sk-shimmer" style="width:44px;height:58px;border-radius:10px;flex-shrink:0"></div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:7px;padding:2px 8px">
+          <span class="sk-shimmer" style="width:54%;height:14px"></span>
+          <span class="sk-shimmer" style="width:68%;height:11px"></span>
+          <span class="sk-shimmer" style="width:42%;height:10px"></span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0">
+          <span class="sk-shimmer" style="width:72px;height:22px;border-radius:12px"></span>
+          <span class="sk-shimmer" style="width:80px;height:30px;border-radius:8px"></span>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- Empty state -->
-    <div class="vl-empty" *ngIf="filteredLeaves.length === 0">
-      <div class="vl-empty-icon">📭</div>
-      <p class="vl-empty-title">No leave applications found</p>
-      <p class="vl-empty-sub">Try clearing the filters or selecting a different class</p>
-    </div>
+  <!-- ── Empty State ────────────────────────────────────────────────── -->
+  <div class="vl-empty" *ngIf="!isLoading && filteredLeaves.length === 0">
+    <div class="vl-empty-icon">📭</div>
+    <p class="vl-empty-title">No leave applications found</p>
+    <p class="vl-empty-sub">Try clearing the filters or selecting a different class</p>
+  </div>
 
-    <!-- Leave list -->
-    <div class="vl-list" *ngIf="filteredLeaves.length > 0">
+  <!-- ── Leave Cards ────────────────────────────────────────────────── -->
+  <div class="vl-section" *ngIf="!isLoading && filteredLeaves.length > 0">
+    <div class="vl-list">
       <div class="vl-card" *ngFor="let leave of filteredLeaves; trackBy: trackByLeaveId">
 
         <!-- Date badge -->
@@ -100,7 +111,7 @@
           <span class="vl-card-reason" *ngIf="leave.reason">{{ leave.reason }}</span>
         </div>
 
-        <!-- Status + actions -->
+        <!-- Right side: status + actions -->
         <div class="vl-card-right">
           <span class="vl-status-chip"
             [class.vl-status-pending]="leave.status === 'PENDING'"
@@ -110,34 +121,34 @@
           </span>
           <div class="vl-actions" *ngIf="loggedInUserRole === 'ADMIN' || loggedInUserRole === 'TEACHER'">
             <ng-container *ngIf="leave.status === 'PENDING'">
-              <button class="vl-btn-approve" (click)="updateLeaveStatus(leave, 'APPROVED')" title="Approve">✓ Approve</button>
-              <button class="vl-btn-reject"  (click)="updateLeaveStatus(leave, 'REJECTED')" title="Reject">✕ Reject</button>
+              <button class="vl-btn-approve" [disabled]="updatingLeaveIds.has(leave.id)" (click)="updateLeaveStatus(leave, 'APPROVED')" title="Approve">✓</button>
+              <button class="vl-btn-reject"  [disabled]="updatingLeaveIds.has(leave.id)" (click)="updateLeaveStatus(leave, 'REJECTED')" title="Reject">✕</button>
             </ng-container>
             <button *ngIf="leave.status !== 'PENDING'"
-              class="vl-btn-edit" (click)="editLeaveStatus(leave)">✎ Edit</button>
+              class="vl-btn-edit" (click)="editLeaveStatus(leave)" title="Edit status">✎</button>
             <button *ngIf="loggedInUserRole === 'ADMIN' && leave.status !== 'APPROVED'"
-              class="vl-btn-del" (click)="deleteLeave(leave.id)">🗑</button>
+              class="vl-btn-del" (click)="deleteLeave(leave.id)" title="Delete">🗑</button>
           </div>
         </div>
 
       </div>
     </div>
-
-    <!-- Pagination -->
-    <div class="vl-pagination" *ngIf="totalElements > 0 && totalPages > 1">
-      <button class="vl-page-btn" (click)="prevPage()" [disabled]="currentPage === 0">← Prev</button>
-
-      <ng-container *ngFor="let p of getPaginationDisplayPages(); trackBy: trackByIndex">
-        <ng-container *ngIf="p !== '...'; else dots">
-          <button class="vl-page-num" [class.vl-page-active]="currentPage === +p" (click)="goToPage(+p)">
-            {{ +p + 1 }}
-          </button>
-        </ng-container>
-        <ng-template #dots><span class="vl-ellipsis">…</span></ng-template>
-      </ng-container>
-
-      <button class="vl-page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages - 1">Next →</button>
-    </div>
-
   </div>
+
+  <!-- ── Pagination ──────────────────────────────────────────────────── -->
+  <div class="vl-pagination" *ngIf="!isLoading && totalElements > 0 && totalPages > 1">
+    <button class="vl-page-btn" (click)="prevPage()" [disabled]="currentPage === 0">← Prev</button>
+
+    <ng-container *ngFor="let p of getPaginationDisplayPages(); trackBy: trackByIndex">
+      <ng-container *ngIf="p !== '...'; else dots">
+        <button class="vl-page-num" [class.vl-page-active]="currentPage === +p" (click)="goToPage(+p)">
+          {{ +p + 1 }}
+        </button>
+      </ng-container>
+      <ng-template #dots><span class="vl-ellipsis">…</span></ng-template>
+    </ng-container>
+
+    <button class="vl-page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages - 1">Next →</button>
+  </div>
+
 </div>

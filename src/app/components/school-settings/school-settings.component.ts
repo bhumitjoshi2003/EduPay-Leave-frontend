@@ -188,6 +188,14 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
       this.toast.warning('Validation', 'Pincode must be exactly 6 digits.');
       return;
     }
+    if (this.editForm.website && !/^https?:\/\/.+/.test(this.editForm.website.trim())) {
+      this.toast.warning('Validation', 'Website URL must start with http:// or https://.');
+      return;
+    }
+    if (!this.editForm.workingDays || this.editForm.workingDays.trim() === '') {
+      this.toast.warning('Validation', 'At least one working day must be selected.');
+      return;
+    }
     this.saving = true;
     this.cdr.markForCheck();
     this.schoolService.updateSettings(this.editForm).pipe(takeUntil(this.destroy$)).subscribe({

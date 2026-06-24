@@ -1,111 +1,106 @@
-<div class="ta-container">
+<div class="ta-page">
 
-  <!-- ── Left class navigation (Admin only) ──────────────────────── -->
-  <div *ngIf="loggedInUserRole === 'ADMIN'" class="ta-left-nav">
-    <h2>Classes</h2>
-    <ul class="ta-class-list">
-      <li *ngFor="let className of classList; trackBy: trackByClass"
-          (click)="onClassSelect(className)"
-          [class.selected]="className === selectedClass"
-          class="ta-class-item">
-        <div class="ta-class-pill">{{ className }}</div>
-      </li>
-    </ul>
+  <!-- ── Hero ──────────────────────────────────────────────────────── -->
+  <div class="ta-hero">
+    <div class="ta-hero-left">
+      <div class="ta-hero-icon">✅</div>
+      <div>
+        <h1 class="ta-hero-title">Attendance</h1>
+        <p class="ta-hero-sub">Mark student attendance by class</p>
+      </div>
+    </div>
+    <div class="ta-blob ta-blob-1"></div>
+    <div class="ta-blob ta-blob-2"></div>
   </div>
 
-  <!-- ── Main content area ─────────────────────────────────────────── -->
-  <div class="ta-main">
-
-    <!-- Hero -->
-    <div class="ta-hero">
-      <div class="ta-hero-left">
-        <div class="ta-hero-icon">✅</div>
-        <div class="ta-hero-text">
-          <h1>Mark Attendance</h1>
-          <p>Class {{ selectedClass }}</p>
-        </div>
-      </div>
-      <div class="ta-blob ta-blob-1"></div>
-      <div class="ta-blob ta-blob-2"></div>
+  <!-- ── Class Chips (admin only) ──────────────────────────────────── -->
+  <div class="ta-chips-wrap" *ngIf="loggedInUserRole === 'ADMIN'">
+    <div class="ta-chips">
+      <button *ngFor="let className of classList; trackBy: trackByClass" class="ta-chip"
+        [class.ta-chip-active]="className === selectedClass"
+        (click)="onClassSelect(className)">{{ className }}</button>
     </div>
+  </div>
 
-    <!-- Section chips -->
-    <div class="ta-section-chips" *ngIf="sections.length > 0">
+  <!-- ── Section Chips ────────────────────────────────────────────── -->
+  <div class="ta-chips-wrap" *ngIf="sections.length > 0">
+    <div class="ta-chips">
       <span class="section-label">Sections</span>
-      <button class="ta-section-chip" [class.ta-section-active]="selectedSectionId === null"
+      <button class="ta-chip ta-chip-section" [class.ta-chip-active]="selectedSectionId === null"
         (click)="onSectionSelect(null)">All Sections</button>
-      <button *ngFor="let sec of sections" class="ta-section-chip"
-        [class.ta-section-active]="selectedSectionId === sec.id"
+      <button *ngFor="let sec of sections" class="ta-chip ta-chip-section"
+        [class.ta-chip-active]="selectedSectionId === sec.id"
         (click)="onSectionSelect(sec.id!)">{{ sec.name }}</button>
     </div>
-
-    <!-- Controls card -->
-    <div class="ta-controls">
-      <div class="ta-controls-row">
-        <mat-form-field appearance="outline" class="ta-date-field">
-          <input matInput [matDatepicker]="picker" [(ngModel)]="attendanceDate" (dateChange)="onDateChange($event)" />
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
-        <div class="ta-action-btns">
-          <button class="ta-btn ta-btn-save"
-            [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate) || !hasStudents"
-            (click)="saveAttendance()">✓ Save</button>
-          <button class="ta-btn ta-btn-delete"
-            [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate) || disableDeleteButton || !hasStudents"
-            (click)="deleteAttendance()">✕ Delete</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Warnings -->
-    <div class="ta-warning" *ngIf="!isDateWithinAllowedRange()">
-      Attendance can only be modified for dates between {{ getRelativeDate(-3) }} and {{ getRelativeDate(0) }}.
-    </div>
-    <div class="ta-warning ta-warning-sunday" *ngIf="isSunday(attendanceDate)">
-      Sunday is a holiday 😄
-    </div>
-
-    <!-- Empty state -->
-    <div class="ta-empty" *ngIf="!hasStudents">
-      <div class="ta-empty-icon">🔍</div>
-      <p class="ta-empty-title">No students found</p>
-      <p class="ta-empty-sub">No students found for the selected class.</p>
-    </div>
-
-    <!-- Student list -->
-    <div class="ta-list" *ngIf="hasStudents">
-      <div *ngFor="let student of students; trackBy: trackByStudentId"
-           class="ta-student-card" [class.ta-absent]="student.absent">
-
-        <div class="ta-student-avatar" [class.ta-avatar-absent]="student.absent">
-          {{ student.name.charAt(0).toUpperCase() }}
-        </div>
-
-        <span class="ta-student-name">{{ student.name }}</span>
-
-        <select *ngIf="student.absent" class="ta-status-select"
-          [(ngModel)]="student.status"
-          [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)">
-          <option value="ABSENT">Absent</option>
-          <option value="HALF_DAY">Half Day</option>
-          <option value="LATE">Late</option>
-          <option value="EXCUSED">Excused</option>
-        </select>
-
-        <button *ngIf="!student.absent" class="ta-mark-btn ta-mark-absent"
-          [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
-          (click)="markAbsent(student.studentId)">
-          Mark Absent
-        </button>
-        <button *ngIf="student.absent" class="ta-mark-btn ta-mark-present"
-          [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
-          (click)="markPresent(student.studentId)">
-          Mark Present
-        </button>
-
-      </div>
-    </div>
-
   </div>
+
+  <!-- ── Controls Card ─────────────────────────────────────────────── -->
+  <div class="ta-controls">
+    <h2 class="ta-class-title">Class {{ selectedClass }}</h2>
+    <div class="ta-controls-row">
+      <mat-form-field appearance="outline" class="ta-date-field">
+        <input matInput [matDatepicker]="picker" [(ngModel)]="attendanceDate" (dateChange)="onDateChange($event)" />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <span class="attendance-marked-badge" *ngIf="isAttendanceAlreadyMarked">&#10003; Already Marked</span>
+      <div class="ta-action-btns">
+        <button class="ta-btn ta-btn-save"
+          [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate) || !hasStudents || isSaving"
+          (click)="saveAttendance()">{{ isSaving ? 'Saving…' : '✓ Save' }}</button>
+        <button class="ta-btn ta-btn-delete"
+          [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate) || disableDeleteButton || !hasStudents"
+          (click)="deleteAttendance()">✕ Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Warnings ───────────────────────────────────────────────────── -->
+  <div class="ta-warning" *ngIf="!isDateWithinAllowedRange()">
+    Attendance can only be modified for dates between {{ getRelativeDate(-3) }} and {{ getRelativeDate(0) }}.
+  </div>
+  <div class="ta-warning ta-warning-sunday" *ngIf="isSunday(attendanceDate)">
+    Sunday is a holiday 😄
+  </div>
+
+  <!-- ── Empty ─────────────────────────────────────────────────────── -->
+  <div class="ta-empty" *ngIf="!hasStudents">
+    <div class="ta-empty-icon">🔍</div>
+    <p class="ta-empty-title">No students found</p>
+    <p class="ta-empty-sub">No students found for the selected class.</p>
+  </div>
+
+  <!-- ── Student List ───────────────────────────────────────────────── -->
+  <div class="ta-list" *ngIf="hasStudents">
+    <div *ngFor="let student of students; trackBy: trackByStudentId"
+      class="ta-student-card" [class.ta-absent]="student.absent">
+
+      <div class="ta-student-avatar" [class.ta-avatar-absent]="student.absent">
+        {{ student.name.charAt(0).toUpperCase() }}
+      </div>
+
+      <span class="ta-student-name">{{ student.name }}</span>
+
+      <select *ngIf="student.absent" class="ta-status-select"
+        [(ngModel)]="student.status"
+        [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)">
+        <option value="ABSENT">Absent</option>
+        <option value="HALF_DAY">Half Day</option>
+        <option value="LATE">Late</option>
+        <option value="EXCUSED">Excused</option>
+      </select>
+
+      <button *ngIf="!student.absent" class="ta-mark-btn ta-mark-absent"
+        [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
+        (click)="markAbsent(student.studentId)">
+        Mark Absent
+      </button>
+      <button *ngIf="student.absent" class="ta-mark-btn ta-mark-present"
+        [disabled]="!isDateWithinAllowedRange() || isSunday(attendanceDate)"
+        (click)="markPresent(student.studentId)">
+        Mark Present
+      </button>
+    </div>
+  </div>
+
 </div>

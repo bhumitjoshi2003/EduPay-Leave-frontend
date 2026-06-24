@@ -10,7 +10,7 @@
     <div class="an-hero-right">
       <div class="an-date-card">
         <span class="an-date-day">{{ today | date:'EEEE' }}</span>
-        <span class="an-date-full">{{ today | date:'d MMMM yyyy' }}</span>
+        <span class="an-date-full">{{ today | date:'d MMM yyyy' }}</span>
       </div>
     </div>
     <div class="an-blob an-blob-1"></div>
@@ -20,19 +20,26 @@
   <!-- ── Skeleton ─────────────────────────────────────────────────── -->
   <ng-container *ngIf="isLoading">
     <div class="an-stats-grid">
-      <div class="sk-shimmer" style="height:90px;border-radius:16px" *ngFor="let i of [1,2,3,4]"></div>
+      <div class="sk-shimmer" style="height:80px;border-radius:16px" *ngFor="let i of [1,2,3,4]"></div>
     </div>
     <div class="an-charts-row">
-      <div class="sk-shimmer" style="height:320px;border-radius:18px"></div>
-      <div class="sk-shimmer" style="height:320px;border-radius:18px"></div>
+      <div class="sk-shimmer" style="height:320px;border-radius:16px"></div>
+      <div class="sk-shimmer" style="height:320px;border-radius:16px"></div>
     </div>
-    <div class="sk-shimmer" style="height:320px;border-radius:18px"></div>
-    <div class="sk-shimmer" style="height:320px;border-radius:18px"></div>
+    <div class="sk-shimmer" style="height:320px;border-radius:16px"></div>
+    <div class="sk-shimmer" style="height:320px;border-radius:16px"></div>
   </ng-container>
 
   <p class="an-error" *ngIf="error && !isLoading">{{ error }}</p>
 
-  <ng-container *ngIf="!isLoading && !error">
+  <div *ngIf="analyticsError && !isLoading" class="analytics-empty-state">
+    <p>{{ analyticsError }}</p>
+  </div>
+  <div *ngIf="!analyticsError && !isLoading && !hasData" class="analytics-empty-state">
+    <p>No data to display. Add classes and record fee transactions to see analytics.</p>
+  </div>
+
+  <ng-container *ngIf="!isLoading && !error && hasData && !analyticsError">
 
     <!-- ── Summary Stats ─────────────────────────────────────────── -->
     <div class="an-stats-grid">
@@ -40,7 +47,7 @@
       <div class="an-stat-card" style="--c1:#0369a1;--c2:#0ea5e9">
         <div class="an-stat-icon">👨‍🎓</div>
         <div class="an-stat-info">
-          <span class="an-stat-value">{{ totalStudents | number }}</span>
+          <span class="an-stat-value">{{ totalStudents }}</span>
           <span class="an-stat-label">Total Students</span>
         </div>
         <div class="an-stat-bg">🎓</div>
@@ -140,7 +147,7 @@
           <h3 class="an-chart-title">Student Distribution</h3>
           <p class="an-chart-sub">Total students across all classes</p>
         </div>
-        <span class="an-chart-badge an-badge-violet">{{ totalStudents | number }} Students</span>
+        <span class="an-chart-badge an-badge-violet">{{ totalStudents }} Students</span>
       </div>
       <div class="an-chart-body an-donut-body">
         <canvas baseChart [data]="distributionData" [options]="distributionOptions" type="doughnut"></canvas>

@@ -2,9 +2,11 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestro
 import { LoggerService } from '../../services/logger.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil, switchMap, Observable, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { TeacherService } from '../../services/teacher.service';
+import { Teacher } from '../../interfaces/teacher';
 import { AuthStateService } from '../../auth/auth-state.service';
+import { SchoolService } from '../../services/school.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -14,7 +16,6 @@ import { ToastService } from '../../services/toast.service';
 import { from, concatMap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { LeaveApplication, LeaveService, PaginatedResponse } from '../../services/leave.service';
-import { SchoolService } from '../../services/school.service';
 
 @Component({
   selector: 'app-view-leaves',
@@ -37,6 +38,8 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   loggedInUserId: string = '';
   loggedInUserClass: string = '';
   filteredLeaves: LeaveApplication[] = [];
+  isLoading: boolean = true;
+  updatingLeaveIds: Set<number> = new Set();
 
   classList: string[] = [];
   selectedClass: string = 'all';
@@ -59,16 +62,15 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
     private authStateService: AuthStateService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
-    private schoolService: SchoolService,
-    private toast: ToastService
+    private toast: ToastService,
+    private schoolService: SchoolService
   ) { }
 
   ngOnInit(): void {
-    this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
-      next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-      error: (err) => this.logger.error('Failed to load classes', err)
+    this.schoolService.getClasses().pipe(takeUntil(this.ngUnsubscribe)).subscribe(classes => {
+      this.classList = classes;
+      this.cdr.markForCheck();
     });
-
     this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
       const studentIdFromParams = params['studentId'];
       if (studentIdFromParams) {
@@ -111,21 +113,20 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
   getTeacherClassAndLoadLeaves(): void {
     this.teacherService.getTeacher(this.loggedInUserId).pipe(
       takeUntil(this.ngUnsubscribe),
-      switchMap((teacher: any) => {
-        this.loggedInUserClass = teacher.classTeacher;
-        this.selectedClass = teacher.classTeacher;
-        return this.fetchLeaves();
-      })
     ).subscribe({
-      next: () => { },
-      error: (error: any) => {
-        this.logger.error('Error fetching teacher details or leaves:', error);
+      next: (teacher: Teacher) => {
+        this.loggedInUserClass = teacher.classTeacher ?? '';
+        this.selectedClass = teacher.classTeacher ?? '';
+        this.fetchLeaves();
+      },
+      error: (error: unknown) => {
+        this.logger.error('Error fetching teacher details:', error);
         this.toast.error('Error!', 'Failed to load teacher details or leave applications.');
       }
     });
   }
 
-  fetchLeaves(): Observable<PaginatedResponse<LeaveApplication>> {
+  fetchLeaves(): void {
     let classFilterToSend: string | undefined = undefined;
 
     if (this.loggedInUserRole === 'ADMIN') {
@@ -152,6 +153,9 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
       'desc'
     );
 
+    this.isLoading = true;
+    this.cdr.markForCheck();
+
     leavesObservable.pipe(takeUntil(this.ngUnsubscribe))
       .subscribe({
         next: (response: PaginatedResponse<LeaveApplication>) => {
@@ -159,18 +163,19 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
           this.totalElements = response.totalElements;
           this.totalPages = response.totalPages;
           this.currentPage = response.number;
+          this.isLoading = false;
           this.cdr.markForCheck();
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.logger.error('Error loading leave applications:', error);
           this.toast.error('Error!', 'Failed to load leave applications.');
           this.filteredLeaves = [];
           this.totalElements = 0;
           this.totalPages = 0;
+          this.isLoading = false;
           this.cdr.markForCheck();
         }
       });
-    return leavesObservable;
   }
 
   formatDate(date: Date): string {
@@ -219,55 +224,57 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
     }
 
     this.toast.confirm({
-      title: 'Are you sure?',
-      message: `You want to delete ${deletable.length} leave application(s) on this page? Approved leaves will be skipped.`,
+      title: 'Delete All Leaves?',
+      html: `This will delete <strong>${deletable.length}</strong> leave application(s) on this page. Approved leaves are skipped.`,
       icon: 'warning',
       danger: true,
-      confirmText: 'Yes, delete!',
+      confirmText: 'Yes, delete all!',
       cancelText: 'Cancel',
     }).then((confirmed) => {
-      if (confirmed) {
-        from(deletable).pipe(
-          concatMap(leave => this.leaveService.deleteLeaveById(leave.id)),
-          takeUntil(this.ngUnsubscribe)
-        ).subscribe({
-          next: () => { },
-          complete: () => {
-            this.toast.success('Deleted!', 'All displayed leave applications deleted successfully.');
-            this.fetchLeaves();
-          },
-          error: (error) => {
-            this.logger.error('Error deleting leaves:', error);
-            this.toast.error('Error!', 'Failed to delete one or more leave applications.');
-            this.fetchLeaves();
-          }
-        });
-      }
+      if (!confirmed) return;
+      from(deletable).pipe(
+        concatMap(leave => this.leaveService.deleteLeaveById(leave.id)),
+        takeUntil(this.ngUnsubscribe)
+      ).subscribe({
+        next: () => { },
+        complete: () => {
+          this.toast.success('Deleted!', 'All displayed leave applications deleted successfully.');
+          this.fetchLeaves();
+        },
+        error: (error) => {
+          this.logger.error('Error deleting leaves:', error);
+          this.toast.error('Error!', 'Failed to delete one or more leave applications.');
+          this.fetchLeaves();
+        }
+      });
     });
   }
 
   deleteLeave(leaveId: number): void {
     this.toast.confirm({
-      title: 'Are you sure?',
-      message: 'You want to delete this leave application?',
+      title: 'Delete Leave?',
+      message: 'This leave application will be permanently deleted.',
       icon: 'warning',
       danger: true,
       confirmText: 'Yes, delete it!',
       cancelText: 'Cancel',
     }).then((confirmed) => {
-      if (confirmed) {
-        this.leaveService.deleteLeaveById(leaveId).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
-          next: (response) => {
-            this.toast.success('Deleted!', response);
-            this.fetchLeaves();
-          },
-          error: (error) => {
-            this.logger.error('Error deleting leave:', error);
-            this.toast.error('Error!', error?.error || 'Failed to delete the leave application.');
-          }
-        });
-      }
+      if (!confirmed) return;
+      this.leaveService.deleteLeaveById(leaveId).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+        next: (response) => {
+          this.toast.success('Deleted!', response);
+          this.fetchLeaves();
+        },
+        error: (error) => {
+          this.logger.error('Error deleting leave:', error);
+          this.toast.error('Error!', error?.error || 'Failed to delete the leave application.');
+        }
+      });
     });
+  }
+
+  get allApproved(): boolean {
+    return this.filteredLeaves.length > 0 && this.filteredLeaves.every(l => l.status === 'APPROVED');
   }
 
   editLeaveStatus(leave: LeaveApplication): void {
@@ -282,51 +289,60 @@ export class ViewLeavesComponent implements OnInit, OnDestroy {
       cancelText: 'Cancel',
     }).then((confirmed) => {
       if (!confirmed) return;
+      this.updatingLeaveIds.add(leave.id);
+      this.cdr.markForCheck();
       this.leaveService.updateLeaveStatus(leave.id, newStatus)
         .pipe(takeUntil(this.ngUnsubscribe))
         .subscribe({
           next: (updated) => {
             leave.status = updated.status;
+            this.updatingLeaveIds.delete(leave.id);
             this.cdr.markForCheck();
             this.toast.success('Updated!', `Status changed to ${updated.status}.`);
           },
           error: (error) => {
+            this.updatingLeaveIds.delete(leave.id);
             this.logger.error('Error updating leave status:', error);
             this.toast.error('Error!', error?.error || 'Failed to update leave status.');
+            this.cdr.markForCheck();
           }
         });
     });
   }
 
   updateLeaveStatus(leave: LeaveApplication, status: 'APPROVED' | 'REJECTED'): void {
-    const action = status === 'APPROVED' ? 'approve' : 'reject';
+    const isApprove = status === 'APPROVED';
     this.toast.confirm({
-      title: `${status === 'APPROVED' ? 'Approve' : 'Reject'} Leave?`,
-      message: `${leave.studentName} — ${leave.leaveDate}`,
+      title: isApprove ? 'Approve Leave?' : 'Reject Leave?',
+      html: `<strong>${leave.studentName}</strong> &mdash; ${leave.leaveDate}`,
       icon: 'question',
-      danger: status === 'REJECTED',
-      confirmText: `Yes, ${action} it!`,
+      danger: !isApprove,
+      confirmText: isApprove ? 'Yes, approve' : 'Yes, reject',
       cancelText: 'Cancel',
     }).then((confirmed) => {
-      if (confirmed) {
-        this.leaveService.updateLeaveStatus(leave.id, status)
-          .pipe(takeUntil(this.ngUnsubscribe))
-          .subscribe({
-            next: (updated) => {
-              leave.status = updated.status;
-              this.cdr.markForCheck();
-              if (status === 'APPROVED') {
-                this.toast.success('Approved!', `Leave has been approved.`);
-              } else {
-                this.toast.info('Rejected!', `Leave has been rejected.`);
-              }
-            },
-            error: (error) => {
-              this.logger.error('Error updating leave status:', error);
-              this.toast.error('Error!', error?.error || 'Failed to update leave status.');
+      if (!confirmed) return;
+      this.updatingLeaveIds.add(leave.id);
+      this.cdr.markForCheck();
+      this.leaveService.updateLeaveStatus(leave.id, status)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe({
+          next: (updated) => {
+            leave.status = updated.status;
+            this.updatingLeaveIds.delete(leave.id);
+            this.cdr.markForCheck();
+            if (status === 'APPROVED') {
+              this.toast.success('Approved!', `Leave has been approved.`);
+            } else {
+              this.toast.info('Rejected!', `Leave has been rejected.`);
             }
-          });
-      }
+          },
+          error: (error) => {
+            this.updatingLeaveIds.delete(leave.id);
+            this.logger.error('Error updating leave status:', error);
+            this.toast.error('Error!', error?.error || 'Failed to update leave status.');
+            this.cdr.markForCheck();
+          }
+        });
     });
   }
 

@@ -190,8 +190,12 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
                                                     return 'Slug must be lowercase letters, digits, and hyphens only.';
     if (f.email && !emailRx.test(f.email.trim()))   return 'School email is not valid.';
     if (f.phone && !phoneRx.test(f.phone.trim()))   return 'School phone must be exactly 10 digits.';
-    if (f.newAdminPassword && f.newAdminPassword.length < 6)
-                                                    return 'New admin password must be at least 6 characters.';
+    if (f.newAdminPassword && f.newAdminPassword.length < 8)
+                                                    return 'New admin password must be at least 8 characters.';
+    if (f.newAdminPassword && !/[A-Z]/.test(f.newAdminPassword))
+                                                    return 'New admin password must contain at least one uppercase letter.';
+    if (f.newAdminPassword && !/[0-9]/.test(f.newAdminPassword))
+                                                    return 'New admin password must contain at least one number.';
     return null;
   }
 
@@ -214,7 +218,9 @@ export class SuperAdminDashboardComponent implements OnInit, OnDestroy {
     if (!phoneRx.test(f.adminPhone.trim()))           return 'Admin phone must be exactly 10 digits.';
     if (!f.adminDob)                                  return 'Admin date of birth is required.';
     if (!f.adminPassword)                             return 'Admin password is required.';
-    if (f.adminPassword.length < 6)                   return 'Admin password must be at least 6 characters.';
+    if (f.adminPassword.length < 8)                   return 'Admin password must be at least 8 characters.';
+    if (!/[A-Z]/.test(f.adminPassword))               return 'Admin password must contain at least one uppercase letter.';
+    if (!/[0-9]/.test(f.adminPassword))               return 'Admin password must contain at least one number.';
     return null;
   }
 

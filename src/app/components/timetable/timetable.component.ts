@@ -8,13 +8,14 @@ import { TimetableService } from '../../services/timetable.service';
 import { TeacherService } from '../../services/teacher.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { StudentService } from '../../services/student.service';
-import { SchoolService, SchoolClass } from '../../services/school.service';
-import { SectionService } from '../../services/section.service';
-import { Section } from '../../interfaces/section';
 import { LoggerService } from '../../services/logger.service';
 import { TimetableEntry } from '../../interfaces/timetable';
 import { Teacher } from '../../interfaces/teacher';
 import { ToastService } from '../../services/toast.service';
+import { Capacitor } from '@capacitor/core';
+import { SchoolService, SchoolClass } from '../../services/school.service';
+import { SectionService } from '../../services/section.service';
+import { Section } from '../../interfaces/section';
 
 @Component({
   selector: 'app-timetable',
@@ -32,7 +33,6 @@ export class TimetableComponent implements OnInit, OnDestroy {
   userId = '';
   userClassName = '';
 
-  private static readonly ALL_DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
   private static readonly DAY_LABELS: Record<string, string> = {
     MONDAY: 'Monday', TUESDAY: 'Tuesday', WEDNESDAY: 'Wednesday',
     THURSDAY: 'Thursday', FRIDAY: 'Friday', SATURDAY: 'Saturday', SUNDAY: 'Sunday'
@@ -85,9 +85,9 @@ export class TimetableComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
+    private toast: ToastService,
     private schoolService: SchoolService,
-    private sectionService: SectionService,
-    private toast: ToastService
+    private sectionService: SectionService
   ) {}
 
   ngOnInit(): void {
@@ -100,7 +100,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
     this.todayDay = dayMap[new Date().getDay()];
     this.selectedDay = this.days.includes(this.todayDay) ? this.todayDay : this.days[0];
 
-    // Load working days from school settings
+    // Load school settings (working days)
     this.schoolService.getSettings().pipe(takeUntil(this.destroy$)).subscribe({
       next: (settings) => {
         if (settings.workingDays) {
@@ -111,10 +111,11 @@ export class TimetableComponent implements OnInit, OnDestroy {
         }
         this.cdr.markForCheck();
       },
-      error: (err) => this.logger.error('Failed to load timetable', err)
+      error: (err) => this.logger.error('Failed to load school settings', err)
     });
 
     if (this.isAdmin()) {
+      // Load class list + managed classes in parallel so section lookup has IDs
       forkJoin({
         classes: this.schoolService.getClasses(),
         managed: this.schoolService.getManagedClasses()
@@ -138,12 +139,14 @@ export class TimetableComponent implements OnInit, OnDestroy {
 
     if (this.isStudent()) {
       this.selectedClass = this.userClassName;
+      // Fetch the student's section so we filter the timetable to their section
       this.studentService.getStudent(this.userId).pipe(takeUntil(this.destroy$)).subscribe({
         next: (student) => {
           this.selectedSectionId = student.sectionId ?? null;
           this.loadClassTimetable();
         },
         error: () => {
+          // Fall back to class-wide timetable if profile fetch fails
           this.loadClassTimetable();
         }
       });
@@ -397,7 +400,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
         this.modalSaving = false;
         this.showModal = false;
         this.loadClassTimetable();
-        this.toast.success('Saved!', 'Timetable entry saved successfully.');
+        this.toast.success('Saved!');
       },
       error: (err) => {
         this.modalSaving = false;
@@ -415,10 +418,8 @@ export class TimetableComponent implements OnInit, OnDestroy {
     this.toast.confirm({
       title: 'Delete this period?',
       message: `${this.modalForm.subjectName} — ${this.dayLabels[this.modalForm.day]} Period ${this.modalForm.periodNumber}`,
-      icon: 'warning',
-      danger: true,
       confirmText: 'Yes, delete',
-      cancelText: 'Cancel',
+      danger: true
     }).then(confirmed => {
       if (!confirmed) return;
       this.timetableService.deleteEntry(this.modalForm.id!)
@@ -426,7 +427,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
           next: () => {
             this.showModal = false;
             this.loadClassTimetable();
-            this.toast.success('Deleted', 'Timetable entry has been deleted.');
+            this.toast.success('Deleted');
           },
           error: (err) => {
             this.logger.error('Failed to delete entry:', err);
@@ -436,7 +437,26 @@ export class TimetableComponent implements OnInit, OnDestroy {
     });
   }
 
-  printTimetable(): void { window.print(); }
+  checkTimeConflict(day: string, startTime: string, endTime: string, excludeId?: number): boolean {
+    if (!startTime || !endTime) return false;
+    return this.entries
+      .filter((e: TimetableEntry) => e.day === day && e.id !== excludeId)
+      .some((e: TimetableEntry) => startTime < e.endTime && e.startTime < endTime);
+  }
+
+  get timetableHeading(): string {
+    const cls = this.selectedClass ?? '';
+    const section = this.selectedSectionName ?? '';
+    return section ? `Class ${cls} – Section ${section}` : `Class ${cls}`;
+  }
+
+  printTimetable(): void {
+    if (Capacitor.isNativePlatform()) {
+      this.toast.info('Print Not Available', 'Printing is not supported on the mobile app. Please use the web version at edunexify.co.in');
+      return;
+    }
+    window.print();
+  }
 
   private emptyForm(): TimetableEntry {
     return {

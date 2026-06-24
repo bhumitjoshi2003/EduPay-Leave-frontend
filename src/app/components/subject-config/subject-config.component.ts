@@ -11,8 +11,8 @@ import {
   OptionalSubjectGroup,
   OptionalSubject,
 } from '../../services/subject-config.service';
-import { SchoolService } from '../../services/school.service';
 import { LoggerService } from '../../services/logger.service';
+import { SchoolService } from '../../services/school.service';
 
 @Component({
   selector: 'app-subject-config',
@@ -29,7 +29,7 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
   classOptions: string[] = [];
 
   // Class subjects tab
-  selectedClass = '';
+  selectedClass = '1';
   classSubjects: ClassSubject[] = [];
   newSubjectName = '';
   newSubjectOptional = false;
@@ -49,21 +49,18 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
 
   constructor(
     private service: SubjectConfigService,
-    private schoolService: SchoolService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
-    private toast: ToastService
+    private toast: ToastService,
+    private schoolService: SchoolService
   ) { }
 
   ngOnInit(): void {
-    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
-      next: classes => {
-        this.classOptions = classes;
-        if (!this.selectedClass && classes.length > 0) this.selectedClass = classes[0];
-        this.cdr.markForCheck();
-        this.loadClassSubjects();
-      },
-      error: e => this.logger.error('Failed to load classes', e)
+    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe(classes => {
+      this.classOptions = classes;
+      if (!this.selectedClass && classes.length > 0) this.selectedClass = classes[0];
+      this.cdr.markForCheck();
+      this.loadClassSubjects();
     });
     this.loadStreams();
     this.loadOptionalGroups();
@@ -83,7 +80,7 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
   loadClassSubjects(): void {
     this.service.getClassSubjects(this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => { this.classSubjects = data; this.cdr.markForCheck(); },
-      error: (e) => this.logger.error('Error loading class subjects:', e),
+      error: (e) => { this.logger.error('Error loading class subjects:', e); this.toast.error('Error', 'Failed to load subjects.'); },
     });
   }
 
@@ -99,6 +96,11 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
     if (!name) return;
     if (this.newSubjectOptional && !this.newSubjectGroup.trim()) {
       this.toast.error('Validation', 'Group name is required for optional subjects.');
+      return;
+    }
+    // Issue #60: Duplicate subject validation
+    if (this.classSubjects.some(s => s.subjectName.toLowerCase() === name.toLowerCase())) {
+      this.toast.error('Duplicate Subject', 'This subject already exists for the selected class.');
       return;
     }
     this.service.addClassSubject(
@@ -124,10 +126,9 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
     this.toast.confirm({
       title: 'Delete subject?',
       message: 'This will remove it from the class.',
-      icon: 'warning',
-      danger: true,
       confirmText: 'Delete',
       cancelText: 'Cancel',
+      danger: true,
     }).then((confirmed) => {
       if (!confirmed) return;
       this.service.deleteClassSubject(id).pipe(takeUntil(this.destroy$)).subscribe({
@@ -147,8 +148,11 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
 
   loadStreams(): void {
     this.service.getStreams().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (data) => { this.streams = data; this.cdr.markForCheck(); },
-      error: (e) => this.logger.error('Error loading streams:', e),
+      next: (data) => {
+        this.streams = (data ?? []).map(s => ({ ...s, coreSubjects: s.coreSubjects ?? [] }));
+        this.cdr.markForCheck();
+      },
+      error: (e) => { this.logger.error('Error loading streams:', e); this.toast.error('Error', 'Failed to load streams.'); },
     });
   }
 
@@ -161,7 +165,7 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
     if (!name) return;
     this.service.addStream(name).pipe(takeUntil(this.destroy$)).subscribe({
       next: (s) => {
-        this.streams = [...this.streams, s];
+        this.streams = [...this.streams, { ...s, coreSubjects: s.coreSubjects ?? [] }];
         this.newStreamName = '';
         this.cdr.markForCheck();
       },
@@ -176,10 +180,9 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
     this.toast.confirm({
       title: 'Delete stream?',
       message: 'This will remove the stream and all its core subjects.',
-      icon: 'warning',
-      danger: true,
       confirmText: 'Delete',
       cancelText: 'Cancel',
+      danger: true,
     }).then((confirmed) => {
       if (!confirmed) return;
       this.service.deleteStream(id).pipe(takeUntil(this.destroy$)).subscribe({
@@ -218,10 +221,9 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
     this.toast.confirm({
       title: 'Delete subject?',
       message: 'This will remove the core subject from the stream.',
-      icon: 'warning',
-      danger: true,
       confirmText: 'Delete',
       cancelText: 'Cancel',
+      danger: true,
     }).then((confirmed) => {
       if (!confirmed) return;
       this.service.deleteCoreSubject(subjectId).pipe(takeUntil(this.destroy$)).subscribe({
@@ -243,8 +245,11 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
 
   loadOptionalGroups(): void {
     this.service.getOptionalGroups().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (data) => { this.optionalGroups = data; this.cdr.markForCheck(); },
-      error: (e) => this.logger.error('Error loading optional groups:', e),
+      next: (data) => {
+        this.optionalGroups = (data ?? []).map(g => ({ ...g, subjects: g.subjects ?? [] }));
+        this.cdr.markForCheck();
+      },
+      error: (e) => { this.logger.error('Error loading optional groups:', e); this.toast.error('Error', 'Failed to load optional groups.'); },
     });
   }
 
@@ -257,7 +262,7 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
     if (!name) return;
     this.service.addOptionalGroup(name).pipe(takeUntil(this.destroy$)).subscribe({
       next: (g) => {
-        this.optionalGroups = [...this.optionalGroups, g];
+        this.optionalGroups = [...this.optionalGroups, { ...g, subjects: g.subjects ?? [] }];
         this.newGroupName = '';
         this.cdr.markForCheck();
       },
@@ -271,10 +276,9 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
   deleteOptionalGroup(id: number): void {
     this.toast.confirm({
       title: 'Delete group?',
-      icon: 'warning',
-      danger: true,
       confirmText: 'Delete',
       cancelText: 'Cancel',
+      danger: true,
     }).then((confirmed) => {
       if (!confirmed) return;
       this.service.deleteOptionalGroup(id).pipe(takeUntil(this.destroy$)).subscribe({
@@ -313,10 +317,9 @@ export class SubjectConfigComponent implements OnInit, OnDestroy {
     this.toast.confirm({
       title: 'Delete subject?',
       message: 'This will remove the subject from the group.',
-      icon: 'warning',
-      danger: true,
       confirmText: 'Delete',
       cancelText: 'Cancel',
+      danger: true,
     }).then((confirmed) => {
       if (!confirmed) return;
       this.service.deleteOptionalSubject(subjectId).pipe(takeUntil(this.destroy$)).subscribe({

@@ -85,6 +85,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
   // Exit modal state
   showExitModal = false;
   exitLoading = false;
+  acknowledgedDues = false;
   exitRequest: StudentExitRequest = {
     exitType: 'WITHDRAWN',
     reasonForLeaving: '',
@@ -402,6 +403,15 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     const file = input.files[0];
     input.value = '';
 
+    if (!file.type.startsWith('image/')) {
+      this.toast.error('Invalid File', 'Please select an image file (JPG, PNG, etc.).');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      this.toast.error('File Too Large', 'Photo must be under 5 MB.');
+      return;
+    }
+
     this.photoUploading = true;
     this.cdr.markForCheck();
 
@@ -441,6 +451,10 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     this.loadSectionsForClass(className);
   }
 
+  get todayStr(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
   // ── Exit Workflow ──────────────────────────────────────────────────
 
   isExitStatus(): boolean {
@@ -457,6 +471,7 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
       exitRemarks: ''
     };
     this.pendingDues = null;
+    this.acknowledgedDues = false;
     this.showExitModal = true;
     this.cdr.markForCheck();
 
@@ -478,6 +493,17 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
     }
     if (!this.exitRequest.leavingDate) {
       this.toast.error('Required', 'Please set a leaving date.');
+      return;
+    }
+    const leavingDate = new Date(this.exitRequest.leavingDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (leavingDate > today) {
+      this.toast.error('Invalid Date', 'Leaving date cannot be in the future.');
+      return;
+    }
+    if (this.pendingDues?.hasPendingDues && !this.acknowledgedDues) {
+      this.toast.error('Pending Dues', 'Please acknowledge the pending dues before proceeding.');
       return;
     }
 

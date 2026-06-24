@@ -1,7 +1,7 @@
 <div *ngIf="showFeesReminderModule; else comingSoonTemplate">
   <div class="fr-page">
 
-    <!-- ── Hero ──────────────────────────────────────────────────────── -->
+    <!-- ── Hero ────────────────────────────────────────────────── -->
     <div class="fr-hero">
       <div class="fr-hero-left">
         <div class="fr-hero-icon">🔔</div>
@@ -14,7 +14,7 @@
       <div class="fr-blob fr-blob-2"></div>
     </div>
 
-    <!-- ── Controls ──────────────────────────────────────────────────── -->
+    <!-- ── Controls ─────────────────────────────────────────────── -->
     <div class="fr-controls no-print">
       <div class="fr-controls-row">
 
@@ -57,7 +57,7 @@
       </div>
     </div>
 
-    <!-- ── Skeleton ────────────────────────────────────────────────── -->
+    <!-- ── Skeleton ─────────────────────────────────────────────── -->
     <div class="fr-table-wrap" *ngIf="isLoading">
       <table class="fr-table" aria-hidden="true">
         <thead>
@@ -91,7 +91,7 @@
     </div>
     <p class="fr-error" *ngIf="error">{{ error }}</p>
 
-    <!-- ── Summary cards ──────────────────────────────────────────── -->
+    <!-- ── Summary cards ────────────────────────────────────────── -->
     <div class="fr-stats" *ngIf="!isLoading && allStudents.length > 0">
       <div class="fr-stat-card" style="--c1:#dc2626;--c2:#f87171">
         <span class="fr-stat-value">{{ filteredStudents.length }}</span>
@@ -115,7 +115,7 @@
       </div>
     </div>
 
-    <!-- ── Action bar ──────────────────────────────────────────────── -->
+    <!-- ── Action bar ────────────────────────────────────────────── -->
     <div class="fr-action-bar no-print" *ngIf="!isLoading && filteredStudents.length > 0">
       <div class="fr-action-left">
         <span class="fr-showing">
@@ -134,7 +134,7 @@
       </button>
     </div>
 
-    <!-- ── Table ──────────────────────────────────────────────────── -->
+    <!-- ── Table ─────────────────────────────────────────────────── -->
     <div class="fr-table-wrap" *ngIf="!isLoading && filteredStudents.length > 0">
 
       <!-- Print header -->
@@ -198,15 +198,17 @@
 
             <td data-label="Action" class="no-print">
               <button class="fr-remind-btn"
-                [class.fr-remind-sent]="reminderSent.has(s.studentId)"
-                [class.fr-remind-sending]="sendingId === s.studentId"
+                [class.fr-remind-sent]="reminderStates.get(s.studentId) === 'sent'"
+                [class.fr-remind-sending]="reminderStates.get(s.studentId) === 'sending'"
+                [class.fr-remind-failed]="reminderStates.get(s.studentId) === 'failed'"
                 [disabled]="!!sendingId || sendingBulk || reminderSent.has(s.studentId)"
                 (click)="sendReminder(s)"
                 [attr.aria-label]="'Send fee reminder to ' + s.studentName">
-                <ng-container *ngIf="reminderSent.has(s.studentId)">✓ Sent</ng-container>
-                <ng-container *ngIf="sendingId === s.studentId">…</ng-container>
-                <ng-container *ngIf="sendingId !== s.studentId && !reminderSent.has(s.studentId)">
-                  Remind
+                <ng-container [ngSwitch]="reminderStates.get(s.studentId)">
+                  <ng-container *ngSwitchCase="'sending'">Sending…</ng-container>
+                  <ng-container *ngSwitchCase="'sent'">✓ Sent</ng-container>
+                  <ng-container *ngSwitchCase="'failed'">✗ Failed</ng-container>
+                  <ng-container *ngSwitchDefault>Remind</ng-container>
                 </ng-container>
               </button>
             </td>
@@ -216,14 +218,18 @@
       </table>
     </div>
 
-    <!-- ── Pagination ──────────────────────────────────────────────── -->
+    <!-- ── Pagination ───────────────────────────────────────────────── -->
     <div class="fr-pagination no-print" *ngIf="!isLoading && totalPages > 1">
       <button class="fr-page-btn" (click)="prevPage()" [disabled]="currentPage === 0">&#8249; Prev</button>
-      <span class="fr-page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+
+      <span class="fr-page-info">
+        Page {{ currentPage + 1 }} of {{ totalPages }}
+      </span>
+
       <button class="fr-page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages - 1">Next &#8250;</button>
     </div>
 
-    <!-- ── Legend ──────────────────────────────────────────────────── -->
+    <!-- ── Legend ────────────────────────────────────────────────── -->
     <div class="fr-legend no-print" *ngIf="!isLoading && filteredStudents.length > 0">
       <span class="fr-legend-item">
         <span class="fr-legend-dot dot-critical"></span> Critical — 60+ days overdue
@@ -236,7 +242,7 @@
       </span>
     </div>
 
-    <!-- ── Empty state ────────────────────────────────────────────── -->
+    <!-- ── Empty state ───────────────────────────────────────────── -->
     <div class="fr-empty" *ngIf="!isLoading && !error && allStudents.length === 0">
       <div class="fr-empty-icon">✅</div>
       <p class="fr-empty-title">All fees are up to date!</p>

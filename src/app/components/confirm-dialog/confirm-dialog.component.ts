@@ -1,4 +1,4 @@
-import { Component, Inject, SecurityContext } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, SecurityContext, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -13,9 +13,11 @@ import { ConfirmDialogData } from '../../services/toast.service';
   templateUrl: './confirm-dialog.component.html',
   styleUrl: './confirm-dialog.component.css',
 })
-export class ConfirmDialogComponent {
+export class ConfirmDialogComponent implements AfterViewInit {
   sanitizedHtml: SafeHtml | null = null;
   confirmInput = '';
+
+  @ViewChild('cancelBtn') cancelBtnRef?: ElementRef<HTMLButtonElement>;
 
   constructor(
     public ref: MatDialogRef<ConfirmDialogComponent>,
@@ -25,6 +27,14 @@ export class ConfirmDialogComponent {
     if (data.html) {
       this.sanitizedHtml = this.sanitizer.sanitize(SecurityContext.HTML, data.html) ?? '';
     }
+    this.ref.keydownEvents().subscribe(event => {
+      if (event.key === 'Escape') this.ref.close(false);
+    });
+  }
+
+  ngAfterViewInit(): void {
+    // Focus cancel button by default (safer choice)
+    setTimeout(() => this.cancelBtnRef?.nativeElement?.focus(), 100);
   }
 
   get confirmDisabled(): boolean {
@@ -33,8 +43,11 @@ export class ConfirmDialogComponent {
 
   get iconName(): string {
     const map: Record<string, string> = {
-      warning: 'warning_amber', danger: 'delete_forever',
-      question: 'help_outline', info: 'info_outline', success: 'check_circle_outline',
+      warning: 'warning_amber',
+      danger:  'delete_forever',
+      question:'help_outline',
+      info:    'info_outline',
+      success: 'check_circle_outline',
     };
     return map[this.data.icon ?? 'warning'] ?? 'warning_amber';
   }
@@ -42,8 +55,11 @@ export class ConfirmDialogComponent {
   get iconClass(): string {
     if (this.data.danger) return 'icon-danger';
     const map: Record<string, string> = {
-      warning: 'icon-warning', danger: 'icon-danger',
-      question: 'icon-question', info: 'icon-info', success: 'icon-success',
+      warning:  'icon-warning',
+      danger:   'icon-danger',
+      question: 'icon-question',
+      info:     'icon-info',
+      success:  'icon-success',
     };
     return map[this.data.icon ?? 'warning'] ?? 'icon-warning';
   }

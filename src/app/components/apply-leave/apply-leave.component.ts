@@ -10,7 +10,6 @@ import { LeaveRequest } from '../../interfaces/leave-request';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { PaginatedResponse } from '../../services/payment-history.service';
 import { Subject, takeUntil } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 
 
 @Component({
@@ -28,6 +27,7 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
   studentName: string = '';
   className = '';
   leaves: { originalLeaveDate: string; leaveDate: string; reason: string; status: string }[] = [];
+  isLoading: boolean = true;
 
   // Pagination
   currentPage: number = 0;
@@ -36,6 +36,7 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
   totalElements: number = 0;
 
   today: string = '';
+  todayDate = new Date();
   reasonOptions: string[] = [
     'Medical Leave',
     'Family Event',
@@ -92,22 +93,30 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
 
   getStudentId(): void {
     const user = this.authStateService.getUser();
-    if (user) {
-      this.studentId = user.userId;
-      this.studentService.getStudent(this.studentId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (student) => {
-          this.className = student.className;
-          this.cdr.markForCheck();
-          this.loadStudentLeaves();
-        },
-        error: (error) => {
-          this.logger.error('Error fetching student details:', error);
-        }
-      });
+    if (!user) {
+      this.isLoading = false;
+      this.cdr.markForCheck();
+      return;
     }
+    this.studentId = user.userId;
+    this.studentService.getStudent(this.studentId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (student) => {
+        this.studentName = student.name;
+        this.className = student.className;
+        this.cdr.markForCheck();
+        this.loadStudentLeaves();
+      },
+      error: (error) => {
+        this.logger.error('Error fetching student details:', error);
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   loadStudentLeaves(): void {
+    this.isLoading = true;
+    this.cdr.markForCheck();
     this.leaveService.getLeavesByStudentId(this.studentId, this.currentPage, this.pageSize)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -120,10 +129,13 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
           }));
           this.totalPages = response.totalPages;
           this.totalElements = response.totalElements;
+          this.isLoading = false;
           this.cdr.markForCheck();
         },
         error: (error) => {
           this.logger.error('Error fetching student leaves:', error);
+          this.isLoading = false;
+          this.cdr.markForCheck();
         }
       });
   }
@@ -147,10 +159,9 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
       this.toast.confirm({
         title: 'Are you sure?',
         message: 'You will not be able to recover this leave!',
-        icon: 'warning',
-        danger: true,
         confirmText: 'Yes, delete it!',
         cancelText: 'Cancel',
+        danger: true,
       }).then((confirmed) => {
         if (confirmed) {
           const formattedLeaveDate = new Date(leaveDate).toISOString().split('T')[0];
@@ -216,8 +227,15 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
       }
 
       if (leaveDate.getDay() === 0) {
-        this.errorMessage = 'Even the server takes Sundays off. Please choose another day!';
+        this.errorMessage = 'Sundays are non-working days. Please select a weekday.';
         return;
+      }
+
+      // Soft warning for leave applications more than 30 days in the future
+      const daysAhead = Math.ceil((leaveDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      if (daysAhead > 30) {
+        this.toast.warning('Long Advance Notice', `You are applying for leave ${daysAhead} days in advance. For extended leave, contact your school administration directly.`);
+        // Don't return — just warn
       }
 
       const formattedLeaveDate = leaveDate.toISOString().split('T')[0];
@@ -237,20 +255,14 @@ export class ApplyLeaveComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.studentService.getStudent(this.studentId).pipe(
-        takeUntil(this.destroy$),
-        switchMap((student) => {
-          this.studentName = student.name;
-          const leaveRequest: LeaveRequest = {
-            studentId: this.studentId,
-            studentName: this.studentName,
-            leaveDate: formattedLeaveDate,
-            reason: finalReason,
-            className: this.className,
-          };
-          return this.leaveService.applyLeave(leaveRequest);
-        })
-      ).subscribe({
+      const leaveRequest: LeaveRequest = {
+        studentId: this.studentId,
+        studentName: this.studentName,
+        leaveDate: formattedLeaveDate,
+        reason: finalReason,
+        className: this.className,
+      };
+      this.leaveService.applyLeave(leaveRequest).pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
           this.leaveForm.reset();
           this.reasonControl?.setValue('');

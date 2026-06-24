@@ -4,24 +4,26 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, A
 import { EventService } from '../../services/event.service';
 import { CalendarEvent } from '../../interfaces/event-calendar.component';
 import { Router, ActivatedRoute } from '@angular/router';
-import { SchoolService } from '../../services/school.service';
-import { ToastService } from '../../services/toast.service';
+
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { Subject, takeUntil } from 'rxjs';
+import { SchoolService } from '../../services/school.service';
+import { ToastService } from '../../services/toast.service';
 
 export const dateRangeValidator: ValidatorFn = (control: AbstractControl): { [key: string]: boolean } | null => {
   const startDate = control.get('startDate')?.value;
   const endDate = control.get('endDate')?.value;
 
   if (startDate && endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
     // Convert dates to YYYY-MM-DD for accurate comparison if they are strings
     const startDateStr = typeof startDate === 'string' ? startDate : new Date(startDate).toISOString().split('T')[0];
     const endDateStr = typeof endDate === 'string' ? endDate : new Date(endDate).toISOString().split('T')[0];
 
+    const today = new Date().toISOString().split('T')[0];
+    if (startDateStr < today) {
+      return { 'pastDateInvalid': true };
+    }
 
     if (endDateStr < startDateStr) { // Compare as strings for YYYY-MM-DD
       return { 'dateRangeInvalid': true };
@@ -87,13 +89,15 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
-      next: classes => { this.targetAudiences = [...this.staticAudiences, ...classes]; this.cdr.markForCheck(); },
+      next: classes => {
+        this.targetAudiences = [...this.staticAudiences, ...classes];
+        this.cdr.markForCheck();
+      },
       error: (err) => {
         this.logger.error('Failed to load classes:', err);
         this.toast.error('Error', 'Failed to load class list.');
       }
     });
-
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = params.get('id');
       if (id) {
@@ -175,6 +179,20 @@ export class EventFormComponent implements OnInit, OnDestroy {
     const fileInput = event.target as HTMLInputElement;
     if (fileInput.files && fileInput.files.length > 0) {
       const file = fileInput.files[0];
+
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        this.toast.error('File Too Large', 'Event image must be less than 5MB. Please choose a smaller file.');
+        (event.target as HTMLInputElement).value = '';
+        return;
+      }
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        this.toast.error('Invalid File', 'Only JPG, PNG, WebP, or GIF images are supported.');
+        (event.target as HTMLInputElement).value = '';
+        return;
+      }
+
       this.selectedFile = file;
 
       // Generate preview for the newly selected image

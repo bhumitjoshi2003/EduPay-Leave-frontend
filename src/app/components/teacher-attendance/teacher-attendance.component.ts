@@ -1,9 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
 import { LeaveService } from '../../services/leave.service';
 import { StudentService } from '../../services/student.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, formatDate } from '@angular/common';
+import { SchoolService, SchoolClass } from '../../services/school.service';
+import { SectionService } from '../../services/section.service';
+import { Section } from '../../interfaces/section';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -12,11 +15,11 @@ import { AttendanceData } from '../../interfaces/atendance-data';
 import { AttendanceService } from '../../services/attendance.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { TeacherService } from '../../services/teacher.service';
-import { Subject, takeUntil } from 'rxjs';
-import { SchoolService, SchoolClass } from '../../services/school.service';
-import { SectionService } from '../../services/section.service';
-import { Section } from '../../interfaces/section';
+import { Teacher } from '../../interfaces/teacher';
+import { Subject, takeUntil, switchMap, of, firstValueFrom } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { SchoolHolidayService } from '../../services/school-holiday.service';
+import { Router } from '@angular/router';
 
 interface Student {
   studentId: string;
@@ -50,6 +53,8 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
   disableDeleteButton: boolean = false;
   loggedInUserRole: string = '';
   hasStudents: boolean = false;
+  isAttendanceAlreadyMarked: boolean = false;
+  isSaving: boolean = false;
 
   classList: string[] = [];
   managedClasses: SchoolClass[] = [];
@@ -64,10 +69,11 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
     private authStateService: AuthStateService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
-    private schoolService: SchoolService,
     private toast: ToastService,
+    private schoolService: SchoolService,
     private sectionService: SectionService,
-    private holidayService: SchoolHolidayService
+    private holidayService: SchoolHolidayService,
+    private router: Router
   ) { }
 
   ngOnDestroy(): void {
@@ -76,7 +82,23 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const role = this.authStateService.getUserRole?.() ?? this.authStateService.getUser?.()?.role;
+    if (!['ADMIN', 'TEACHER'].includes(role ?? '')) {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
     this.attendanceDate = this.getTodayDateWithoutTime();
+    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
+      next: classes => {
+        this.classList = classes;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.logger.error('Failed to load classes:', err);
+        this.toast.error('Error', 'Failed to load class list.');
+      }
+    });
     this.schoolService.getManagedClasses().pipe(takeUntil(this.destroy$)).subscribe({
       next: classes => { this.managedClasses = classes; },
       error: (err) => this.logger.error('Failed to load managed classes', err)
@@ -98,27 +120,10 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
       this.teacherId = user.userId;
 
       if (this.loggedInUserRole === 'ADMIN') {
-        this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
-          next: classes => {
-            this.classList = classes;
-            this.selectedClass = localStorage.getItem('lastSelectedClass') || this.classList[0];
-            this.cdr.markForCheck();
-            if (this.selectedClass) this.loadSectionsForClass(this.selectedClass);
-            this.loadStudentsAndApplyAttendance();
-          },
-          error: (err) => {
-            this.logger.error('Failed to load classes:', err);
-            this.toast.error('Error', 'Failed to load class list.');
-          }
-        });
+        this.selectedClass = localStorage.getItem('lastSelectedClass') || '';
+        if (this.selectedClass) this.loadSectionsForClass(this.selectedClass);
+        this.loadStudentsAndApplyAttendance();
       } else {
-        this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
-          next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-          error: (err) => {
-            this.logger.error('Failed to load classes:', err);
-            this.toast.error('Error', 'Failed to load class list.');
-          }
-        });
         this.getTeacherClassAndLoadStudents();
       }
     }
@@ -127,8 +132,8 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 
   getTeacherClassAndLoadStudents(): void {
     this.teacherService.getTeacher(this.teacherId).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (teacher: any) => {
-        this.selectedClass = teacher.classTeacher;
+      next: (teacher: Teacher) => {
+        this.selectedClass = teacher.classTeacher ?? '';
         this.loadStudentsAndApplyAttendance();
       },
       error: () => {
@@ -227,77 +232,54 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
     const classAtRequest = this.selectedClass;
     const dateAtRequest = this.attendanceDate;
 
-    this.attendanceService.getAttendanceByDateAndClass(formattedDate, classAtRequest).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (attendanceData) => {
+    this.attendanceService.getAttendanceByDateAndClass(formattedDate, classAtRequest).pipe(
+      takeUntil(this.destroy$),
+      catchError(err => {
+        // Attendance fetch failed — fall through to leaves as fallback
+        this.logger.error('Error loading attendance data:', err);
+        return of([] as AttendanceData[]);
+      }),
+      switchMap(attendanceData => {
+        if (attendanceData.length > 0) {
+          // Attendance already saved — apply it directly, no second request
+          return of({ source: 'attendance' as const, leaves: [] as string[], attendance: attendanceData });
+        }
+        // No saved attendance — pre-fill from approved leaves for the day
+        return this.leaveService.getLeavesByDateAndClass(formattedDate, classAtRequest).pipe(
+          takeUntil(this.destroy$),
+          map(leaves => ({ source: 'leaves' as const, leaves, attendance: [] as AttendanceData[] })),
+          catchError(err => {
+            this.logger.error('No leaves found or error fetching leaves:', err);
+            return of({ source: 'leaves' as const, leaves: [] as string[], attendance: [] as AttendanceData[] });
+          })
+        );
+      })
+    ).subscribe({
+      next: ({ source, attendance, leaves }) => {
         if (this.selectedClass !== classAtRequest || this.attendanceDate !== dateAtRequest) return;
-        if (attendanceData && attendanceData.length === 0) {
-          this.disableDeleteButton = true;
-        }
-        if (attendanceData && attendanceData.length > 0) {
-          this.disableDeleteButton = false;
-          const attendanceMap = new Map<string, AttendanceData>();
-          attendanceData.forEach((attendance) => {
-            attendanceMap.set(attendance.studentId, attendance);
-          });
 
-          this.students.forEach((student) => {
-            const attendance = attendanceMap.get(student.studentId);
-            if (attendance) {
-              student.absent = true;
-              student.chargePaid = attendance.chargePaid;
-              student.status = attendance.status as Student['status'] || 'ABSENT';
-            } else {
-              student.absent = false;
-              student.chargePaid = true;
-              student.status = 'ABSENT';
-            }
+        if (source === 'attendance') {
+          this.disableDeleteButton = false;
+          this.isAttendanceAlreadyMarked = attendance.length > 0;
+          const attendanceMap = new Map<string, AttendanceData>();
+          attendance.forEach(a => attendanceMap.set(a.studentId, a));
+          this.students.forEach(student => {
+            const att = attendanceMap.get(student.studentId);
+            student.absent = !!att;
+            student.chargePaid = att ? att.chargePaid : true;
+            student.status = att?.status as Student['status'] || 'ABSENT';
           });
-          this.cdr.markForCheck();
         } else {
-          this.leaveService.getLeavesByDateAndClass(formattedDate, classAtRequest).pipe(takeUntil(this.destroy$)).subscribe({
-            next: (leaves) => {
-              if (this.selectedClass !== classAtRequest || this.attendanceDate !== dateAtRequest) return;
-              this.absentStudents = leaves;
-              this.students.forEach((student) => {
-                if (this.absentStudents.includes(student.studentId)) {
-                  student.absent = true;
-                  student.chargePaid = true;
-                } else {
-                  student.absent = false;
-                  student.chargePaid = true;
-                }
-              });
-              this.cdr.markForCheck();
-            },
-            error: (error) => {
-              this.logger.error('No leaves found or error fetching leaves:', error);
-            },
+          this.disableDeleteButton = true;
+          this.isAttendanceAlreadyMarked = false;
+          this.absentStudents = leaves;
+          this.students.forEach(student => {
+            student.absent = leaves.includes(student.studentId);
+            student.chargePaid = true;
           });
         }
-      },
-      error: (error) => {
-        this.logger.error('Error loading attendance data:', error);
-        this.leaveService.getLeavesByDateAndClass(formattedDate, classAtRequest).pipe(takeUntil(this.destroy$)).subscribe({
-          next: (leaves) => {
-            if (this.selectedClass !== classAtRequest || this.attendanceDate !== dateAtRequest) return;
-            this.absentStudents = leaves;
-            this.students.forEach((student) => {
-              if (this.absentStudents.includes(student.studentId)) {
-                student.absent = true;
-                student.chargePaid = true;
-              } else {
-                student.absent = false;
-                student.chargePaid = true;
-              }
-            });
-            this.cdr.markForCheck();
-          },
-          error: (leavesError) => {
-            this.logger.error('Error loading leaves after attendance failed:', leavesError);
-            this.toast.error('Error', 'Failed to load attendance or leave data.');
-          },
-        });
-      },
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -322,16 +304,24 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
   onDateChange(event: any): void {
     const selectedDate = event.value;
     if (selectedDate) {
-      const offset = selectedDate.getTimezoneOffset() * 60000;
-      const adjustedDate = new Date(selectedDate.getTime() - offset);
-      adjustedDate.setHours(0, 0, 0, 0);
-      this.attendanceDate = adjustedDate;
-
+      const date = new Date(selectedDate);
+      date.setHours(0, 0, 0, 0);
+      this.attendanceDate = date;
       this.loadStudentsAndApplyAttendance();
     }
   }
 
   async saveAttendance(): Promise<void> {
+    if (this.isAttendanceAlreadyMarked) {
+      const replaceConfirmed = await this.toast.confirm({
+        title: 'Attendance Already Marked',
+        message: 'Attendance is already saved for this date. Do you want to replace it?',
+        confirmText: 'Yes, Replace',
+        cancelText: 'Cancel',
+      });
+      if (!replaceConfirmed) return;
+    }
+
     const confirmed = await this.toast.confirm({
       title: 'Save Attendance',
       message: `You are about to save attendance for ${this.students.length} students. Are you sure?`,
@@ -352,22 +342,26 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
         status: student.status,
       }));
 
-    attendanceData.push({
-      studentId: 'X',
-      chargePaid: true,
-      date: formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en'),
-      className: this.selectedClass,
-      status: 'ABSENT',
-    });
+    this.isSaving = true;
+    this.cdr.markForCheck();
 
-    this.attendanceService.saveAttendance(attendanceData).subscribe({
+    this.attendanceService.saveAttendance(attendanceData).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
+        this.isSaving = false;
         this.toast.success('Attendance Saved!', 'Attendance data saved successfully.');
+        // Check if there are approved leaves for this date that weren't pre-filled
+        // (i.e. attendance already existed before leave approval)
+        if (this.absentStudents.length > 0 && this.isAttendanceAlreadyMarked) {
+          this.toast.info('Check Leaves', 'Some students may have approved leaves for this date. Review attendance if needed.');
+        }
         this.applyAttendanceAndLeavesToStudents();
+        this.cdr.markForCheck();
       },
       error: (error) => {
+        this.isSaving = false;
         this.logger.error('Error saving attendance:', error);
         this.toast.error('Error!', error.error || 'Failed to save attendance. Please try again.');
+        this.cdr.markForCheck();
       },
     });
   }
@@ -412,17 +406,16 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
     this.toast.confirm({
       title: 'Confirm Deletion',
       message: 'Are you sure you want to delete the attendance for this date?',
-      icon: 'warning',
       confirmText: 'Yes, delete it!',
       cancelText: 'Cancel',
       danger: true,
     }).then((confirmed) => {
       if (confirmed) {
         const formattedDate = formatDate(this.attendanceDate, 'yyyy-MM-dd', 'en');
-        this.attendanceService.deleteAttendanceByDateAndClass(formattedDate, this.selectedClass).subscribe({
+        this.attendanceService.deleteAttendanceByDateAndClass(formattedDate, this.selectedClass).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.toast.success('Deleted!', 'Attendance has been deleted.');
-            this.loadStudentsAndApplyAttendance();
+            this.loadStudentsAndApplyAttendance(); // refresh the student list
           },
           error: (error) => {
             this.logger.error('Error deleting attendance:', error);

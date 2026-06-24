@@ -184,6 +184,17 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
             amount: Math.round((this.feeGrid[cls][fh.id!] || 0) * 100), // rupees → paise
             effectiveFrom: today,
           }));
+
+        // Issue #22: Validate no duplicate fee head IDs per class
+        const feeHeadIds = rules.map((r: any) => r.feeHeadId ?? r.feeHead?.id);
+        const uniqueIds = new Set(feeHeadIds.filter(Boolean));
+        if (uniqueIds.size !== feeHeadIds.filter(Boolean).length) {
+          this.isEditing = true;
+          this.cdr.markForCheck();
+          this.toast.error('Duplicate Fee Heads', 'Each fee head can only appear once per class.');
+          return;
+        }
+
         if (rules.length > 0) {
           saveCalls[cls] = this.feeRuleService.saveRulesForClass(sessionId, cls, rules);
         }
@@ -330,6 +341,27 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
       SEMI_ANNUAL: 'Semi-Annual', ANNUAL: 'Annual', ONE_TIME: 'One-Time',
     };
     return labels[freq] ?? freq;
+  }
+
+  dueMonthsForFrequency(frequency: string): string {
+    switch (frequency) {
+      case 'MONTHLY':     return '[1,2,3,4,5,6,7,8,9,10,11,12]';
+      case 'QUARTERLY':   return '[1,4,7,10]';
+      case 'SEMI_ANNUAL': return '[1,7]';
+      case 'ANNUAL':      return '[1]';
+      case 'ONE_TIME':    return '[1]';
+      default:            return '[1,2,3,4,5,6,7,8,9,10,11,12]';
+    }
+  }
+
+  onNewFeeHeadFrequencyChange(frequency: string): void {
+    this.newFeeHead.frequency = frequency as FeeHead['frequency'];
+    this.newFeeHead.dueMonths = this.dueMonthsForFrequency(frequency);
+  }
+
+  onEditFeeHeadFrequencyChange(frequency: string): void {
+    this.editFeeHeadForm.frequency = frequency as FeeHead['frequency'];
+    this.editFeeHeadForm.dueMonths = this.dueMonthsForFrequency(frequency);
   }
 
   private defaultFeeHead(): Partial<FeeHead> {

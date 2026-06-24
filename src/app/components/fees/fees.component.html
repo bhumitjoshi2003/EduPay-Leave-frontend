@@ -21,7 +21,7 @@
       <div class="pt-blob pt-blob-2"></div>
     </div>
 
-    <!-- ── Warning Banners ────────────────────────────────────────────── -->
+    <!-- ── Warning Banners ──────────────────────────────────────────── -->
     <div class="pt-alert pt-alert--overdue" *ngIf="pastUnpaidMonthNames.length > 0">
       <div class="pt-alert-icon">⚠️</div>
       <div class="pt-alert-body">
@@ -45,13 +45,13 @@
       </div>
     </div>
 
-    <!-- ── Summary Strip ──────────────────────────────────────────────── -->
+    <!-- ── Summary Strip ────────────────────────────────────────────── -->
     <div class="pt-summary" *ngIf="role !== 'ADMIN' && totalAmountToPay > 0">
       <span class="pt-summary-label">Selected Total</span>
-      <span class="pt-summary-amount">₹{{ totalAmountToPay }}</span>
+      <span class="pt-summary-amount">{{ totalAmountToPay | currency:'INR':'symbol':'1.0-0' }}</span>
     </div>
 
-    <!-- ── Month Grid ──────────────────────────────────────────────────── -->
+    <!-- ── Month Grid ────────────────────────────────────────────────── -->
     <div class="pt-grid">
       <div *ngFor="let month of months; trackBy: trackByMonth"
         class="pt-month"
@@ -64,6 +64,7 @@
         }"
         (click)="role !== 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : (role === 'ADMIN' && !month.paid && !month.manuallyPaid ? toggleMonthSelection(month) : null)">
 
+        <!-- status icon -->
         <div class="pt-month-icon">
           <span *ngIf="month.paid || month.manuallyPaid">✓</span>
           <span *ngIf="isLate(month) && !month.paid && !month.manuallyPaid">!</span>
@@ -74,9 +75,10 @@
         <span class="pt-month-name">{{ month.name }}</span>
 
         <span class="pt-month-amount">
-          <ng-container *ngIf="month.paid && !month.manuallyPaid">₹{{ month.amountPaid }}</ng-container>
-          <ng-container *ngIf="month.manuallyPaid">₹{{ month.manualPaymentReceived }}</ng-container>
-          <ng-container *ngIf="!month.paid && !month.manuallyPaid">₹{{ month.fee + (month.busFee || 0) + month.lateFee }}</ng-container>
+          <!-- Currency formatted consistently using INR currency pipe -->
+          <ng-container *ngIf="month.paid && !month.manuallyPaid">{{ month.amountPaid | currency:'INR':'symbol':'1.0-0' }}</ng-container>
+          <ng-container *ngIf="month.manuallyPaid">{{ month.manualPaymentReceived | currency:'INR':'symbol':'1.0-0' }}</ng-container>
+          <ng-container *ngIf="!month.paid && !month.manuallyPaid">{{ month.fee + (month.busFee || 0) + month.lateFee | currency:'INR':'symbol':'1.0-0' }}</ng-container>
         </span>
 
         <span class="pt-month-chip">
@@ -89,18 +91,18 @@
       </div>
     </div>
 
-    <!-- ── Fee Breakdown ────────────────────────────────────────────────── -->
+    <!-- ── Fee Breakdown ─────────────────────────────────────────────── -->
     <app-fee-breakdown
       [details]="selectedMonthDetails"
       [platformFeeAmount]="platformFeeAmount"
       [selectedMonthCount]="(selectedMonthsByYear[selectedYear] || []).length">
     </app-fee-breakdown>
 
-    <!-- ── Footer ──────────────────────────────────────────────────────── -->
+    <!-- ── Sticky Footer ─────────────────────────────────────────────── -->
     <div *ngIf="role !== 'ADMIN'; else adminPayment" class="pt-footer">
       <div class="pt-footer-total">
         <span class="pt-footer-label">Total to Pay</span>
-        <span class="pt-footer-amount">₹{{ totalAmountToPay }}</span>
+        <span class="pt-footer-amount">{{ totalAmountToPay | currency:'INR':'symbol':'1.0-0' }}</span>
       </div>
       <app-payment [paymentData]="paymentData" (paymentSuccess)="handleSuccessfulPayment()"
         (paymentProcessingStarted)="onPaymentProcessingStarted()" [disabled]="isLoadingPayment">
@@ -111,7 +113,7 @@
       <div class="pt-footer">
         <div class="pt-footer-total">
           <span class="pt-footer-label">Total to Pay</span>
-          <span class="pt-footer-amount">₹{{ totalAmountToPay }}</span>
+          <span class="pt-footer-amount">{{ totalAmountToPay | currency:'INR':'symbol':'1.0-0' }}</span>
         </div>
         <div class="pt-admin-controls">
           <div class="pt-amount-field">

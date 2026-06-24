@@ -1,20 +1,30 @@
 <div class="import-page">
 
-  <!-- Page header -->
-  <div class="page-header">
-    <button class="back-btn" (click)="goToStudentList()">&#8592; Student List</button>
-    <div class="page-header__text">
-      <h1>Bulk Student Import</h1>
-      <p>Upload a CSV file to register multiple students at once.</p>
+  <!-- ── Hero ──────────────────────────────────────────────────────── -->
+  <div class="bi-hero">
+    <div class="bi-hero-left">
+      <button class="bi-back-btn" (click)="goToStudentList()">&#8592;</button>
+      <div class="bi-hero-icon">📥</div>
+      <div>
+        <h1 class="bi-hero-title">Bulk Student Import</h1>
+        <p class="bi-hero-sub">Upload a CSV file to register multiple students at once</p>
+      </div>
     </div>
-    <button class="template-btn" (click)="downloadTemplate()" [disabled]="isDownloadingTemplate">
+    <button class="bi-template-btn" (click)="downloadTemplate()" [disabled]="isDownloadingTemplate">
       <span *ngIf="!isDownloadingTemplate">&#8595; Download Template</span>
       <span *ngIf="isDownloadingTemplate">Downloading...</span>
     </button>
+    <div class="bi-blob bi-blob-1"></div>
+    <div class="bi-blob bi-blob-2"></div>
   </div>
 
   <!-- Upload area (hidden once result is shown) -->
   <ng-container *ngIf="!result">
+
+    <div class="import-help">
+      <strong>Required columns:</strong> name, email, phone, className, dateOfBirth (YYYY-MM-DD), gender (MALE/FEMALE)
+      <br><small>Download the template above for the correct format.</small>
+    </div>
 
     <div class="instructions-card">
       <div class="instructions-card__step">
@@ -121,6 +131,9 @@
     </div>
 
     <div class="action-row action-row--result">
+      <button *ngIf="result?.errors?.length" class="secondary-btn" (click)="downloadErrorCSV()">
+        &#8595; Download Error Report ({{ result!.errors.length }} rows)
+      </button>
       <button class="secondary-btn" (click)="reset()">Import Another File</button>
       <button class="import-btn" (click)="goToStudentList()">Go to Student List</button>
     </div>

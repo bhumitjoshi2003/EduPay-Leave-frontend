@@ -98,26 +98,43 @@ export class StudentPromotionComponent implements OnInit, OnDestroy {
     const detained = this.detainedCount;
     const passedOut = this.passOutCount;
 
-    this.toast.confirm({
-      title: 'Confirm Promotion',
-      html: `
-        <p style="margin-bottom:12px;color:#374151;">This will update <strong>${total}</strong> students:</p>
-        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-          <span style="background:#dcfce7;color:#166534;padding:6px 14px;border-radius:20px;font-weight:700;">${promoted} Promoted</span>
-          <span style="background:#fef9c3;color:#854d0e;padding:6px 14px;border-radius:20px;font-weight:700;">${detained} Detained</span>
-          <span style="background:#f0f9ff;color:#0369a1;padding:6px 14px;border-radius:20px;font-weight:700;">${passedOut} Passed Out</span>
-        </div>
-        <p style="margin-top:14px;font-size:0.85rem;color:#ef4444;font-weight:600;">This action cannot be undone easily. Please verify before confirming.</p>
-      `,
-      icon: 'warning',
-      danger: true,
-      confirmText: 'Yes, Execute Promotion',
-      cancelText: 'Cancel',
-    }).then((confirmed) => {
-      if (confirmed) {
-        this.doExecute();
-      }
-    });
+    const runMain = () => {
+      this.toast.confirm({
+        title: 'Confirm Promotion',
+        html: `
+          <p style="margin-bottom:12px;color:#374151;">This will update <strong>${total}</strong> students:</p>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <span style="background:#dcfce7;color:#166534;padding:6px 14px;border-radius:20px;font-weight:700;">${promoted} Promoted</span>
+            <span style="background:#fef9c3;color:#854d0e;padding:6px 14px;border-radius:20px;font-weight:700;">${detained} Detained</span>
+            <span style="background:#f0f9ff;color:#0369a1;padding:6px 14px;border-radius:20px;font-weight:700;">${passedOut} Passed Out</span>
+          </div>
+          <p style="margin-top:14px;font-size:0.85rem;color:#ef4444;font-weight:600;">This action cannot be undone easily. Please verify before confirming.</p>
+        `,
+        icon: 'warning',
+        danger: true,
+        confirmText: 'Yes, Execute Promotion',
+        cancelText: 'Cancel',
+      }).then((confirmed) => {
+        if (confirmed) {
+          this.doExecute();
+        }
+      });
+    };
+
+    if (passedOut > 0) {
+      this.toast.confirm({
+        title: `Graduate ${passedOut} Student${passedOut > 1 ? 's' : ''}?`,
+        message: `${passedOut} student${passedOut > 1 ? 's' : ''} will be marked as GRADUATED. This sets their status to completed and cannot be reversed without re-admission. Are you sure?`,
+        icon: 'warning',
+        danger: true,
+        confirmText: 'Yes, Graduate Them',
+        cancelText: 'Cancel',
+      }).then((confirmed) => {
+        if (confirmed) runMain();
+      });
+    } else {
+      runMain();
+    }
   }
 
   private doExecute(): void {

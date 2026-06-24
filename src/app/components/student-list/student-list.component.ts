@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { StudentService } from '../../services/student.service';
 import { TeacherService } from '../../services/teacher.service';
+import { Teacher } from '../../interfaces/teacher';
 import { Router } from '@angular/router';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { CommonModule } from '@angular/common';
-import { Subject, forkJoin, takeUntil } from 'rxjs';
+import { Subject, takeUntil, switchMap, forkJoin, of, EMPTY } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { LoggerService } from '../../services/logger.service';
 import { ToastService } from '../../services/toast.service';
 import { SchoolService, SchoolClass } from '../../services/school.service';
@@ -14,6 +16,8 @@ import { Section } from '../../interfaces/section';
 interface Student {
   studentId: string;
   name: string;
+  status?: string;
+  readmissionDate?: string;
 }
 
 @Component({
@@ -26,11 +30,14 @@ interface Student {
 
 export class StudentListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
-  isLoading = false;
+  /** Emits a class name whenever we want to load students for that class.
+   *  switchMap auto-cancels the previous in-flight set of requests. */
+  private loadClass$ = new Subject<string>();
   activeStudents: Student[] = [];
   newStudents: Student[] = [];
   alumniStudents: Student[] = [];
   leftStudents: Student[] = [];
+  isLoading: boolean = true;
   teacherId: string = '';
   loggedInUserRole: string = '';
   selectedClass: string = '';
@@ -57,6 +64,45 @@ export class StudentListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // switchMap cancels any previous in-flight batch when the class changes rapidly
+    this.loadClass$.pipe(
+      takeUntil(this.destroy$),
+      switchMap(className => {
+        this.isLoading = true;
+        this.cdr.markForCheck();
+        const secId = this.selectedSectionId ?? undefined;
+
+        const active$ = this.studentService.getActiveStudentsByClass(className, secId);
+        const upcoming$ = this.loggedInUserRole === 'ADMIN'
+          ? this.studentService.getNewStudentsByClass(className, secId)
+          : of([] as Student[]);
+        const alumni$ = this.loggedInUserRole === 'ADMIN'
+          ? this.studentService.getAlumniByClass(className, secId)
+          : of([] as Student[]);
+        const left$ = this.loggedInUserRole === 'ADMIN'
+          ? this.studentService.getLeftStudentsByClass(className, secId)
+          : of([] as Student[]);
+
+        return forkJoin([active$, upcoming$, alumni$, left$]).pipe(
+          map(([active, upcoming, alumni, left]) => ({ active, upcoming, alumni, left })),
+          catchError(err => {
+            this.logger.error('Error loading students:', err);
+            this.toast.error('Error', 'Failed to load students. Please try again.');
+            this.isLoading = false;
+            this.cdr.markForCheck();
+            return EMPTY;
+          })
+        );
+      })
+    ).subscribe(({ active, upcoming, alumni, left }) => {
+      this.activeStudents = active;
+      this.newStudents = upcoming;
+      this.alumniStudents = alumni;
+      this.leftStudents = left;
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    });
+
     this.getUserRoleAndLoadData();
   }
 
@@ -74,27 +120,23 @@ export class StudentListComponent implements OnInit, OnDestroy {
           next: ({ managedClasses, classList }) => {
             this.managedClasses = managedClasses;
             this.classList = classList;
-            this.selectedClass = localStorage.getItem('lastSelectedClass') || this.classList[0] || '';
+            this.selectedClass = localStorage.getItem('lastSelectedClass') || classList[0] || '';
             this.cdr.markForCheck();
             if (this.selectedClass) {
               this.loadSectionsForClass(this.selectedClass, () => this.loadStudents());
             } else {
-              this.loadStudents();
+              this.isLoading = false;
+              this.cdr.markForCheck();
             }
           },
-          error: (err: unknown) => {
-            this.logger.error('Failed to load classes:', err);
-            this.toast.error('Error', 'Failed to load class list.');
-          }
-        });
-      } else if (this.loggedInUserRole === 'TEACHER') {
-        this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
-          next: classes => { this.classList = classes; this.cdr.markForCheck(); },
           error: (err) => {
             this.logger.error('Failed to load classes:', err);
             this.toast.error('Error', 'Failed to load class list.');
+            this.isLoading = false;
+            this.cdr.markForCheck();
           }
         });
+      } else if (this.loggedInUserRole === 'TEACHER') {
         this.getTeacherClassAndLoadStudents();
       }
     } else {
@@ -103,69 +145,24 @@ export class StudentListComponent implements OnInit, OnDestroy {
 
   getTeacherClassAndLoadStudents(): void {
     this.teacherService.getTeacher(this.teacherId).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (teacher: any) => {
-        this.selectedClass = teacher.classTeacher;
+      next: (teacher: Teacher) => {
+        this.selectedClass = teacher.classTeacher ?? '';
         this.loadStudents();
       },
-      error: (error: any) => {
+      error: (error: unknown) => {
         this.logger.error('Error fetching teacher details:', error);
+        this.isLoading = false;
+        this.cdr.markForCheck();
+        this.toast.error('Error', 'Failed to load teacher details. Please try again.');
       }
     });
   }
 
   loadStudents(): void {
-    const classAtRequest = this.selectedClass;
-    localStorage.setItem('lastSelectedClass', classAtRequest);
-    const secId = this.selectedSectionId ?? undefined;
-
-    this.studentService.getActiveStudentsByClass(classAtRequest, secId).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (students) => {
-        if (this.selectedClass !== classAtRequest) return;
-        this.activeStudents = students;
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.logger.error('Failed to load students:', err);
-        this.toast.error('Error', 'Failed to load student list.');
-        this.cdr.markForCheck();
-      }
-    });
-
-    if (this.loggedInUserRole === 'ADMIN') {
-      this.studentService.getNewStudentsByClass(classAtRequest, secId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (students) => {
-          if (this.selectedClass !== classAtRequest) return;
-          this.newStudents = students;
-          this.cdr.markForCheck();
-        },
-        error: (err) => {
-          this.logger.error('Failed to load upcoming students:', err);
-          this.toast.error('Error', 'Failed to load student list.');
-        }
-      });
-      this.studentService.getAlumniByClass(classAtRequest, secId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (students) => {
-          if (this.selectedClass !== classAtRequest) return;
-          this.alumniStudents = students;
-          this.cdr.markForCheck();
-        },
-        error: (err) => {
-          this.logger.error('Failed to load alumni students:', err);
-        }
-      });
-      this.studentService.getLeftStudentsByClass(classAtRequest, secId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (students) => {
-          if (this.selectedClass !== classAtRequest) return;
-          this.leftStudents = students;
-          this.cdr.markForCheck();
-        },
-        error: (err) => {
-          this.logger.error('Failed to load left students:', err);
-        }
-      });
-    }
+    localStorage.setItem('lastSelectedClass', this.selectedClass);
+    // Emitting triggers the switchMap pipeline in ngOnInit, which auto-cancels
+    // any in-flight requests from the previous class selection
+    this.loadClass$.next(this.selectedClass);
   }
 
   viewStudentDetails(studentId: string): void {
@@ -204,5 +201,18 @@ export class StudentListComponent implements OnInit, OnDestroy {
 
   navigateToBulkImport(): void {
     this.router.navigate(['/dashboard/student-bulk-import']);
+  }
+
+  // Issue #30: Status badge color for alumni/left sections
+  getExitBadgeClass(status: string): string {
+    if (status === 'GRADUATED') return 'badge-success';
+    if (status === 'TRANSFERRED') return 'badge-info';
+    if (status === 'WITHDRAWN') return 'badge-warning';
+    return 'badge-secondary';
+  }
+
+  // Issue #81: Re-admitted badge
+  isReadmitted(student: Student): boolean {
+    return !!student.readmissionDate;
   }
 }

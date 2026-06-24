@@ -250,6 +250,19 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
   async saveMarksA(): Promise<void> {
     if (!this.selectedSubjectEntryId) return;
 
+    const subject = this.getSelectedSubject();
+    const maxMarks = subject?.maxMarks ?? Infinity;
+
+    // Validate marks range
+    const invalid = this.subjectStudents.filter(s => {
+      const val = this.marksInputA[s.studentId];
+      return val !== null && val !== undefined && (val < 0 || val > maxMarks);
+    });
+    if (invalid.length > 0) {
+      this.toast.error('Invalid Marks', `Marks must be between 0 and ${maxMarks}. Please correct highlighted entries.`);
+      return;
+    }
+
     // Only send entries where the mark has actually changed from the loaded value
     const entries: MarkEntryRequest[] = this.subjectStudents
       .filter(s => {
@@ -303,6 +316,17 @@ export class MarkEntryComponent implements OnInit, OnDestroy {
 
   async saveMarksB(): Promise<void> {
     if (!this.selectedStudentId) return;
+
+    // Validate marks range per subject
+    const invalidB = this.studentSubjects.filter(s => {
+      const val = this.marksInputB[s.examSubjectEntryId];
+      return val !== null && val !== undefined && (val < 0 || val > s.maxMarks);
+    });
+    if (invalidB.length > 0) {
+      const names = invalidB.map(s => s.subjectName).join(', ');
+      this.toast.error('Invalid Marks', `Marks out of range for: ${names}. Please correct before saving.`);
+      return;
+    }
 
     // Only send subjects where the mark has actually changed from the loaded value
     const entries: MarkEntryRequest[] = this.studentSubjects

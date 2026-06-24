@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { NotificationService } from '../../services/notification.service';
 import { AuthStateService } from '../../auth/auth-state.service';
-import { SchoolService } from '../../services/school.service';
 import { Notification } from '../../interfaces/notification';
 import { UserNotification } from '../../interfaces/user-notification';
 import { LoggerService } from '../../services/logger.service';
 import { ToastService } from '../../services/toast.service';
+import { SchoolService } from '../../services/school.service';
 
 @Component({
   selector: 'app-notice',
@@ -60,18 +60,17 @@ export class NoticeComponent implements OnInit, OnDestroy {
     private authStateService: AuthStateService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
-    private schoolService: SchoolService,
-    private toast: ToastService
+    private toast: ToastService,
+    private schoolService: SchoolService
   ) { }
 
   ngOnInit(): void {
     const user = this.authStateService.getUser();
     this.role = user?.role ?? '';
-    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
-      next: classes => { this.classList = classes; this.cdr.markForCheck(); },
-      error: (err) => this.logger.error('Failed to load classes', err)
+    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe(classes => {
+      this.classList = classes;
+      this.cdr.markForCheck();
     });
-
     this.loadData();
   }
 
@@ -167,7 +166,24 @@ export class NoticeComponent implements OnInit, OnDestroy {
   // ── Admin: post notice ───────────────────────────────────────────────
 
   postNotice(): void {
-    if (!this.form.title.trim() || !this.form.body.trim() || !this.form.targetAudience) {
+    const title = this.form.title?.trim() ?? '';
+    const body = this.form.body?.trim() ?? '';
+
+    if (!title || title.length > 200) {
+      this.toast.warning('Validation', 'Notice title must be between 1 and 200 characters.');
+      return;
+    }
+    if (!body || body.length > 5000) {
+      this.toast.warning('Validation', 'Notice message must be between 1 and 5,000 characters.');
+      return;
+    }
+    const htmlPattern = /<[^>]*>/g;
+    if (htmlPattern.test(title) || htmlPattern.test(body)) {
+      this.toast.warning('Invalid Format', 'HTML tags are not allowed in notices. Please use plain text.');
+      return;
+    }
+
+    if (!this.form.targetAudience) {
       this.toast.warning('Incomplete', 'Please fill in all required fields.');
       return;
     }
@@ -178,7 +194,6 @@ export class NoticeComponent implements OnInit, OnDestroy {
 
     this.toast.confirm({
       title: 'Post this notice?',
-      icon: 'question',
       confirmText: 'Yes, post it',
       cancelText: 'Cancel',
     }).then((confirmed) => {
@@ -241,7 +256,7 @@ export class NoticeComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.editingId = null;
-          this.toast.success('Updated', 'Notice has been updated successfully.');
+          this.toast.success('Updated');
           this.loadData();
         },
         error: (e) => {
@@ -257,10 +272,9 @@ export class NoticeComponent implements OnInit, OnDestroy {
     this.toast.confirm({
       title: 'Delete this notice?',
       message: 'This action cannot be undone.',
-      icon: 'warning',
-      danger: true,
       confirmText: 'Yes, delete',
       cancelText: 'Cancel',
+      danger: true,
     }).then((confirmed) => {
       if (!confirmed) return;
       this.notificationService.deleteNotification(id)
@@ -268,7 +282,7 @@ export class NoticeComponent implements OnInit, OnDestroy {
         .subscribe({
           next: () => {
             this.allNotices = this.allNotices.filter(n => n.id !== id);
-            this.toast.success('Deleted', 'Notice has been deleted.');
+            this.toast.success('Deleted');
             this.cdr.markForCheck();
           },
           error: (e) => {
@@ -289,7 +303,10 @@ export class NoticeComponent implements OnInit, OnDestroy {
           this.userNotifications = this.userNotifications.map(n => ({ ...n, isRead: true }));
           this.cdr.markForCheck();
         },
-        error: (e) => this.logger.error('Error marking notifications as read:', e),
+        error: (e) => {
+          this.logger.error('Error marking notifications as read:', e);
+          this.toast.error('Error', 'Failed to mark notifications as read.');
+        },
       });
   }
 
@@ -314,7 +331,7 @@ export class NoticeComponent implements OnInit, OnDestroy {
   trackById(_: number, item: { id?: number }): number { return item.id ?? 0; }
 
   getNoticeAccent(index: number): string {
-    const palette = ['#4fbdbd', '#0891b2', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#0284c7'];
+    const palette = ['#6366f1', '#0891b2', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#0284c7'];
     return palette[index % palette.length];
   }
 

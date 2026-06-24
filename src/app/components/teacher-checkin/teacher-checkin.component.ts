@@ -39,6 +39,8 @@ export class TeacherCheckinComponent implements OnInit, OnDestroy {
   isCheckingOut = false;
   gpsError: string | null = null;
 
+  readonly CALENDAR_SKELETON_COUNT = 35;
+
   readonly monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -149,6 +151,10 @@ export class TeacherCheckinComponent implements OnInit, OnDestroy {
   }
 
   async checkIn(): Promise<void> {
+    if (this.hasCheckedIn) {
+      this.toast.warning('Already Checked In', 'You have already checked in for today.');
+      return;
+    }
     this.isCheckingIn = true;
     this.gpsError = null;
     this.cdr.markForCheck();
@@ -184,6 +190,14 @@ export class TeacherCheckinComponent implements OnInit, OnDestroy {
   }
 
   async checkOut(): Promise<void> {
+    if (!this.hasCheckedIn) {
+      this.toast.warning('Not Checked In', 'You must check in before checking out.');
+      return;
+    }
+    if (this.hasCheckedOut) {
+      this.toast.warning('Already Checked Out', 'You have already checked out for today.');
+      return;
+    }
     this.isCheckingOut = true;
     this.gpsError = null;
     this.cdr.markForCheck();

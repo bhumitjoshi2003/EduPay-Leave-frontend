@@ -11,6 +11,8 @@ import { Section } from '../../interfaces/section';
 import { ToastService } from '../../services/toast.service';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth.service';
+import { AuthStateService } from '../../auth/auth-state.service';
+import { strictEmailValidator, pastDateValidator, phoneValidator } from '../../validators/shared.validators';
 
 @Component({
   selector: 'app-register-student',
@@ -32,6 +34,7 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
     private studentService: StudentService,
     private router: Router,
     private authService: AuthService,
+    private authState: AuthStateService,
     private logger: LoggerService,
     private schoolService: SchoolService,
     private sectionService: SectionService,
@@ -41,9 +44,9 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
     this.studentForm = this.fb.group({
       studentId: ['', Validators.required],
       name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', Validators.pattern('^[0-9]{10}$')],
-      dob: ['', Validators.required],
+      email: ['', [Validators.required, strictEmailValidator()]],
+      phoneNumber: ['', phoneValidator()],
+      dob: ['', [Validators.required, pastDateValidator()]],
       className: ['', Validators.required],
       gender: ['', Validators.required],
       fatherName: [''],
@@ -60,7 +63,18 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  get todayStr(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
   ngOnInit(): void {
+    // Issue #13: Defense-in-depth role check — backend is authoritative, this is UX-only
+    const role = this.authState.getUserRole();
+    if (role !== 'ADMIN') {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
     this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
       next: classes => { this.classList = classes; this.cdr.markForCheck(); },
       error: () => {

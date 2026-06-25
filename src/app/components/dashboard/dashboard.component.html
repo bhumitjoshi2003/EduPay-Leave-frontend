@@ -131,6 +131,21 @@
           <mat-icon>schedule</mat-icon><span>Timetable</span>
         </a>
 
+        <div class="nav-section-label">Report Cards</div>
+
+        <a class="nav-item" *ngIf="hasFeature('EXAM_MARKS')" routerLink="/dashboard/report-card-remarks" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Remarks Entry">
+          <mat-icon>rate_review</mat-icon><span>Remarks Entry</span>
+        </a>
+        <a class="nav-item" *ngIf="hasFeature('EXAM_MARKS')" routerLink="/dashboard/bulk-report-cards" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Bulk PDFs">
+          <mat-icon>picture_as_pdf</mat-icon><span>Bulk PDFs</span>
+        </a>
+        <a class="nav-item" *ngIf="hasFeature('EXAM_MARKS')" routerLink="/dashboard/class-overview" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Class Overview">
+          <mat-icon>bar_chart</mat-icon><span>Class Overview</span>
+        </a>
+
         <div class="nav-section-label">Communication</div>
 
         <a class="nav-item" routerLink="/dashboard/notice" routerLinkActive="active"
@@ -236,6 +251,29 @@
         <a class="nav-item" routerLink="/dashboard/timetable" routerLinkActive="active"
            (click)="closeSidebarOnMobile()" title="Timetable">
           <mat-icon>schedule</mat-icon><span>Timetable</span>
+        </a>
+
+        <div class="nav-section-label">Report Cards</div>
+
+        <a class="nav-item" *ngIf="hasFeature('EXAM_MARKS')" routerLink="/dashboard/assessment-group-config" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Assessment Groups">
+          <mat-icon>layers</mat-icon><span>Assessment Groups</span>
+        </a>
+        <a class="nav-item" *ngIf="hasFeature('EXAM_MARKS')" routerLink="/dashboard/report-card-templates" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="RC Templates">
+          <mat-icon>description</mat-icon><span>RC Templates</span>
+        </a>
+        <a class="nav-item" *ngIf="hasFeature('EXAM_MARKS')" routerLink="/dashboard/report-card-remarks" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Remarks Entry">
+          <mat-icon>rate_review</mat-icon><span>Remarks Entry</span>
+        </a>
+        <a class="nav-item" *ngIf="hasFeature('EXAM_MARKS')" routerLink="/dashboard/bulk-report-cards" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Bulk PDFs">
+          <mat-icon>picture_as_pdf</mat-icon><span>Bulk PDFs</span>
+        </a>
+        <a class="nav-item" *ngIf="hasFeature('EXAM_MARKS')" routerLink="/dashboard/class-overview" routerLinkActive="active"
+           (click)="closeSidebarOnMobile()" title="Class Overview">
+          <mat-icon>bar_chart</mat-icon><span>Class Overview</span>
         </a>
 
         <div class="nav-section-label">Fees</div>

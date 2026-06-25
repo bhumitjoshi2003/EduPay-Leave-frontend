@@ -196,8 +196,14 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     return `color: ${this.primaryColor}; border: 2px solid ${this.primaryColor}`;
   }
 
+  // sectionBarStyle is kept for table <th> headers (solid colored background, white text)
   get sectionBarStyle(): string {
     return `background: ${this.primaryColor}; border-color: ${this.primaryColor}`;
+  }
+
+  // sectionTitleStyle — elegant left-bordered label for section separators
+  get sectionTitleStyle(): string {
+    return `color: ${this.primaryColor}; border-left: 3px solid ${this.primaryColor}`;
   }
 
   get thStyle(): string {

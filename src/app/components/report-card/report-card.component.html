@@ -144,7 +144,7 @@
         <ng-container *ngIf="section.sectionType === 'MARKS_TABLE'
                               && reportCardData.weightedResult.marksTable">
           <div class="rc-section rc-marks-table-section">
-            <h3 class="rc-section-title" [attr.style]="sectionBarStyle">Scholastic Performance</h3>
+            <h3 class="rc-section-title" [attr.style]="sectionTitleStyle">Scholastic Performance</h3>
             <div class="rc-table-scroll">
               <table class="rc-table">
                 <thead>
@@ -202,7 +202,7 @@
         <!-- ── ASSESSMENT_SUMMARY ───────────────────────────────────── -->
         <ng-container *ngIf="section.sectionType === 'ASSESSMENT_SUMMARY'">
           <div class="rc-section rc-assessment-summary">
-            <h3 class="rc-section-title" [attr.style]="sectionBarStyle">Assessment Summary</h3>
+            <h3 class="rc-section-title" [attr.style]="sectionTitleStyle">Assessment Summary</h3>
             <table class="rc-table rc-summary-table">
               <tbody>
                 <tr>
@@ -232,7 +232,7 @@
         <!-- ── ATTENDANCE ───────────────────────────────────────────── -->
         <ng-container *ngIf="section.sectionType === 'ATTENDANCE' && reportCardData.attendance">
           <div class="rc-section rc-attendance-section">
-            <h3 class="rc-section-title" [attr.style]="sectionBarStyle">Attendance</h3>
+            <h3 class="rc-section-title" [attr.style]="sectionTitleStyle">Attendance</h3>
             <table class="rc-table">
               <thead>
                 <tr>
@@ -261,7 +261,7 @@
         <!-- ── CO_SCHOLASTIC ────────────────────────────────────────── -->
         <ng-container *ngIf="section.sectionType === 'CO_SCHOLASTIC'">
           <div class="rc-section rc-co-scholastic">
-            <h3 class="rc-section-title" [attr.style]="sectionBarStyle">Co-Scholastic Activities</h3>
+            <h3 class="rc-section-title" [attr.style]="sectionTitleStyle">Co-Scholastic Activities</h3>
 
             <!-- Data entered by teacher -->
             <ng-container *ngIf="reportCardData.coScholasticGrades && reportCardData.coScholasticGrades.length > 0; else coBlankTpl">
@@ -314,7 +314,7 @@
         <!-- ── TEACHER_REMARKS ──────────────────────────────────────── -->
         <ng-container *ngIf="section.sectionType === 'TEACHER_REMARKS'">
           <div class="rc-section rc-remarks-section">
-            <h3 class="rc-section-title" [attr.style]="sectionBarStyle">Class Teacher's Remarks</h3>
+            <h3 class="rc-section-title" [attr.style]="sectionTitleStyle">Class Teacher's Remarks</h3>
             <div class="rc-remark-body">
               <div *ngIf="reportCardData.teacherRemarks; else teacherBlankTpl" class="rc-remark-text">
                 {{ reportCardData.teacherRemarks }}
@@ -333,7 +333,7 @@
         <!-- ── PRINCIPAL_REMARKS ────────────────────────────────────── -->
         <ng-container *ngIf="section.sectionType === 'PRINCIPAL_REMARKS'">
           <div class="rc-section rc-remarks-section">
-            <h3 class="rc-section-title" [attr.style]="sectionBarStyle">Principal's Remarks</h3>
+            <h3 class="rc-section-title" [attr.style]="sectionTitleStyle">Principal's Remarks</h3>
             <div class="rc-remark-body">
               <div *ngIf="reportCardData.principalRemarks; else principalBlankTpl" class="rc-remark-text">
                 {{ reportCardData.principalRemarks }}
@@ -352,7 +352,7 @@
         <!-- ── PROMOTION_STATUS ─────────────────────────────────────── -->
         <ng-container *ngIf="section.sectionType === 'PROMOTION_STATUS'">
           <div class="rc-section rc-promotion-section">
-            <h3 class="rc-section-title" [attr.style]="sectionBarStyle">Result</h3>
+            <h3 class="rc-section-title" [attr.style]="sectionTitleStyle">Result</h3>
             <div class="rc-result-body">
               <div class="rc-result-row">
                 <span class="rc-result-label">Result:</span>

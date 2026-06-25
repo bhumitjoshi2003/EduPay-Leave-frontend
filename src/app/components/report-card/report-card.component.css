@@ -233,10 +233,11 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #fff;
-  padding: 4px 12px;
+  /* color and border-left come from [attr.style]="sectionTitleStyle" */
+  padding: 5px 12px 5px 10px;
   margin: 0;
-  /* background and border come from [attr.style]="sectionBarStyle" */
+  background: #f8fafc;
+  /* NO solid background fill — this is a left-bordered label, not a colored bar */
 }
 
 /* ════════════════════════════════════════════════════════════════════════

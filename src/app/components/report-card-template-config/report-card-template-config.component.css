@@ -750,3 +750,62 @@
   .rct-my-stripe { width: 100%; height: 4px; }
   .rct-my-actions { justify-content: flex-start; }
 }
+
+/* ── Layout Style picker ─────────────────────────────────────────────── */
+.rct-layout-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.rct-layout-opt {
+  flex: 1;
+  min-width: 120px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  position: relative;
+}
+.rct-layout-opt input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.rct-layout-opt--active {
+  border-color: #1a3a6b;
+  background: #f0f4fb;
+}
+.rct-layout-opt:hover:not(.rct-layout-opt--active) {
+  border-color: #9ca3af;
+  background: #f9fafb;
+}
+.rct-layout-opt-name {
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+.rct-layout-opt-desc {
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.3;
+}
+/* "New" badge in gallery */
+.rct-layout-new-badge {
+  display: inline-block;
+  background: #059669;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: 5px;
+  vertical-align: middle;
+  letter-spacing: 0.5px;
+}

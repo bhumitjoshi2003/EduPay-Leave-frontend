@@ -43,6 +43,8 @@ export interface GalleryStyle {
   description: string;
   primaryColor: string;
   suggestedName: string;
+  layoutStyle: string;      // NEW
+  mottoExample?: string;    // NEW
 }
 
 const GALLERY_STYLES: GalleryStyle[] = [
@@ -54,6 +56,7 @@ const GALLERY_STYLES: GalleryStyle[] = [
     description: 'Full-border tables, navy header, official government document style.',
     primaryColor: '#1a3a6b',
     suggestedName: 'CBSE Report Card',
+    layoutStyle: 'CLASSIC',
   },
   {
     id: 'icse',
@@ -63,6 +66,7 @@ const GALLERY_STYLES: GalleryStyle[] = [
     description: 'Clean teal header, horizontal-rule tables, modern academic look.',
     primaryColor: '#0d5f5f',
     suggestedName: 'ICSE Report Card',
+    layoutStyle: 'CLASSIC',
   },
   {
     id: 'primary',
@@ -72,6 +76,7 @@ const GALLERY_STYLES: GalleryStyle[] = [
     description: 'Larger text, grade-only format, activity sections, friendly layout.',
     primaryColor: '#4338ca',
     suggestedName: 'Primary Report Card',
+    layoutStyle: 'CLASSIC',
   },
   {
     id: 'senior',
@@ -81,6 +86,7 @@ const GALLERY_STYLES: GalleryStyle[] = [
     description: 'Theory + Practical columns, stream grouping, board exam format.',
     primaryColor: '#7c2d2d',
     suggestedName: 'Senior Secondary Report Card',
+    layoutStyle: 'CLASSIC',
   },
   {
     id: 'minimal',
@@ -90,6 +96,29 @@ const GALLERY_STYLES: GalleryStyle[] = [
     description: 'Horizontal rules only, no colored fills, pure typographic layout.',
     primaryColor: '#1c1c1e',
     suggestedName: 'Report Card',
+    layoutStyle: 'CLASSIC',
+  },
+  {
+    id: 'classic-elegance',
+    name: 'Classic Elegance',
+    tagline: 'Premium · Heritage look',
+    bestFor: 'Premium private schools, Heritage institutions, top CBSE/ICSE private schools',
+    description: 'Cream parchment background, circular school monogram, gold accent rules, large-number summary, circular result badge. A distinguished, prestigious look.',
+    primaryColor: '#2c5f2e',
+    suggestedName: 'Classic Elegance Report Card',
+    layoutStyle: 'WARM_ELEGANCE',
+    mottoExample: 'Scientia · Disciplina · Servitium',
+  },
+  {
+    id: 'scholar-blue',
+    name: 'Scholar Blue',
+    tagline: 'Academic · Prestigious',
+    bestFor: 'English-medium boarding schools, IB / IGCSE programs, top private schools',
+    description: 'Clean white with deep navy, crimson accent, mixed-case titles, dotted row separators, circular grade stamp. Scholarly and deeply professional.',
+    primaryColor: '#1a2b5e',
+    suggestedName: 'Scholar Blue Report Card',
+    layoutStyle: 'NAVY_SCHOLAR',
+    mottoExample: 'Knowledge · Discipline · Service',
   },
 ];
 
@@ -124,6 +153,18 @@ const THEME_PRESETS_BY_STYLE: Record<string, ThemePreset[]> = {
   ],
   minimal: [
     { label: 'Charcoal',    color: '#1c1c1e' },
+  ],
+  'classic-elegance': [
+    { label: 'Forest Green', color: '#2c5f2e' },
+    { label: 'Deep Maroon',  color: '#6b1a1a' },
+    { label: 'Royal Navy',   color: '#1a3a6b' },
+    { label: 'Slate Gray',   color: '#3d4f5c' },
+  ],
+  'scholar-blue': [
+    { label: 'Deep Navy',    color: '#1a2b5e' },
+    { label: 'Oxford Blue',  color: '#002147' },
+    { label: 'Forest Green', color: '#1a5c2a' },
+    { label: 'Charcoal',     color: '#2c2c2c' },
   ],
 };
 
@@ -234,14 +275,19 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
   useGalleryStyle(style: GalleryStyle): void {
     this.selectedGalleryStyle = style;
     this.editingId = null;
+    const branding: BrandingConfig = {
+      ...this.defaultBranding(),
+      primaryColor: style.primaryColor,
+      layoutStyle: style.layoutStyle,
+      schoolMotto: style.mottoExample ?? '',
+    };
     this.form = {
       ...this.blankForm(),
       name: style.suggestedName,
-      brandingJson: JSON.stringify({ ...this.defaultBranding(), primaryColor: style.primaryColor }),
+      brandingJson: JSON.stringify(branding),
     };
     this.showForm = true;
     this.cdr.markForCheck();
-    // Scroll form into view
     setTimeout(() => document.querySelector('.rct-form-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
   }
 
@@ -479,6 +525,8 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
       footerText:      '',
       showCgpa:        true,
       showGradePoints: false,
+      layoutStyle:     'CLASSIC',
+      schoolMotto:     '',
     };
   }
 

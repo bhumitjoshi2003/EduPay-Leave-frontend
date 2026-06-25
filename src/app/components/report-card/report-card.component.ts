@@ -81,7 +81,8 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     this.demoStyleName = params.get('styleName') ?? 'CBSE Standard';
     if (this.demoMode) {
       const color = params.get('color') ?? '#1565c0';
-      this.reportCardData = this.buildSampleData(color);
+      const layoutStyle = params.get('layoutStyle') ?? 'CLASSIC';
+      this.reportCardData = this.buildSampleData(color, layoutStyle);
       this.templateId = -1; // signals template mode
       this.loading = false;
       this.cdr.markForCheck();
@@ -292,6 +293,17 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     return this.branding.showGradePoints === true;
   }
 
+  get layoutStyle(): string { return this.branding.layoutStyle ?? 'CLASSIC'; }
+  get isNewLayout(): boolean { return this.layoutStyle !== 'CLASSIC'; }
+  get cardLayoutClass(): string { return this.layoutStyle.toLowerCase().replace(/_/g, '-'); }
+  get schoolInitials(): string {
+    const name = this.reportCardData?.schoolName ?? '';
+    const words = name.trim().split(/\s+/).filter(w => w.length > 0);
+    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
+  }
+  get schoolMotto(): string { return this.branding.schoolMotto ?? ''; }
+
   private darken(hex: string, factor: number): string {
     try {
       const h = hex.replace('#', '');
@@ -468,7 +480,7 @@ export class ReportCardComponent implements OnInit, OnDestroy {
 
   goBack(): void { this.location.back(); }
 
-  private buildSampleData(color: string): ReportCardData {
+  private buildSampleData(color: string, layoutStyle = 'CLASSIC'): ReportCardData {
     const sections: TemplateSection[] = [
       { sectionType: 'SCHOOL_HEADER',      enabled: true, displayOrder: 1 },
       { sectionType: 'STUDENT_INFO',       enabled: true, displayOrder: 2 },
@@ -553,7 +565,12 @@ export class ReportCardComponent implements OnInit, OnDestroy {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         sections,
-        brandingJson: JSON.stringify({ primaryColor: color, showCgpa: true } as BrandingConfig),
+        brandingJson: JSON.stringify({
+          primaryColor: color,
+          showCgpa: true,
+          layoutStyle,
+          schoolMotto: layoutStyle !== 'CLASSIC' ? 'Knowledge · Discipline · Service' : ''
+        } as BrandingConfig),
       },
       weightedResult: {
         groupId: 0,

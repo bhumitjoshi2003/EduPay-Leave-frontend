@@ -68,55 +68,110 @@
        TEMPLATE-BASED REPORT CARD
   ══════════════════════════════════════════════════════════════════════ -->
   <ng-container *ngIf="!loading && (templateId || demoMode) && reportCardData">
-    <div class="rc-card">
+    <div [ngClass]="'rc-card rc-card--' + cardLayoutClass">
 
       <ng-container *ngFor="let section of enabledSections; trackBy: trackBySection">
 
         <!-- ── SCHOOL_HEADER ────────────────────────────────────────── -->
         <ng-container *ngIf="section.sectionType === 'SCHOOL_HEADER'">
-          <!-- Custom header image (uploaded by school) -->
-          <ng-container *ngIf="headerImageSrc; else autoHeader">
-            <div class="rc-custom-header-wrap">
-              <img [src]="headerImageSrc" alt="School Header" class="rc-custom-header-img" />
-              <div class="rc-custom-header-divider" [attr.style]="'border-color:' + primaryColor"></div>
+
+          <!-- Custom header image (all layouts — takes priority) -->
+          <div *ngIf="headerImageSrc" class="rc-custom-header-wrap">
+            <img [src]="headerImageSrc" alt="School Header" class="rc-custom-header-img" />
+          </div>
+
+          <!-- Elegant centered header (WARM_ELEGANCE / NAVY_SCHOLAR — no custom image) -->
+          <div *ngIf="!headerImageSrc && isNewLayout" class="rc-elegant-header">
+            <div class="rc-circular-logo" [attr.style]="'border-color:' + primaryColor">
+              <img *ngIf="logoSrc" [src]="logoSrc" alt="School Logo" class="rc-circular-logo-img" />
+              <span *ngIf="!logoSrc" class="rc-circular-initials" [attr.style]="'color:' + primaryColor">
+                {{ schoolInitials }}
+              </span>
             </div>
-          </ng-container>
-          <!-- Auto-generated header (fallback) -->
-          <ng-template #autoHeader>
-            <div class="rc-school-header" [attr.style]="headerStyle">
-              <div class="rc-header-inner">
-                <div class="rc-header-logo" *ngIf="logoSrc">
-                  <img [src]="logoSrc" alt="School Logo" class="rc-school-logo" />
+            <div class="rc-elegant-school-name" [attr.style]="'color:' + primaryColor">
+              {{ reportCardData.schoolName }}
+            </div>
+            <div class="rc-elegant-motto" *ngIf="schoolMotto">{{ schoolMotto }}</div>
+            <div class="rc-elegant-meta">
+              <ng-container *ngIf="reportCardData.affiliationNumber">
+                Affiliation No. {{ reportCardData.affiliationNumber }}
+              </ng-container>
+              <ng-container *ngIf="reportCardData.affiliationNumber && reportCardData.schoolAddress">
+                &nbsp;&bull;&nbsp;
+              </ng-container>
+              <ng-container *ngIf="reportCardData.schoolAddress">
+                {{ reportCardData.schoolAddress }}
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- Classic auto-generated header (CLASSIC layout — no custom image) -->
+          <div *ngIf="!headerImageSrc && !isNewLayout" class="rc-school-header" [attr.style]="headerStyle">
+            <div class="rc-header-inner">
+              <div class="rc-header-logo" *ngIf="logoSrc">
+                <img [src]="logoSrc" alt="School Logo" class="rc-school-logo" />
+              </div>
+              <div class="rc-header-center">
+                <div class="rc-school-name">{{ reportCardData.schoolName }}</div>
+                <div *ngIf="boardLabel" class="rc-school-board-label">{{ boardLabel }}</div>
+                <div *ngIf="reportCardData.schoolAddress" class="rc-school-detail">
+                  {{ reportCardData.schoolAddress }}
                 </div>
-                <div class="rc-header-center">
-                  <div class="rc-school-name">{{ reportCardData.schoolName }}</div>
-                  <div *ngIf="boardLabel" class="rc-school-board-label">{{ boardLabel }}</div>
-                  <div *ngIf="reportCardData.schoolAddress" class="rc-school-detail">
-                    {{ reportCardData.schoolAddress }}
-                  </div>
-                  <div class="rc-school-detail" *ngIf="reportCardData.schoolPhone || reportCardData.schoolEmail">
-                    <ng-container *ngIf="reportCardData.schoolPhone">Ph: {{ reportCardData.schoolPhone }}</ng-container>
-                    <ng-container *ngIf="reportCardData.schoolPhone && reportCardData.schoolEmail">&nbsp;|&nbsp;</ng-container>
-                    <ng-container *ngIf="reportCardData.schoolEmail">{{ reportCardData.schoolEmail }}</ng-container>
-                  </div>
-                  <div *ngIf="reportCardData.affiliationNumber" class="rc-school-detail">
-                    Affiliation No: {{ reportCardData.affiliationNumber }}
-                  </div>
+                <div class="rc-school-detail" *ngIf="reportCardData.schoolPhone || reportCardData.schoolEmail">
+                  <ng-container *ngIf="reportCardData.schoolPhone">Ph: {{ reportCardData.schoolPhone }}</ng-container>
+                  <ng-container *ngIf="reportCardData.schoolPhone && reportCardData.schoolEmail">&nbsp;|&nbsp;</ng-container>
+                  <ng-container *ngIf="reportCardData.schoolEmail">{{ reportCardData.schoolEmail }}</ng-container>
                 </div>
-                <div class="rc-header-right">
-                  <div class="rc-report-title-box" [attr.style]="rcLabelStyle">
-                    <span class="rc-report-label">REPORT CARD</span>
-                    <span class="rc-session-text">{{ reportCardData.session }}</span>
-                  </div>
+                <div *ngIf="reportCardData.affiliationNumber" class="rc-school-detail">
+                  Affiliation No: {{ reportCardData.affiliationNumber }}
                 </div>
               </div>
             </div>
-          </ng-template>
+          </div>
+
+          <!-- Title band — WARM ELEGANCE variant -->
+          <div *ngIf="layoutStyle === 'WARM_ELEGANCE'" class="rc-title-warm">
+            <div class="rc-title-rule-warm" [attr.style]="'border-color:' + primaryColor"></div>
+            <div class="rc-title-warm-label">R E P O R T &nbsp;&nbsp; C A R D</div>
+            <div class="rc-title-warm-session">
+              <ng-container *ngIf="reportCardData.session">Academic Session {{ reportCardData.session }}</ng-container>
+              <ng-container *ngIf="reportCardData.weightedResult?.groupName">
+                &nbsp;&middot;&nbsp;{{ reportCardData.weightedResult.groupName }} Examination
+              </ng-container>
+            </div>
+            <div class="rc-title-rule-warm" [attr.style]="'border-color:' + primaryColor"></div>
+          </div>
+
+          <!-- Title band — NAVY SCHOLAR variant -->
+          <div *ngIf="layoutStyle === 'NAVY_SCHOLAR'" class="rc-title-navy">
+            <div class="rc-title-navy-sep"></div>
+            <div class="rc-title-navy-label" [attr.style]="'color:' + primaryColor">Report Card</div>
+            <div class="rc-title-navy-underline" [attr.style]="'border-color:' + primaryColor"></div>
+            <div class="rc-title-navy-session">
+              <ng-container *ngIf="reportCardData.session">Academic Session {{ reportCardData.session }}</ng-container>
+              <ng-container *ngIf="reportCardData.weightedResult?.groupName">
+                &nbsp;&middot;&nbsp;{{ reportCardData.weightedResult.groupName }} Examination
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- Title band — CLASSIC variant -->
+          <div *ngIf="!isNewLayout" class="rc-doc-title-band" [attr.style]="'background:' + primaryColor">
+            <div class="rc-doc-title-label">REPORT CARD</div>
+            <div class="rc-doc-title-meta">
+              <ng-container *ngIf="reportCardData.session">Academic Session: {{ reportCardData.session }}</ng-container>
+              <ng-container *ngIf="reportCardData.weightedResult?.groupName">
+                &nbsp;&bull;&nbsp;{{ reportCardData.weightedResult.groupName }}
+              </ng-container>
+            </div>
+          </div>
+
         </ng-container>
 
         <!-- ── STUDENT_INFO ─────────────────────────────────────────── -->
         <ng-container *ngIf="section.sectionType === 'STUDENT_INFO'">
           <div class="rc-section rc-student-info-section">
+            <h3 class="rc-section-title" [attr.style]="sectionTitleStyle">Student Information</h3>
             <table class="rc-student-table">
               <tbody>
                 <tr>
@@ -224,7 +279,43 @@
         <ng-container *ngIf="section.sectionType === 'ASSESSMENT_SUMMARY'">
           <div class="rc-section rc-assessment-summary">
             <h3 class="rc-section-title" [attr.style]="sectionTitleStyle">Assessment Summary</h3>
-            <table class="rc-table rc-summary-table">
+
+            <!-- Large-number layout for WARM_ELEGANCE / NAVY_SCHOLAR -->
+            <div *ngIf="isNewLayout" class="rc-summary-large">
+              <div class="rc-summary-stat">
+                <div class="rc-summary-big-num" [attr.style]="'color:' + primaryColor">
+                  {{ reportCardData.weightedResult.weightedPercentage | number:'1.1-1' }}%
+                </div>
+                <div class="rc-summary-stat-label">Overall</div>
+              </div>
+              <div class="rc-summary-stat-div"></div>
+              <div class="rc-summary-stat">
+                <div class="rc-summary-big-num"
+                     [ngClass]="getGradeClassFromPct(reportCardData.weightedResult.weightedPercentage)">
+                  {{ getGradeFromPct(reportCardData.weightedResult.weightedPercentage) }}
+                </div>
+                <div class="rc-summary-stat-label">Grade</div>
+              </div>
+              <div class="rc-summary-stat-div"></div>
+              <div class="rc-summary-stat">
+                <div class="rc-summary-big-num">
+                  {{ reportCardData.weightedResult.rank > 0 ? reportCardData.weightedResult.rank : '—' }}
+                </div>
+                <div class="rc-summary-stat-label">Class Rank</div>
+              </div>
+              <ng-container *ngIf="showCgpa">
+                <div class="rc-summary-stat-div"></div>
+                <div class="rc-summary-stat">
+                  <div class="rc-summary-big-num" [attr.style]="'color:' + primaryColor">
+                    {{ reportCardData.cgpa | number:'1.1-1' }}
+                  </div>
+                  <div class="rc-summary-stat-label">CGPA</div>
+                </div>
+              </ng-container>
+            </div>
+
+            <!-- Classic table layout -->
+            <table *ngIf="!isNewLayout" class="rc-table rc-summary-table">
               <tbody>
                 <tr>
                   <td class="rc-si-label">Overall Percentage</td>
@@ -365,9 +456,32 @@
         <!-- ── PROMOTION_STATUS ─────────────────────────────────────── -->
         <ng-container *ngIf="section.sectionType === 'PROMOTION_STATUS'">
           <div class="rc-section rc-promotion-section">
-            <h3 class="rc-section-title" [attr.style]="sectionTitleStyle">Result</h3>
+            <h3 *ngIf="!isNewLayout" class="rc-section-title" [attr.style]="sectionTitleStyle">Result</h3>
             <div class="rc-result-body">
-              <div class="rc-result-stamp-wrap">
+
+              <!-- Circular badge for new layouts -->
+              <div *ngIf="isNewLayout" class="rc-circular-badge-wrap">
+                <div class="rc-circular-badge"
+                     [attr.style]="'border-color:' + primaryColor">
+                  <div class="rc-badge-top" [attr.style]="'color:' + primaryColor">
+                    {{ isPass(reportCardData.weightedResult.weightedPercentage) ? 'PASSED WITH' : 'RESULT' }}
+                  </div>
+                  <div class="rc-badge-grade"
+                       [ngClass]="getGradeClassFromPct(reportCardData.weightedResult.weightedPercentage)"
+                       [attr.style]="'color:' + primaryColor">
+                    {{ getGradeFromPct(reportCardData.weightedResult.weightedPercentage) }}
+                  </div>
+                  <div class="rc-badge-mid" [attr.style]="'color:' + primaryColor">
+                    {{ isPass(reportCardData.weightedResult.weightedPercentage) ? 'DISTINCTION' : 'FAILED' }}
+                  </div>
+                  <div class="rc-badge-pct">
+                    {{ reportCardData.weightedResult.weightedPercentage | number:'1.1-1' }}%
+                  </div>
+                </div>
+              </div>
+
+              <!-- Classic rectangular stamp for CLASSIC layout -->
+              <div *ngIf="!isNewLayout" class="rc-result-stamp-wrap">
                 <div class="rc-result-stamp"
                      [class.rc-result-pass]="isPass(reportCardData.weightedResult.weightedPercentage)"
                      [class.rc-result-fail]="!isPass(reportCardData.weightedResult.weightedPercentage)"
@@ -382,6 +496,7 @@
                   </span>
                 </div>
               </div>
+
             </div>
           </div>
         </ng-container>

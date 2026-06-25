@@ -54,6 +54,8 @@ export interface BrandingConfig {
   footerText?: string;
   showCgpa?: boolean;       // default true (CBSE)
   showGradePoints?: boolean; // show GP column in marks table
+  layoutStyle?: string;    // 'CLASSIC' | 'WARM_ELEGANCE' | 'NAVY_SCHOLAR'
+  schoolMotto?: string;    // shown in new layout headers
 }
 
 // ── Publishing ────────────────────────────────────────────────────────────────

@@ -367,7 +367,10 @@
 
             <!-- Card info -->
             <div class="rct-gallery-info">
-              <div class="rct-gallery-name">{{ style.name }}</div>
+              <div class="rct-gallery-name">
+                {{ style.name }}
+                <span *ngIf="style.layoutStyle !== 'CLASSIC'" class="rct-layout-new-badge">New</span>
+              </div>
               <div class="rct-gallery-tagline">{{ style.tagline }}</div>
               <div class="rct-gallery-bestfor">Best for: {{ style.bestFor }}</div>
               <div class="rct-gallery-desc">{{ style.description }}</div>
@@ -463,6 +466,41 @@
       <div class="rct-modal-header">
         <h2 class="rct-modal-title" id="theme-modal-title">Theme — {{ editingBrandingFor.name }}</h2>
         <button class="rct-modal-close" (click)="closeBrandingEditor()" aria-label="Close theme editor">✕</button>
+      </div>
+
+      <!-- Layout Style picker -->
+      <div class="rct-theme-section">
+        <label class="rct-brand-label">Layout Style</label>
+        <div class="rct-layout-options">
+          <label class="rct-layout-opt" [class.rct-layout-opt--active]="brandingForm.layoutStyle === 'CLASSIC'">
+            <input type="radio" name="layoutStyle" value="CLASSIC"
+                   [(ngModel)]="brandingForm.layoutStyle" class="rct-radio" />
+            <div class="rct-layout-opt-name">Classic</div>
+            <div class="rct-layout-opt-desc">Colored header, table layout</div>
+          </label>
+          <label class="rct-layout-opt" [class.rct-layout-opt--active]="brandingForm.layoutStyle === 'WARM_ELEGANCE'">
+            <input type="radio" name="layoutStyle" value="WARM_ELEGANCE"
+                   [(ngModel)]="brandingForm.layoutStyle" class="rct-radio" />
+            <div class="rct-layout-opt-name">Classic Elegance</div>
+            <div class="rct-layout-opt-desc">Cream, circular logo, gold rules</div>
+          </label>
+          <label class="rct-layout-opt" [class.rct-layout-opt--active]="brandingForm.layoutStyle === 'NAVY_SCHOLAR'">
+            <input type="radio" name="layoutStyle" value="NAVY_SCHOLAR"
+                   [(ngModel)]="brandingForm.layoutStyle" class="rct-radio" />
+            <div class="rct-layout-opt-name">Scholar Blue</div>
+            <div class="rct-layout-opt-desc">White, navy, dotted rows</div>
+          </label>
+        </div>
+        <!-- School motto — visible for new layouts -->
+        <ng-container *ngIf="brandingForm.layoutStyle !== 'CLASSIC'">
+          <label class="rct-brand-label" style="margin-top:10px">
+            School Motto <span class="rct-optional">(optional)</span>
+          </label>
+          <input type="text" [(ngModel)]="brandingForm.schoolMotto"
+                 class="rct-input"
+                 placeholder="e.g. Knowledge · Discipline · Service" maxlength="100" />
+          <small class="rct-brand-hint">Shown in italic below the school name in the header.</small>
+        </ng-container>
       </div>
 
       <!-- Colour preset swatches -->

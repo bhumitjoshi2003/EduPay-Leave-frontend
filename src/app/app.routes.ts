@@ -158,6 +158,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/bulk-report-card/bulk-report-card.component').then(m => m.BulkReportCardComponent),
         canActivate: [roleGuard], data: { roles: ['ADMIN', 'TEACHER'] }
       },
+      {
+        path: 'class-overview',
+        loadComponent: () => import('./components/class-overview/class-overview.component').then(m => m.ClassOverviewComponent),
+        canActivate: [roleGuard], data: { roles: ['ADMIN', 'TEACHER'] }
+      },
 
       // ── Admin-only routes ─────────────────────────────────────────────
       {

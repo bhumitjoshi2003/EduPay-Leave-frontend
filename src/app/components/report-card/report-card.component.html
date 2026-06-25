@@ -24,6 +24,16 @@
   <!-- ── Loading ────────────────────────────────────────────────────── -->
   <div *ngIf="loading" class="rc-loading no-print">Loading report card…</div>
 
+  <!-- ── Not Published (student view) ─────────────────────────────── -->
+  <div *ngIf="!loading && notPublished" class="rc-locked no-print">
+    <div class="rc-locked-icon">🔒</div>
+    <h2 class="rc-locked-title">Report Card Not Yet Available</h2>
+    <p class="rc-locked-msg">
+      Your report card for <strong>{{ session }}</strong> hasn't been published yet.
+      Please check back later or contact your school administration.
+    </p>
+  </div>
+
   <!-- ══════════════════════════════════════════════════════════════════
        NEW: Template-based report card (templateId query param)
   ══════════════════════════════════════════════════════════════════════ -->

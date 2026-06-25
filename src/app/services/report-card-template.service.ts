@@ -55,6 +55,50 @@ export interface BrandingConfig {
   showGradePoints?: boolean; // show GP column in marks table
 }
 
+// ── Publishing ────────────────────────────────────────────────────────────────
+
+export interface ReportCardPublication {
+  id?: number;
+  templateId: number;
+  templateName?: string;
+  session: string;
+  className: string;
+  published: boolean;
+  publishedAt?: string;
+  publishedBy?: string;
+  emailSentAt?: string;
+  emailCount?: number;
+}
+
+export interface PublishRequest {
+  templateId: number;
+  session: string;
+  className: string;
+}
+
+// ── Class Performance Overview (Phase 7) ──────────────────────────────────────
+
+export interface StudentSummaryDTO {
+  studentId: string;
+  studentName: string;
+  percentage: number;
+  grade: string;
+  rank: number;
+  passed: boolean;
+}
+
+export interface ClassOverviewDTO {
+  className: string;
+  session: string;
+  templateName: string;
+  totalStudents: number;
+  passCount: number;
+  failCount: number;
+  classAverage: number;
+  gradeDistribution: Record<string, number>;
+  students: StudentSummaryDTO[];
+}
+
 export interface ReportCardTemplateRequest {
   name: string;
   description?: string;
@@ -281,6 +325,41 @@ export class ReportCardTemplateService {
 
   saveCoScholastic(req: CoScholasticRequest): Observable<void> {
     return this.http.put<void>(`${this.rcBase}/co-scholastic`, req, { withCredentials: true });
+  }
+
+  // ── Publishing ──────────────────────────────────────────────────────────────
+
+  getPublishStatus(templateId: number, session: string, className: string): Observable<ReportCardPublication> {
+    return this.http.get<ReportCardPublication>(`${this.rcBase}/publish`, {
+      params: { templateId: templateId.toString(), session, className },
+      withCredentials: true
+    });
+  }
+
+  publish(req: PublishRequest): Observable<ReportCardPublication> {
+    return this.http.post<ReportCardPublication>(`${this.rcBase}/publish`, req,
+      { withCredentials: true });
+  }
+
+  unpublish(templateId: number, session: string, className: string): Observable<void> {
+    return this.http.delete<void>(`${this.rcBase}/publish`, {
+      params: { templateId: templateId.toString(), session, className },
+      withCredentials: true
+    });
+  }
+
+  emailBlast(req: PublishRequest): Observable<{ initiated: number; message: string }> {
+    return this.http.post<{ initiated: number; message: string }>(
+      `${this.rcBase}/email-blast`, req, { withCredentials: true });
+  }
+
+  // Class Performance Overview (Phase 7)
+
+  getClassOverview(templateId: number, session: string, className: string): Observable<ClassOverviewDTO> {
+    return this.http.get<ClassOverviewDTO>(`${this.rcBase}/class-overview`, {
+      params: { templateId: templateId.toString(), session, className },
+      withCredentials: true
+    });
   }
 
   // PDF Download

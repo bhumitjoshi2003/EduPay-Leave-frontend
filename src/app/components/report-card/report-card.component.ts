@@ -41,6 +41,7 @@ export class ReportCardComponent implements OnInit, OnDestroy {
   reportCardData: ReportCardData | null = null;
 
   loading = true;
+  notPublished = false;  // true when STUDENT hits a 403 (report not yet published)
   private originalTitle = '';
 
   constructor(
@@ -111,8 +112,12 @@ export class ReportCardComponent implements OnInit, OnDestroy {
           );
         },
         error: (e) => {
-          this.logger.error('Error loading template report card:', e);
-          this.toast.error('Error', 'Failed to load report card.');
+          if (e.status === 403) {
+            this.notPublished = true;
+          } else {
+            this.logger.error('Error loading template report card:', e);
+            this.toast.error('Error', 'Failed to load report card.');
+          }
           this.loading = false;
           this.cdr.markForCheck();
         }

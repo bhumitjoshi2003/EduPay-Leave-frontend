@@ -10,7 +10,12 @@ import { Subject, takeUntil } from 'rxjs';
 import { Capacitor } from '@capacitor/core';
 
 import { SchoolService } from '../../services/school.service';
-import { ReportCardTemplateService, ReportCardTemplate } from '../../services/report-card-template.service';
+import {
+  ReportCardTemplateService,
+  ReportCardTemplate,
+  ReportCardPublication,
+  PublishRequest
+} from '../../services/report-card-template.service';
 import { ToastService } from '../../services/toast.service';
 import { LoggerService } from '../../services/logger.service';
 import { AuthStateService } from '../../auth/auth-state.service';
@@ -39,6 +44,13 @@ export class BulkReportCardComponent implements OnInit, OnDestroy {
   loadingTemplates = true;
   downloading = false;
 
+  // ── Publishing ────────────────────────────────────────────────────────
+  publication: ReportCardPublication | null = null;
+  loadingPubStatus = false;
+  publishing = false;
+  sendingEmails = false;
+  isAdmin = false;
+
   isNative = Capacitor.isNativePlatform();
 
   constructor(
@@ -52,6 +64,7 @@ export class BulkReportCardComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.isAdmin = this.authState.getUserRole() === 'ADMIN';
     this.buildSessions();
     this.loadClasses();
     this.loadTemplates();
@@ -65,7 +78,6 @@ export class BulkReportCardComponent implements OnInit, OnDestroy {
   private buildSessions(): void {
     const now = new Date();
     const year = now.getFullYear();
-    // Offer current and previous two academic years
     for (let y = year; y >= year - 2; y--) {
       this.sessions.push(`${y}-${y + 1}`);
     }
@@ -96,6 +108,7 @@ export class BulkReportCardComponent implements OnInit, OnDestroy {
         else if (templates.length > 0) this.selectedTemplateId = templates[0].id;
         this.loadingTemplates = false;
         this.cdr.markForCheck();
+        this.loadPublishStatus();
       },
       error: (e) => {
         this.logger.error('Failed to load templates', e);
@@ -104,6 +117,108 @@ export class BulkReportCardComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  onSelectionChange(): void {
+    this.publication = null;
+    this.loadPublishStatus();
+  }
+
+  loadPublishStatus(): void {
+    if (!this.selectedClass || !this.selectedTemplateId || !this.selectedSession) return;
+    this.loadingPubStatus = true;
+    this.cdr.markForCheck();
+
+    this.rcTemplateService.getPublishStatus(
+      this.selectedTemplateId!, this.selectedSession, this.selectedClass
+    ).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (pub) => {
+        this.publication = pub;
+        this.loadingPubStatus = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.publication = null;
+        this.loadingPubStatus = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  togglePublish(): void {
+    if (!this.selectedClass || !this.selectedTemplateId || !this.selectedSession) return;
+    this.publishing = true;
+    this.cdr.markForCheck();
+
+    if (this.publication?.published) {
+      this.rcTemplateService.unpublish(this.selectedTemplateId!, this.selectedSession, this.selectedClass)
+        .pipe(takeUntil(this.destroy$)).subscribe({
+          next: () => {
+            this.publication = { published: false, templateId: this.selectedTemplateId!, session: this.selectedSession, className: this.selectedClass };
+            this.toast.success('Unpublished', 'Report card access revoked for students.');
+            this.publishing = false;
+            this.cdr.markForCheck();
+          },
+          error: (e) => {
+            this.toast.error('Error', e.error?.message ?? 'Failed to unpublish.');
+            this.publishing = false;
+            this.cdr.markForCheck();
+          }
+        });
+    } else {
+      const req: PublishRequest = {
+        templateId: this.selectedTemplateId!,
+        session: this.selectedSession,
+        className: this.selectedClass
+      };
+      this.rcTemplateService.publish(req).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (pub) => {
+          this.publication = pub;
+          this.toast.success('Published', 'Students can now view their report cards.');
+          this.publishing = false;
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          this.toast.error('Error', e.error?.message ?? 'Failed to publish.');
+          this.publishing = false;
+          this.cdr.markForCheck();
+        }
+      });
+    }
+  }
+
+  sendEmailBlast(): void {
+    if (!this.selectedClass || !this.selectedTemplateId || !this.selectedSession) return;
+    if (!this.publication?.published) {
+      this.toast.warning('Not Published', 'Publish the report card first before sending emails.');
+      return;
+    }
+
+    this.sendingEmails = true;
+    this.cdr.markForCheck();
+
+    const req: PublishRequest = {
+      templateId: this.selectedTemplateId!,
+      session: this.selectedSession,
+      className: this.selectedClass
+    };
+
+    this.rcTemplateService.emailBlast(req).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res) => {
+        this.toast.success('Email Blast Initiated', res.message);
+        this.sendingEmails = false;
+        this.cdr.markForCheck();
+        // Refresh pub status after a delay to pick up email count
+        setTimeout(() => this.loadPublishStatus(), 3000);
+      },
+      error: (e) => {
+        this.toast.error('Email Failed', e.error?.message ?? 'Failed to send emails.');
+        this.sendingEmails = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // ── Download ──────────────────────────────────────────────────────────
 
   get canDownload(): boolean {
     return !!this.selectedClass && !!this.selectedTemplateId && !!this.selectedSession && !this.downloading;

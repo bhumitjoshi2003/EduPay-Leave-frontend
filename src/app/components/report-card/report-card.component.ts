@@ -16,6 +16,7 @@ import { SchoolService } from '../../services/school.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { Capacitor } from '@capacitor/core';
 import { ToastService } from '../../services/toast.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-report-card',
@@ -204,6 +205,15 @@ export class ReportCardComponent implements OnInit, OnDestroy {
   // sectionTitleStyle — elegant left-bordered label for section separators
   get sectionTitleStyle(): string {
     return `color: ${this.primaryColor}; border-left: 3px solid ${this.primaryColor}`;
+  }
+
+  // logoSrc — resolves the relative logo path (e.g. /uploads/school-logos/1.png)
+  // to a full URL the same way the login page does via TenantService.getLogoUrl()
+  get logoSrc(): string {
+    const url = this.reportCardData?.schoolLogoUrl;
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `${environment.apiUrl}${url}`;
   }
 
   get thStyle(): string {

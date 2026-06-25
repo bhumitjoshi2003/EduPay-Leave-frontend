@@ -76,8 +76,8 @@
         <ng-container *ngIf="section.sectionType === 'SCHOOL_HEADER'">
           <div class="rc-school-header" [attr.style]="headerStyle">
             <div class="rc-header-inner">
-              <div class="rc-header-logo" *ngIf="reportCardData.schoolLogoUrl">
-                <img [src]="reportCardData.schoolLogoUrl" alt="School Logo" class="rc-school-logo" />
+              <div class="rc-header-logo" *ngIf="logoSrc">
+                <img [src]="logoSrc" alt="School Logo" class="rc-school-logo" />
               </div>
               <div class="rc-header-center">
                 <div class="rc-school-name">{{ reportCardData.schoolName }}</div>

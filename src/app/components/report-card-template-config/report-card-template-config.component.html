@@ -509,12 +509,32 @@
         <label class="rct-brand-label">Watermark</label>
         <label class="rct-toggle-row">
           <input type="checkbox" [(ngModel)]="brandingForm.showWatermark" class="rct-checkbox" />
-          <span>Show faded logo watermark on PDF</span>
+          <span>Show faded watermark on every PDF page</span>
         </label>
-        <input *ngIf="brandingForm.showWatermark"
-               type="text" [(ngModel)]="brandingForm.watermarkText"
-               class="rct-input rct-input-sm"
-               placeholder="Watermark text (blank = school name)" maxlength="30" />
+        <ng-container *ngIf="brandingForm.showWatermark">
+          <!-- Watermark type selector -->
+          <div class="rct-wm-type-row">
+            <label class="rct-wm-type-opt">
+              <input type="radio" name="watermarkType" value="TEXT"
+                     [(ngModel)]="brandingForm.watermarkType" class="rct-radio" />
+              <span>Text</span>
+            </label>
+            <label class="rct-wm-type-opt">
+              <input type="radio" name="watermarkType" value="LOGO"
+                     [(ngModel)]="brandingForm.watermarkType" class="rct-radio" />
+              <span>School Logo</span>
+            </label>
+          </div>
+          <!-- Text input — only when TEXT mode -->
+          <input *ngIf="brandingForm.watermarkType !== 'LOGO'"
+                 type="text" [(ngModel)]="brandingForm.watermarkText"
+                 class="rct-input rct-input-sm"
+                 placeholder="Watermark text (blank = school name)" maxlength="30" />
+          <!-- Info note — only when LOGO mode -->
+          <p *ngIf="brandingForm.watermarkType === 'LOGO'" class="rct-wm-logo-note">
+            Your school logo will be centred on each page at ~12% opacity — visible but won't obscure text.
+          </p>
+        </ng-container>
       </div>
 
       <!-- Footer text -->

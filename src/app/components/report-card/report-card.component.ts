@@ -216,6 +216,70 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     return `${environment.apiUrl}${url}`;
   }
 
+  // headerImageSrc — resolves the custom report card header image URL
+  get headerImageSrc(): string {
+    const url = this.reportCardData?.reportCardHeaderImageUrl;
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `${environment.apiUrl}${url}`;
+  }
+
+  // photoSrc — resolves student photo relative path to a full URL
+  get photoSrc(): string {
+    const url = this.reportCardData?.photoUrl;
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `${environment.apiUrl}${url}`;
+  }
+
+  // classDisplay — e.g. "10" or "10 – A" when section exists
+  get classDisplay(): string {
+    const cls = this.reportCardData?.className ?? '';
+    const sec = this.reportCardData?.sectionName;
+    return sec ? `${cls} – ${sec}` : cls;
+  }
+
+  // boardLabel — human-readable board type shown in school header
+  get boardLabel(): string {
+    const map: Record<string, string> = {
+      CBSE: 'CBSE Affiliated',
+      ICSE: 'ICSE Affiliated',
+      STATE: 'State Board',
+      OTHER: ''
+    };
+    return map[this.reportCardData?.boardType ?? ''] ?? '';
+  }
+
+  // gradeLegend — rows for the grade scale legend shown below marks table
+  get gradeLegend(): { grade: string; range: string; descriptor: string }[] {
+    const gs = this.reportCardData?.gradingSystem ?? 'CBSE';
+    if (gs === 'CBSE') {
+      return [
+        { grade: 'A1', range: '91–100', descriptor: 'Outstanding' },
+        { grade: 'A2', range: '81–90',  descriptor: 'Excellent' },
+        { grade: 'B1', range: '71–80',  descriptor: 'Very Good' },
+        { grade: 'B2', range: '61–70',  descriptor: 'Good' },
+        { grade: 'C1', range: '51–60',  descriptor: 'Satisfactory' },
+        { grade: 'C2', range: '41–50',  descriptor: 'Average' },
+        { grade: 'D',  range: '33–40',  descriptor: 'Needs Improvement' },
+        { grade: 'E',  range: '0–32',   descriptor: 'Fail' },
+      ];
+    }
+    if (gs === 'LETTER') {
+      return [
+        { grade: 'A+', range: '90–100', descriptor: 'Outstanding' },
+        { grade: 'A',  range: '80–89',  descriptor: 'Excellent' },
+        { grade: 'B+', range: '70–79',  descriptor: 'Very Good' },
+        { grade: 'B',  range: '60–69',  descriptor: 'Good' },
+        { grade: 'C+', range: '50–59',  descriptor: 'Satisfactory' },
+        { grade: 'C',  range: '40–49',  descriptor: 'Average' },
+        { grade: 'D',  range: '33–39',  descriptor: 'Needs Improvement' },
+        { grade: 'F',  range: '0–32',   descriptor: 'Fail' },
+      ];
+    }
+    return []; // PERCENTAGE — no letter grade legend needed
+  }
+
   get thStyle(): string {
     return `background: ${this.primaryColor}; border-color: ${this.primaryColor}; color: #fff`;
   }

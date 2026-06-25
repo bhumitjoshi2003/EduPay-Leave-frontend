@@ -680,6 +680,20 @@
 
 .rct-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
+/* Watermark type radio row */
+.rct-wm-type-row {
+  display: flex; gap: 20px; margin: 6px 0 8px;
+}
+.rct-wm-type-opt {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.84rem; color: #334155; cursor: pointer;
+}
+.rct-radio { width: 15px; height: 15px; cursor: pointer; accent-color: #1565c0; }
+.rct-wm-logo-note {
+  font-size: 0.76rem; color: #64748b;
+  margin: 4px 0 0; line-height: 1.4;
+}
+
 /* ════════════════════════════════════════════════════════════════════════
    EMPTY STATE
 ════════════════════════════════════════════════════════════════════════ */

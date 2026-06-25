@@ -81,6 +81,11 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
   logoFile: File | null = null;
   uploadingLogo = false;
 
+  // Report card header image upload
+  headerImagePreviewUrl: string | null = null;
+  headerImageFile: File | null = null;
+  uploadingHeaderImage = false;
+
   readonly boardTypes = ['CBSE', 'ICSE', 'STATE', 'IB', 'IGCSE', 'OTHER'];
   readonly gradingSystems = [
     { value: 'CBSE', label: 'CBSE (A1/A2/B1…)' },
@@ -158,6 +163,7 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
       email: this.settings.email,
       website: this.settings.website,
       boardType: this.settings.boardType,
+      affiliationNumber: this.settings.affiliationNumber ?? '',
       academicYearStartMonth: this.settings.academicYearStartMonth ?? 4,
       workingDays: this.settings.workingDays ?? 'MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY',
       periodsPerDay: this.settings.periodsPerDay ?? 8,
@@ -515,6 +521,79 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
         this.uploadingLogo = false;
         this.cdr.markForCheck();
       }
+    });
+  }
+
+  onHeaderImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const maxSize = 10 * 1024 * 1024;
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.toast.error('Invalid File', 'Only PNG, JPG, or WebP images are supported.');
+      return;
+    }
+    if (file.size > maxSize) {
+      this.toast.error('File Too Large', 'Header image must be under 10 MB.');
+      return;
+    }
+    this.headerImageFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.headerImagePreviewUrl = e.target?.result as string;
+      this.cdr.markForCheck();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  cancelHeaderImageUpload(): void {
+    this.headerImageFile = null;
+    this.headerImagePreviewUrl = null;
+    this.cdr.markForCheck();
+  }
+
+  uploadHeaderImage(): void {
+    if (!this.headerImageFile) return;
+    this.uploadingHeaderImage = true;
+    this.cdr.markForCheck();
+    this.schoolService.uploadReportCardHeader(this.headerImageFile).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res) => {
+        if (this.settings) this.settings.reportCardHeaderImageUrl = res.headerImageUrl;
+        this.headerImageFile = null;
+        this.headerImagePreviewUrl = null;
+        this.uploadingHeaderImage = false;
+        this.toast.success('Header Updated', 'Report card header image uploaded successfully.');
+        this.cdr.markForCheck();
+      },
+      error: (e) => {
+        this.logger.error('Failed to upload report card header', e);
+        this.toast.error('Upload Failed', e?.error?.message || 'Could not upload header image. Please try again.');
+        this.uploadingHeaderImage = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  removeHeaderImage(): void {
+    this.toast.confirm({
+      title: 'Remove Header Image',
+      message: 'This will revert to the auto-generated header on all report cards. Continue?',
+      confirmText: 'Remove',
+      cancelText: 'Cancel',
+      danger: true
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.schoolService.removeReportCardHeader().pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          if (this.settings) this.settings.reportCardHeaderImageUrl = null;
+          this.toast.success('Removed', 'Report card header image removed.');
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.toast.error('Error', 'Failed to remove header image.');
+        }
+      });
     });
   }
 

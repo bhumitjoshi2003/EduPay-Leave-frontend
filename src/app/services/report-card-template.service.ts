@@ -49,6 +49,7 @@ export interface BrandingConfig {
   primaryColor?: string;   // hex e.g. "#1565c0"
   accentColor?: string;
   showWatermark?: boolean;
+  watermarkType?: 'TEXT' | 'LOGO';  // default 'TEXT'
   watermarkText?: string;
   footerText?: string;
   showCgpa?: boolean;       // default true (CBSE)
@@ -244,6 +245,7 @@ export interface ReportCardData {
   overallGrade?: string;
   cgpa?: number | null;
   className: string;
+  sectionName?: string;
   rollNumber?: string;
   session: string;
   fatherName?: string;
@@ -256,6 +258,8 @@ export interface ReportCardData {
   schoolPhone?: string;
   schoolEmail?: string;
   affiliationNumber?: string;
+  boardType?: string;
+  reportCardHeaderImageUrl?: string;
   template: ReportCardTemplate;
   gradingSystem: string;
   weightedResult: WeightedGroupResult;

@@ -38,6 +38,8 @@ export interface SchoolSettings {
   workingDays: string;              // comma-separated, e.g. "MONDAY,TUESDAY,...,SATURDAY"
   periodsPerDay: number;            // number of periods per school day
   gradingSystem: string;            // CBSE | PERCENTAGE | LETTER
+  affiliationNumber?: string | null; // e.g. CBSE school no., ICSE index no.
+  reportCardHeaderImageUrl?: string | null; // custom header banner image for report cards
   // Staff attendance / GPS check-in settings
   schoolLatitude?: number;
   schoolLongitude?: number;
@@ -273,6 +275,16 @@ export class SchoolService {
     const form = new FormData();
     form.append('file', file);
     return this.http.post<{ logoUrl: string }>(`${this.baseUrl}/logo`, form);
+  }
+
+  uploadReportCardHeader(file: File): Observable<{ headerImageUrl: string }> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<{ headerImageUrl: string }>(`${this.baseUrl}/report-card-header`, form);
+  }
+
+  removeReportCardHeader(): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/report-card-header`);
   }
 
   updateRazorpayKeys(keyId: string, keySecret: string): Observable<void> {

@@ -124,6 +124,56 @@
         </div>
       </div>
 
+      <!-- Report Card Header Image card -->
+      <div class="ss-card">
+        <div class="ss-card-header">
+          <div class="ss-card-title-row">
+            <div class="ss-card-icon-box" style="background:#e0f2fe;color:#0284c7">🖼️</div>
+            <div>
+              <h2 class="ss-card-title">Report Card Header</h2>
+              <p class="ss-card-subtitle">Custom banner shown at the top of every report card — replaces the auto-generated header</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ss-logo-area">
+          <div class="ss-header-img-display">
+            <ng-container *ngIf="headerImagePreviewUrl; else currentHeaderImg">
+              <img [src]="headerImagePreviewUrl" class="ss-header-img" alt="Header preview">
+              <span class="ss-logo-badge">Preview</span>
+            </ng-container>
+            <ng-template #currentHeaderImg>
+              <ng-container *ngIf="settings!.reportCardHeaderImageUrl; else noHeaderImg">
+                <img [src]="tenantService.getLogoUrl(settings!.reportCardHeaderImageUrl)" class="ss-header-img" alt="Report card header">
+              </ng-container>
+              <ng-template #noHeaderImg>
+                <div class="ss-header-placeholder">No custom header — auto-generated header will be used</div>
+              </ng-template>
+            </ng-template>
+          </div>
+
+          <div class="ss-logo-controls" *ngIf="isAdmin">
+            <ng-container *ngIf="!headerImageFile">
+              <label class="ss-btn ss-btn-ghost ss-logo-pick-btn" for="headerInput">
+                {{ settings!.reportCardHeaderImageUrl ? '🔄 Change Header' : '+ Upload Header' }}
+              </label>
+              <input id="headerInput" type="file" accept="image/png,image/jpeg,image/webp" (change)="onHeaderImageSelected($event)" hidden>
+              <p class="ss-logo-hint">PNG or JPG &middot; Recommended 1800 &times; 300 px &middot; max 10 MB</p>
+              <button *ngIf="settings!.reportCardHeaderImageUrl" class="ss-btn ss-btn-ghost" style="color:#dc2626;border-color:#dc2626" (click)="removeHeaderImage()">
+                🗑️ Remove Header
+              </button>
+            </ng-container>
+            <ng-container *ngIf="headerImageFile">
+              <button class="ss-btn ss-btn-primary" (click)="uploadHeaderImage()" [disabled]="uploadingHeaderImage">
+                {{ uploadingHeaderImage ? 'Uploading…' : 'Save Header' }}
+              </button>
+              <button class="ss-btn ss-btn-ghost" (click)="cancelHeaderImageUpload()" [disabled]="uploadingHeaderImage">Cancel</button>
+            </ng-container>
+          </div>
+          <p class="ss-logo-hint" *ngIf="!isAdmin && !settings?.reportCardHeaderImageUrl">No custom header uploaded yet.</p>
+        </div>
+      </div>
+
       <!-- VIEW mode -->
       <ng-container *ngIf="!isEditing">
         <div class="ss-card">
@@ -152,6 +202,13 @@
               <div class="ss-info-row-body">
                 <span class="ss-info-row-label">Board / Affiliation</span>
                 <span class="ss-info-row-value">{{ settings.boardType || '—' }}</span>
+              </div>
+            </div>
+            <div class="ss-info-row" *ngIf="settings.affiliationNumber">
+              <div class="ss-info-row-icon">🔢</div>
+              <div class="ss-info-row-body">
+                <span class="ss-info-row-label">Affiliation Number</span>
+                <span class="ss-info-row-value">{{ settings.affiliationNumber }}</span>
               </div>
             </div>
           </div>
@@ -316,6 +373,12 @@
                   <option value="">— Select —</option>
                   <option *ngFor="let b of boardTypes" [value]="b">{{ b }}</option>
                 </select>
+              </div>
+              <div class="ss-form-group">
+                <label class="ss-label">Affiliation Number</label>
+                <input class="ss-input" type="text" [(ngModel)]="editForm.affiliationNumber"
+                       name="ssAffiliationNumber"
+                       placeholder="e.g. 2730012 (CBSE school no.)">
               </div>
             </div>
           </div>

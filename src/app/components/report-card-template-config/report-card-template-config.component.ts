@@ -474,6 +474,7 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
     return {
       primaryColor:    '#1a3a6b',
       showWatermark:   false,
+      watermarkType:   'TEXT',
       watermarkText:   '',
       footerText:      '',
       showCgpa:        true,

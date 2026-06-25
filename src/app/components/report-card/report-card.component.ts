@@ -7,7 +7,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { Subject, takeUntil } from 'rxjs';
 import { MarksService, ExamResult } from '../../services/marks.service';
-import { ReportCardTemplateService, ReportCardData, TemplateSection, BrandingConfig } from '../../services/report-card-template.service';
+import {
+  ReportCardTemplateService, ReportCardData, TemplateSection, BrandingConfig,
+  ExamColumn, SubjectRow
+} from '../../services/report-card-template.service';
 import { LoggerService } from '../../services/logger.service';
 import { SchoolService } from '../../services/school.service';
 import { AuthStateService } from '../../auth/auth-state.service';
@@ -27,6 +30,10 @@ export class ReportCardComponent implements OnInit, OnDestroy {
 
   studentId = '';
   session = '';
+
+  // ── Demo mode ─────────────────────────────────────────────────────────
+  demoMode = false;
+  demoStyleName = '';
 
   // ── Legacy exam-based mode ────────────────────────────────────────────
   examId: number | null = null;
@@ -69,18 +76,32 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     this.examId     = examIdStr     ? Number(examIdStr)     : null;
     this.templateId = templateIdStr ? Number(templateIdStr) : null;
 
+    this.demoMode = params.get('demo') === 'true';
+    this.demoStyleName = params.get('styleName') ?? 'CBSE Standard';
+    if (this.demoMode) {
+      const color = params.get('color') ?? '#1565c0';
+      this.reportCardData = this.buildSampleData(color);
+      this.templateId = -1; // signals template mode
+      this.loading = false;
+      this.cdr.markForCheck();
+      this.titleService.setTitle(`Sample Report Card — ${this.demoStyleName}`);
+      return;
+    }
+
     if (!this.studentId || !this.session) {
       this.router.navigate(['/dashboard']);
       return;
     }
 
     // STUDENT role can only view own report card
-    const role = this.authState.getUserRole();
-    const authUserId = this.authState.getUserId();
-    if (role === 'STUDENT' && this.studentId && this.studentId !== String(authUserId)) {
-      this.toast.error('Access Denied', 'You can only view your own report card.');
-      this.router.navigate(['/dashboard']);
-      return;
+    if (!this.demoMode) {
+      const role = this.authState.getUserRole();
+      const authUserId = this.authState.getUserId();
+      if (role === 'STUDENT' && this.studentId && this.studentId !== String(authUserId)) {
+        this.toast.error('Access Denied', 'You can only view your own report card.');
+        this.router.navigate(['/dashboard']);
+        return;
+      }
     }
 
     if (this.templateId) {
@@ -366,6 +387,127 @@ export class ReportCardComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void { this.location.back(); }
+
+  private buildSampleData(color: string): ReportCardData {
+    const sections: TemplateSection[] = [
+      { sectionType: 'SCHOOL_HEADER',      enabled: true, displayOrder: 1 },
+      { sectionType: 'STUDENT_INFO',       enabled: true, displayOrder: 2 },
+      { sectionType: 'MARKS_TABLE',        enabled: true, displayOrder: 3 },
+      { sectionType: 'ASSESSMENT_SUMMARY', enabled: true, displayOrder: 4 },
+      { sectionType: 'ATTENDANCE',         enabled: true, displayOrder: 5 },
+      { sectionType: 'CO_SCHOLASTIC',      enabled: true, displayOrder: 6 },
+      { sectionType: 'TEACHER_REMARKS',    enabled: true, displayOrder: 7 },
+      { sectionType: 'PRINCIPAL_REMARKS',  enabled: true, displayOrder: 8 },
+      { sectionType: 'PROMOTION_STATUS',   enabled: true, displayOrder: 9 },
+      { sectionType: 'SIGNATURES',         enabled: true, displayOrder: 10 },
+    ];
+    const examColumns: ExamColumn[] = [
+      { examId: 1, examName: 'Periodic Test I',  maxTotal: 20, weightage: 0.10 },
+      { examId: 2, examName: 'Mid-Term Exam',    maxTotal: 80, weightage: 0.30 },
+      { examId: 3, examName: 'Periodic Test II', maxTotal: 20, weightage: 0.10 },
+      { examId: 4, examName: 'Annual Exam',      maxTotal: 80, weightage: 0.50 },
+    ];
+    const subjectRows: SubjectRow[] = [
+      { subjectName: 'English Language & Literature', examMarks: [
+          { obtained: 17, max: 20, percentage: 85 },
+          { obtained: 63, max: 80, percentage: 78.75 },
+          { obtained: 16, max: 20, percentage: 80 },
+          { obtained: 61, max: 80, percentage: 76.25 },
+        ], weightedPercentage: 78.3 },
+      { subjectName: 'Hindi (Course A)', examMarks: [
+          { obtained: 15, max: 20, percentage: 75 },
+          { obtained: 58, max: 80, percentage: 72.5 },
+          { obtained: 14, max: 20, percentage: 70 },
+          { obtained: 56, max: 80, percentage: 70 },
+        ], weightedPercentage: 71.1 },
+      { subjectName: 'Mathematics', examMarks: [
+          { obtained: 19, max: 20, percentage: 95 },
+          { obtained: 72, max: 80, percentage: 90 },
+          { obtained: 18, max: 20, percentage: 90 },
+          { obtained: 70, max: 80, percentage: 87.5 },
+        ], weightedPercentage: 89.2 },
+      { subjectName: 'Science', examMarks: [
+          { obtained: 16, max: 20, percentage: 80 },
+          { obtained: 60, max: 80, percentage: 75 },
+          { obtained: 15, max: 20, percentage: 75 },
+          { obtained: 58, max: 80, percentage: 72.5 },
+        ], weightedPercentage: 73.8 },
+      { subjectName: 'Social Science', examMarks: [
+          { obtained: 14, max: 20, percentage: 70 },
+          { obtained: 55, max: 80, percentage: 68.75 },
+          { obtained: 13, max: 20, percentage: 65 },
+          { obtained: 52, max: 80, percentage: 65 },
+        ], weightedPercentage: 66.4 },
+      { subjectName: 'Computer Science', examMarks: [
+          { obtained: 18, max: 20, percentage: 90 },
+          { obtained: 68, max: 80, percentage: 85 },
+          { obtained: 17, max: 20, percentage: 85 },
+          { obtained: 65, max: 80, percentage: 81.25 },
+        ], weightedPercentage: 83.5 },
+    ];
+    return {
+      studentId: 'ADM/2016/042',
+      studentName: 'Aryan Kumar Sharma',
+      rollNumber: '12',
+      className: 'Class VIII — A',
+      session: '2024-2025',
+      fatherName: 'Rajesh Kumar Sharma',
+      motherName: 'Sunita Devi Sharma',
+      dateOfBirth: '15 August 2011',
+      schoolName: 'Sunrise International School',
+      schoolAddress: '14, Education Colony, Sector 12, New Delhi — 110001',
+      schoolPhone: '+91-11-2345-6789',
+      schoolEmail: 'info@sunrise.edu.in',
+      affiliationNumber: '2730012',
+      gradingSystem: 'CBSE',
+      cgpa: 8.2,
+      overallGrade: 'B1',
+      template: {
+        id: -1,
+        schoolId: 0,
+        name: 'Sample Template',
+        assessmentGroupId: 0,
+        assessmentGroupName: 'Annual Assessment',
+        isDefault: true,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        sections,
+        brandingJson: JSON.stringify({ primaryColor: color, showCgpa: true } as BrandingConfig),
+      },
+      weightedResult: {
+        groupId: 0,
+        groupName: 'Annual Assessment',
+        groupType: 'EXAM_BASED',
+        weightedPercentage: 76.7,
+        rank: 3,
+        subjectResults: [],
+        marksTable: {
+          examColumns,
+          subjectRows,
+          examTotals: [
+            { obtained: 99,  max: 120 },
+            { obtained: 376, max: 480 },
+            { obtained: 93,  max: 120 },
+            { obtained: 362, max: 480 },
+          ],
+        },
+      },
+      attendance: {
+        workingDays: 220,
+        presentDays: 198,
+        percentage: 90.0,
+      },
+      teacherRemarks: 'Aryan is a sincere and hardworking student. Shows excellent progress in Mathematics and Science. Needs to focus more on Social Science. Keep up the good work!',
+      principalRemarks: 'A promising student with great academic potential. Encouraged to participate actively in co-curricular activities. Best wishes for the future.',
+      coScholasticGrades: [
+        { activity: 'Discipline & Behaviour',      grade: 'A' },
+        { activity: 'Sports & Physical Education',  grade: 'B' },
+        { activity: 'Co-Curricular Activities',     grade: 'A' },
+        { activity: 'General Hygiene',              grade: 'A' },
+      ],
+    };
+  }
 
   trackByExamId(index: number, exam: ExamResult): number { return exam.examId; }
   trackByIndex(index: number): number { return index; }

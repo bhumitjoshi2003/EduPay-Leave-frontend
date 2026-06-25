@@ -42,7 +42,6 @@
         </div>
       </div>
       <div class="rct-se-topbar-actions">
-        <button class="rct-btn-cancel" (click)="closeSectionEditor()">Cancel</button>
         <button class="rct-btn-save" (click)="saveSections()" [disabled]="savingSections">
           {{ savingSections ? 'Saving…' : 'Save Sections' }}
         </button>
@@ -64,14 +63,16 @@
 
             <div class="rct-section-order-btns">
               <button class="rct-order-btn" (click)="moveSectionUp(i)"
-                      [disabled]="i === 0" title="Move up">▲</button>
+                      [disabled]="i === 0" title="Move up"
+                      [attr.aria-label]="'Move ' + row.label + ' up'">▲</button>
               <button class="rct-order-btn" (click)="moveSectionDown(i)"
-                      [disabled]="i === sectionRows.length - 1" title="Move down">▼</button>
+                      [disabled]="i === sectionRows.length - 1" title="Move down"
+                      [attr.aria-label]="'Move ' + row.label + ' down'">▼</button>
             </div>
 
             <label class="rct-section-toggle">
               <input type="checkbox" [(ngModel)]="row.enabled"
-                     (change)="cdr.markForCheck()" class="rct-checkbox" />
+                     (change)="onSectionToggled()" class="rct-checkbox" />
             </label>
 
             <div class="rct-section-info">
@@ -208,8 +209,8 @@
   ══════════════════════════════════════════════════════════════════════ -->
   <ng-container *ngIf="!editingSectionsFor">
 
-    <div *ngIf="loading" class="rct-empty">
-      <div class="rct-loading-spinner"></div>
+    <div *ngIf="loading" class="rct-empty" role="status" aria-live="polite" aria-busy="true">
+      <div class="rct-loading-spinner" aria-hidden="true"></div>
       <p>Loading templates…</p>
     </div>
 
@@ -262,13 +263,13 @@
 
           <!-- Assessment Group -->
           <div class="rct-field">
-            <label>Assessment Group <span class="rct-req">*</span></label>
+            <label>Exam Structure <span class="rct-req">*</span></label>
             <select [(ngModel)]="form.assessmentGroupId" class="rct-select">
               <option [value]="0" disabled>Select assessment group…</option>
               <option *ngFor="let g of assessmentGroups" [value]="g.id">{{ g.name }}</option>
             </select>
             <small class="rct-hint" *ngIf="assessmentGroups.length === 0">
-              No groups found for this session. Create one in Assessment Groups first.
+              No exam structures found for this session. Go to Assessment Groups to create one first.
             </small>
           </div>
 
@@ -306,7 +307,7 @@
           <div>
             <h2 class="rct-gallery-heading">Choose a Report Card Style</h2>
             <p class="rct-gallery-sub">
-              Professionally designed layouts. Click <strong>Use This</strong> to configure and save.
+              Pick the layout that matches your school. You can customise sections and colours after saving.
             </p>
           </div>
         </div>
@@ -374,14 +375,28 @@
 
             <button class="rct-gallery-use-btn"
                     [style.background]="style.primaryColor"
+                    [attr.aria-label]="'Use ' + style.name + ' template'"
                     (click)="useGalleryStyle(style)">
-              Use This Template
+              Use {{ style.name }}
             </button>
 
           </div><!-- end gallery card -->
         </div><!-- end gallery grid -->
       </div>
       <!-- end gallery section -->
+
+      <!-- ── EMPTY STATE (no templates yet) ───────────────────────────── -->
+      <div *ngIf="!showForm && templates.length === 0" class="rct-empty-state">
+        <div class="rct-empty-state-icon" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M3 9h18M9 21V9"/>
+          </svg>
+        </div>
+        <p class="rct-empty-state-title">No templates yet</p>
+        <p class="rct-empty-state-sub">Pick a style above to create your first report card template. It takes under a minute.</p>
+      </div>
 
       <!-- ── MY TEMPLATES ────────────────────────────────────────────── -->
       <div class="rct-my-section" *ngIf="templates.length > 0">
@@ -402,7 +417,7 @@
               </div>
               <p *ngIf="t.description" class="rct-my-desc">{{ t.description }}</p>
               <div class="rct-my-meta">
-                <span class="rct-meta-item">Group: <strong>{{ t.assessmentGroupName }}</strong></span>
+                <span class="rct-meta-item">Exam Structure: <strong>{{ t.assessmentGroupName }}</strong></span>
                 <span class="rct-meta-item" *ngIf="t.gradingOverride">
                   Grading: <strong>{{ t.gradingOverride }}</strong>
                 </span>
@@ -424,7 +439,9 @@
                 Edit
               </button>
               <button class="rct-my-btn rct-my-btn--delete" (click)="deleteTemplate(t)"
-                      [disabled]="t.isDefault">
+                      [disabled]="t.isDefault"
+                      [title]="t.isDefault ? 'Cannot delete the default template' : 'Delete template'"
+                      [attr.aria-label]="'Delete ' + t.name">
                 Delete
               </button>
             </div>
@@ -442,27 +459,29 @@
        THEME EDITOR MODAL (formerly "Branding")
   ══════════════════════════════════════════════════════════════════════ -->
   <div *ngIf="editingBrandingFor" class="rct-overlay">
-    <div class="rct-modal rct-modal--theme">
+    <div class="rct-modal rct-modal--theme" role="dialog" aria-modal="true" aria-labelledby="theme-modal-title">
       <div class="rct-modal-header">
-        <h2 class="rct-modal-title">Theme — {{ editingBrandingFor.name }}</h2>
-        <button class="rct-modal-close" (click)="closeBrandingEditor()">✕</button>
+        <h2 class="rct-modal-title" id="theme-modal-title">Theme — {{ editingBrandingFor.name }}</h2>
+        <button class="rct-modal-close" (click)="closeBrandingEditor()" aria-label="Close theme editor">✕</button>
       </div>
 
       <!-- Colour preset swatches -->
       <div class="rct-theme-section">
-        <label class="rct-brand-label">Colour Theme</label>
+        <label class="rct-brand-label">Accent Colour</label>
         <div class="rct-theme-swatches">
           <button *ngFor="let preset of themePresets"
                   class="rct-swatch-btn"
                   [class.rct-swatch-btn--active]="brandingForm.primaryColor === preset.color"
                   [style.background]="preset.color"
                   [title]="preset.label"
+                  [attr.aria-label]="preset.label + ' colour'"
                   (click)="applyThemePreset(preset.color)">
           </button>
           <!-- Custom colour -->
-          <label class="rct-swatch-btn rct-swatch-custom" title="Custom colour">
+          <label class="rct-swatch-btn rct-swatch-custom" title="Custom colour" aria-label="Pick custom colour">
             <input type="color" [(ngModel)]="brandingForm.primaryColor"
-                   (input)="cdr.markForCheck()" style="opacity:0;width:0;height:0;position:absolute" />
+                   (input)="onColorInput()" style="opacity:0;width:0;height:0;position:absolute"
+                   aria-label="Custom colour picker" />
             <span class="rct-swatch-custom-icon">+</span>
           </label>
         </div>
@@ -474,7 +493,7 @@
 
       <!-- CBSE options -->
       <div class="rct-theme-section">
-        <label class="rct-brand-label">CBSE Options</label>
+        <label class="rct-brand-label">Display Options</label>
         <label class="rct-toggle-row">
           <input type="checkbox" [(ngModel)]="brandingForm.showCgpa" class="rct-checkbox" />
           <span>Show CGPA in Assessment Summary</span>
@@ -504,7 +523,7 @@
         <input type="text" [(ngModel)]="brandingForm.footerText"
                class="rct-input"
                placeholder="e.g. This is a computer-generated report card." maxlength="200" />
-        <small class="rct-brand-hint">Shown above the signature lines.</small>
+        <small class="rct-brand-hint">Printed at the bottom of the report card, above the signature lines.</small>
       </div>
 
       <div class="rct-modal-actions">

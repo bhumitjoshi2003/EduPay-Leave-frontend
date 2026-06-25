@@ -192,7 +192,7 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
     private sessionService: AcademicSessionService,
     private schoolService: SchoolService,
     private toast: ToastService,
-    readonly cdr: ChangeDetectorRef,   // public so template can call markForCheck on section toggle
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -500,6 +500,10 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
     return t.sections.filter(s => s.enabled).length;
   }
 
+  onSectionToggled(): void {
+    this.cdr.markForCheck();
+  }
+
   sectionLabel(type: string): string {
     return ALL_SECTIONS.find(s => s.type === type)?.label ?? type;
   }
@@ -518,4 +522,9 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
 
   /** Dummy array for ngFor loops in gallery mini-doc preview */
   readonly fakeRows = [0, 1, 2, 3];
+
+  /** Called from the template when the custom color picker value changes */
+  onColorInput(): void {
+    this.cdr.markForCheck();
+  }
 }

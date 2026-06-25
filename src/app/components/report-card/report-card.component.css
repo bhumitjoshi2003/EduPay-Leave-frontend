@@ -71,8 +71,55 @@
 .rc-btn-pdf:hover:not(:disabled) { opacity: 0.88; }
 .rc-btn-pdf:disabled { opacity: 0.5; cursor: default; }
 
+/* ── Demo mode banner ────────────────────────────────────────────────── */
+.rc-demo-banner {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 0 auto 16px;
+  max-width: 900px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.87rem;
+  color: #92400e;
+  flex-wrap: wrap;
+}
+.rc-demo-dismiss {
+  margin-left: auto;
+  background: none;
+  border: 1px solid #d97706;
+  color: #d97706;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.rc-demo-dismiss:hover { background: #fef3c7; }
+
 /* ── Loading / Empty ─────────────────────────────────────────────────── */
-.rc-loading, .rc-empty {
+.rc-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 64px 48px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+.rc-loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e0ecf5;
+  border-top-color: #1565c0;
+  border-radius: 50%;
+  animation: rc-spin 0.75s linear infinite;
+}
+@keyframes rc-spin { to { transform: rotate(360deg); } }
+.rc-empty {
   text-align: center; color: #888; font-style: italic; padding: 48px;
 }
 
@@ -95,9 +142,12 @@
    SCHOOL HEADER
 ════════════════════════════════════════════════════════════════════════ */
 .rc-school-header {
-  /* border-top color comes from [attr.style]="headerStyle" */
+  /* border-top color and width come from [attr.style]="headerStyle" */
   border-bottom: 1px solid #444;
   background: #fff;
+  /* Ensure the top stripe prints on all printers */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .rc-header-inner {
@@ -219,6 +269,8 @@
   text-transform: uppercase;
   letter-spacing: 0.3px;
   white-space: nowrap;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .rc-si-value {
@@ -288,7 +340,11 @@
 .rc-td-num      { text-align: center; }
 .rc-td-grade    { text-align: center; font-weight: 700; }
 
-.rc-table tbody tr:nth-child(even) td { background: #f9f9f9; }
+.rc-table tbody tr:nth-child(even) td {
+  background: #f9f9f9;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
 
 /* Table footer (totals row) */
 .rc-tfoot-row td {
@@ -633,17 +689,24 @@
   .rc-section-title,
   .rc-exam-heading,
   .rc-tfoot-row td,
-  .rc-si-label {
+  .rc-si-label,
+  .rc-student-table td,
+  .rc-table tbody tr:nth-child(even) td,
+  .rc-tfoot-summary td {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
   /* Grade text colors must print */
   .grade-a, .grade-b, .grade-c, .grade-fail,
-  .rc-result-pass, .rc-result-fail {
+  .rc-result-pass, .rc-result-fail,
+  .rc-absent-text {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+
+  /* Remove box-shadow from print */
+  * { box-shadow: none !important; }
 }
 
 /* ════════════════════════════════════════════════════════════════════════

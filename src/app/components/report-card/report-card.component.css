@@ -6,7 +6,7 @@
 .rc-page {
   background: #ccc;
   padding: 32px 0 48px;
-  font-family: Didot, 'Bodoni 72', Garamond, Georgia, 'Times New Roman', Times, serif;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -139,7 +139,7 @@
   outline-offset: -5px;
   box-shadow: 0 4px 32px rgba(0,0,0,.16);
   position: relative;
-  font-family: Didot, 'Bodoni 72', Garamond, Georgia, 'Times New Roman', Times, serif;
+  font-family: 'Times New Roman', Times, serif;
   box-sizing: border-box;
   overflow: hidden;
   color: #52645e;
@@ -189,9 +189,9 @@
 }
 
 .rc-school-name {
-  font-family: Didot, 'Bodoni 72', Garamond, Georgia, serif;
+  font-family: 'Times New Roman', Times, serif;
   font-size: 26pt;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0.39em;
   text-transform: uppercase;
   color: #455f57;
@@ -234,10 +234,10 @@
   margin: 0;
 }
 .rc-title-label {
-  font-family: Didot, 'Bodoni 72', Garamond, Georgia, serif;
+  font-family: 'Times New Roman', Times, serif;
   font-size: 13pt;
   letter-spacing: 0.5em;
-  font-weight: 400;
+  font-weight: 500;
   color: #52645e;
   padding: 6px 0 6px;
   line-height: 1;
@@ -258,10 +258,10 @@
 
 /* ── Section titles (centered, small-caps style) ── */
 .rc-sec-title {
-  font-family: Didot, 'Bodoni 72', Garamond, Georgia, serif;
+  font-family: 'Times New Roman', Times, serif;
   text-align: center;
   font-size: 8.1pt;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0.3em;
   color: #52645e;
   text-transform: uppercase;
@@ -331,6 +331,7 @@
   font-size: 8.8pt;
 }
 .rc-th {
+  font-family: 'Times New Roman', Times, serif;
   background: #eee9df;
   color: #52645e;
   padding: 5px 7px;

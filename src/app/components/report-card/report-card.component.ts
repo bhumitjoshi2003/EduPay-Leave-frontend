@@ -293,6 +293,11 @@ export class ReportCardComponent implements OnInit, OnDestroy {
   }
   get schoolMotto(): string { return this.branding.schoolMotto ?? ''; }
   get examTerm(): string { return this.branding.examTerm ?? ''; }
+  get examDisplay(): string {
+    const term = this.examTerm.trim();
+    if (!term) return '';
+    return term.toLowerCase().includes('exam') ? term : `${term} Examination`;
+  }
   get watermarkEnabled(): boolean { return this.branding.showWatermark === true; }
   get watermarkType(): string { return this.branding.watermarkType ?? 'TEXT'; }
   get watermarkText(): string { return this.branding.watermarkText ?? (this.reportCardData?.schoolName ?? ''); }

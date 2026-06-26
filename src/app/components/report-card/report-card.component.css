@@ -6,7 +6,7 @@
 .rc-page {
   background: #ccc;
   padding: 32px 0 48px;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: Garamond, Georgia, 'Times New Roman', Times, serif;
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -139,10 +139,10 @@
   outline-offset: -5px;
   box-shadow: 0 4px 32px rgba(0,0,0,.16);
   position: relative;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: Garamond, Georgia, 'Times New Roman', Times, serif;
   box-sizing: border-box;
   overflow: hidden;
-  color: #183b33;
+  color: #243f38;
 }
 
 /* ── Watermark layer ── */
@@ -190,10 +190,10 @@
 
 .rc-school-name {
   font-size: 25pt;
-  font-weight: 700;
-  letter-spacing: 0.45em;
+  font-weight: 600;
+  letter-spacing: 0.43em;
   text-transform: uppercase;
-  color: #183b33;
+  color: #214238;
   margin: 2px 0 4px;
   line-height: 1.15;
 }
@@ -208,7 +208,7 @@
 
 .rc-affiliation {
   font-size: 7.3pt;
-  color: #76827c;
+  color: #7f8b86;
   margin: 0;
   letter-spacing: 0.3px;
 }
@@ -225,26 +225,25 @@
   position: relative;
   z-index: 1;
   text-align: center;
-  margin-bottom: 7px;
+  margin: 0 0 8px;
 }
 .rc-title-rule {
   border-top: 1px solid #b58a24;
   height: 0;
-  margin: 0 0 6px;
+  margin: 0;
 }
 .rc-title-label {
-  border-top: 1px solid #b58a24;
-  border-bottom: 1px solid #b58a24;
-  font-size: 13pt;
-  letter-spacing: 0.52em;
-  font-weight: 700;
-  color: #183b33;
-  padding: 5px 0 4px;
+  font-size: 12.6pt;
+  letter-spacing: 0.5em;
+  font-weight: 600;
+  color: #223d36;
+  padding: 6px 0 6px;
+  line-height: 1;
 }
 .rc-title-session {
   font-style: italic;
   font-size: 8.3pt;
-  color: #6f7b75;
+  color: #737f79;
   margin-top: 5px;
 }
 
@@ -259,40 +258,48 @@
 .rc-sec-title {
   text-align: center;
   font-size: 7.7pt;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.3em;
-  color: #183b33;
+  color: #223d36;
   text-transform: uppercase;
-  margin: 7px 0 5px;
+  margin: 8px 0 6px;
 }
 
 /* ── Student info ── */
 .rc-student-layout {
-  display: flex;
-  gap: 9px;
+  display: grid;
+  grid-template-columns: 1fr 23mm;
+  gap: 8mm;
   align-items: flex-start;
 }
-.rc-student-fields { flex: 1; }
+.rc-student-fields {
+  display: grid;
+  grid-template-rows: repeat(3, 8.4mm);
+}
 
 .rc-info-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1.2fr 1fr 1.2fr;
   border-bottom: 0.5px solid #d5c9b8;
-  padding: 4px 0;
-  align-items: baseline;
+  padding: 0;
+  align-items: center;
   font-size: 8.7pt;
 }
 .rc-lbl { font-style: italic; color: #78857f; }
-.rc-val { font-weight: 700; color: #1d2f2a; padding-left: 4px; }
+.rc-val {
+  font-weight: 600;
+  color: #243f38;
+  padding-left: 4px;
+}
 
-.rc-photo-col { text-align: center; flex-shrink: 0; }
+.rc-photo-col { text-align: center; }
 .rc-student-photo {
-  width: 18mm; height: 23mm;
+  width: 21mm; height: 25.2mm;
   object-fit: cover;
   border: 1px solid #ccc;
 }
 .rc-photo-placeholder {
-  width: 18mm; height: 23mm;
+  width: 21mm; height: 25.2mm;
   border: 1.5px dashed #aaa;
   background: #f0f0f0;
   display: flex;
@@ -318,10 +325,10 @@
 }
 .rc-th {
   background: transparent;
-  color: #183b33;
+  color: #223d36;
   padding: 5px 7px;
   font-size: 7.2pt;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   border-top: 1px solid #b58a24;
@@ -338,8 +345,9 @@
 .rc-td-center { padding: 4.2px 7px; border-bottom: 0.5px solid #d5c9b8; text-align: center; }
 .rc-td-subject,
 .rc-td-center,
-.rc-td-grade { color: #1d2f2a; }
-.rc-td-grade { padding: 4.2px 7px; border-bottom: 0.5px solid #d5c9b8; text-align: right; font-weight: 700; }
+.rc-td-grade { color: #243f38; }
+.rc-td-center { font-weight: 600; }
+.rc-td-grade { padding: 4.2px 7px; border-bottom: 0.5px solid #d5c9b8; text-align: right; font-weight: 600; }
 
 .rc-tr-even td { background: #f5f0e8; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
@@ -348,7 +356,7 @@
   border-bottom: none;
   padding: 5px 7px;
   font-size: 8.8pt;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Grade coloring */
@@ -383,7 +391,7 @@
   padding: 4px 0;
   font-size: 8.6pt;
 }
-.rc-val-r { color: #1d2f2a; font-weight: 700; }
+.rc-val-r { color: #243f38; font-weight: 600; }
 
 /* ── Assessment Summary ── */
 .rc-kpi-row {
@@ -396,8 +404,8 @@
 .rc-kpi-val {
   display: block;
   font-size: 20pt;
-  font-weight: 700;
-  color: #183b33;
+  font-weight: 600;
+  color: #214238;
   line-height: 1.1;
 }
 .rc-kpi-lbl {
@@ -420,13 +428,13 @@
 }
 .rc-remark-lbl {
   font-size: 7pt;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.15em;
   color: #78857f;
   white-space: nowrap;
   flex-shrink: 0;
 }
-.rc-remark-txt { font-style: italic; color: #1d2f2a; }
+.rc-remark-txt { font-style: italic; color: #243f38; }
 
 /* ── Result badge + Signatures ── */
 .rc-sig-badge-row {

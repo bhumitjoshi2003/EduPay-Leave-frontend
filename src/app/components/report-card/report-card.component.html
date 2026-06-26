@@ -90,7 +90,7 @@
         <div class="rc-title-label">R E P O R T &nbsp;&nbsp; C A R D</div>
         <div class="rc-title-rule"></div>
         <div class="rc-title-session" *ngIf="reportCardData.session">
-          Academic Session {{ reportCardData.session }}<ng-container *ngIf="examTerm">&nbsp;&middot;&nbsp;{{ examTerm }} Examination</ng-container>
+          Academic Session {{ reportCardData.session }}<ng-container *ngIf="examDisplay">&nbsp;&middot;&nbsp;{{ examDisplay }}</ng-container>
         </div>
       </div>
 

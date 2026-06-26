@@ -6,7 +6,7 @@
 .rc-page {
   background: #ccc;
   padding: 32px 0 48px;
-  font-family: Garamond, Georgia, 'Times New Roman', Times, serif;
+  font-family: Didot, 'Bodoni 72', Garamond, Georgia, 'Times New Roman', Times, serif;
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -135,11 +135,11 @@
   margin: 0 auto;
   padding: 13mm 14mm 7mm;
   border: 2px double #153a32;
-  outline: 1px solid #b58a24;
+  outline: 1px solid #c29b4b;
   outline-offset: -5px;
   box-shadow: 0 4px 32px rgba(0,0,0,.16);
   position: relative;
-  font-family: Garamond, Georgia, 'Times New Roman', Times, serif;
+  font-family: Didot, 'Bodoni 72', Garamond, Georgia, 'Times New Roman', Times, serif;
   box-sizing: border-box;
   overflow: hidden;
   color: #243f38;
@@ -189,11 +189,12 @@
 }
 
 .rc-school-name {
-  font-size: 25pt;
+  font-family: Didot, 'Bodoni 72', Garamond, Georgia, serif;
+  font-size: 26pt;
   font-weight: 600;
-  letter-spacing: 0.43em;
+  letter-spacing: 0.39em;
   text-transform: uppercase;
-  color: #214238;
+  color: #213f37;
   margin: 2px 0 4px;
   line-height: 1.15;
 }
@@ -201,7 +202,7 @@
 .rc-motto {
   font-style: italic;
   font-size: 9pt;
-  color: #9f7a24;
+  color: #a78234;
   margin: 2px 0 5px;
   letter-spacing: 0.5px;
 }
@@ -216,7 +217,7 @@
 /* ── Gold separator ── */
 .rc-gold-rule {
   border: none;
-  border-top: 1.5px solid #8a6a10;
+  border-top: 1.5px solid #c29b4b;
   margin: 6px 0 10px;
 }
 
@@ -228,15 +229,16 @@
   margin: 0 0 8px;
 }
 .rc-title-rule {
-  border-top: 1px solid #b58a24;
+  border-top: 1px solid #c29b4b;
   height: 0;
   margin: 0;
 }
 .rc-title-label {
-  font-size: 12.6pt;
+  font-family: Didot, 'Bodoni 72', Garamond, Georgia, serif;
+  font-size: 13pt;
   letter-spacing: 0.5em;
   font-weight: 600;
-  color: #223d36;
+  color: #233f37;
   padding: 6px 0 6px;
   line-height: 1;
 }
@@ -256,11 +258,12 @@
 
 /* ── Section titles (centered, small-caps style) ── */
 .rc-sec-title {
+  font-family: Didot, 'Bodoni 72', Garamond, Georgia, serif;
   text-align: center;
-  font-size: 7.7pt;
+  font-size: 8.1pt;
   font-weight: 600;
   letter-spacing: 0.3em;
-  color: #223d36;
+  color: #233f37;
   text-transform: uppercase;
   margin: 8px 0 6px;
 }
@@ -331,8 +334,8 @@
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  border-top: 1px solid #b58a24;
-  border-bottom: 1px solid #b58a24;
+  border-top: 1px solid #c29b4b;
+  border-bottom: 1px solid #c29b4b;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -352,7 +355,7 @@
 .rc-tr-even td { background: #f5f0e8; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
 .rc-tfoot-row td {
-  border-top: 1.2px solid #b58a24;
+  border-top: 1.2px solid #c29b4b;
   border-bottom: none;
   padding: 5px 7px;
   font-size: 8.8pt;
@@ -417,11 +420,12 @@
 }
 
 /* ── Remarks ── */
-.rc-remarks { margin-top: 3px; }
+.rc-remarks { margin-top: 4px; }
 .rc-remark-line {
-  display: flex;
+  display: grid;
+  grid-template-columns: 31mm 1fr;
   align-items: baseline;
-  gap: 10px;
+  gap: 4mm;
   padding: 3px 0;
   border-bottom: none;
   font-size: 8.5pt;
@@ -441,14 +445,14 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-top: 7px;
+  margin-top: 5px;
   padding-top: 0;
 }
 .rc-sig-col { text-align: center; flex: 1; }
 .rc-sig-line {
   border-top: 1px solid #6f7b75;
   width: 36mm;
-  margin: 24mm auto 5px;
+  margin: 12mm auto 5px;
 }
 .rc-sig-label {
   font-size: 7pt;
@@ -466,7 +470,7 @@
   width: 29mm;
   height: 29mm;
   border-radius: 50%;
-  border: 2px solid #b58a24;
+  border: 2px solid #c29b4b;
   padding: 8px;
   background: #faf8f2;
   -webkit-print-color-adjust: exact;
@@ -482,26 +486,26 @@
   font-size: 6pt;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: #9f7a24;
+  color: #a78234;
   text-transform: uppercase;
 }
 .rc-badge-grade {
   font-size: 19pt;
   font-weight: 700;
-  color: #9f7a24;
+  color: #a78234;
   line-height: 1.1;
 }
 .rc-badge-mid {
   font-size: 6pt;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: #9f7a24;
+  color: #a78234;
   text-transform: uppercase;
 }
 .rc-badge-pct {
   font-size: 7.5pt;
   font-style: italic;
-  color: #9f7a24;
+  color: #a78234;
   margin-top: 2px;
 }
 
@@ -510,7 +514,7 @@
   position: absolute;
   left: 14mm;
   right: 14mm;
-  bottom: 4.2mm;
+  bottom: 3.2mm;
   text-align: center;
   margin-top: 0;
   padding-top: 0;
@@ -524,7 +528,7 @@
 }
 .rc-footer-brand {
   font-size: 6.3pt;
-  color: #b58a24;
+  color: #a78234;
   margin-top: 2px;
 }
 

@@ -155,11 +155,6 @@
             </tr>
           </tfoot>
         </table>
-        <div class="rc-grade-legend" *ngIf="gradeLegend.length && !isVeryDenseReport">
-          <ng-container *ngFor="let g of gradeLegend; let last = last">
-            <span>{{ g.grade }} ({{ g.range }}) {{ g.descriptor }}</span><ng-container *ngIf="!last"> · </ng-container>
-          </ng-container>
-        </div>
       </section>
 
       <div class="rc-two-col">

@@ -80,13 +80,11 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     this.demoMode = params.get('demo') === 'true';
     this.demoStyleName = params.get('styleName') ?? 'CBSE Standard';
     if (this.demoMode) {
-      const color = params.get('color') ?? '#1565c0';
-      const layoutStyle = params.get('layoutStyle') ?? 'CLASSIC';
-      this.reportCardData = this.buildSampleData(color, layoutStyle);
-      this.templateId = -1; // signals template mode
+      this.reportCardData = this.buildSampleData();
+      this.templateId = -1;
       this.loading = false;
       this.cdr.markForCheck();
-      this.titleService.setTitle(`Sample Report Card — ${this.demoStyleName}`);
+      this.titleService.setTitle('Sample Report Card — Indra Academy Style');
       return;
     }
 
@@ -186,40 +184,18 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     try { return JSON.parse(this.reportCardData.template.brandingJson); } catch { return {}; }
   }
 
-  get primaryColor(): string { return this.branding.primaryColor ?? '#1565c0'; }
-
   get headerStyle(): string {
-    // White document header with a thick colored top stripe — no gradient.
-    return `border-top: 4px solid ${this.primaryColor}`;
+    return '';
   }
 
   get rcLabelStyle(): string {
-    // Bordered box with primary color text and border — not a solid fill.
-    return `color: ${this.primaryColor}; border: 2px solid ${this.primaryColor}`;
-  }
-
-  // sectionBarStyle is kept for table <th> headers (solid colored background, white text)
-  get sectionBarStyle(): string {
-    return `background: ${this.primaryColor}; border-color: ${this.primaryColor}`;
-  }
-
-  // sectionTitleStyle — elegant left-bordered label for section separators
-  get sectionTitleStyle(): string {
-    return `color: ${this.primaryColor}; border-left: 3px solid ${this.primaryColor}`;
+    return '';
   }
 
   // logoSrc — resolves the relative logo path (e.g. /uploads/school-logos/1.png)
   // to a full URL the same way the login page does via TenantService.getLogoUrl()
   get logoSrc(): string {
     const url = this.reportCardData?.schoolLogoUrl;
-    if (!url) return '';
-    if (url.startsWith('http')) return url;
-    return `${environment.apiUrl}${url}`;
-  }
-
-  // headerImageSrc — resolves the custom report card header image URL
-  get headerImageSrc(): string {
-    const url = this.reportCardData?.reportCardHeaderImageUrl;
     if (!url) return '';
     if (url.startsWith('http')) return url;
     return `${environment.apiUrl}${url}`;
@@ -281,10 +257,6 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     return []; // PERCENTAGE — no letter grade legend needed
   }
 
-  get thStyle(): string {
-    return `background: ${this.primaryColor}; border-color: ${this.primaryColor}; color: #fff`;
-  }
-
   get showCgpa(): boolean {
     return (this.branding.showCgpa !== false) && !!this.reportCardData?.cgpa;
   }
@@ -293,9 +265,6 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     return this.branding.showGradePoints === true;
   }
 
-  get layoutStyle(): string { return this.branding.layoutStyle ?? 'CLASSIC'; }
-  get isNewLayout(): boolean { return this.layoutStyle !== 'CLASSIC'; }
-  get cardLayoutClass(): string { return this.layoutStyle.toLowerCase().replace(/_/g, '-'); }
   get schoolInitials(): string {
     const name = this.reportCardData?.schoolName ?? '';
     const words = name.trim().split(/\s+/).filter(w => w.length > 0);
@@ -303,15 +272,20 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     return name.substring(0, 2).toUpperCase();
   }
   get schoolMotto(): string { return this.branding.schoolMotto ?? ''; }
+  get examTerm(): string { return this.branding.examTerm ?? ''; }
+  get watermarkEnabled(): boolean { return this.branding.showWatermark === true; }
+  get watermarkType(): string { return this.branding.watermarkType ?? 'TEXT'; }
+  get watermarkText(): string { return this.branding.watermarkText ?? (this.reportCardData?.schoolName ?? ''); }
 
-  private darken(hex: string, factor: number): string {
-    try {
-      const h = hex.replace('#', '');
-      const r = Math.round(parseInt(h.substring(0, 2), 16) * (1 - factor));
-      const g = Math.round(parseInt(h.substring(2, 4), 16) * (1 - factor));
-      const b = Math.round(parseInt(h.substring(4, 6), 16) * (1 - factor));
-      return `rgb(${r},${g},${b})`;
-    } catch { return '#0f172a'; }
+  get affiliationLine(): string {
+    const parts: string[] = [];
+    const aff = this.reportCardData?.affiliationNumber;
+    const code = this.reportCardData?.schoolCode;
+    const city = this.reportCardData?.schoolCity;
+    if (aff) parts.push(`Affiliation No. ${aff}`);
+    if (code) parts.push(`School Code ${code}`);
+    if (city) parts.push(city);
+    return parts.join(' \u00b7 ');
   }
 
   cbseGradePoint(pct: number): number {
@@ -480,7 +454,7 @@ export class ReportCardComponent implements OnInit, OnDestroy {
 
   goBack(): void { this.location.back(); }
 
-  private buildSampleData(color: string, layoutStyle = 'CLASSIC'): ReportCardData {
+  private buildSampleData(): ReportCardData {
     const sections: TemplateSection[] = [
       { sectionType: 'SCHOOL_HEADER',      enabled: true, displayOrder: 1 },
       { sectionType: 'STUDENT_INFO',       enabled: true, displayOrder: 2 },
@@ -494,114 +468,76 @@ export class ReportCardComponent implements OnInit, OnDestroy {
       { sectionType: 'SIGNATURES',         enabled: true, displayOrder: 10 },
     ];
     const examColumns: ExamColumn[] = [
-      { examId: 1, examName: 'Periodic Test I',  maxTotal: 20, weightage: 0.10 },
-      { examId: 2, examName: 'Mid-Term Exam',    maxTotal: 80, weightage: 0.30 },
-      { examId: 3, examName: 'Periodic Test II', maxTotal: 20, weightage: 0.10 },
-      { examId: 4, examName: 'Annual Exam',      maxTotal: 80, weightage: 0.50 },
+      { examId: 1, examName: 'Half-Yearly', maxTotal: 80, weightage: 1.0 },
     ];
     const subjectRows: SubjectRow[] = [
-      { subjectName: 'English Language & Literature', examMarks: [
-          { obtained: 17, max: 20, percentage: 85 },
-          { obtained: 63, max: 80, percentage: 78.75 },
-          { obtained: 16, max: 20, percentage: 80 },
-          { obtained: 61, max: 80, percentage: 76.25 },
-        ], weightedPercentage: 78.3 },
-      { subjectName: 'Hindi (Course A)', examMarks: [
-          { obtained: 15, max: 20, percentage: 75 },
-          { obtained: 58, max: 80, percentage: 72.5 },
-          { obtained: 14, max: 20, percentage: 70 },
-          { obtained: 56, max: 80, percentage: 70 },
-        ], weightedPercentage: 71.1 },
+      { subjectName: 'Computer', examMarks: [
+          { obtained: 78, max: 80, percentage: 97.5 },
+        ], weightedPercentage: 97.5 },
+      { subjectName: 'General Knowledge', examMarks: [
+          { obtained: 71, max: 80, percentage: 88.75 },
+        ], weightedPercentage: 88.75 },
       { subjectName: 'Mathematics', examMarks: [
-          { obtained: 19, max: 20, percentage: 95 },
-          { obtained: 72, max: 80, percentage: 90 },
-          { obtained: 18, max: 20, percentage: 90 },
-          { obtained: 70, max: 80, percentage: 87.5 },
-        ], weightedPercentage: 89.2 },
-      { subjectName: 'Science', examMarks: [
-          { obtained: 16, max: 20, percentage: 80 },
-          { obtained: 60, max: 80, percentage: 75 },
-          { obtained: 15, max: 20, percentage: 75 },
-          { obtained: 58, max: 80, percentage: 72.5 },
-        ], weightedPercentage: 73.8 },
-      { subjectName: 'Social Science', examMarks: [
-          { obtained: 14, max: 20, percentage: 70 },
-          { obtained: 55, max: 80, percentage: 68.75 },
-          { obtained: 13, max: 20, percentage: 65 },
-          { obtained: 52, max: 80, percentage: 65 },
-        ], weightedPercentage: 66.4 },
-      { subjectName: 'Computer Science', examMarks: [
-          { obtained: 18, max: 20, percentage: 90 },
-          { obtained: 68, max: 80, percentage: 85 },
-          { obtained: 17, max: 20, percentage: 85 },
-          { obtained: 65, max: 80, percentage: 81.25 },
-        ], weightedPercentage: 83.5 },
+          { obtained: 75, max: 80, percentage: 93.75 },
+        ], weightedPercentage: 93.75 },
     ];
     return {
-      studentId: 'ADM/2016/042',
-      studentName: 'Aryan Kumar Sharma',
-      rollNumber: '12',
-      className: 'Class VIII — A',
-      session: '2024-2025',
-      fatherName: 'Rajesh Kumar Sharma',
-      motherName: 'Sunita Devi Sharma',
-      dateOfBirth: '15 August 2011',
-      schoolName: 'Sunrise International School',
-      schoolAddress: '14, Education Colony, Sector 12, New Delhi — 110001',
-      schoolPhone: '+91-11-2345-6789',
-      schoolEmail: 'info@sunrise.edu.in',
-      affiliationNumber: '2730012',
+      studentId: 'S102',
+      studentName: 'Himani',
+      rollNumber: 'S102',
+      className: 'II',
+      sectionName: 'A',
+      session: '2026-2027',
+      dateOfBirth: '29 Jun 2015',
+      schoolName: 'Indra Academy',
+      affiliationNumber: '2130456',
+      schoolCode: '41207',
+      schoolCity: 'Lucknow 226001',
       gradingSystem: 'CBSE',
-      cgpa: 8.2,
-      overallGrade: 'B1',
+      cgpa: 9.7,
       template: {
         id: -1,
         schoolId: 0,
         name: 'Sample Template',
         assessmentGroupId: 0,
-        assessmentGroupName: 'Annual Assessment',
+        assessmentGroupName: 'Half-Yearly Assessment',
         isDefault: true,
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         sections,
         brandingJson: JSON.stringify({
-          primaryColor: color,
           showCgpa: true,
-          layoutStyle,
-          schoolMotto: layoutStyle !== 'CLASSIC' ? 'Knowledge · Discipline · Service' : ''
+          schoolMotto: 'Scientia · Disciplina · Servitium',
+          examTerm: 'Half-Yearly',
         } as BrandingConfig),
       },
       weightedResult: {
         groupId: 0,
-        groupName: 'Annual Assessment',
+        groupName: 'Half-Yearly Assessment',
         groupType: 'EXAM_BASED',
-        weightedPercentage: 76.7,
-        rank: 3,
+        weightedPercentage: 93.3,
+        rank: 0,
         subjectResults: [],
         marksTable: {
           examColumns,
           subjectRows,
           examTotals: [
-            { obtained: 99,  max: 120 },
-            { obtained: 376, max: 480 },
-            { obtained: 93,  max: 120 },
-            { obtained: 362, max: 480 },
+            { obtained: 224, max: 240 },
           ],
         },
       },
       attendance: {
-        workingDays: 220,
-        presentDays: 198,
-        percentage: 90.0,
+        workingDays: 200,
+        presentDays: 188,
+        percentage: 94,
       },
-      teacherRemarks: 'Aryan is a sincere and hardworking student. Shows excellent progress in Mathematics and Science. Needs to focus more on Social Science. Keep up the good work!',
-      principalRemarks: 'A promising student with great academic potential. Encouraged to participate actively in co-curricular activities. Best wishes for the future.',
+      teacherRemarks: 'Himani is a diligent and curious learner who participates wholeheartedly.',
+      principalRemarks: 'A commendable performance. Promoted with distinction.',
       coScholasticGrades: [
-        { activity: 'Discipline & Behaviour',      grade: 'A' },
-        { activity: 'Sports & Physical Education',  grade: 'B' },
-        { activity: 'Co-Curricular Activities',     grade: 'A' },
-        { activity: 'General Hygiene',              grade: 'A' },
+        { activity: 'Work Education',      grade: 'A' },
+        { activity: 'Art Education',       grade: 'A' },
+        { activity: 'Health & Phys. Edu.', grade: 'A' },
       ],
     };
   }

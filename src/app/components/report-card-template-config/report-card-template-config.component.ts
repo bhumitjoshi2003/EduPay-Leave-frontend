@@ -33,140 +33,6 @@ const ALL_SECTIONS: { type: SectionType; label: string; description: string }[] 
   { type: 'SIGNATURES',         label: 'Signatures & Seal',     description: 'Teacher, Principal, Parent, School Seal' },
 ];
 
-// ── Gallery styles ────────────────────────────────────────────────────────────
-
-export interface GalleryStyle {
-  id: string;
-  name: string;
-  tagline: string;
-  bestFor: string;
-  description: string;
-  primaryColor: string;
-  suggestedName: string;
-  layoutStyle: string;      // NEW
-  mottoExample?: string;    // NEW
-}
-
-const GALLERY_STYLES: GalleryStyle[] = [
-  {
-    id: 'cbse',
-    name: 'CBSE Standard',
-    tagline: 'Most popular · Recommended',
-    bestFor: 'CBSE-affiliated, Government, Kendriya Vidyalaya schools',
-    description: 'Full-border tables, navy header, official government document style.',
-    primaryColor: '#1a3a6b',
-    suggestedName: 'CBSE Report Card',
-    layoutStyle: 'CLASSIC',
-  },
-  {
-    id: 'icse',
-    name: 'ICSE Style',
-    tagline: 'English-medium schools',
-    bestFor: 'ICSE / ISC, private English-medium schools',
-    description: 'Clean teal header, horizontal-rule tables, modern academic look.',
-    primaryColor: '#0d5f5f',
-    suggestedName: 'ICSE Report Card',
-    layoutStyle: 'CLASSIC',
-  },
-  {
-    id: 'primary',
-    name: 'Primary School',
-    tagline: 'Classes Nursery – 5',
-    bestFor: 'Nursery to Class 5, activity-based schools',
-    description: 'Larger text, grade-only format, activity sections, friendly layout.',
-    primaryColor: '#4338ca',
-    suggestedName: 'Primary Report Card',
-    layoutStyle: 'CLASSIC',
-  },
-  {
-    id: 'senior',
-    name: 'Senior Secondary',
-    tagline: 'Classes 11 & 12',
-    bestFor: 'Classes 11–12 with Science / Commerce / Arts streams',
-    description: 'Theory + Practical columns, stream grouping, board exam format.',
-    primaryColor: '#7c2d2d',
-    suggestedName: 'Senior Secondary Report Card',
-    layoutStyle: 'CLASSIC',
-  },
-  {
-    id: 'minimal',
-    name: 'Minimal',
-    tagline: 'Clean & modern',
-    bestFor: 'IB schools, International schools, Premium institutions',
-    description: 'Horizontal rules only, no colored fills, pure typographic layout.',
-    primaryColor: '#1c1c1e',
-    suggestedName: 'Report Card',
-    layoutStyle: 'CLASSIC',
-  },
-  {
-    id: 'classic-elegance',
-    name: 'Classic Elegance',
-    tagline: 'Premium · Heritage look',
-    bestFor: 'Premium private schools, Heritage institutions, top CBSE/ICSE private schools',
-    description: 'Cream parchment background, circular school monogram, gold accent rules, large-number summary, circular result badge. A distinguished, prestigious look.',
-    primaryColor: '#2c5f2e',
-    suggestedName: 'Classic Elegance Report Card',
-    layoutStyle: 'WARM_ELEGANCE',
-    mottoExample: 'Scientia · Disciplina · Servitium',
-  },
-  {
-    id: 'scholar-blue',
-    name: 'Scholar Blue',
-    tagline: 'Academic · Prestigious',
-    bestFor: 'English-medium boarding schools, IB / IGCSE programs, top private schools',
-    description: 'Clean white with deep navy, crimson accent, mixed-case titles, dotted row separators, circular grade stamp. Scholarly and deeply professional.',
-    primaryColor: '#1a2b5e',
-    suggestedName: 'Scholar Blue Report Card',
-    layoutStyle: 'NAVY_SCHOLAR',
-    mottoExample: 'Knowledge · Discipline · Service',
-  },
-];
-
-// ── Theme presets (Phase D) ───────────────────────────────────────────────────
-
-export interface ThemePreset {
-  label: string;
-  color: string;
-}
-
-const THEME_PRESETS_BY_STYLE: Record<string, ThemePreset[]> = {
-  cbse:    [
-    { label: 'Navy Blue',   color: '#1a3a6b' },
-    { label: 'Maroon',      color: '#7c2020' },
-    { label: 'Forest Green',color: '#1a5c2a' },
-    { label: 'Charcoal',    color: '#2c2c2c' },
-  ],
-  icse:    [
-    { label: 'Deep Teal',   color: '#0d5f5f' },
-    { label: 'Navy',        color: '#1a3a6b' },
-    { label: 'Charcoal',    color: '#2c2c2c' },
-  ],
-  primary: [
-    { label: 'Indigo',      color: '#4338ca' },
-    { label: 'Royal Blue',  color: '#1d4ed8' },
-    { label: 'Emerald',     color: '#065f46' },
-  ],
-  senior:  [
-    { label: 'Maroon',      color: '#7c2d2d' },
-    { label: 'Navy',        color: '#1a3a6b' },
-    { label: 'Charcoal',    color: '#2c2c2c' },
-  ],
-  minimal: [
-    { label: 'Charcoal',    color: '#1c1c1e' },
-  ],
-  'classic-elegance': [
-    { label: 'Forest Green', color: '#2c5f2e' },
-    { label: 'Deep Maroon',  color: '#6b1a1a' },
-    { label: 'Royal Navy',   color: '#1a3a6b' },
-    { label: 'Slate Gray',   color: '#3d4f5c' },
-  ],
-  'scholar-blue': [
-    { label: 'Deep Navy',    color: '#1a2b5e' },
-    { label: 'Oxford Blue',  color: '#002147' },
-    { label: 'Forest Green', color: '#1a5c2a' },
-    { label: 'Charcoal',     color: '#2c2c2c' },
-  ],
-};
 
 // ── Section row ───────────────────────────────────────────────────────────────
 
@@ -199,20 +65,10 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
   loading = true;
   saving = false;
 
-  // ── Gallery ──────────────────────────────────────────────────────────
-  readonly galleryStyles: GalleryStyle[] = GALLERY_STYLES;
-  selectedGalleryStyle: GalleryStyle | null = null;
-
   // ── Create/Edit form ──────────────────────────────────────────────
   showForm = false;
   editingId: number | null = null;
   form: ReportCardTemplateRequest = this.blankForm();
-
-  // ── Theme preset picker (shown inside branding editor when style is known) ──
-  get themePresets(): ThemePreset[] {
-    const styleId = this.selectedGalleryStyle?.id ?? this.editingBrandingFor?.description ?? '';
-    return THEME_PRESETS_BY_STYLE[styleId] ?? THEME_PRESETS_BY_STYLE['cbse'];
-  }
 
   // ── Section editor ─────────────────────────────────────────────────
   editingSectionsFor: ReportCardTemplate | null = null;
@@ -270,32 +126,10 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Gallery ───────────────────────────────────────────────────────
-
-  useGalleryStyle(style: GalleryStyle): void {
-    this.selectedGalleryStyle = style;
-    this.editingId = null;
-    const branding: BrandingConfig = {
-      ...this.defaultBranding(),
-      primaryColor: style.primaryColor,
-      layoutStyle: style.layoutStyle,
-      schoolMotto: style.mottoExample ?? '',
-    };
-    this.form = {
-      ...this.blankForm(),
-      name: style.suggestedName,
-      brandingJson: JSON.stringify(branding),
-    };
-    this.showForm = true;
-    this.cdr.markForCheck();
-    setTimeout(() => document.querySelector('.rct-form-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
-  }
-
   // ── Create / Edit ─────────────────────────────────────────────────
 
   openEdit(t: ReportCardTemplate): void {
     this.editingId = t.id;
-    this.selectedGalleryStyle = null;
     this.form = {
       name: t.name,
       description: t.description ?? '',
@@ -311,7 +145,6 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
   cancelForm(): void {
     this.showForm = false;
     this.editingId = null;
-    this.selectedGalleryStyle = null;
     this.cdr.markForCheck();
   }
 
@@ -335,7 +168,6 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
         this.showForm = false;
         this.saving = false;
         this.editingId = null;
-        this.selectedGalleryStyle = null;
         this.loadTemplates();
         this.cdr.markForCheck();
       },
@@ -345,13 +177,6 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       }
     });
-  }
-
-  // ── Theme preset (inside branding editor) ─────────────────────────
-
-  applyThemePreset(color: string): void {
-    this.brandingForm = { ...this.brandingForm, primaryColor: color };
-    this.cdr.markForCheck();
   }
 
   // ── Delete ────────────────────────────────────────────────────────
@@ -462,10 +287,9 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
     return (heights[type] ?? 5) + '%';
   }
 
-  /** Primary color from the template's brandingJson (for preview bar) */
-  templateColor(t: ReportCardTemplate): string {
-    if (!t.brandingJson) return '#1a3a6b';
-    try { return JSON.parse(t.brandingJson).primaryColor ?? '#1a3a6b'; } catch { return '#1a3a6b'; }
+  /** Color for preview bar (hardcoded to design system dark green) */
+  templateColor(_t: ReportCardTemplate): string {
+    return '#1e3d1e';
   }
 
   // ── Branding editor ───────────────────────────────────────────────
@@ -518,15 +342,14 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
 
   private defaultBranding(): BrandingConfig {
     return {
-      primaryColor:    '#1a3a6b',
+      showCgpa:        true,
+      showGradePoints: false,
+      footerText:      '',
+      schoolMotto:     '',
+      examTerm:        '',
       showWatermark:   false,
       watermarkType:   'TEXT',
       watermarkText:   '',
-      footerText:      '',
-      showCgpa:        true,
-      showGradePoints: false,
-      layoutStyle:     'CLASSIC',
-      schoolMotto:     '',
     };
   }
 
@@ -569,11 +392,6 @@ export class ReportCardTemplateConfigComponent implements OnInit, OnDestroy {
     return { '': 'School default', 'CBSE': 'CBSE Grades', 'LETTER': 'Letter Grades', 'PERCENTAGE': 'Percentage' };
   }
 
-  /** Dummy array for ngFor loops in gallery mini-doc preview */
+  /** Dummy array for ngFor loops in section preview */
   readonly fakeRows = [0, 1, 2, 3];
-
-  /** Called from the template when the custom color picker value changes */
-  onColorInput(): void {
-    this.cdr.markForCheck();
-  }
 }

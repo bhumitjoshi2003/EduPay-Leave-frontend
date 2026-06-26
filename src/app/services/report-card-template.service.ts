@@ -46,16 +46,14 @@ export interface ReportCardTemplate {
 // ── Branding ──────────────────────────────────────────────────────────────────
 
 export interface BrandingConfig {
-  primaryColor?: string;   // hex e.g. "#1565c0"
-  accentColor?: string;
-  showWatermark?: boolean;
-  watermarkType?: 'TEXT' | 'LOGO';  // default 'TEXT'
-  watermarkText?: string;
+  schoolMotto?: string;        // shown in header
+  examTerm?: string;           // e.g., "Half-Yearly" → shown as "Half-Yearly Examination"
+  showCgpa?: boolean;          // default true
+  showGradePoints?: boolean;
   footerText?: string;
-  showCgpa?: boolean;       // default true (CBSE)
-  showGradePoints?: boolean; // show GP column in marks table
-  layoutStyle?: string;    // 'CLASSIC' | 'WARM_ELEGANCE' | 'NAVY_SCHOLAR'
-  schoolMotto?: string;    // shown in new layout headers
+  showWatermark?: boolean;
+  watermarkType?: 'TEXT' | 'LOGO';
+  watermarkText?: string;
 }
 
 // ── Publishing ────────────────────────────────────────────────────────────────
@@ -260,6 +258,8 @@ export interface ReportCardData {
   schoolPhone?: string;
   schoolEmail?: string;
   affiliationNumber?: string;
+  schoolCode?: string;
+  schoolCity?: string;
   boardType?: string;
   reportCardHeaderImageUrl?: string;
   template: ReportCardTemplate;

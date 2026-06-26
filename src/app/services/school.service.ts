@@ -39,6 +39,7 @@ export interface SchoolSettings {
   periodsPerDay: number;            // number of periods per school day
   gradingSystem: string;            // CBSE | PERCENTAGE | LETTER
   affiliationNumber?: string | null; // e.g. CBSE school no., ICSE index no.
+  schoolCode?: string | null;        // e.g. CBSE school code for report card header
   reportCardHeaderImageUrl?: string | null; // custom header banner image for report cards
   // Staff attendance / GPS check-in settings
   schoolLatitude?: number;

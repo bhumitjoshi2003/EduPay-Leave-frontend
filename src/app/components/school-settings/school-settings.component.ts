@@ -164,6 +164,7 @@ export class SchoolSettingsComponent implements OnInit, OnDestroy {
       website: this.settings.website,
       boardType: this.settings.boardType,
       affiliationNumber: this.settings.affiliationNumber ?? '',
+      schoolCode: this.settings.schoolCode ?? '',
       academicYearStartMonth: this.settings.academicYearStartMonth ?? 4,
       workingDays: this.settings.workingDays ?? 'MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY',
       periodsPerDay: this.settings.periodsPerDay ?? 8,

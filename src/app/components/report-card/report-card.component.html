@@ -68,226 +68,190 @@
        TEMPLATE-BASED REPORT CARD
   ══════════════════════════════════════════════════════════════════════ -->
   <ng-container *ngIf="!loading && (templateId || demoMode) && reportCardData">
-    <div class="rc-card">
+    <div class="rc-card" [class.rc-dense]="isDenseReport">
 
-      <!-- Watermark overlay (above content, very low opacity) -->
+      <!-- Watermark overlay -->
       <div class="rc-watermark-layer" *ngIf="watermarkEnabled" aria-hidden="true">
         <img *ngIf="watermarkType === 'LOGO' && logoSrc" [src]="logoSrc" alt="" class="rc-watermark-img">
         <span *ngIf="watermarkType !== 'LOGO' || !logoSrc" class="rc-watermark-text">{{ watermarkText }}</span>
       </div>
 
-      <ng-container *ngFor="let section of enabledSections; trackBy: trackBySection">
+      <header class="rc-header">
+        <div class="rc-header-logo-wrap" *ngIf="logoSrc">
+          <img [src]="logoSrc" alt="School Logo" class="rc-logo-img">
+        </div>
+        <h1 class="rc-school-name">{{ reportCardData.schoolName }}</h1>
+        <p class="rc-motto" *ngIf="schoolMotto">&#10087;&nbsp; {{ schoolMotto }} &nbsp;&#10087;</p>
+        <p class="rc-affiliation" *ngIf="affiliationLine">{{ affiliationLine }}</p>
+      </header>
 
-        <!-- ── SCHOOL_HEADER ────────────────────────────────────────── -->
-        <ng-container *ngIf="section.sectionType === 'SCHOOL_HEADER'">
-          <div class="rc-header">
-            <div class="rc-header-logo-wrap">
-              <img *ngIf="logoSrc" [src]="logoSrc" alt="School Logo" class="rc-logo-img">
-              <div *ngIf="!logoSrc" class="rc-monogram">{{ schoolInitials }}</div>
-            </div>
-            <h1 class="rc-school-name">{{ reportCardData.schoolName }}</h1>
-            <p class="rc-motto" *ngIf="schoolMotto">&#127807; {{ schoolMotto }} &#127807;</p>
-            <p class="rc-affiliation" *ngIf="affiliationLine">{{ affiliationLine }}</p>
-          </div>
-          <div class="rc-gold-rule"></div>
-          <div class="rc-title-section">
-            <div class="rc-thin-rule"></div>
-            <div class="rc-title-label">R E P O R T &nbsp;&nbsp; C A R D</div>
-            <div class="rc-thin-rule"></div>
-            <div class="rc-title-session" *ngIf="reportCardData.session">
-              Academic Session {{ reportCardData.session }}<ng-container *ngIf="examTerm">&nbsp;&bull;&nbsp;{{ examTerm }} Examination</ng-container>
-            </div>
-          </div>
-        </ng-container>
+      <div class="rc-title-section">
+        <div class="rc-title-rule"></div>
+        <div class="rc-title-label">R E P O R T &nbsp;&nbsp; C A R D</div>
+        <div class="rc-title-rule"></div>
+        <div class="rc-title-session" *ngIf="reportCardData.session">
+          Academic Session {{ reportCardData.session }}<ng-container *ngIf="examTerm">&nbsp;&middot;&nbsp;{{ examTerm }} Examination</ng-container>
+        </div>
+      </div>
 
-        <!-- ── STUDENT_INFO ─────────────────────────────────────────── -->
-        <ng-container *ngIf="section.sectionType === 'STUDENT_INFO'">
-          <div class="rc-section rc-student-section">
-            <div class="rc-sec-title">STUDENT INFORMATION</div>
-            <div class="rc-student-layout">
-              <div class="rc-student-fields">
-                <div class="rc-info-row">
-                  <span class="rc-lbl">Name</span>
-                  <span class="rc-val">{{ reportCardData.studentName }}</span>
-                  <span class="rc-lbl">Class &amp; Section</span>
-                  <span class="rc-val">{{ classDisplay }}</span>
-                </div>
-                <div class="rc-info-row">
-                  <span class="rc-lbl">Admission No.</span>
-                  <span class="rc-val">{{ reportCardData.rollNumber || '—' }}</span>
-                  <span class="rc-lbl">Date of Birth</span>
-                  <span class="rc-val">{{ reportCardData.dateOfBirth || '—' }}</span>
-                </div>
-                <div class="rc-info-row">
-                  <span class="rc-lbl">Father's Name</span>
-                  <span class="rc-val">{{ reportCardData.fatherName || '—' }}</span>
-                  <span class="rc-lbl">Mother's Name</span>
-                  <span class="rc-val">{{ reportCardData.motherName || '—' }}</span>
-                </div>
-              </div>
-              <div class="rc-photo-col">
-                <img *ngIf="photoSrc" [src]="photoSrc" alt="Student Photo" class="rc-student-photo">
-                <div *ngIf="!photoSrc" class="rc-photo-placeholder">
-                  <span>Student<br>photo<br>or<br>browse<br>files</span>
-                </div>
-                <div class="rc-photo-label">PHOTO</div>
-              </div>
+      <section class="rc-section rc-student-section">
+        <div class="rc-sec-title">S T U D E N T &nbsp; I N F O R M A T I O N</div>
+        <div class="rc-student-layout">
+          <div class="rc-student-fields">
+            <div class="rc-info-row">
+              <span class="rc-lbl">Name</span>
+              <span class="rc-val">{{ reportCardData.studentName }}</span>
+              <span class="rc-lbl">Class &amp; Section</span>
+              <span class="rc-val">{{ classDisplay }}</span>
+            </div>
+            <div class="rc-info-row">
+              <span class="rc-lbl">Admission No.</span>
+              <span class="rc-val">{{ reportCardData.rollNumber || reportCardData.studentId || '—' }}</span>
+              <span class="rc-lbl">Date of Birth</span>
+              <span class="rc-val">{{ reportCardData.dateOfBirth || '—' }}</span>
+            </div>
+            <div class="rc-info-row">
+              <span class="rc-lbl">Father's Name</span>
+              <span class="rc-val">{{ reportCardData.fatherName || '—' }}</span>
+              <span class="rc-lbl">Mother's Name</span>
+              <span class="rc-val">{{ reportCardData.motherName || '—' }}</span>
             </div>
           </div>
-        </ng-container>
-
-        <!-- ── MARKS_TABLE ──────────────────────────────────────────── -->
-        <ng-container *ngIf="section.sectionType === 'MARKS_TABLE'">
-          <div class="rc-section" *ngIf="reportCardData.weightedResult?.marksTable as mt">
-            <div class="rc-sec-title">MARKS TABLE</div>
-            <table class="rc-table rc-marks-table">
-              <thead>
-                <tr>
-                  <th class="rc-th rc-th-subject">SUBJECT</th>
-                  <th class="rc-th rc-th-exam" *ngFor="let col of mt.examColumns">
-                    {{ col.examName | uppercase }}<br>
-                    <span class="rc-th-weight">({{ col.weightage * 100 | number:'1.0-0' }}%)</span>
-                  </th>
-                  <th class="rc-th rc-th-grade">GRADE</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let row of mt.subjectRows; let even = even" [class.rc-tr-even]="even">
-                  <td class="rc-td-subject">{{ row.subjectName }}</td>
-                  <td class="rc-td-center" *ngFor="let mark of row.examMarks">
-                    <ng-container *ngIf="mark !== null">{{ mark.obtained !== null ? mark.obtained : 'Ab' }} / {{ mark.max }}</ng-container>
-                    <ng-container *ngIf="mark === null">—</ng-container>
-                  </td>
-                  <td class="rc-td-grade" [ngClass]="getGradeClassFromPct(row.weightedPercentage)">{{ getGradeFromPct(row.weightedPercentage) }}</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr class="rc-tfoot-row">
-                  <td class="rc-td-subject"><strong>TOTAL</strong></td>
-                  <td class="rc-td-center" *ngFor="let tot of mt.examTotals"><strong>{{ tot.obtained }} / {{ tot.max }}</strong></td>
-                  <td class="rc-td-grade" [ngClass]="getGradeClassFromPct(reportCardData.weightedResult.weightedPercentage)"><strong>{{ getGradeFromPct(reportCardData.weightedResult.weightedPercentage) }}</strong></td>
-                </tr>
-              </tfoot>
-            </table>
-            <div class="rc-grade-legend" *ngIf="gradeLegend.length">
-              <ng-container *ngFor="let g of gradeLegend; let last = last">
-                <span><strong>{{ g.grade }}</strong> ({{ g.range }}) {{ g.descriptor }}</span><ng-container *ngIf="!last"> &nbsp;&middot;&nbsp; </ng-container>
-              </ng-container>
+          <div class="rc-photo-col">
+            <img *ngIf="photoSrc" [src]="photoSrc" alt="Student Photo" class="rc-student-photo">
+            <div *ngIf="!photoSrc" class="rc-photo-placeholder">
+              <span>Student<br>photo</span>
             </div>
+            <div class="rc-photo-label">PHOTO</div>
           </div>
-        </ng-container>
+        </div>
+      </section>
 
-        <!-- ── ATTENDANCE ───────────────────────────────────────────── -->
-        <ng-container *ngIf="section.sectionType === 'ATTENDANCE' && reportCardData.attendance">
-          <div class="rc-section rc-attendance-section">
-            <div class="rc-sec-title">ATTENDANCE</div>
-            <div class="rc-simple-row">
-              <span class="rc-lbl">Working Days</span>
-              <span class="rc-val-r">{{ reportCardData.attendance.workingDays }}</span>
+      <section class="rc-section" *ngIf="reportCardData.weightedResult?.marksTable as mt">
+        <div class="rc-sec-title">M A R K S &nbsp; T A B L E</div>
+        <table class="rc-table rc-marks-table">
+          <thead>
+            <tr>
+              <th class="rc-th rc-th-subject">S U B J E C T</th>
+              <th class="rc-th rc-th-exam" *ngFor="let col of mt.examColumns">{{ col.examName | uppercase }}</th>
+              <th class="rc-th rc-th-grade">G R A D E</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of mt.subjectRows">
+              <td class="rc-td-subject">{{ row.subjectName }}</td>
+              <td class="rc-td-center" *ngFor="let mark of row.examMarks">
+                <ng-container *ngIf="mark !== null">{{ mark.obtained !== null ? mark.obtained : 'Ab' }} / {{ mark.max }}</ng-container>
+                <ng-container *ngIf="mark === null">—</ng-container>
+              </td>
+              <td class="rc-td-grade">{{ getGradeFromPct(row.weightedPercentage) }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="rc-tfoot-row">
+              <td class="rc-td-subject">TOTAL</td>
+              <td class="rc-td-center" *ngFor="let tot of mt.examTotals">{{ tot.obtained }} / {{ tot.max }}</td>
+              <td class="rc-td-grade">{{ getGradeFromPct(reportCardData.weightedResult.weightedPercentage) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="rc-grade-legend" *ngIf="gradeLegend.length && !isVeryDenseReport">
+          <ng-container *ngFor="let g of gradeLegend; let last = last">
+            <span>{{ g.grade }} ({{ g.range }}) {{ g.descriptor }}</span><ng-container *ngIf="!last"> · </ng-container>
+          </ng-container>
+        </div>
+      </section>
+
+      <div class="rc-two-col">
+        <section class="rc-section" *ngIf="reportCardData.attendance">
+          <div class="rc-sec-title">A T T E N D A N C E</div>
+          <div class="rc-simple-row">
+            <span class="rc-lbl">Working Days</span>
+            <span class="rc-val-r">{{ reportCardData.attendance.workingDays }}</span>
+          </div>
+          <div class="rc-simple-row">
+            <span class="rc-lbl">Days Present</span>
+            <span class="rc-val-r">{{ reportCardData.attendance.presentDays }}</span>
+          </div>
+          <div class="rc-simple-row">
+            <span class="rc-lbl">Percentage</span>
+            <span class="rc-val-r">{{ reportCardData.attendance.percentage | number:'1.0-0' }}%</span>
+          </div>
+        </section>
+
+        <section class="rc-section">
+          <div class="rc-sec-title">C O - S C H O L A S T I C</div>
+          <ng-container *ngIf="reportCardData.coScholasticGrades?.length; else coEmpty">
+            <div class="rc-simple-row" *ngFor="let g of reportCardData.coScholasticGrades">
+              <span class="rc-lbl">{{ g.activity }}</span>
+              <span class="rc-val-r">{{ g.grade || '—' }}</span>
             </div>
-            <div class="rc-simple-row">
-              <span class="rc-lbl">Days Present</span>
-              <span class="rc-val-r">{{ reportCardData.attendance.presentDays }}</span>
+          </ng-container>
+          <ng-template #coEmpty>
+            <div class="rc-simple-row" *ngFor="let act of coScholasticActivities">
+              <span class="rc-lbl">{{ act }}</span>
+              <span class="rc-val-r">—</span>
             </div>
-            <div class="rc-simple-row">
-              <span class="rc-lbl">Percentage</span>
-              <span class="rc-val-r"><strong>{{ reportCardData.attendance.percentage | number:'1.0-0' }}%</strong></span>
-            </div>
-          </div>
-        </ng-container>
+          </ng-template>
+        </section>
+      </div>
 
-        <!-- ── CO_SCHOLASTIC ────────────────────────────────────────── -->
-        <ng-container *ngIf="section.sectionType === 'CO_SCHOLASTIC'">
-          <div class="rc-section rc-co-scholastic">
-            <div class="rc-sec-title">CO-SCHOLASTIC</div>
-            <ng-container *ngIf="reportCardData.coScholasticGrades?.length; else coEmpty">
-              <div class="rc-simple-row" *ngFor="let g of reportCardData.coScholasticGrades">
-                <span class="rc-lbl">{{ g.activity }}</span>
-                <span class="rc-val-r"><strong>{{ g.grade || '—' }}</strong></span>
-              </div>
-            </ng-container>
-            <ng-template #coEmpty>
-              <div class="rc-simple-row" *ngFor="let act of coScholasticActivities">
-                <span class="rc-lbl">{{ act }}</span>
-                <span class="rc-val-r"><strong>—</strong></span>
-              </div>
-            </ng-template>
+      <section class="rc-section rc-assessment-summary" *ngIf="reportCardData.weightedResult">
+        <div class="rc-sec-title">A S S E S S M E N T &nbsp; S U M M A R Y</div>
+        <div class="rc-kpi-row">
+          <div class="rc-kpi">
+            <span class="rc-kpi-val">{{ reportCardData.weightedResult.weightedPercentage | number:'1.1-1' }}%</span>
+            <span class="rc-kpi-lbl">Overall</span>
           </div>
-        </ng-container>
-
-        <!-- ── ASSESSMENT_SUMMARY ───────────────────────────────────── -->
-        <ng-container *ngIf="section.sectionType === 'ASSESSMENT_SUMMARY' && reportCardData.weightedResult">
-          <div class="rc-section rc-assessment-summary">
-            <div class="rc-sec-title">ASSESSMENT SUMMARY</div>
-            <div class="rc-kpi-row">
-              <div class="rc-kpi">
-                <span class="rc-kpi-val">{{ reportCardData.weightedResult.weightedPercentage | number:'1.1-1' }}%</span>
-                <span class="rc-kpi-lbl">Overall</span>
-              </div>
-              <div class="rc-kpi">
-                <span class="rc-kpi-val">{{ getGradeFromPct(reportCardData.weightedResult.weightedPercentage) }}</span>
-                <span class="rc-kpi-lbl">Grade</span>
-              </div>
-              <div class="rc-kpi">
-                <span class="rc-kpi-val">{{ reportCardData.weightedResult.rank > 0 ? reportCardData.weightedResult.rank : '—' }}</span>
-                <span class="rc-kpi-lbl">Class Rank</span>
-              </div>
-              <div class="rc-kpi" *ngIf="showCgpa && reportCardData.cgpa != null">
-                <span class="rc-kpi-val">{{ reportCardData.cgpa | number:'1.1-1' }}</span>
-                <span class="rc-kpi-lbl">CGPA</span>
-              </div>
-            </div>
+          <div class="rc-kpi">
+            <span class="rc-kpi-val">{{ getGradeFromPct(reportCardData.weightedResult.weightedPercentage) }}</span>
+            <span class="rc-kpi-lbl">Grade</span>
           </div>
-        </ng-container>
-
-        <!-- ── TEACHER_REMARKS ──────────────────────────────────────── -->
-        <ng-container *ngIf="section.sectionType === 'TEACHER_REMARKS' && reportCardData.teacherRemarks">
-          <div class="rc-section rc-remark-line">
-            <span class="rc-remark-lbl">CLASS TEACHER</span>
-            <span class="rc-remark-txt">{{ reportCardData.teacherRemarks }}</span>
+          <div class="rc-kpi">
+            <span class="rc-kpi-val">{{ reportCardData.weightedResult.rank > 0 ? reportCardData.weightedResult.rank : '—' }}</span>
+            <span class="rc-kpi-lbl">Class Rank</span>
           </div>
-        </ng-container>
-
-        <!-- ── PRINCIPAL_REMARKS ────────────────────────────────────── -->
-        <ng-container *ngIf="section.sectionType === 'PRINCIPAL_REMARKS' && reportCardData.principalRemarks">
-          <div class="rc-section rc-remark-line">
-            <span class="rc-remark-lbl">PRINCIPAL</span>
-            <span class="rc-remark-txt">{{ reportCardData.principalRemarks }}</span>
+          <div class="rc-kpi" *ngIf="showCgpa && reportCardData.cgpa != null">
+            <span class="rc-kpi-val">{{ reportCardData.cgpa | number:'1.1-1' }}</span>
+            <span class="rc-kpi-lbl">CGPA</span>
           </div>
-        </ng-container>
+        </div>
+      </section>
 
-        <!-- ── PROMOTION_STATUS ─────────────────────────────────────── -->
-        <ng-container *ngIf="section.sectionType === 'PROMOTION_STATUS' && reportCardData.weightedResult">
-          <div class="rc-section rc-sig-badge-row">
-            <div class="rc-sig-col">
-              <div class="rc-sig-line"></div>
-              <div class="rc-sig-label">CLASS TEACHER</div>
-            </div>
-            <div class="rc-badge-center">
-              <div class="rc-circle-badge" [class.rc-badge-fail]="!isPass(reportCardData.weightedResult.weightedPercentage)">
-                <span class="rc-badge-top">PASSED WITH</span>
-                <span class="rc-badge-grade">{{ getGradeFromPct(reportCardData.weightedResult.weightedPercentage) }}</span>
-                <span class="rc-badge-mid">DISTINCTION</span>
-                <span class="rc-badge-pct">{{ reportCardData.weightedResult.weightedPercentage | number:'1.1-1' }}%</span>
-              </div>
-            </div>
-            <div class="rc-sig-col">
-              <div class="rc-sig-line"></div>
-              <div class="rc-sig-label">PRINCIPAL</div>
-            </div>
+      <section class="rc-section rc-remarks">
+        <div class="rc-remark-line" *ngIf="reportCardData.teacherRemarks">
+          <span class="rc-remark-lbl">CLASS TEACHER</span>
+          <span class="rc-remark-txt">{{ reportCardData.teacherRemarks }}</span>
+        </div>
+        <div class="rc-remark-line" *ngIf="reportCardData.principalRemarks">
+          <span class="rc-remark-lbl">PRINCIPAL</span>
+          <span class="rc-remark-txt">{{ reportCardData.principalRemarks }}</span>
+        </div>
+      </section>
+
+      <section class="rc-section rc-sig-badge-row" *ngIf="reportCardData.weightedResult">
+        <div class="rc-sig-col">
+          <div class="rc-sig-line"></div>
+          <div class="rc-sig-label">CLASS TEACHER</div>
+        </div>
+        <div class="rc-badge-center">
+          <div class="rc-circle-badge" [class.rc-badge-fail]="!isPass(reportCardData.weightedResult.weightedPercentage)">
+            <span class="rc-badge-top">{{ isPass(reportCardData.weightedResult.weightedPercentage) ? 'PASSED WITH' : 'RESULT' }}</span>
+            <span class="rc-badge-grade">{{ getGradeFromPct(reportCardData.weightedResult.weightedPercentage) }}</span>
+            <span class="rc-badge-mid">{{ isPass(reportCardData.weightedResult.weightedPercentage) ? 'DISTINCTION' : 'NEEDS REVIEW' }}</span>
+            <span class="rc-badge-pct">{{ reportCardData.weightedResult.weightedPercentage | number:'1.1-1' }}%</span>
           </div>
-        </ng-container>
+        </div>
+        <div class="rc-sig-col">
+          <div class="rc-sig-line"></div>
+          <div class="rc-sig-label">PRINCIPAL</div>
+        </div>
+      </section>
 
-        <!-- ── SIGNATURES ───────────────────────────────────────────── -->
-        <ng-container *ngIf="section.sectionType === 'SIGNATURES'">
-          <div class="rc-footer-section">
-            <div class="rc-footer-seal">ISSUED UNDER THE SEAL OF THE SCHOOL<ng-container *ngIf="reportCardData.session">&nbsp;&bull;&nbsp;{{ reportCardData.session }}</ng-container></div>
-            <div class="rc-footer-brand">Powered by Edunexify</div>
-          </div>
-        </ng-container>
-
-      </ng-container>
-      <!-- end section loop -->
+      <footer class="rc-footer-section">
+        <div class="rc-footer-seal">ISSUED UNDER THE SEAL OF THE SCHOOL<ng-container *ngIf="reportCardData.session">&nbsp;&middot;&nbsp;{{ reportCardData.session }}</ng-container></div>
+        <div class="rc-footer-brand">Powered by Edunexify</div>
+      </footer>
 
     </div><!-- end rc-card (template mode) -->
   </ng-container>

@@ -265,6 +265,26 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     return this.branding.showGradePoints === true;
   }
 
+  get marksRowCount(): number {
+    return this.reportCardData?.weightedResult?.marksTable?.subjectRows?.length ?? 0;
+  }
+
+  get examColumnCount(): number {
+    return this.reportCardData?.weightedResult?.marksTable?.examColumns?.length ?? 0;
+  }
+
+  get coScholasticCount(): number {
+    return this.reportCardData?.coScholasticGrades?.length || this.coScholasticActivities.length || 0;
+  }
+
+  get isDenseReport(): boolean {
+    return this.marksRowCount > 6 || this.examColumnCount > 2 || this.coScholasticCount > 4;
+  }
+
+  get isVeryDenseReport(): boolean {
+    return this.marksRowCount > 9 || this.examColumnCount > 3 || this.coScholasticCount > 6;
+  }
+
   get schoolInitials(): string {
     const name = this.reportCardData?.schoolName ?? '';
     const words = name.trim().split(/\s+/).filter(w => w.length > 0);

@@ -229,14 +229,7 @@
           <div class="rc-sig-line"></div>
           <div class="rc-sig-label">CLASS TEACHER</div>
         </div>
-        <div class="rc-badge-center">
-          <div class="rc-circle-badge" [class.rc-badge-fail]="!isPass(reportCardData.weightedResult.weightedPercentage)">
-            <span class="rc-badge-top">{{ isPass(reportCardData.weightedResult.weightedPercentage) ? 'PASSED WITH' : 'RESULT' }}</span>
-            <span class="rc-badge-grade">{{ getGradeFromPct(reportCardData.weightedResult.weightedPercentage) }}</span>
-            <span class="rc-badge-mid">{{ isPass(reportCardData.weightedResult.weightedPercentage) ? 'DISTINCTION' : 'NEEDS REVIEW' }}</span>
-            <span class="rc-badge-pct">{{ reportCardData.weightedResult.weightedPercentage | number:'1.1-1' }}%</span>
-          </div>
-        </div>
+        <div class="rc-badge-center"></div>
         <div class="rc-sig-col">
           <div class="rc-sig-line"></div>
           <div class="rc-sig-label">PRINCIPAL</div>

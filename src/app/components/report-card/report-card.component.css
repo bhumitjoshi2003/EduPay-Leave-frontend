@@ -303,11 +303,11 @@
 .rc-student-photo {
   width: 21mm; height: 27mm;
   object-fit: cover;
-  border: 1px solid #ccc;
+  border: none;
 }
 .rc-photo-placeholder {
   width: 21mm; height: 27mm;
-  border: 1.5px dashed #aaa;
+  border: none;
   background: #f0f0f0;
   display: flex;
   align-items: center;
@@ -339,8 +339,8 @@
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  border-top: 1px solid #c29b4b;
-  border-bottom: 1px solid #c29b4b;
+  border-top: 0.7px solid #c29b4b;
+  border-bottom: 0.7px solid #c29b4b;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -360,7 +360,7 @@
 .rc-tr-even td { background: #f5f0e8; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
 .rc-tfoot-row td {
-  border-top: 1.2px solid #c29b4b;
+  border-top: 0.8px solid #c29b4b;
   border-bottom: none;
   padding: 5px 7px;
   font-size: 8.8pt;

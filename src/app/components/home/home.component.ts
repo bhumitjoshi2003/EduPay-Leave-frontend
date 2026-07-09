@@ -206,7 +206,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         // SUPER_ADMIN has no schoolSlug and stays on the root domain.
         if (response.schoolSlug) {
           localStorage.removeItem('redirectUrl');
-          if (response.schoolSlug === this.tenantService.slug) {
+          if (response.schoolSlug === this.tenantService.slug || this.tenantService.isLocalDev) {
             // Already on the correct subdomain — navigate locally, no reload needed.
             this.authenticated = true;
             this.showLoginForm = false;

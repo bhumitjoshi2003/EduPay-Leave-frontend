@@ -12,8 +12,8 @@
 /* ── Hero banner ─────────────────────────────────────────────────── */
 .sd-hero {
   background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 55%, #0ea5e9 100%);
-  border-radius: 20px;
-  padding: 16px 16px 28px;
+  border-radius: 16px;
+  padding: 14px 16px 18px;
   display: flex;
   align-items: center;
   gap: 24px;
@@ -572,8 +572,8 @@
 
 /* Decorative blobs (previously ::before/::after on sd-hero) */
 .sd-blob { position: absolute; border-radius: 50%; pointer-events: none; }
-.sd-blob-1 { width: 120px; height: 120px; background: rgba(255,255,255,0.07); top: -30px; right: -20px; }
-.sd-blob-2 { width: 70px;  height: 70px;  background: rgba(255,255,255,0.05); bottom: -15px; left: 38%; }
+.sd-blob-1 { width: 90px; height: 90px; background: rgba(255,255,255,0.07); top: -34px; right: -18px; }
+.sd-blob-2 { display: none; }
 
 /* Hero bar (top row: back button + action buttons) */
 .sd-hero-bar {
@@ -641,9 +641,10 @@
 /* Hero center (photo + name + chips) */
 .sd-hero-center {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 16px;
   width: 100%;
   position: relative;
   z-index: 1;
@@ -651,7 +652,7 @@
 
 /* Photo ring */
 .sd-photo-ring {
-  width: 90px; height: 90px;
+  width: 66px; height: 66px;
   border-radius: 50%;
   overflow: hidden;
   background: linear-gradient(135deg, #1f6f8b, #4fbdbd);
@@ -668,7 +669,7 @@
 .sd-initials {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 2.2rem; font-weight: 800; color: #fff;
+  font-size: 1.55rem; font-weight: 800; color: #fff;
   user-select: none;
 }
 
@@ -697,6 +698,13 @@
   display: inline-block;
 }
 
+.sd-hero-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
 /* Hero chips (class, ID, status) */
 .sd-hero-chips {
   display: flex;
@@ -712,6 +720,17 @@
   color: #fff;
   font-size: 0.74rem;
   font-weight: 600;
+}
+
+.sd-hero-name {
+  margin: 0 0 8px;
+  font-size: 1.55rem;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.sd-hero-center .sd-hero-chips {
+  justify-content: flex-start;
 }
 
 /* ── Info sections ────────────────────────────────────────────────── */
@@ -873,7 +892,10 @@
   .sd-grid         { grid-template-columns: 1fr; }
   .sd-item-wide    { grid-column: auto; }
   .sd-actions-grid { grid-template-columns: repeat(2, 1fr); }
-  .sd-hero-center  { gap: 8px; }
-  .sd-photo-ring   { width: 76px; height: 76px; }
+  .sd-hero-center  { flex-direction: column; gap: 8px; }
+  .sd-hero-identity { align-items: center; }
+  .sd-photo-ring   { width: 64px; height: 64px; }
+  .sd-hero-name    { text-align: center; font-size: 1.35rem; }
+  .sd-hero-center .sd-hero-chips { justify-content: center; }
   .sd-hero-chips   { gap: 6px; }
 }

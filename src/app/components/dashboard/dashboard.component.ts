@@ -298,6 +298,37 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.router.navigate(['/dashboard/notice']);
   }
 
+  getProfileInitials(): string {
+    const source = (this.Name || this.Role || 'U').trim();
+    const parts = source.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return source.charAt(0).toUpperCase();
+  }
+
+  getRoleLabel(): string {
+    const labels: Record<string, string> = {
+      STUDENT: 'Student',
+      TEACHER: 'Teacher',
+      ADMIN: 'Admin',
+      SUB_ADMIN: 'Sub Admin',
+      SUPER_ADMIN: 'Super Admin',
+    };
+    return labels[this.Role] ?? this.Role;
+  }
+
+  getRoleChipClass(): string {
+    const classes: Record<string, string> = {
+      STUDENT: 'chip-student',
+      TEACHER: 'chip-teacher',
+      ADMIN: 'chip-admin',
+      SUB_ADMIN: 'chip-subadmin',
+      SUPER_ADMIN: 'chip-superadmin',
+    };
+    return classes[this.Role] ?? 'chip-student';
+  }
+
   private get isMobile(): boolean {
     return typeof window !== 'undefined' && window.innerWidth <= 900;
   }

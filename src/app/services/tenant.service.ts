@@ -33,6 +33,11 @@ export class TenantService {
   get isBranded(): boolean { return this._school !== null; }
   get school(): PublicSchoolInfo | null { return this._school; }
   get slug(): string | null { return this._slug; }
+  get isLocalDev(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    const hostname = window.location.hostname;
+    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+  }
 
   /**
    * Called once during APP_INITIALIZER before the app renders.
@@ -71,6 +76,9 @@ export class TenantService {
    *   → 'https://childrens-academy.edunexify.co.in/dashboard'
    */
   buildSchoolUrl(slug: string, path = ''): string {
+    if (this.isLocalDev) {
+      return `${window.location.origin}${path}`;
+    }
     const { protocol, port } = window.location;
     return `${protocol}//${slug}.${this.BASE_DOMAIN}${port ? ':' + port : ''}${path}`;
   }

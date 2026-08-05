@@ -19,6 +19,7 @@ import { WelcomeDialogComponent } from '../welcome-dialog/welcome-dialog.compone
 import { Subject, takeUntil, interval, Subscription } from 'rxjs';
 import { NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { AiCopilotComponent } from '../ai-copilot/ai-copilot.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -31,7 +32,8 @@ import { filter } from 'rxjs/operators';
     MatIconModule,
     MatDividerModule,
     CommonModule,
-    MatBadgeModule
+    MatBadgeModule,
+    AiCopilotComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],

@@ -48,6 +48,10 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
   showNewBadge = false;
   showPulse    = false;
 
+  // Scopes short-term server-side memory (see edunexify-ai/memory.py). A fresh
+  // conversationId per "New chat" means fresh (empty) memory for that chat.
+  conversationId = crypto.randomUUID();
+
   constructor(
     private aiService:   AiCopilotService,
     private authState:   AuthStateService,
@@ -146,6 +150,7 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
   clearChat(): void {
     this.messages        = [];
     this.lastUserMessage = '';
+    this.conversationId  = crypto.randomUUID();
     this.cdr.markForCheck();
     setTimeout(() => this.inputEl?.nativeElement?.focus(), 50);
   }
@@ -186,7 +191,7 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.shouldScroll = true;
     this.cdr.markForCheck();
 
-    this.aiService.send(content).pipe(takeUntil(this.destroy$)).subscribe({
+    this.aiService.send(content, this.conversationId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.messages = [
           ...this.messages,

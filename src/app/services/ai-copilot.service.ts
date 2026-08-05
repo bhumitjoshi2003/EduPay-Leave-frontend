@@ -13,7 +13,7 @@ export class AiCopilotService {
 
   constructor(private http: HttpClient) {}
 
-  send(message: string): Observable<AiChatResponse> {
-    return this.http.post<AiChatResponse>(this.url, { message });
+  send(message: string, conversationId: string): Observable<AiChatResponse> {
+    return this.http.post<AiChatResponse>(this.url, { message, conversationId });
   }
 }

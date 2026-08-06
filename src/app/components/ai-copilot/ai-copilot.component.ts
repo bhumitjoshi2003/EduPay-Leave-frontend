@@ -12,6 +12,7 @@ import {
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { HttpDownloadProgressEvent, HttpEventType } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
 import { AiCopilotService } from '../../services/ai-copilot.service';
 import { AuthStateService } from '../../auth/auth-state.service';
@@ -191,27 +192,69 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.shouldScroll = true;
     this.cdr.markForCheck();
 
-    this.aiService.send(content, this.conversationId).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
-        this.messages = [
-          ...this.messages,
-          { id: `a_${Date.now()}`, role: 'assistant', content: res.reply, timestamp: new Date(), error: false },
-        ];
-        this.isLoading    = false;
-        this.shouldScroll = true;
-        this.cdr.markForCheck();
+    // Populated on the first chunk that actually arrives, so the typing
+    // indicator stays visible for any gap before generation starts (e.g. while
+    // tool calls are resolving server-side — those never reach the client as
+    // text, see routers/chat.py, so this bubble only appears once real content does).
+    let assistantMsg: ChatMessage | null = null;
+    let receivedSoFar = '';
+
+    this.aiService.sendStream(content, this.conversationId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (event) => {
+        if (event.type === HttpEventType.DownloadProgress) {
+          const partialText = (event as HttpDownloadProgressEvent).partialText ?? '';
+          const delta = partialText.slice(receivedSoFar.length);
+          receivedSoFar = partialText;
+          if (!delta) return;
+
+          if (!assistantMsg) {
+            assistantMsg = { id: `a_${Date.now()}`, role: 'assistant', content: '', timestamp: new Date(), error: false };
+            this.messages = [...this.messages, assistantMsg];
+            this.isLoading = false;
+          }
+          assistantMsg.content += delta;
+          this.shouldScroll = true;
+          this.cdr.markForCheck();
+          return;
+        }
+
+        if (event.type === HttpEventType.Response && !assistantMsg) {
+          // Stream completed without ever emitting a DownloadProgress chunk
+          // (can happen for a very short/instant reply) — show the full body now.
+          const finalText = (event.body as string)?.trim();
+          this.messages = [
+            ...this.messages,
+            {
+              id: `a_${Date.now()}`,
+              role: 'assistant',
+              content: finalText || "I wasn't able to complete your request. Please try again.",
+              timestamp: new Date(),
+              error: false,
+            },
+          ];
+          this.isLoading    = false;
+          this.shouldScroll = true;
+          this.cdr.markForCheck();
+        }
       },
       error: () => {
-        this.messages = [
-          ...this.messages,
-          {
-            id: `e_${Date.now()}`,
-            role: 'assistant',
-            content: 'Something went wrong. Please check your connection and try again.',
-            timestamp: new Date(),
-            error: true,
-          },
-        ];
+        if (assistantMsg) {
+          // Partial content already showing — keep it, and note the stream broke,
+          // rather than discarding what the user has already read.
+          assistantMsg.content += '\n\n⚠️ Connection lost — response may be incomplete.';
+          assistantMsg.error = true;
+        } else {
+          this.messages = [
+            ...this.messages,
+            {
+              id: `e_${Date.now()}`,
+              role: 'assistant',
+              content: 'Something went wrong. Please check your connection and try again.',
+              timestamp: new Date(),
+              error: true,
+            },
+          ];
+        }
         this.isLoading    = false;
         this.shouldScroll = true;
         this.cdr.markForCheck();

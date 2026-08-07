@@ -13,7 +13,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpDownloadProgressEvent, HttpEventType } from '@angular/common/http';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { AiCopilotService } from '../../services/ai-copilot.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { ChatMarkdownPipe } from '../../pipes/chat-markdown.pipe';
@@ -38,6 +38,7 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
   private destroy$ = new Subject<void>();
   private shouldScroll = false;
   private lastUserMessage = '';
+  private currentRequest?: Subscription;
 
   @ViewChild('messagesEl') messagesEl!: ElementRef<HTMLElement>;
   @ViewChild('inputEl')    inputEl!:    ElementRef<HTMLTextAreaElement>;
@@ -46,6 +47,10 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
   messages: ChatMessage[] = [];
   inputText    = '';
   isLoading    = false;
+  // True for the whole request lifetime (send → final chunk/error/stop), unlike isLoading
+  // which only covers the gap before the first chunk arrives (drives the typing dots).
+  // Governs the send-vs-stop button swap and blocks starting a second concurrent request.
+  isStreaming  = false;
   showNewBadge = false;
   showPulse    = false;
 
@@ -175,7 +180,7 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   sendMessage(text?: string): void {
     const content = (text ?? this.inputText).trim();
-    if (!content || this.isLoading) return;
+    if (!content || this.isStreaming) return;
 
     this.lastUserMessage = content;
     this.inputText       = '';
@@ -189,6 +194,7 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
       { id: `u_${Date.now()}`, role: 'user', content, timestamp: new Date(), error: false },
     ];
     this.isLoading    = true;
+    this.isStreaming  = true;
     this.shouldScroll = true;
     this.cdr.markForCheck();
 
@@ -199,7 +205,7 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
     let assistantMsg: ChatMessage | null = null;
     let receivedSoFar = '';
 
-    this.aiService.sendStream(content, this.conversationId).pipe(takeUntil(this.destroy$)).subscribe({
+    this.currentRequest = this.aiService.sendStream(content, this.conversationId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (event) => {
         if (event.type === HttpEventType.DownloadProgress) {
           const partialText = (event as HttpDownloadProgressEvent).partialText ?? '';
@@ -256,14 +262,32 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
           ];
         }
         this.isLoading    = false;
+        this.isStreaming  = false;
         this.shouldScroll = true;
+        this.cdr.markForCheck();
+      },
+      complete: () => {
+        this.isLoading   = false;
+        this.isStreaming = false;
         this.cdr.markForCheck();
       },
     });
   }
 
+  /** User hit the stop button mid-stream. Cancels the underlying XHR — Spring/FastAPI
+   * detect the dropped connection and stop pulling more tokens (see routers/chat.py's
+   * is_disconnected() check). Whatever text already arrived stays in the bubble as-is. */
+  stopGenerating(): void {
+    this.currentRequest?.unsubscribe();
+    this.currentRequest = undefined;
+    this.isLoading    = false;
+    this.isStreaming  = false;
+    this.shouldScroll = true;
+    this.cdr.markForCheck();
+  }
+
   retry(): void {
-    if (!this.lastUserMessage || this.isLoading) return;
+    if (!this.lastUserMessage || this.isStreaming) return;
     // Drop the last error message, then resend
     this.messages = this.messages.slice(0, -1);
     this.sendMessage(this.lastUserMessage);

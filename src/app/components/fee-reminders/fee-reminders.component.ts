@@ -111,8 +111,14 @@ export class FeeRemindersComponent implements OnInit, OnDestroy {
     return Math.ceil(this.filteredStudents.length / this.pageSize);
   }
 
+  /** Sum of known amounts only — students with an unconfigured fee structure (totalDue
+   * null) are excluded rather than silently treated as ₹0. See amountUnknownCount. */
   get totalDue(): number {
-    return this.filteredStudents.reduce((sum, s) => sum + s.totalDue, 0);
+    return this.filteredStudents.reduce((sum, s) => sum + (s.totalDue ?? 0), 0);
+  }
+
+  get amountUnknownCount(): number {
+    return this.filteredStudents.filter(s => s.totalDue === null).length;
   }
 
   get criticalCount(): number {

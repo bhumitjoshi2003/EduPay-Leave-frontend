@@ -13,10 +13,19 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpDownloadProgressEvent, HttpEventType } from '@angular/common/http';
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import { Observable, Subject, Subscription, takeUntil } from 'rxjs';
 import { AiCopilotService } from '../../services/ai-copilot.service';
+import { AiWorkflowService, FeeReminderWorkflowResponse } from '../../services/ai-workflow.service';
+import { AcademicSessionService } from '../../services/academic-session.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { ChatMarkdownPipe } from '../../pipes/chat-markdown.pipe';
+import { switchMap } from 'rxjs/operators';
+
+export interface WorkflowCardData extends FeeReminderWorkflowResponse {
+  /** UI-only — never sent to the backend. Drives the approve/reject buttons' local state. */
+  actionState: 'idle' | 'sending' | 'error';
+  actionError?: string;
+}
 
 export interface ChatMessage {
   id: string;
@@ -24,6 +33,9 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   error: boolean;
+  /** Defaults to a plain text bubble when absent — see ai-copilot.component.html. */
+  kind?: 'text' | 'fee_reminder_approval';
+  workflow?: WorkflowCardData;
 }
 
 @Component({
@@ -59,9 +71,11 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
   conversationId = crypto.randomUUID();
 
   constructor(
-    private aiService:   AiCopilotService,
-    private authState:   AuthStateService,
-    private cdr:         ChangeDetectorRef,
+    private aiService:      AiCopilotService,
+    private workflowService: AiWorkflowService,
+    private sessionService:  AcademicSessionService,
+    private authState:      AuthStateService,
+    private cdr:            ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -108,6 +122,12 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
     return map[this.userRole] ?? this.userRole;
   }
 
+  /** Backend independently enforces ADMIN/SUPER_ADMIN on every workflow endpoint — this
+   * getter is a UX guard only, same convention as auth-state.service.ts's hasPermission(). */
+  get isAdmin(): boolean {
+    return this.userRole === 'ADMIN' || this.userRole === 'SUPER_ADMIN';
+  }
+
   get welcomeDesc(): string {
     if (this.userRole === 'STUDENT') {
       return 'Ask me about your fees, attendance, exam results, or anything else about your school.';
@@ -118,7 +138,7 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
     return 'Ask me anything about school data or Edunexify features.';
   }
 
-  get suggestedPrompts(): { icon: string; text: string }[] {
+  get suggestedPrompts(): { icon: string; text: string; action?: 'startFeeReminders' }[] {
     if (this.userRole === 'STUDENT') {
       return [
         { icon: '🏆', text: 'How did I perform in my latest exam?' },
@@ -127,10 +147,24 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
         { icon: '📊', text: 'Give me a full overview of my progress' },
       ];
     }
+    if (this.isAdmin) {
+      return [
+        { icon: '📋', text: 'Review fee reminder batch', action: 'startFeeReminders' },
+        { icon: '💡', text: 'What can you help me with?' },
+      ];
+    }
     return [
       { icon: '💡', text: 'What can you help me with?' },
       { icon: '📚', text: 'Tell me about Edunexify features' },
     ];
+  }
+
+  onSuggestedPromptClick(prompt: { text: string; action?: 'startFeeReminders' }): void {
+    if (prompt.action === 'startFeeReminders') {
+      this.startFeeReminderWorkflow();
+    } else {
+      this.sendMessage(prompt.text);
+    }
   }
 
   // ── Panel open / close ─────────────────────────────────────────────────────
@@ -213,6 +247,13 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
           receivedSoFar = partialText;
           if (!delta) return;
 
+          // A workflow response (see routers/chat.py's start_fee_reminder_workflow
+          // short-circuit) is ONE complete JSON object, never interleaved with prose —
+          // so if the body looks like it's building one, hold off rendering anything
+          // until the stream completes and the whole thing can be parsed, rather than
+          // flashing raw JSON text into the bubble character by character.
+          if (this.looksLikeStructuredPayload(receivedSoFar)) return;
+
           if (!assistantMsg) {
             assistantMsg = { id: `a_${Date.now()}`, role: 'assistant', content: '', timestamp: new Date(), error: false };
             this.messages = [...this.messages, assistantMsg];
@@ -225,12 +266,14 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
 
         if (event.type === HttpEventType.Response && !assistantMsg) {
-          // Stream completed without ever emitting a DownloadProgress chunk
-          // (can happen for a very short/instant reply) — show the full body now.
-          const finalText = (event.body as string)?.trim();
+          // Covers two cases: a very short/instant text reply that never crossed the
+          // DownloadProgress threshold, AND a structured workflow payload that was
+          // deliberately held back above — event.body is always the full accumulated
+          // text at this point either way.
+          const finalText = (event.body as string)?.trim() ?? '';
           this.messages = [
             ...this.messages,
-            {
+            this.tryParseWorkflowMessage(finalText) ?? {
               id: `a_${Date.now()}`,
               role: 'assistant',
               content: finalText || "I wasn't able to complete your request. Please try again.",
@@ -291,6 +334,126 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
     // Drop the last error message, then resend
     this.messages = this.messages.slice(0, -1);
     this.sendMessage(this.lastUserMessage);
+  }
+
+  // ── Structured workflow responses arriving via /chat/stream ──────────────────
+  //
+  // Small, backward-compatible extension to the chat protocol, not a rewrite: the
+  // transport (chunked text/plain, HttpDownloadProgressEvent) is unchanged. The only new
+  // behavior is that a turn's FULL body may, instead of prose, be one self-describing JSON
+  // object ({"kind": "fee_reminder_workflow", ...}) when the admin's message caused the
+  // model to call start_fee_reminder_workflow — see routers/chat.py. No sentinels, no
+  // header/trailer tricks: it's parsed with plain JSON.parse and a discriminator field,
+  // exactly like ChatMessage.kind already discriminates rendering client-side.
+
+  private looksLikeStructuredPayload(text: string): boolean {
+    return text.trimStart().startsWith('{');
+  }
+
+  private tryParseWorkflowMessage(text: string): ChatMessage | null {
+    if (!this.looksLikeStructuredPayload(text)) return null;
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed?.kind !== 'fee_reminder_workflow') return null;
+      return {
+        id: `wf_${Date.now()}`,
+        role: 'assistant',
+        content: '',
+        timestamp: new Date(),
+        error: false,
+        kind: 'fee_reminder_approval',
+        workflow: { ...parsed, actionState: 'idle' },
+      };
+    } catch {
+      return null; // looked like JSON but wasn't (or wasn't ours) — render as plain text instead
+    }
+  }
+
+  // ── Fee reminder workflow (LangGraph, human-in-the-loop) ────────────────────
+  //
+  // Deliberately NOT routed through sendMessage()/the LLM tool-calling loop — this is a
+  // plain, deterministic POST that starts the workflow up to its approval pause and
+  // renders the result directly as a card. No free-text/LLM step is involved in *starting*
+  // it, so there's no risk of the model ever deciding on its own to send anything; the
+  // send-with-approval boundary is enforced entirely by which buttons the admin clicks
+  // below, each hitting its own explicit backend endpoint.
+
+  startFeeReminderWorkflow(): void {
+    if (this.isStreaming) return;
+    this.isLoading    = true;
+    this.shouldScroll = true;
+    this.cdr.markForCheck();
+
+    this.sessionService.getCurrentSession().pipe(
+      switchMap(session => this.workflowService.startFeeReminderWorkflow(session.label)),
+      takeUntil(this.destroy$),
+    ).subscribe({
+      next: (result) => {
+        this.messages = [
+          ...this.messages,
+          {
+            id: `wf_${Date.now()}`,
+            role: 'assistant',
+            content: '',
+            timestamp: new Date(),
+            error: false,
+            kind: 'fee_reminder_approval',
+            workflow: { ...result, actionState: 'idle' },
+          },
+        ];
+        this.isLoading    = false;
+        this.shouldScroll = true;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.messages = [
+          ...this.messages,
+          {
+            id: `e_${Date.now()}`,
+            role: 'assistant',
+            content: err?.error?.error || 'Could not start the fee reminder review. Please try again.',
+            timestamp: new Date(),
+            error: true,
+          },
+        ];
+        this.isLoading    = false;
+        this.shouldScroll = true;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  approveWorkflow(msg: ChatMessage): void {
+    this.resumeWorkflow(msg, wf => this.workflowService.approve(wf.workflowId));
+  }
+
+  rejectWorkflow(msg: ChatMessage): void {
+    this.resumeWorkflow(msg, wf => this.workflowService.reject(wf.workflowId));
+  }
+
+  private resumeWorkflow(
+    msg: ChatMessage,
+    call: (wf: WorkflowCardData) => Observable<FeeReminderWorkflowResponse>,
+  ): void {
+    const wf = msg.workflow;
+    if (!wf || wf.actionState === 'sending') return;
+
+    wf.actionState = 'sending';
+    wf.actionError = undefined;
+    this.cdr.markForCheck();
+
+    call(wf).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (result) => {
+        msg.workflow = { ...result, actionState: 'idle' };
+        this.shouldScroll = true;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        wf.actionState = 'error';
+        wf.actionError = err?.error?.error || 'Something went wrong. Please try again.';
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   // ── Scroll ─────────────────────────────────────────────────────────────────

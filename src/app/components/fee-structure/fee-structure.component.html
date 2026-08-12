@@ -13,6 +13,14 @@
     <div class="fs-blob fs-blob-2"></div>
   </div>
 
+  <!-- Orphan fee-rule warning: rules exist for a class name with no matching configured
+       SchoolClass. Surfaced rather than silently dropped — see buildGrid(). -->
+  <div class="fs-orphan-warning" *ngIf="orphanFeeRuleClassNames.length > 0" role="alert">
+    ⚠️ Fee rules exist for class name(s) not configured in Class Management:
+    <strong>{{ orphanFeeRuleClassNames.join(', ') }}</strong>.
+    These amounts are not shown below. Please review Class Management.
+  </div>
+
   <!-- Controls -->
   <div class="fs-controls" *ngIf="!isLoading">
     <div class="fs-controls-row">

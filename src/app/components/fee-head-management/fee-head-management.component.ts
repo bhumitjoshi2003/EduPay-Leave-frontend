@@ -1,11 +1,13 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, take, takeUntil } from 'rxjs';
 import { FeeHeadService } from '../../services/fee-head.service';
 import { FeeHead } from '../../interfaces/fee-head';
 import { ToastService } from '../../services/toast.service';
 import { LoggerService } from '../../services/logger.service';
+import { SchoolService } from '../../services/school.service';
+import { FeesCalculationService } from '../../services/fees-calculation.service';
 
 @Component({
   selector: 'app-fee-head-management',
@@ -34,12 +36,15 @@ export class FeeHeadManagementComponent implements OnInit, OnDestroy {
     { value: 'ONE_TIME', label: 'One-Time' },
   ];
 
-  allMonths = [
-    { value: 1, label: 'Jan' }, { value: 2, label: 'Feb' }, { value: 3, label: 'Mar' },
-    { value: 4, label: 'Apr' }, { value: 5, label: 'May' }, { value: 6, label: 'Jun' },
-    { value: 7, label: 'Jul' }, { value: 8, label: 'Aug' }, { value: 9, label: 'Sep' },
-    { value: 10, label: 'Oct' }, { value: 11, label: 'Nov' }, { value: 12, label: 'Dec' },
-  ];
+  /** value = academic month number (1 = the school's own start month, per FeeHead.dueMonths'
+   * convention); label = the real calendar month name for that academic month. Starts with a
+   * generic Jan..Dec placeholder and is recomputed in ngOnInit once academicYearStartMonth
+   * is loaded from SchoolService. */
+  allMonths: { value: number; label: string }[] = Array.from({ length: 12 }, (_, i) => ({
+    value: i + 1,
+    label: ['January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'][i],
+  }));
 
   selectedMonths: Set<number> = new Set();
 
@@ -48,9 +53,22 @@ export class FeeHeadManagementComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
+    private schoolService: SchoolService,
+    private feesCalc: FeesCalculationService,
   ) {}
 
   ngOnInit(): void {
+    this.schoolService.getSettings().pipe(take(1), takeUntil(this.destroy$)).subscribe({
+      next: (settings) => {
+        this.feesCalc.setStartMonth(settings.academicYearStartMonth ?? 4);
+        this.allMonths = Array.from({ length: 12 }, (_, i) => ({
+          value: i + 1,
+          label: this.feesCalc.getMonthName(i + 1),
+        }));
+        this.cdr.markForCheck();
+      },
+      error: (e) => this.logger.error('Failed to load school settings; due-month labels will show academic month numbers only.', e),
+    });
     this.loadFeeHeads();
   }
 
@@ -169,13 +187,18 @@ export class FeeHeadManagementComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  /** dueMonths values are academic-relative (1 = the school's own start month, whatever
+   * calendar month that is — see FeeHead.dueMonths' documented convention and
+   * FeeCalculationService.appliesThisAcademicMonth on the backend), never literal calendar
+   * months. Matches fee-structure.component.ts's dueMonthsForFrequency exactly, so both
+   * admin screens that write this field agree on what the numbers mean. */
   private defaultMonthsForFrequency(frequency: FeeHead['frequency']): Set<number> {
     switch (frequency) {
       case 'MONTHLY': return new Set([1,2,3,4,5,6,7,8,9,10,11,12]);
-      case 'QUARTERLY': return new Set([4,7,10,1]); // Apr, Jul, Oct, Jan
-      case 'SEMI_ANNUAL': return new Set([4,10]);   // Apr, Oct
-      case 'ANNUAL': return new Set([4]);            // Apr (first month of academic year)
-      case 'ONE_TIME': return new Set([4]);
+      case 'QUARTERLY': return new Set([1,4,7,10]);
+      case 'SEMI_ANNUAL': return new Set([1,7]);
+      case 'ANNUAL': return new Set([1]);
+      case 'ONE_TIME': return new Set([1]);
       default: return new Set([1,2,3,4,5,6,7,8,9,10,11,12]);
     }
   }

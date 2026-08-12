@@ -283,6 +283,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/payment-record/payment-record.component').then(m => m.PaymentRecordComponent),
         canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
+      {
+        path: 'fee-recalculation',
+        loadComponent: () => import('./components/fee-recalculation/fee-recalculation.component').then(m => m.FeeRecalculationComponent),
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
 
       // ── Exam / Results ────────────────────────────────────────────────
       {

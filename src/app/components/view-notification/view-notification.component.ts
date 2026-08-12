@@ -46,12 +46,12 @@ export class ViewNotificationComponent implements OnInit, OnDestroy {
     this.notificationService.getUserNotifications().pipe(
       takeUntil(this.destroy$),
       tap(data => {
-        this.userNotifications = data;
+        this.userNotifications = data.content;
         this.isLoading = false;
         this.cdr.markForCheck();
       }),
       switchMap(data =>
-        data.some(n => !n.isRead)
+        data.content.some(n => !n.isRead)
           ? this.notificationService.markAllNotificationsAsRead().pipe(
               tap(() => {
                 this.userNotifications.forEach(n => n.isRead = true);

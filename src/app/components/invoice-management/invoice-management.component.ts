@@ -10,6 +10,7 @@ import { Invoice, InvoiceGenerationRequest } from '../../interfaces/invoice';
 import { AcademicSession } from '../../interfaces/academic-session';
 import { ToastService } from '../../services/toast.service';
 import { LoggerService } from '../../services/logger.service';
+import { FeesCalculationService } from '../../services/fees-calculation.service';
 
 @Component({
   selector: 'app-invoice-management',
@@ -45,7 +46,10 @@ export class InvoiceManagementComponent implements OnInit, OnDestroy {
   generating = false;
   issuing = false;
 
-  months = [
+  /** value = academic month (1 = the school's own start month, per InvoiceGenerationService's
+   * documented billingMonth convention); label = the real calendar month name, recomputed in
+   * ngOnInit once academicYearStartMonth is loaded. Placeholder Jan..Dec labels until then. */
+  months: { value: number; label: string }[] = [
     { value: 1, label: 'January' }, { value: 2, label: 'February' }, { value: 3, label: 'March' },
     { value: 4, label: 'April' }, { value: 5, label: 'May' }, { value: 6, label: 'June' },
     { value: 7, label: 'July' }, { value: 8, label: 'August' }, { value: 9, label: 'September' },
@@ -61,6 +65,7 @@ export class InvoiceManagementComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
+    private feesCalc: FeesCalculationService,
   ) {}
 
   ngOnInit(): void {
@@ -68,10 +73,16 @@ export class InvoiceManagementComponent implements OnInit, OnDestroy {
     forkJoin({
       sessions: this.sessionService.getAllSessions(),
       classes: this.schoolService.getClasses(),
+      settings: this.schoolService.getSettings(),
     }).pipe(takeUntil(this.destroy$)).subscribe({
-      next: ({ sessions, classes }) => {
+      next: ({ sessions, classes, settings }) => {
         this.sessions = sessions;
         this.classes = classes;
+        this.feesCalc.setStartMonth(settings.academicYearStartMonth ?? 4);
+        this.months = Array.from({ length: 12 }, (_, i) => ({
+          value: i + 1,
+          label: this.feesCalc.getMonthName(i + 1),
+        }));
         const current = sessions.find(s => s.current);
         if (current) {
           this.selectedSessionId = current.id;

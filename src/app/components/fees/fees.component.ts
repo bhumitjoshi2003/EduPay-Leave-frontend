@@ -4,28 +4,24 @@ import { CommonModule } from '@angular/common';
 import { PaymentComponent } from "../payment/payment.component";
 import { ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FeesService } from '../../services/fees.service';
-import { AcademicSessionService } from '../../services/academic-session.service';
-import { FeeRuleService } from '../../services/fee-rule.service';
-import { FeeHeadService } from '../../services/fee-head.service';
-import { FeeStructureRule } from '../../interfaces/fee-rule';
-import { FeeHead } from '../../interfaces/fee-head';
-import { AcademicSession } from '../../interfaces/academic-session';
 import { StudentService } from '../../services/student.service';
-import { BusFeesService } from '../../services/bus-fees.service';
 import { ToastService } from '../../services/toast.service';
 import { PaymentData } from '../../interfaces/payment-data';
 import { StudentFee } from '../../interfaces/student-fee';
+import { CheckoutQuote } from '../../interfaces/checkout-quote';
+import { MonthFeeBreakdown } from '../../interfaces/month-fee-breakdown';
+import { ManualPaymentRequest } from '../../interfaces/manual-payment-request';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, forkJoin, of, takeUntil } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../../auth/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AttendanceService } from '../../services/attendance.service';
 import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
 import { MODULE_MESSAGES } from '../../config/module-messages.config';
-import { FeesCalculationService, PaymentContext } from '../../services/fees-calculation.service';
+import { FeesCalculationService } from '../../services/fees-calculation.service';
 import { FeeBreakdownComponent } from './fee-breakdown.component';
 import { LoggerService } from '../../services/logger.service';
 import { SchoolService } from '../../services/school.service';
@@ -39,33 +35,36 @@ export interface FeeLineItem {
 export interface MonthViewModel extends StudentFee {
   monthNumber: number;
   name: string;
+  /** Backend-computed school fee for this month (baseAmountDue, net of any discount). */
   fee: number;
-  tuitionFee: number;
-  annualCharges: number;
-  ecaProject: number;
-  examinationFee: number;
-  labCharges: number;
+  /** Backend-computed bus fee for this month (busFeeDue). */
   busFee: number;
-  unappliedLeaveCharge: number;
-  lateFee: number;
   selected: boolean;
-  feeLineItems: FeeLineItem[];
+  /** True when baseAmountDue is null or snapshotStatus isn't COMPUTED — the amount shown is
+   * NOT confidently known. Never treated as ₹0; selection is disabled for such months. */
+  amountUnavailable: boolean;
 }
 
 export interface MonthBreakdownDetails {
   studentId: string;
   studentClass: string;
   studentName: string;
-  tuitionFee: number;
-  annualCharges: number;
-  labCharges: number;
-  ecaProject: number;
-  examinationFee: number;
-  busFee: number;
   monthName: string;
   additionalCharges: number;
+  /** Aggregate late fee across the current selection — the checkout-quote endpoint only
+   * returns a total, not a per-month breakdown, so this reflects the whole selection's
+   * late fee even when this receipt panel is showing one particular month's other details. */
   lateFee: number;
+  /** Built from the backend's authoritative StudentFeesLineItem breakdown (fee-head name +
+   * gross, and a following discount row when that fee head had one) — bus fee arrives as
+   * its own entry here too, never shown as a separate hardcoded row. Never computed from
+   * baseAmountDue/discountAmount in Angular. */
   feeLineItems: FeeLineItem[];
+  /** True when the backend has no per-fee-head breakdown for this month (a historical row
+   * generated before line items existed) — the receipt must show "breakdown unavailable"
+   * rather than inventing components. feeLineItems may still carry a single trusted-total
+   * row in this case; see populateMonthDetails. */
+  breakdownUnavailable: boolean;
 }
 
 @Component({
@@ -84,11 +83,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private feesService: FeesService,
-    private academicSessionService: AcademicSessionService,
-    private feeRuleService: FeeRuleService,
-    private feeHeadService: FeeHeadService,
     private studentService: StudentService,
-    private busFeesService: BusFeesService,
     private authService: AuthService,
     private attendanceService: AttendanceService,
     private authStateService: AuthStateService,
@@ -115,6 +110,9 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
   studentName: string = '';
   role: string = '';
   manualPaymentAmount: number = 0;
+  manualPaymentMode: ManualPaymentRequest['paymentMode'] = 'CASH';
+  manualPaymentReference: string = '';
+  readonly manualPaymentModes: ManualPaymentRequest['paymentMode'][] = ['CASH', 'CHEQUE', 'BANK_TRANSFER', 'UPI', 'OTHER'];
   paidManually: boolean = false;
   amountPaid: number = 0;
   totalUnappliedLeaves: number = 0;
@@ -122,8 +120,6 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
   lateFees: number = 0;
   isLoadingPayment: boolean = false;
   platformFeeAmount: number = 0;
-  private cachedFeeRules: FeeStructureRule[] = [];
-  private cachedFeeHeads: FeeHead[] = [];
 
   currentMonth = new Date().getMonth() + 1;
   academicCurrentMonth: number = 0;
@@ -193,64 +189,21 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     this.fetchFees();
   }
 
-  fetchBusFees(): void {
-    this.months
-      .filter(month => month.takesBus)
-      .forEach(month => {
-        this.busFeesService.getBusFeesOfDistance(month.distance!, this.session)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: (busFee) => {
-              month.busFee = busFee;
-              this.cdr.markForCheck();
-            },
-            error: (error) => {
-              this.logger.error('Error fetching bus fee:', error);
-              month.busFee = 0;
-              this.cdr.markForCheck();
-            }
-          });
-      });
-  }
-
   fetchFees(): void {
     this.onPaymentProcessCompleted();
 
     forkJoin([
       this.feesService.getStudentFees(this.studentId, this.session),
       this.attendanceService.getTotalUnappliedLeaveCount(this.studentId, this.session)
-        .pipe(catchError(() => of(0))),
-      this.academicSessionService.getAllSessions()
-        .pipe(catchError(() => of([] as AcademicSession[])))
+        .pipe(catchError(() => of(0)))
     ]).pipe(
-      takeUntil(this.destroy$),
-      switchMap(([fees, totalUnappliedLeaves, sessions]) => {
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: ([fees, totalUnappliedLeaves]) => {
         this.className = fees.length > 0 ? fees[0].className : '';
         this.totalUnappliedLeaves = totalUnappliedLeaves;
         this.totalUnappliedLeaveCharge = totalUnappliedLeaves * 25;
-
-        const sessionObj = sessions.find((s: AcademicSession) => s.label === this.session);
-        const sessionId = sessionObj?.id;
-
-        if (!sessionId || !this.className) {
-          return of({ fees, feeRules: [] as FeeStructureRule[], feeHeads: [] as FeeHead[] });
-        }
-
-        return forkJoin([
-          this.feeRuleService.getRulesBySessionAndClass(sessionId, this.className)
-            .pipe(catchError(() => of([] as FeeStructureRule[]))),
-          this.feeHeadService.getActiveFeeHeads()
-            .pipe(catchError(() => of([] as FeeHead[])))
-        ]).pipe(
-          map(([feeRules, feeHeads]) => ({ fees, feeRules, feeHeads }))
-        );
-      })
-    ).subscribe({
-      next: ({ fees, feeRules, feeHeads }) => {
-        this.cachedFeeRules = feeRules;
-        this.cachedFeeHeads = feeHeads;
-        this.months = fees.map(fee => this.buildDynamicMonthViewModel(fee, feeRules, feeHeads));
-        this.fetchBusFees();
+        this.months = fees.map(fee => this.buildMonthViewModel(fee));
         this.checkAndDisplayFeeWarnings();
       },
       error: (error) => {
@@ -259,94 +212,20 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     });
   }
 
-  private buildDynamicMonthViewModel(fee: StudentFee, feeRules: FeeStructureRule[], feeHeads: FeeHead[]): MonthViewModel {
-    const breakdown = this.calculateDynamicBreakdown(fee.month, feeRules, feeHeads);
+  /** Reads the backend-computed snapshot directly off the fetched StudentFee row — no
+   * client-side fee-rule recomputation. A row with no trustworthy snapshot (baseAmountDue
+   * null, or snapshotStatus isn't COMPUTED) is flagged amountUnavailable and never silently
+   * shown/treated as ₹0. */
+  private buildMonthViewModel(fee: StudentFee): MonthViewModel {
+    const amountUnavailable = fee.baseAmountDue == null || fee.snapshotStatus !== 'COMPUTED';
     return {
       ...fee,
       monthNumber: fee.month,
       name: this.feesCalc.getMonthName(fee.month),
       selected: this.isMonthSelected(fee.month, this.selectedYear),
-      fee: breakdown.total,
-      tuitionFee: breakdown.tuitionFee,
-      annualCharges: breakdown.annualCharges,
-      ecaProject: breakdown.ecaProject,
-      examinationFee: breakdown.examinationFee,
-      labCharges: breakdown.labCharges,
-      busFee: 0,
-      unappliedLeaveCharge: 0,
-      lateFee: this.feesCalc.calculateLateFees(fee.month, this.session, this.currentAcademicYear),
-      feeLineItems: breakdown.lineItems,
-    };
-  }
-
-  /**
-   * Returns true if this fee head is due in the given academic month.
-   *
-   * When dueMonths contains all 12 months (the form default that admins often leave unchanged),
-   * we derive the schedule from the frequency field instead of trusting the raw dueMonths data.
-   * When dueMonths is a custom subset, we use it directly.
-   */
-  private feeAppliesThisMonth(academicMonth: number, head: FeeHead, dueMonths: number[]): boolean {
-    if (dueMonths.length === 12) {
-      // Default "all months" — apply frequency-based schedule
-      switch (head.frequency) {
-        case 'MONTHLY': return true;
-        case 'QUARTERLY': return academicMonth % 3 === 1; // academic months 1, 4, 7, 10
-        case 'SEMI_ANNUAL': return academicMonth === 1 || academicMonth === 7;
-        case 'ANNUAL':
-        case 'ONE_TIME': return academicMonth === 1;
-        default: return false;
-      }
-    }
-    // Custom schedule — respect dueMonths as-is (academic months, 1 = first month of year)
-    return dueMonths.includes(academicMonth);
-  }
-
-  private calculateDynamicBreakdown(academicMonth: number, feeRules: FeeStructureRule[], feeHeads: FeeHead[]): {
-    total: number; tuitionFee: number; annualCharges: number; ecaProject: number; examinationFee: number; labCharges: number;
-    lineItems: FeeLineItem[];
-  } {
-    let tuitionFee = 0, annualCharges = 0, ecaProject = 0, examinationFee = 0, labCharges = 0;
-    const lineItems: FeeLineItem[] = [];
-
-    for (const rule of feeRules) {
-      const head = feeHeads.find(h => h.id === rule.feeHeadId);
-      if (!head) continue;
-
-      let dueMonths: number[] = [];
-      try {
-        dueMonths = JSON.parse(head.dueMonths);
-      } catch {
-        continue;
-      }
-
-      if (!this.feeAppliesThisMonth(academicMonth, head, dueMonths)) continue;
-
-      const amountInRupees = rule.amount / 100;
-      // Use the school's actual fee head name for the line item display
-      lineItems.push({ name: rule.feeHeadName || head.name, amount: amountInRupees });
-
-      // Also bucket into legacy fields for PaymentData aggregation
-      const code = (rule.feeHeadCode || head.code || '').toUpperCase();
-      if (code.includes('TUITION')) {
-        tuitionFee += amountInRupees;
-      } else if (code.includes('ANNUAL')) {
-        annualCharges += amountInRupees;
-      } else if (code.includes('ECA') || code.includes('EXTRA')) {
-        ecaProject += amountInRupees;
-      } else if (code.includes('EXAM')) {
-        examinationFee += amountInRupees;
-      } else if (code.includes('LAB')) {
-        labCharges += amountInRupees;
-      } else {
-        tuitionFee += amountInRupees;
-      }
-    }
-
-    return {
-      total: tuitionFee + annualCharges + ecaProject + examinationFee + labCharges,
-      tuitionFee, annualCharges, ecaProject, examinationFee, labCharges,
-      lineItems,
+      fee: fee.baseAmountDue ?? 0,
+      busFee: fee.busFeeDue ?? 0,
+      amountUnavailable,
     };
   }
 
@@ -368,8 +247,11 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
         ? this.feesCalc.getMonthName(currentMonthFee.monthNumber)
         : '';
 
+      // Any genuinely past unpaid month has a real, positive late fee under the backend's
+      // tiering rule (see StudentFeesService.calculateLateFees) — the date check alone
+      // already captures this, without needing a client-computed late-fee figure.
       this.pastUnpaidMonthNames = this.months
-        .filter(month => !month.paid && month.monthNumber < currentAcademicMonth && month.lateFee > 0)
+        .filter(month => !month.paid && month.monthNumber < currentAcademicMonth)
         .map(m => this.feesCalc.getMonthName(m.monthNumber));
     }
     this.cdr.markForCheck();
@@ -379,21 +261,84 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     return this.selectedMonthsByYear[year]?.includes(monthNumber) || false;
   }
 
+  /** Backend-authoritative recompute: whenever the selection changes, fetch the checkout
+   * quote for every currently-selected month and use its totals as-is — school fee due,
+   * late fee, and platform fee are never computed client-side. Resets to zero when nothing
+   * is selected. */
   private recalculateTotals(): void {
-    const result = this.feesCalc.recalculateTotals(
-      this.selectedMonthsByYear,
-      this.months,
-      this.selectedYear,
-      this.totalUnappliedLeaveCharge
-    );
-    this.platformFeeAmount = result.platformFeeAmount;
-    this.totalAmountToPay = result.totalAmountToPay;
-    this.paymentData.totalAmount = this.totalAmountToPay;
-    this.paymentData.platformFee = this.platformFeeAmount;
+    const selectedMonths = this.selectedMonthsByYear[this.selectedYear] || [];
+    if (selectedMonths.length === 0) {
+      this.totalAmountToPay = 0;
+      this.platformFeeAmount = 0;
+      this.lateFees = 0;
+      this.paymentData.totalAmount = 0;
+      this.paymentData.platformFee = 0;
+      this.paymentData.lateFees = 0;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.feesService.getCheckoutQuote(this.studentId, this.session, selectedMonths)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (quote) => this.applyCheckoutQuote(quote, selectedMonths),
+        error: (error) => {
+          this.logger.error('Error fetching checkout quote:', error);
+          this.toast.error('Error', 'Could not calculate the payment amount. Please try again.');
+        }
+      });
+  }
+
+  private applyCheckoutQuote(quote: CheckoutQuote, selectedMonths: number[]): void {
+    if (quote.unresolvedMonths?.length) {
+      this.logger.error('Checkout quote has unresolved months:', quote.unresolvedMonths);
+      this.toast.error('Error', 'The fee amount for one or more selected months could not be determined. Please contact the school office.');
+    }
+
+    this.totalAmountToPay = quote.totalAmount;
+    this.platformFeeAmount = quote.platformFee;
+    this.lateFees = quote.lateFee;
+
+    let monthSelectionString = '000000000000';
+    let totalBusFee = 0;
+    selectedMonths.forEach(m => {
+      monthSelectionString = monthSelectionString.substring(0, m - 1) + '1' + monthSelectionString.substring(m);
+      const monthVm = this.months.find(mm => mm.month === m);
+      if (monthVm) totalBusFee += monthVm.busFee || 0;
+    });
+
+    this.paymentData = {
+      ...this.paymentData,
+      monthSelectionString,
+      totalAmount: quote.totalAmount,
+      // Legacy per-fee-head buckets are display-only on the backend now (see
+      // PaymentController.createOrder) — schoolFeeDue is the authoritative figure.
+      totalTuitionFee: quote.schoolFeeDue,
+      totalAnnualCharges: 0,
+      totalLabCharges: 0,
+      totalEcaProject: 0,
+      totalExaminationFee: 0,
+      totalBusFee,
+      lateFees: quote.lateFee,
+      platformFee: quote.platformFee,
+      additionalCharges: this.totalUnappliedLeaveCharge,
+      studentId: this.studentId,
+      studentName: this.studentName,
+      className: this.className,
+      session: this.session,
+      paidManually: this.paidManually,
+      amountPaid: this.paidManually ? this.amountPaid : quote.totalAmount,
+    };
+
+    if (this.selectedMonthDetails) {
+      this.selectedMonthDetails = { ...this.selectedMonthDetails, lateFee: quote.lateFee };
+    }
+
+    this.cdr.markForCheck();
   }
 
   toggleMonthSelection(month: MonthViewModel): void {
-    if (month.paid || this.isLoadingPayment) return;
+    if (month.paid || this.isLoadingPayment || month.amountUnavailable) return;
 
     const year = this.selectedYear;
     if (!this.selectedMonthsByYear[year]) {
@@ -407,17 +352,13 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
       this.lastSelectedMonth = month;
 
       this.populateMonthDetails(month)
-        .then(() => {
-          this.recalculateTotals();
-          this.updatePaymentData(month, true);
-        })
+        .then(() => this.recalculateTotals())
         .catch((error) => {
           this.logger.error('Error during populateMonthDetails:', error);
         });
     } else {
       this.selectedMonthsByYear[year].splice(index, 1);
       this.cdr.markForCheck();
-      this.updatePaymentData(month, false);
       this.recalculateTotals();
 
       if (this.lastSelectedMonth === month) {
@@ -442,27 +383,59 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     month.selected = !month.selected;
   }
 
+  /** Builds the receipt-panel line items from the backend's authoritative per-fee-head
+   * breakdown. Never fabricates a breakdown for a historical month with no
+   * StudentFeesLineItem rows: falls back to the trusted total (schoolFeeDue) alone when
+   * available, or to nothing at all when even the total is genuinely unknown — the caller
+   * (fee-breakdown.component.html) renders a "breakdown unavailable" placeholder in both of
+   * those cases via breakdownUnavailable. */
+  private buildFeeLineItems(breakdown: MonthFeeBreakdown | null): { feeLineItems: FeeLineItem[]; breakdownUnavailable: boolean } {
+    if (breakdown?.lineItemBreakdownAvailable) {
+      const feeLineItems: FeeLineItem[] = [];
+      for (const li of breakdown.lineItems) {
+        feeLineItems.push({ name: li.feeHeadName, amount: li.grossAmount });
+        if (li.discountAmount) {
+          feeLineItems.push({ name: `${li.feeHeadName} Discount`, amount: -li.discountAmount });
+        }
+      }
+      return { feeLineItems, breakdownUnavailable: false };
+    }
+    if (breakdown?.schoolFeeDue != null) {
+      return {
+        feeLineItems: [{ name: 'School Fee (breakdown unavailable)', amount: breakdown.schoolFeeDue }],
+        breakdownUnavailable: true,
+      };
+    }
+    return { feeLineItems: [], breakdownUnavailable: true };
+  }
+
   populateMonthDetails(month: MonthViewModel): Promise<void> {
     return new Promise((resolve) => {
-      this.studentService.getStudent(this.studentId)
+      forkJoin({
+        student: this.studentService.getStudent(this.studentId),
+        breakdown: this.feesService.getMonthFeeBreakdown(this.studentId, this.session, month.month).pipe(
+          catchError((error) => {
+            this.logger.error('Error fetching month fee breakdown:', error);
+            return of(null);
+          })
+        ),
+      })
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (student) => {
+          next: ({ student, breakdown }) => {
             this.studentName = student.name;
+            const { feeLineItems, breakdownUnavailable } = this.buildFeeLineItems(breakdown);
             this.selectedMonthDetails = {
               studentId: this.studentId,
               studentClass: student.className,
               studentName: this.studentName,
-              tuitionFee: month.tuitionFee,
-              annualCharges: month.annualCharges,
-              labCharges: month.labCharges,
-              ecaProject: month.ecaProject,
-              examinationFee: month.examinationFee,
-              busFee: month.busFee,
               monthName: month.name,
               additionalCharges: this.totalUnappliedLeaveCharge,
-              lateFee: month.lateFee,
-              feeLineItems: month.feeLineItems,
+              // Updated to the real selection-wide aggregate once the checkout quote
+              // resolves (applyCheckoutQuote) — this endpoint has no per-month breakdown.
+              lateFee: this.lateFees,
+              feeLineItems,
+              breakdownUnavailable,
             };
             this.cdr.markForCheck();
             resolve();
@@ -475,21 +448,6 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
           }
         });
     });
-  }
-
-  updatePaymentData(month: MonthViewModel, add: boolean): void {
-    const ctx: PaymentContext = {
-      studentId: this.studentId,
-      studentName: this.studentName,
-      className: this.className,
-      session: this.session,
-      paidManually: this.paidManually,
-      amountPaid: this.amountPaid,
-      totalAmountToPay: this.totalAmountToPay,
-      totalUnappliedLeaveCharge: this.totalUnappliedLeaveCharge,
-      platformFeeAmount: this.platformFeeAmount,
-    };
-    this.paymentData = this.feesCalc.applyMonthToPaymentData(this.paymentData, month, add, ctx);
   }
 
   onPaymentProcessingStarted(): void {
@@ -523,8 +481,15 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     this.platformFeeAmount = 0;
   }
 
+  /** Submits only what the admin observed (student, months, amount received, mode,
+   * reference) — Spring Boot recomputes the authoritative amount owed from each selected
+   * month's StudentFees snapshot and validates amountReceived against it. The frontend never
+   * splits the amount across months or decides which months get marked paid itself; a
+   * rejection (unresolved month, amount short of the computed total, duplicate reference) is
+   * surfaced as-is from the backend. */
   markAsManuallyPaid(): void {
-    if (this.role !== 'ADMIN' || !this.manualPaymentAmount || !this.selectedMonthsByYear[this.selectedYear]?.length) {
+    const selectedMonths = this.selectedMonthsByYear[this.selectedYear] || [];
+    if (this.role !== 'ADMIN' || !this.manualPaymentAmount || !selectedMonths.length) {
       this.toast.warning('Warning', 'Please select months and enter the amount received.');
       return;
     }
@@ -536,25 +501,40 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
       confirmText: 'Yes, mark as paid!',
       cancelText: 'Cancel',
     }).then((confirmed) => {
-      if (confirmed) {
-        this.feesService.processManualPayment(
-          this.studentId,
-          this.selectedMonthsByYear,
-          this.manualPaymentAmount,
-          this.paymentData
-        ).pipe(takeUntil(this.destroy$)).subscribe({
-          next: () => {
-            this.initPaymentData();
-            this.fetchFees();
-            this.selectedMonthsByYear = {};
-            this.totalAmountToPay = 0;
-            this.manualPaymentAmount = 0;
-            this.cdr.detectChanges();
-            this.toast.success('Marked as Paid!', 'The selected months have been marked as paid.');
-          },
-          error: () => this.toast.error('Error!', 'Failed to record manual payment.')
-        });
-      }
+      if (!confirmed) return;
+
+      let monthSelectionString = '000000000000';
+      selectedMonths.forEach(m => {
+        monthSelectionString = monthSelectionString.substring(0, m - 1) + '1' + monthSelectionString.substring(m);
+      });
+
+      const request: ManualPaymentRequest = {
+        studentId: this.studentId,
+        studentName: this.studentName,
+        className: this.className,
+        session: this.session,
+        monthSelectionString,
+        amountReceived: this.manualPaymentAmount,
+        paymentMode: this.manualPaymentMode,
+        referenceNumber: this.manualPaymentReference?.trim() || undefined,
+      };
+
+      this.feesService.recordManualPayment(request).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.initPaymentData();
+          this.fetchFees();
+          this.selectedMonthsByYear = {};
+          this.totalAmountToPay = 0;
+          this.manualPaymentAmount = 0;
+          this.manualPaymentReference = '';
+          this.cdr.detectChanges();
+          this.toast.success('Marked as Paid!', 'The selected months have been marked as paid.');
+        },
+        error: (err) => {
+          const message = err?.error?.error || 'Failed to record manual payment.';
+          this.toast.error('Error!', message);
+        }
+      });
     });
   }
 
@@ -571,4 +551,35 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
   trackByMonth(index: number, month: MonthViewModel): number { return month.month; }
   trackByYear(index: number, year: string): string { return year; }
   trackByIndex(index: number): number { return index; }
+
+  /** Maps the ledger-derived paymentProvenance value to a human-readable chip label. A paid
+   * month with no provenance (e.g. a historical row predating the allocation ledger) falls
+   * back to the generic "Paid" — never fabricates a specific mode it doesn't actually know. */
+  private static readonly PROVENANCE_LABELS: Record<string, string> = {
+    CASH: 'Cash',
+    CHEQUE: 'Cheque',
+    BANK_TRANSFER: 'Bank Transfer',
+    UPI: 'UPI',
+    OTHER: 'Other',
+    RAZORPAY: 'Razorpay',
+    MIXED: 'Mixed',
+  };
+
+  paymentProvenanceLabel(month: MonthViewModel): string {
+    const provenance = month.paymentProvenance;
+    if (!provenance) return 'Paid';
+    return PaymentTrackerComponent.PROVENANCE_LABELS[provenance] ?? provenance;
+  }
+
+  /** The row's authoritative net amount paid, from the ledger-derived StudentFees.amountPaid
+   * — the same figure the backend uses to decide `paid` (see StudentFeesService.markFeesAsPaid
+   * / PaymentService.recomputeStudentFeesNetState). Never manualPaymentReceived, which is only
+   * the manual-sourced slice of a row's funding and would understate a MIXED-funded row or a
+   * row that still has net gateway money after a manual portion was refunded. Correctly
+   * reflects a partial refund (reduced but still positive) and a full refund (0, at which
+   * point the month card falls back to showing the amount due again — the correct "resulting
+   * state" for money that's been returned). Never null/undefined for display purposes. */
+  netAmountPaid(month: MonthViewModel): number {
+    return month.amountPaid ?? 0;
+  }
 }

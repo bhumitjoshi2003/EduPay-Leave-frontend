@@ -55,29 +55,13 @@
         <td [ngClass]="{'status-success': paymentDetails.status === 'success'}">{{ paymentDetails.status | uppercase }}
         </td>
       </tr>
-      <tr>
-        <td class="label">Tuition Fee:</td>
-        <td>{{ paymentDetails.tuitionFee | currency: 'INR' }}</td>
+      <tr *ngFor="let item of feeLineItems">
+        <td class="label">{{ item.name }}:</td>
+        <td>{{ item.amount | currency: 'INR' }}</td>
       </tr>
-      <tr>
-        <td class="label">Bus Fee:</td>
-        <td>{{ paymentDetails.busFee | currency: 'INR' }}</td>
-      </tr>
-      <tr>
-        <td class="label">Annual Charges:</td>
-        <td>{{ paymentDetails.annualCharges | currency: 'INR' }}</td>
-      </tr>
-      <tr>
-        <td class="label">Lab Charges:</td>
-        <td>{{ paymentDetails.labCharges | currency: 'INR' }}</td>
-      </tr>
-      <tr>
-        <td class="label">ECA Project:</td>
-        <td>{{ paymentDetails.ecaProject | currency: 'INR' }}</td>
-      </tr>
-      <tr>
-        <td class="label">Examination Fee:</td>
-        <td>{{ paymentDetails.examinationFee | currency: 'INR' }}</td>
+      <tr *ngIf="breakdownUnavailable && feeLineItems.length === 0">
+        <td class="label">Fee Breakdown:</td>
+        <td class="unavailable">Detailed breakdown unavailable</td>
       </tr>
       <tr *ngIf="paymentDetails.additionalCharges">
         <td class="label">Unapplied Leave Charges:</td>
@@ -93,11 +77,11 @@
       </tr>
       <tr>
         <td class="label">Total Amount:</td>
-        <td>{{ paymentDetails.amount | currency: 'INR' }}</td>
+        <td>{{ (paymentDetails.amount / 100) | currency: 'INR' }}</td>
       </tr>
       <tr>
         <td class="label">Amount Received:</td>
-        <td>{{ paymentDetails.amountPaid | currency: 'INR' }}</td>
+        <td>{{ (paymentDetails.amountPaid / 100) | currency: 'INR' }}</td>
       </tr>
     </table>
   </div>

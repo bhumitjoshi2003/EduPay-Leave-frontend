@@ -114,7 +114,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
   loadNotifications(): void {
     this.notificationService.getAllNotifications().pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => {
-        this.notifications = data;
+        this.notifications = data.content;
         this.cdr.markForCheck();
       },
       error: (err) => {

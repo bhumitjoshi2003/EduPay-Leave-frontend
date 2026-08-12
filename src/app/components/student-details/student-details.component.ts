@@ -72,13 +72,6 @@ export class StudentDetailsComponent implements OnInit, OnDestroy {
   cpShowConfirm = false;
   cpShowOldField = false;
 
-  academicMonths = [
-    { value: 0, label: 'New Academic Year' },
-    { value: 1, label: 'April' }, { value: 2, label: 'May' }, { value: 3, label: 'June' },
-    { value: 4, label: 'July' }, { value: 5, label: 'August' }, { value: 6, label: 'September' },
-    { value: 7, label: 'October' }, { value: 8, label: 'November' }, { value: 9, label: 'December' },
-    { value: 10, label: 'January' }, { value: 11, label: 'February' }, { value: 12, label: 'March' }
-  ];
   classList: string[] = [];
   managedClasses: SchoolClass[] = [];
   sections: Section[] = [];

@@ -125,6 +125,11 @@ td:hover {
   font-weight: bold;
 }
 
+.unavailable {
+  color: #999;
+  font-style: italic;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

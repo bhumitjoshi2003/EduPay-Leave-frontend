@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { ConfirmDialogComponent } from '../components/confirm-dialog/confirm-dialog.component';
+import { SelectMonthDialogComponent } from '../components/select-month-dialog/select-month-dialog.component';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -22,6 +23,12 @@ export interface ConfirmDialogData {
   danger?: boolean;
   icon?: 'warning' | 'question' | 'info' | 'success' | 'danger';
   requiredInput?: string;
+}
+
+export interface SelectMonthDialogData {
+  title: string;
+  options: { value: number; label: string }[];
+  confirmText?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -58,5 +65,17 @@ export class ToastService {
         disableClose: true,
       }).afterClosed()
     ).then(r => !!r);
+  }
+
+  /** Open a month-picker dialog. Returns the selected month number, or null if cancelled. */
+  selectMonth(data: SelectMonthDialogData): Promise<number | null> {
+    return firstValueFrom(
+      this.dialog.open(SelectMonthDialogComponent, {
+        data,
+        maxWidth: '380px',
+        width: '92vw',
+        panelClass: 'edu-dialog',
+      }).afterClosed()
+    ).then(r => (r !== undefined && r !== null && r !== false) ? r : null);
   }
 }

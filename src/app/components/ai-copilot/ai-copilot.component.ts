@@ -15,13 +15,31 @@ import { MatIconModule } from '@angular/material/icon';
 import { HttpDownloadProgressEvent, HttpEventType } from '@angular/common/http';
 import { Observable, Subject, Subscription, takeUntil } from 'rxjs';
 import { AiCopilotService } from '../../services/ai-copilot.service';
-import { AiWorkflowService, FeeReminderWorkflowResponse } from '../../services/ai-workflow.service';
+import { AiWorkflowService, AttendanceReminderWorkflowResponse, FeeReminderWorkflowResponse, LeaveDecisionWorkflowResponse, TeacherAttendanceReminderWorkflowResponse } from '../../services/ai-workflow.service';
 import { AcademicSessionService } from '../../services/academic-session.service';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { ChatMarkdownPipe } from '../../pipes/chat-markdown.pipe';
 import { switchMap } from 'rxjs/operators';
 
 export interface WorkflowCardData extends FeeReminderWorkflowResponse {
+  /** UI-only — never sent to the backend. Drives the approve/reject buttons' local state. */
+  actionState: 'idle' | 'sending' | 'error';
+  actionError?: string;
+}
+
+export interface AttendanceWorkflowCardData extends AttendanceReminderWorkflowResponse {
+  /** UI-only — never sent to the backend. Drives the approve/reject buttons' local state. */
+  actionState: 'idle' | 'sending' | 'error';
+  actionError?: string;
+}
+
+export interface TeacherAttendanceWorkflowCardData extends TeacherAttendanceReminderWorkflowResponse {
+  /** UI-only — never sent to the backend. Drives the approve/reject buttons' local state. */
+  actionState: 'idle' | 'sending' | 'error';
+  actionError?: string;
+}
+
+export interface LeaveDecisionCardData extends LeaveDecisionWorkflowResponse {
   /** UI-only — never sent to the backend. Drives the approve/reject buttons' local state. */
   actionState: 'idle' | 'sending' | 'error';
   actionError?: string;
@@ -34,8 +52,11 @@ export interface ChatMessage {
   timestamp: Date;
   error: boolean;
   /** Defaults to a plain text bubble when absent — see ai-copilot.component.html. */
-  kind?: 'text' | 'fee_reminder_approval';
+  kind?: 'text' | 'fee_reminder_approval' | 'attendance_reminder_approval' | 'teacher_attendance_reminder_approval' | 'leave_decision_approval';
   workflow?: WorkflowCardData;
+  attendanceWorkflow?: AttendanceWorkflowCardData;
+  teacherAttendanceWorkflow?: TeacherAttendanceWorkflowCardData;
+  leaveWorkflow?: LeaveDecisionCardData;
 }
 
 @Component({
@@ -138,7 +159,7 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
     return 'Ask me anything about school data or Edunexify features.';
   }
 
-  get suggestedPrompts(): { icon: string; text: string; action?: 'startFeeReminders' }[] {
+  get suggestedPrompts(): { icon: string; text: string; action?: 'startFeeReminders' | 'startAttendanceReminders' | 'startTeacherAttendanceReminders' }[] {
     if (this.userRole === 'STUDENT') {
       return [
         { icon: '🏆', text: 'How did I perform in my latest exam?' },
@@ -150,7 +171,15 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (this.isAdmin) {
       return [
         { icon: '📋', text: 'Review fee reminder batch', action: 'startFeeReminders' },
+        { icon: '📅', text: 'Review attendance reminder batch', action: 'startAttendanceReminders' },
         { icon: '💡', text: 'What can you help me with?' },
+      ];
+    }
+    if (this.userRole === 'TEACHER') {
+      return [
+        { icon: '📅', text: 'Review my class attendance reminder batch', action: 'startTeacherAttendanceReminders' },
+        { icon: '💡', text: 'What can you help me with?' },
+        { icon: '📚', text: 'Tell me about Edunexify features' },
       ];
     }
     return [
@@ -159,9 +188,13 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
     ];
   }
 
-  onSuggestedPromptClick(prompt: { text: string; action?: 'startFeeReminders' }): void {
+  onSuggestedPromptClick(prompt: { text: string; action?: 'startFeeReminders' | 'startAttendanceReminders' | 'startTeacherAttendanceReminders' }): void {
     if (prompt.action === 'startFeeReminders') {
       this.startFeeReminderWorkflow();
+    } else if (prompt.action === 'startAttendanceReminders') {
+      this.startAttendanceReminderWorkflow();
+    } else if (prompt.action === 'startTeacherAttendanceReminders') {
+      this.startTeacherAttendanceReminderWorkflow();
     } else {
       this.sendMessage(prompt.text);
     }
@@ -265,22 +298,33 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
           return;
         }
 
-        if (event.type === HttpEventType.Response && !assistantMsg) {
-          // Covers two cases: a very short/instant text reply that never crossed the
-          // DownloadProgress threshold, AND a structured workflow payload that was
-          // deliberately held back above — event.body is always the full accumulated
-          // text at this point either way.
+        if (event.type === HttpEventType.Response) {
+          // event.body is the full accumulated text for the turn.
           const finalText = (event.body as string)?.trim() ?? '';
-          this.messages = [
-            ...this.messages,
-            this.tryParseWorkflowMessage(finalText) ?? {
-              id: `a_${Date.now()}`,
-              role: 'assistant',
-              content: finalText || "I wasn't able to complete your request. Please try again.",
-              timestamp: new Date(),
-              error: false,
-            },
-          ];
+          const card = this.tryParseWorkflowMessage(finalText);
+
+          if (card) {
+            // A card supersedes anything the model narrated on the way to producing it — drop
+            // the partially-streamed bubble rather than leaving prose with raw JSON stuck on
+            // the end. (Nothing to drop in the usual case, where the body was only the payload.)
+            if (assistantMsg) {
+              const streamed = assistantMsg;
+              this.messages = this.messages.filter(m => m !== streamed);
+            }
+            this.messages = [...this.messages, card];
+          } else if (!assistantMsg) {
+            // A very short/instant reply that never crossed the DownloadProgress threshold.
+            this.messages = [
+              ...this.messages,
+              {
+                id: `a_${Date.now()}`,
+                role: 'assistant',
+                content: finalText || "I wasn't able to complete your request. Please try again.",
+                timestamp: new Date(),
+                error: false,
+              },
+            ];
+          }
           this.isLoading    = false;
           this.shouldScroll = true;
           this.cdr.markForCheck();
@@ -350,20 +394,93 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
     return text.trimStart().startsWith('{');
   }
 
+  /**
+   * Pulls the workflow payload out of a turn's full body.
+   *
+   * Usually the body IS the payload and nothing else. But a turn that needs a read tool before
+   * the workflow tool (leave decisions always do — the requests must be looked up before they
+   * can be acted on) gives the model an opening to narrate the read results first, and that
+   * prose is already streamed by the time the workflow tool runs. Bytes on the wire can't be
+   * recalled, so the payload arrives appended to the prose instead of alone.
+   *
+   * Rather than trust the model never to narrate, take the last balanced {...} in the body and
+   * see if it's ours. The card supersedes the narration either way, so the prose is dropped.
+   */
+  private extractWorkflowPayload(text: string): string | null {
+    const trimmed = text.trim();
+    if (!trimmed.endsWith('}')) return null;
+
+    // Walk back from the end, tracking brace depth, to find where this object began. String
+    // literals are skipped so a `{` inside a reason or student name can't throw the count off.
+    let depth = 0, inString = false, escaped = false;
+    for (let i = trimmed.length - 1; i >= 0; i--) {
+      const ch = trimmed[i];
+      if (inString) {
+        if (escaped) { escaped = false; continue; }
+        if (ch === '\\') { escaped = true; continue; }
+        if (ch === '"') inString = false;
+        continue;
+      }
+      if (ch === '"') { inString = true; continue; }
+      if (ch === '}') depth++;
+      else if (ch === '{') {
+        depth--;
+        if (depth === 0) return trimmed.slice(i);
+      }
+    }
+    return null;
+  }
+
   private tryParseWorkflowMessage(text: string): ChatMessage | null {
-    if (!this.looksLikeStructuredPayload(text)) return null;
+    const payload = this.looksLikeStructuredPayload(text) ? text : this.extractWorkflowPayload(text);
+    if (!payload) return null;
     try {
-      const parsed = JSON.parse(text);
-      if (parsed?.kind !== 'fee_reminder_workflow') return null;
-      return {
-        id: `wf_${Date.now()}`,
-        role: 'assistant',
-        content: '',
-        timestamp: new Date(),
-        error: false,
-        kind: 'fee_reminder_approval',
-        workflow: { ...parsed, actionState: 'idle' },
-      };
+      const parsed = JSON.parse(payload);
+      if (parsed?.kind === 'fee_reminder_workflow') {
+        return {
+          id: `wf_${Date.now()}`,
+          role: 'assistant',
+          content: '',
+          timestamp: new Date(),
+          error: false,
+          kind: 'fee_reminder_approval',
+          workflow: { ...parsed, actionState: 'idle' },
+        };
+      }
+      if (parsed?.kind === 'attendance_reminder_workflow') {
+        return {
+          id: `wf_${Date.now()}`,
+          role: 'assistant',
+          content: '',
+          timestamp: new Date(),
+          error: false,
+          kind: 'attendance_reminder_approval',
+          attendanceWorkflow: { ...parsed, actionState: 'idle' },
+        };
+      }
+      if (parsed?.kind === 'leave_decision_workflow') {
+        return {
+          id: `wf_${Date.now()}`,
+          role: 'assistant',
+          content: '',
+          timestamp: new Date(),
+          error: false,
+          kind: 'leave_decision_approval',
+          leaveWorkflow: { ...parsed, actionState: 'idle' },
+        };
+      }
+      if (parsed?.kind === 'teacher_attendance_reminder_workflow') {
+        return {
+          id: `wf_${Date.now()}`,
+          role: 'assistant',
+          content: '',
+          timestamp: new Date(),
+          error: false,
+          kind: 'teacher_attendance_reminder_approval',
+          teacherAttendanceWorkflow: { ...parsed, actionState: 'idle' },
+        };
+      }
+      return null;
     } catch {
       return null; // looked like JSON but wasn't (or wasn't ours) — render as plain text instead
     }
@@ -445,6 +562,217 @@ export class AiCopilotComponent implements OnInit, OnDestroy, AfterViewChecked {
     call(wf).pipe(takeUntil(this.destroy$)).subscribe({
       next: (result) => {
         msg.workflow = { ...result, actionState: 'idle' };
+        this.shouldScroll = true;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        wf.actionState = 'error';
+        wf.actionError = err?.error?.error || 'Something went wrong. Please try again.';
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  // ── Attendance reminder workflow (LangGraph, human-in-the-loop) ─────────────
+  //
+  // Structurally identical to the fee reminder workflow above — kept as separate methods
+  // rather than parameterizing resumeWorkflow further, since the two card types live on
+  // different ChatMessage fields (workflow vs attendanceWorkflow) and different response
+  // shapes (FeeReminderWorkflowResponse vs AttendanceReminderWorkflowResponse).
+
+  startAttendanceReminderWorkflow(): void {
+    if (this.isStreaming) return;
+    this.isLoading    = true;
+    this.shouldScroll = true;
+    this.cdr.markForCheck();
+
+    this.sessionService.getCurrentSession().pipe(
+      switchMap(session => this.workflowService.startAttendanceReminderWorkflow(session.label)),
+      takeUntil(this.destroy$),
+    ).subscribe({
+      next: (result) => {
+        this.messages = [
+          ...this.messages,
+          {
+            id: `awf_${Date.now()}`,
+            role: 'assistant',
+            content: '',
+            timestamp: new Date(),
+            error: false,
+            kind: 'attendance_reminder_approval',
+            attendanceWorkflow: { ...result, actionState: 'idle' },
+          },
+        ];
+        this.isLoading    = false;
+        this.shouldScroll = true;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.messages = [
+          ...this.messages,
+          {
+            id: `e_${Date.now()}`,
+            role: 'assistant',
+            content: err?.error?.error || 'Could not start the attendance reminder review. Please try again.',
+            timestamp: new Date(),
+            error: true,
+          },
+        ];
+        this.isLoading    = false;
+        this.shouldScroll = true;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  approveAttendanceWorkflow(msg: ChatMessage): void {
+    this.resumeAttendanceWorkflow(msg, wf => this.workflowService.approveAttendance(wf.workflowId));
+  }
+
+  rejectAttendanceWorkflow(msg: ChatMessage): void {
+    this.resumeAttendanceWorkflow(msg, wf => this.workflowService.rejectAttendance(wf.workflowId));
+  }
+
+  private resumeAttendanceWorkflow(
+    msg: ChatMessage,
+    call: (wf: AttendanceWorkflowCardData) => Observable<AttendanceReminderWorkflowResponse>,
+  ): void {
+    const wf = msg.attendanceWorkflow;
+    if (!wf || wf.actionState === 'sending') return;
+
+    wf.actionState = 'sending';
+    wf.actionError = undefined;
+    this.cdr.markForCheck();
+
+    call(wf).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (result) => {
+        msg.attendanceWorkflow = { ...result, actionState: 'idle' };
+        this.shouldScroll = true;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        wf.actionState = 'error';
+        wf.actionError = err?.error?.error || 'Something went wrong. Please try again.';
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  // ── Teacher-scoped attendance reminder workflow (LangGraph, human-in-the-loop) ──
+  //
+  // Structurally identical to the admin attendance workflow above — kept as separate
+  // methods for the same reason (different ChatMessage field, different response shape).
+  // No className is ever passed here: the backend resolves it from the teacher's own
+  // classTeacher field (see AiTeacherAttendanceWorkflowController.start) — there's no
+  // parameter here that could widen it.
+
+  startTeacherAttendanceReminderWorkflow(): void {
+    if (this.isStreaming) return;
+    this.isLoading    = true;
+    this.shouldScroll = true;
+    this.cdr.markForCheck();
+
+    this.sessionService.getCurrentSession().pipe(
+      switchMap(session => this.workflowService.startTeacherAttendanceReminderWorkflow(session.label)),
+      takeUntil(this.destroy$),
+    ).subscribe({
+      next: (result) => {
+        this.messages = [
+          ...this.messages,
+          {
+            id: `twf_${Date.now()}`,
+            role: 'assistant',
+            content: '',
+            timestamp: new Date(),
+            error: false,
+            kind: 'teacher_attendance_reminder_approval',
+            teacherAttendanceWorkflow: { ...result, actionState: 'idle' },
+          },
+        ];
+        this.isLoading    = false;
+        this.shouldScroll = true;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.messages = [
+          ...this.messages,
+          {
+            id: `e_${Date.now()}`,
+            role: 'assistant',
+            content: err?.error?.error || 'Could not start the attendance reminder review. Please try again.',
+            timestamp: new Date(),
+            error: true,
+          },
+        ];
+        this.isLoading    = false;
+        this.shouldScroll = true;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  approveTeacherAttendanceWorkflow(msg: ChatMessage): void {
+    this.resumeTeacherAttendanceWorkflow(msg, wf => this.workflowService.approveTeacherAttendance(wf.workflowId));
+  }
+
+  rejectTeacherAttendanceWorkflow(msg: ChatMessage): void {
+    this.resumeTeacherAttendanceWorkflow(msg, wf => this.workflowService.rejectTeacherAttendance(wf.workflowId));
+  }
+
+  private resumeTeacherAttendanceWorkflow(
+    msg: ChatMessage,
+    call: (wf: TeacherAttendanceWorkflowCardData) => Observable<TeacherAttendanceReminderWorkflowResponse>,
+  ): void {
+    const wf = msg.teacherAttendanceWorkflow;
+    if (!wf || wf.actionState === 'sending') return;
+
+    wf.actionState = 'sending';
+    wf.actionError = undefined;
+    this.cdr.markForCheck();
+
+    call(wf).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (result) => {
+        msg.teacherAttendanceWorkflow = { ...result, actionState: 'idle' };
+        this.shouldScroll = true;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        wf.actionState = 'error';
+        wf.actionError = err?.error?.error || 'Something went wrong. Please try again.';
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  // ── Leave decision workflow (LangGraph, human-in-the-loop) ──────────────────
+  //
+  // No start method here on purpose, unlike the reminder workflows. A leave decision always
+  // targets specific requests, so it can only originate from a conversation where those
+  // requests were actually looked up — there is no "review leave batch" quick-action button
+  // that could start one without the user having named anything.
+
+  approveLeaveWorkflow(msg: ChatMessage): void {
+    this.resumeLeaveWorkflow(msg, wf => this.workflowService.approveLeaveDecision(wf.workflowId));
+  }
+
+  rejectLeaveWorkflow(msg: ChatMessage): void {
+    this.resumeLeaveWorkflow(msg, wf => this.workflowService.rejectLeaveDecision(wf.workflowId));
+  }
+
+  private resumeLeaveWorkflow(
+    msg: ChatMessage,
+    call: (wf: LeaveDecisionCardData) => Observable<LeaveDecisionWorkflowResponse>,
+  ): void {
+    const wf = msg.leaveWorkflow;
+    if (!wf || wf.actionState === 'sending') return;
+
+    wf.actionState = 'sending';
+    wf.actionError = undefined;
+    this.cdr.markForCheck();
+
+    call(wf).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (result) => {
+        msg.leaveWorkflow = { ...result, actionState: 'idle' };
         this.shouldScroll = true;
         this.cdr.markForCheck();
       },

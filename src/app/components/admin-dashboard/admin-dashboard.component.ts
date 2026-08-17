@@ -12,6 +12,8 @@ import { AdminService } from '../../services/admin.service';
 import { DashboardAnalyticsService, DashboardStats } from '../../services/dashboard-analytics.service';
 import { LeaveService, LeaveApplication } from '../../services/leave.service';
 import { SchoolService, SchoolEntitlementSummary } from '../../services/school.service';
+import { TeacherCheckinService } from '../../services/teacher-checkin.service';
+import { TeacherAttendanceTodaySummary } from '../../interfaces/teacher-checkin';
 import { LoggerService } from '../../services/logger.service';
 import { ToastService } from '../../services/toast.service';
 
@@ -33,6 +35,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   stats: DashboardStats | null = null;
   recentLeaves: LeaveApplication[] = [];
   entitlement: SchoolEntitlementSummary | null = null;
+  staffAttendance: TeacherAttendanceTodaySummary | null = null;
 
   constructor(
     private authState: AuthStateService,
@@ -40,6 +43,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private analyticsService: DashboardAnalyticsService,
     private leaveService: LeaveService,
     private schoolService: SchoolService,
+    private teacherCheckinService: TeacherCheckinService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
     private toast: ToastService,
@@ -64,14 +68,16 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       this.analyticsService.getStats(),
       this.leaveService.getLeavesPaginated(0, 10),
       this.schoolService.getEntitlement(),
+      this.teacherCheckinService.getTodaySummary(),
     ]).pipe(takeUntil(this.destroy$)).subscribe({
-      next: ([stats, leavesPage, entitlement]) => {
+      next: ([stats, leavesPage, entitlement, staffAttendance]) => {
         // DashboardStatsDto.feesCollectedThisMonth is paise on the backend (nets
         // Payment.amountPaid, itself paise) — convert once here rather than in the template.
         this.stats = { ...(stats as DashboardStats), feesCollectedThisMonth: (stats as DashboardStats).feesCollectedThisMonth / 100 };
         const pending = (leavesPage as any).content.filter((l: any) => l.status === 'PENDING');
         this.recentLeaves = pending.slice(0, 5);
         this.entitlement = entitlement as SchoolEntitlementSummary;
+        this.staffAttendance = staffAttendance as TeacherAttendanceTodaySummary;
         this.isLoading = false;
         this.cdr.markForCheck();
       },

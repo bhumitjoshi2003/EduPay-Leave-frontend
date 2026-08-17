@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestro
 import { LoggerService } from '../../services/logger.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EMPTY, Subject, takeUntil } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 import { StudentService } from '../../services/student.service';
 import { Router } from '@angular/router';
 import { SchoolService, SchoolClass } from '../../services/school.service';
@@ -111,17 +111,16 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     if (this.studentForm.valid) {
+      // The backend derives the initial login password from the student's date of
+      // birth (YYYYMMDD) — it is never generated or supplied by the frontend.
       this.studentService.addStudent(this.studentForm.value).pipe(
         takeUntil(this.destroy$),
         switchMap((response: { studentId: string }) => {
-          const tempPassword = this.generateTempPassword();
           return this.authService.register({
             userId: response.studentId,
-            password: tempPassword,
             role: 'STUDENT',
             email: this.studentForm.value.email
           }).pipe(
-            map(() => tempPassword),
             catchError((authError) => {
               this.logger.error('Error registering user in auth service:', authError);
               this.toast.error('Error', 'Student record created but account setup failed. Please retry.');
@@ -130,11 +129,12 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
           );
         })
       ).subscribe({
-        next: (tempPassword) => {
+        next: () => {
           this.toast.confirm({
             icon: 'success',
             title: 'Student Registered!',
-            message: `Registration complete. Temporary Password: ${tempPassword} — Share this with the student. They should change it on first login.`,
+            message: 'Registration successful. Initial password: Date of birth in YYYYMMDD format. ' +
+              'Example: 23 May 1990 → 19900523. The user must create a new password during their first login.',
             confirmText: 'Done'
           });
           this.studentForm.reset();
@@ -152,13 +152,6 @@ export class RegisterStudentComponent implements OnInit, OnDestroy {
     } else {
       this.toast.error('Validation Error!', 'Please fill in all the required fields correctly.');
     }
-  }
-
-  private generateTempPassword(): string {
-    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#$!';
-    const array = new Uint32Array(10);
-    crypto.getRandomValues(array);
-    return Array.from(array, v => chars[v % chars.length]).join('');
   }
 
   goBack() {

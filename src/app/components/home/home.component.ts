@@ -202,6 +202,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         this.authStateService.setUser(response);
 
+        // First-login (or admin-reset) accounts land on the mandatory password-change
+        // page instead of the dashboard — enforced server-side too (JwtAuthFilter).
+        const targetPath = response.mustChangePassword ? '/change-initial-password' : '/dashboard';
+
         // School user → ensure they're on their school subdomain.
         // SUPER_ADMIN has no schoolSlug and stays on the root domain.
         if (response.schoolSlug) {
@@ -211,10 +215,10 @@ export class HomeComponent implements OnInit, OnDestroy {
             this.authenticated = true;
             this.showLoginForm = false;
             this.cdr.markForCheck();
-            this.router.navigateByUrl('/dashboard');
+            this.router.navigateByUrl(targetPath);
           } else {
             // On root domain — redirect to their school subdomain.
-            window.location.href = this.tenantService.buildSchoolUrl(response.schoolSlug, '/dashboard');
+            window.location.href = this.tenantService.buildSchoolUrl(response.schoolSlug, targetPath);
           }
           return;
         }
@@ -222,6 +226,11 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.authenticated = true;
         this.showLoginForm = false;
         this.cdr.markForCheck();
+
+        if (response.mustChangePassword) {
+          this.router.navigateByUrl(targetPath);
+          return;
+        }
 
         const redirectUrl = localStorage.getItem('redirectUrl') || '/dashboard';
         localStorage.removeItem('redirectUrl');

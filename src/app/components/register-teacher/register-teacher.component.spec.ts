@@ -61,7 +61,7 @@ describe('RegisterTeacherComponent', () => {
     authService.register.and.returnValue(of('ok'));
 
     component.teacherForm.patchValue({
-      teacherId: 'T1', name: 'Test', email: 'test@test.com', gender: 'MALE', dob: '1985-03-20'
+      teacherId: 'T1', name: 'Test', email: 'test@test.com', gender: 'MALE', dob: '1985-03-20', joiningDate: '2026-04-01'
     });
     component.onSubmit();
 
@@ -77,7 +77,7 @@ describe('RegisterTeacherComponent', () => {
     authService.register.and.returnValue(of('ok'));
 
     component.teacherForm.patchValue({
-      teacherId: 'T1', name: 'Test', email: 'test@test.com', gender: 'MALE', dob: '1985-03-20'
+      teacherId: 'T1', name: 'Test', email: 'test@test.com', gender: 'MALE', dob: '1985-03-20', joiningDate: '2026-04-01'
     });
     component.onSubmit();
 

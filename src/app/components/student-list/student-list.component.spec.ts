@@ -38,8 +38,9 @@ describe('StudentListComponent', () => {
     studentServiceSpy.getLeftStudentsByClass.and.returnValue(of([]));
 
     schoolServiceSpy = jasmine.createSpyObj('SchoolService', ['getClasses', 'getManagedClasses']);
-    authStateServiceSpy = jasmine.createSpyObj('AuthStateService', ['getUser']);
+    authStateServiceSpy = jasmine.createSpyObj('AuthStateService', ['getUser', 'hasFeature']);
     authStateServiceSpy.getUser.and.returnValue(adminUser as any);
+    authStateServiceSpy.hasFeature.and.returnValue(true);
 
     await TestBed.configureTestingModule({
       imports: [StudentListComponent],

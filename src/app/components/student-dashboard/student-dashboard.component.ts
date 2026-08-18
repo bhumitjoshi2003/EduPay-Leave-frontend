@@ -150,4 +150,8 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     if (status === 'REJECTED') return 'Rejected';
     return 'Pending';
   }
+
+  hasFeature(featureKey: string): boolean {
+    return this.authState.hasFeature(featureKey);
+  }
 }

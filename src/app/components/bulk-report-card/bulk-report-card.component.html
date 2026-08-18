@@ -188,7 +188,7 @@
       <!-- Email blast (only when published) -->
       <button
         class="brc-btn-email"
-        *ngIf="publication?.published"
+        *ngIf="publication?.published && hasBulkCommunications"
         [disabled]="sendingEmails || isNative"
         (click)="sendEmailBlast()">
         <mat-icon *ngIf="!sendingEmails">email</mat-icon>

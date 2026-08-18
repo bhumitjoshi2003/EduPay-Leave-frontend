@@ -50,4 +50,19 @@ describe('AuthStateService — mustChangePassword', () => {
     service.clearUser();
     expect(service.mustChangePassword()).toBeFalse();
   });
+
+  it('grants only explicitly entitled paid features', () => {
+    service.setUser({ ...baseUser, featureKeys: ['FEE_MANAGEMENT', 'EXAM_MARKS'] });
+
+    expect(service.hasFeature('FEE_MANAGEMENT')).toBeTrue();
+    expect(service.hasFeature('AI_COPILOT')).toBeFalse();
+  });
+
+  it('denies paid features when no effective entitlement is available', () => {
+    service.setUser({ ...baseUser, featureKeys: [] });
+    expect(service.hasFeature('AI_COPILOT')).toBeFalse();
+
+    service.setUser({ ...baseUser, featureKeys: null });
+    expect(service.hasFeature('AI_COPILOT')).toBeFalse();
+  });
 });

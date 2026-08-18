@@ -2135,11 +2135,11 @@
 }
 
 .sl-panel-edu-logo {
-  height: 18px;
-  width: auto;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
-  filter: brightness(0) invert(1);
-  opacity: 0.85;
+  border-radius: 5px;
+  opacity: 0.9;
 }
 
 /* ── Right panel — light cream, form ── */

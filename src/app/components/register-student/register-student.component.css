@@ -194,3 +194,43 @@
   .rs-actions { justify-content: stretch; }
   .rs-btn-cancel, .rs-btn-save { flex: 1; text-align: center; }
 }
+
+.rs-btn-cancel:disabled,
+.rs-btn-save:disabled { cursor: not-allowed; opacity: 0.65; transform: none; }
+
+.rs-registering-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(2px);
+}
+
+.rs-registering-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(320px, 100%);
+  padding: 28px 24px;
+  border-radius: 16px;
+  background: #fff;
+  color: #1e293b;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.3);
+}
+
+.rs-registering-card span:last-child { color: #64748b; font-size: 0.8rem; }
+.rs-registering-spinner {
+  width: 34px;
+  height: 34px;
+  border: 4px solid #d1fae5;
+  border-top-color: #059669;
+  border-radius: 50%;
+  animation: rs-spin 0.75s linear infinite;
+}
+
+@keyframes rs-spin { to { transform: rotate(360deg); } }

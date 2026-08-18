@@ -99,6 +99,12 @@
       <div class="td-actions-grid">
 
         <ng-container *ngIf="isClassTeacher">
+          <a class="td-action-card" routerLink="/dashboard/teacher-checkin">
+            <div class="td-action-icon" style="background:#eff6ff;color:#1d4ed8">
+              <mat-icon>location_on</mat-icon>
+            </div>
+            <span>My Check-in</span>
+          </a>
           <a class="td-action-card" routerLink="/dashboard/teacher-attendance">
             <div class="td-action-icon" style="background:#e0f2fe;color:#0369a1">
               <mat-icon>how_to_reg</mat-icon>
@@ -147,12 +153,6 @@
             </div>
             <span>My Leaves</span>
           </a>
-          <a class="td-action-card" routerLink="/dashboard/teacher-checkin">
-            <div class="td-action-icon" style="background:#eff6ff;color:#1d4ed8">
-              <mat-icon>location_on</mat-icon>
-            </div>
-            <span>My Check-in</span>
-          </a>
           <a class="td-action-card" routerLink="/dashboard/timetable">
             <div class="td-action-icon" style="background:#e0e7ff;color:#3730a3">
               <mat-icon>schedule</mat-icon>
@@ -174,6 +174,12 @@
         </ng-container>
 
         <ng-container *ngIf="!isClassTeacher">
+          <a class="td-action-card" routerLink="/dashboard/teacher-checkin">
+            <div class="td-action-icon" style="background:#eff6ff;color:#1d4ed8">
+              <mat-icon>location_on</mat-icon>
+            </div>
+            <span>My Check-in</span>
+          </a>
           <a class="td-action-card" routerLink="/dashboard/timetable">
             <div class="td-action-icon" style="background:#e0e7ff;color:#3730a3">
               <mat-icon>schedule</mat-icon>
@@ -209,12 +215,6 @@
               <mat-icon>event_note</mat-icon>
             </div>
             <span>My Leaves</span>
-          </a>
-          <a class="td-action-card" routerLink="/dashboard/teacher-checkin">
-            <div class="td-action-icon" style="background:#eff6ff;color:#1d4ed8">
-              <mat-icon>location_on</mat-icon>
-            </div>
-            <span>My Check-in</span>
           </a>
           <a class="td-action-card" routerLink="/dashboard/event-calendar">
             <div class="td-action-icon" style="background:#f0fdf4;color:#15803d">

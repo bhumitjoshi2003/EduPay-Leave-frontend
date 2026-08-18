@@ -108,8 +108,11 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
       .subscribe({
         next: ({ students, absentToday, leaves, summary }) => {
           this.totalStudents = students.length;
-          this.attendanceTaken = absentToday.length > 0;
-          this.todayAbsent = absentToday.length;
+          // `X` is an internal sentinel proving attendance was submitted even when every
+          // student is present. It must never appear to the teacher or count as an absence.
+          this.attendanceTaken = absentToday.some(a => a.studentId === 'X');
+          this.todayAbsent = absentToday.filter(a => a.studentId !== 'X'
+            && (!a.status || a.status === 'ABSENT')).length;
 
           const pending = leaves.content.filter((l) => l.status === 'PENDING');
           this.pendingLeavesCount = pending.length;

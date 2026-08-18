@@ -282,6 +282,4 @@ export class BulkReportCardComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  goBack(): void { this.router.navigate(['/dashboard']); }
 }

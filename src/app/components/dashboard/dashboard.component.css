@@ -558,11 +558,6 @@
   box-shadow: none !important;
   border: none !important;
 }
-::ng-deep .custom-dialog-container .mat-dialog-container {
-  padding: 0;
-  border-radius: 20px;
-  overflow: hidden;
-}
 
 /* Sidebar collapsed: hide sidebar name/school, show topbar logo+name group */
 .layout-wrapper.sidebar-collapsed .sidebar-brand-text {

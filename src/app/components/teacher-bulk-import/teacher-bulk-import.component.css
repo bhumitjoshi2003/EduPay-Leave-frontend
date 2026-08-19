@@ -1,11 +1,16 @@
+@import '../bulk-import/bulk-import.component.css';
+
+/* Legacy teacher-specific theme retained for history; shared student styles are authoritative.
 .import-page {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   max-width: 820px;
   margin: 0 auto;
   padding: 32px 24px;
 }
+*/
 
-/* ── Page header ──────────────────────────── */
+@media not all {
+/* ── Legacy teacher-specific rules disabled ─────────────────────── */
 
 .page-header {
   display: flex;
@@ -452,4 +457,5 @@
   .error-table td {
     padding: 8px 12px;
   }
+}
 }

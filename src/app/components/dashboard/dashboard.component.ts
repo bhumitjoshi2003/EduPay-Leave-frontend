@@ -1,6 +1,17 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  OnDestroy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
-import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
+import {
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+  Router,
+} from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
@@ -35,10 +46,9 @@ import { AiCopilotComponent } from '../ai-copilot/ai-copilot.component';
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-
   Role: string = '';
   Id: string = '';
   Name: string = '';
@@ -63,18 +73,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private schoolService: SchoolService,
     public tenantService: TenantService,
     private cdr: ChangeDetectorRef,
-    private logger: LoggerService
-  ) { }
+    private logger: LoggerService,
+  ) {}
 
   ngOnInit() {
     this.getDetails();
+    this.loadAuthenticatedSchoolBranding();
     this.handleInitialNavigation();
     this.fetchUnreadCount();
     // Re-fetch on every navigation (catches mark-all-read from notice board)
-    this.router.events.pipe(
-      filter(e => e instanceof NavigationEnd),
-      takeUntil(this.ngUnsubscribe)
-    ).subscribe(() => this.fetchUnreadCount());
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationEnd),
+        takeUntil(this.ngUnsubscribe),
+      )
+      .subscribe(() => this.fetchUnreadCount());
     // Also poll every 60 seconds as a background fallback
     this.pollingIntervalSubscription = interval(60000)
       .pipe(takeUntil(this.ngUnsubscribe))
@@ -82,6 +95,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.checkForAppUpdate();
     this.onVisibilityChange = this.onVisibilityChange.bind(this);
     document.addEventListener('visibilitychange', this.onVisibilityChange);
+  }
+
+  private loadAuthenticatedSchoolBranding(): void {
+    const schoolSlug = this.authStateService.getUser()?.schoolSlug;
+    if (!schoolSlug || this.tenantService.school) return;
+
+    this.tenantService
+      .loadSchoolBySlug(schoolSlug)
+      .then(() => this.cdr.markForCheck());
   }
 
   ngOnDestroy(): void {
@@ -95,7 +117,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private onVisibilityChange(): void {
     if (document.visibilityState === 'visible') {
-      this.authStateService.loadCurrentUser()
+      this.authStateService
+        .loadCurrentUser()
         .then(() => this.cdr.markForCheck())
         .catch(() => {});
     }
@@ -112,43 +135,54 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   fetchUserDetails() {
     if (this.Role === 'STUDENT' && this.Id) {
-      this.studentService.getStudent(this.Id).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
-        next: (student) => {
-          this.Name = student.name;
-          this.Class = student.className;
-          this.cdr.markForCheck();
-        },
-        error: (error) => {
-          this.logger.error('Error fetching student details:', error);
-        }
-      });
+      this.studentService
+        .getStudent(this.Id)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe({
+          next: (student) => {
+            this.Name = student.name;
+            this.Class = student.className;
+            this.cdr.markForCheck();
+          },
+          error: (error) => {
+            this.logger.error('Error fetching student details:', error);
+          },
+        });
     } else if (this.Role === 'TEACHER' && this.Id) {
-      this.teacherService.getTeacher(this.Id).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
-        next: (teacher) => {
-          this.Name = teacher.name;
-          this.ClassTeacher = teacher.classTeacher ?? '';
-          this.cdr.markForCheck();
-        },
-        error: (error) => {
-          this.logger.error('Error fetching teacher details:', error);
-        }
-      });
+      this.teacherService
+        .getTeacher(this.Id)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe({
+          next: (teacher) => {
+            this.Name = teacher.name;
+            this.ClassTeacher = teacher.classTeacher ?? '';
+            this.cdr.markForCheck();
+          },
+          error: (error) => {
+            this.logger.error('Error fetching teacher details:', error);
+          },
+        });
     } else if (this.Role === 'ADMIN' && this.Id) {
-      this.adminService.getAdminById(this.Id).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
-        next: (admin) => {
-          this.Name = admin.name;
-          this.cdr.markForCheck();
-        },
-        error: (error) => {
-          this.logger.error('Error fetching admin details:', error);
-        }
-      });
+      this.adminService
+        .getAdminById(this.Id)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe({
+          next: (admin) => {
+            this.Name = admin.name;
+            this.cdr.markForCheck();
+          },
+          error: (error) => {
+            this.logger.error('Error fetching admin details:', error);
+          },
+        });
     }
   }
 
   handleInitialNavigation(): void {
     if (this.Role === 'ADMIN' && this.subscriptionStatus === 'EXPIRED') {
-      this.router.navigate(['/dashboard/school-settings'], { queryParams: { tab: 'subscription' } });
+      this.router.navigate(['/dashboard/school-settings'], {
+        queryParams: { tab: 'subscription' },
+      });
       return;
     }
     const url = this.router.url.split('?')[0];
@@ -202,28 +236,42 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const cap = (window as any).Capacitor;
     if (!cap || !cap.isNativePlatform || !cap.isNativePlatform()) return;
     const mod = '@capawesome/capacitor-app-update';
-    (Function('m', 'return import(m)')(mod) as Promise<any>).then(({ AppUpdate, AppUpdateAvailability }: any) => {
-      AppUpdate.getAppUpdateInfo().then((info: any) => {
-        if (info.updateAvailability === AppUpdateAvailability.UPDATE_AVAILABLE) {
-          this.latestAppVersion = info.availableVersionName ?? '';
-          this.showUpdateBanner = true;
-          this.cdr.markForCheck();
-        }
-      }).catch(() => {});
-    }).catch(() => {});
+    (Function('m', 'return import(m)')(mod) as Promise<any>)
+      .then(({ AppUpdate, AppUpdateAvailability }: any) => {
+        AppUpdate.getAppUpdateInfo()
+          .then((info: any) => {
+            if (
+              info.updateAvailability === AppUpdateAvailability.UPDATE_AVAILABLE
+            ) {
+              this.latestAppVersion = info.availableVersionName ?? '';
+              this.showUpdateBanner = true;
+              this.cdr.markForCheck();
+            }
+          })
+          .catch(() => {});
+      })
+      .catch(() => {});
   }
 
   openPlayStore(): void {
     const cap = (window as any).Capacitor;
     if (cap && cap.isNativePlatform && cap.isNativePlatform()) {
       const mod = '@capawesome/capacitor-app-update';
-      (Function('m', 'return import(m)')(mod) as Promise<any>).then(({ AppUpdate }: any) => {
-        AppUpdate.openAppStore().catch(() => {
-          window.open('https://play.google.com/store/apps/details?id=in.edunexify.app', '_system');
+      (Function('m', 'return import(m)')(mod) as Promise<any>)
+        .then(({ AppUpdate }: any) => {
+          AppUpdate.openAppStore().catch(() => {
+            window.open(
+              'https://play.google.com/store/apps/details?id=in.edunexify.app',
+              '_system',
+            );
+          });
+        })
+        .catch(() => {
+          window.open(
+            'https://play.google.com/store/apps/details?id=in.edunexify.app',
+            '_system',
+          );
         });
-      }).catch(() => {
-        window.open('https://play.google.com/store/apps/details?id=in.edunexify.app', '_system');
-      });
     }
   }
 
@@ -236,16 +284,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.schoolService.invalidateClasses();
     this.authService.logout().subscribe({
       next: () => this.router.navigate(['/home']),
-      error: () => this.router.navigate(['/home'])
+      error: () => this.router.navigate(['/home']),
     });
   }
 
   fetchUnreadCount(): void {
     if (this.Role === 'SUPER_ADMIN') return;
-    this.notificationService.getUnreadNotificationCount()
+    this.notificationService
+      .getUnreadNotificationCount()
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe({
-        next: (count) => { this.unreadNotificationCount = count; this.cdr.markForCheck(); },
+        next: (count) => {
+          this.unreadNotificationCount = count;
+          this.cdr.markForCheck();
+        },
         error: (e) => this.logger.error('Error fetching unread count:', e),
       });
   }

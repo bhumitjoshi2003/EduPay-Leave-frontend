@@ -1,6 +1,7 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface PublicSchoolInfo {
@@ -22,7 +23,6 @@ export interface PublicSchoolInfo {
  */
 @Injectable({ providedIn: 'root' })
 export class TenantService {
-
   private readonly BASE_DOMAIN = 'edunexify.co.in';
   private _school: PublicSchoolInfo | null = null;
   private _slug: string | null = null;
@@ -30,13 +30,21 @@ export class TenantService {
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
 
-  get isBranded(): boolean { return this._school !== null; }
-  get school(): PublicSchoolInfo | null { return this._school; }
-  get slug(): string | null { return this._slug; }
+  get isBranded(): boolean {
+    return this._school !== null;
+  }
+  get school(): PublicSchoolInfo | null {
+    return this._school;
+  }
+  get slug(): string | null {
+    return this._slug;
+  }
   get isLocalDev(): boolean {
     if (!isPlatformBrowser(this.platformId)) return false;
     const hostname = window.location.hostname;
-    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+    return (
+      hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1'
+    );
   }
 
   /**
@@ -49,15 +57,30 @@ export class TenantService {
     const slug = this.extractSlug();
     if (!slug) return Promise.resolve();
 
-    this._slug = slug;
+    return this.loadSchoolBySlug(slug);
+  }
 
-    return this.http
-      .get<PublicSchoolInfo>(`${environment.apiUrl}/public/school/${slug}`, {
-        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-      })
-      .toPromise()
-      .then(info => { this._school = info ?? null; })
-      .catch(() => { this._school = null; });
+  /**
+   * Loads branding for an authenticated user's school. This is needed on
+   * localhost and other hosts where a school slug cannot be read from the URL.
+   */
+  async loadSchoolBySlug(slug: string): Promise<void> {
+    const normalizedSlug = slug.trim();
+    if (!normalizedSlug || (this._slug === normalizedSlug && this._school))
+      return;
+
+    this._slug = normalizedSlug;
+    try {
+      const info = await firstValueFrom(
+        this.http.get<PublicSchoolInfo>(
+          `${environment.apiUrl}/public/school/${normalizedSlug}`,
+          { headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' } },
+        ),
+      );
+      this._school = info ?? null;
+    } catch {
+      this._school = null;
+    }
   }
 
   /**

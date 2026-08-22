@@ -8,7 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { Subject, forkJoin, takeUntil } from 'rxjs';
+import { Subject, catchError, forkJoin, of, takeUntil } from 'rxjs';
 
 import { AuthStateService } from '../../auth/auth-state.service';
 import { TeacherService } from '../../services/teacher.service';
@@ -17,6 +17,8 @@ import { AttendanceService } from '../../services/attendance.service';
 import { LeaveService, LeaveApplication } from '../../services/leave.service';
 import { LoggerService } from '../../services/logger.service';
 import { ToastService } from '../../services/toast.service';
+import { TeacherCheckinService } from '../../services/teacher-checkin.service';
+import { TeacherAttendanceRecord, TeacherAttendanceSummary } from '../../interfaces/teacher-checkin';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -41,6 +43,10 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
   pendingLeavesCount = 0;
   monthlyAttendanceRate = 0;
   recentLeaves: LeaveApplication[] = [];
+  personalAttendance: TeacherAttendanceSummary | null = null;
+  todayTeacherRecord: TeacherAttendanceRecord | null = null;
+  workingDayNames: string[] = [];
+  personalSummaryLoading = true;
 
   constructor(
     private authState: AuthStateService,
@@ -50,7 +56,8 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
     private leaveService: LeaveService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
-    private toast: ToastService
+    private toast: ToastService,
+    private checkinService: TeacherCheckinService
   ) {}
 
   ngOnInit(): void {
@@ -60,6 +67,8 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
       return;
     }
+
+    this.loadPersonalAttendance();
 
     this.teacherService
       .getTeacher(user.userId)
@@ -85,6 +94,48 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
           this.toast.error('Error', 'Failed to load teacher profile.');
         },
       });
+  }
+
+  private loadPersonalAttendance(): void {
+    const month = this.today.getMonth() + 1;
+    const year = this.today.getFullYear();
+
+    forkJoin({
+      summary: this.checkinService.getMyAttendance(month, year).pipe(
+        catchError(error => {
+          this.logger.error('Personal attendance summary load error:', error);
+          return of(null);
+        })
+      ),
+      calendar: this.attendanceService.getCalendarConfig().pipe(
+        catchError(error => {
+          this.logger.error('Working days load error:', error);
+          return of(null);
+        })
+      )
+    }).pipe(takeUntil(this.destroy$)).subscribe(({ summary, calendar }) => {
+      this.personalAttendance = summary;
+      this.workingDayNames = calendar?.workingDays
+        ? calendar.workingDays.split(',').map(day => this.formatWorkingDay(day.trim())).filter(Boolean)
+        : [];
+
+      if (summary) {
+        const todayKey = this.toLocalDateKey(this.today);
+        this.todayTeacherRecord = summary.records.find(record => record.date === todayKey) ?? null;
+      }
+
+      this.personalSummaryLoading = false;
+      this.cdr.markForCheck();
+    });
+  }
+
+  private toLocalDateKey(date: Date): string {
+    const pad = (value: number) => String(value).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  }
+
+  private formatWorkingDay(day: string): string {
+    return day ? `${day.charAt(0)}${day.slice(1).toLowerCase()}` : '';
   }
 
   ngOnDestroy(): void {
@@ -186,6 +237,16 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
 
   get todayPresentCount(): number {
     return Math.max(0, this.totalStudents - this.todayAbsent);
+  }
+
+  get personalAttendanceStatus(): string {
+    if (!this.todayTeacherRecord) return 'Not checked in';
+    return this.todayTeacherRecord.status.replaceAll('_', ' ').toLowerCase()
+      .replace(/\b\w/g, character => character.toUpperCase());
+  }
+
+  get personalAttendancePercent(): number {
+    return Math.max(0, Math.min(100, this.personalAttendance?.attendancePercentage ?? 0));
   }
 
   get absentCardState(): 'marked' | 'not-marked' | 'weekend' {

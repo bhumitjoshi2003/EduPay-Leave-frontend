@@ -29,6 +29,74 @@
       <div class="td-blob td-blob-2"></div>
     </div>
 
+    <!-- ── Personal attendance snapshot ─────────────────────────────── -->
+    <section class="td-personal" aria-labelledby="personal-attendance-title">
+      <div class="td-personal-heading">
+        <div>
+          <span class="td-eyebrow">My attendance</span>
+          <h2 id="personal-attendance-title">{{ today | date:'MMMM' }} at a glance</h2>
+        </div>
+        <a routerLink="/dashboard/teacher-checkin" class="td-details-link">
+          View details <mat-icon>arrow_forward</mat-icon>
+        </a>
+      </div>
+
+      <div class="td-personal-skeleton" *ngIf="personalSummaryLoading">
+        <span></span><span></span><span></span><span></span>
+      </div>
+
+      <ng-container *ngIf="!personalSummaryLoading && personalAttendance as attendance">
+        <div class="td-today-strip">
+          <div class="td-today-icon"><mat-icon>fingerprint</mat-icon></div>
+          <div class="td-today-copy">
+            <span>Today</span>
+            <strong>{{ personalAttendanceStatus }}</strong>
+          </div>
+          <div class="td-time-pair" *ngIf="todayTeacherRecord">
+            <span><small>IN</small>{{ todayTeacherRecord.checkInTime || '—' }}</span>
+            <span><small>OUT</small>{{ todayTeacherRecord.checkOutTime || '—' }}</span>
+          </div>
+          <a *ngIf="!todayTeacherRecord?.checkInTime" routerLink="/dashboard/teacher-checkin" class="td-checkin-cta">
+            Check in
+          </a>
+        </div>
+
+        <div class="td-personal-stats">
+          <div class="td-mini-stat td-mini-green">
+            <mat-icon>check_circle</mat-icon><strong>{{ attendance.presentDays }}</strong><span>Present</span>
+          </div>
+          <div class="td-mini-stat td-mini-amber">
+            <mat-icon>schedule</mat-icon><strong>{{ attendance.lateDays }}</strong><span>Late</span>
+          </div>
+          <div class="td-mini-stat td-mini-red">
+            <mat-icon>event_busy</mat-icon><strong>{{ attendance.absentDays }}</strong><span>Absent</span>
+          </div>
+          <div class="td-mini-stat td-mini-purple">
+            <mat-icon>beach_access</mat-icon><strong>{{ attendance.onLeaveDays }}</strong><span>On leave</span>
+          </div>
+        </div>
+
+        <div class="td-attendance-progress">
+          <div class="td-progress-copy">
+            <span>Monthly attendance</span>
+            <strong>{{ personalAttendancePercent | number:'1.0-1' }}%</strong>
+          </div>
+          <div class="td-progress-track"><span [style.width.%]="personalAttendancePercent"></span></div>
+          <p>{{ attendance.totalWorkingDays }} working days counted this month</p>
+        </div>
+
+        <div class="td-working-days" *ngIf="workingDayNames.length">
+          <mat-icon>date_range</mat-icon>
+          <div><span>School working days</span><strong>{{ workingDayNames.join(' · ') }}</strong></div>
+        </div>
+      </ng-container>
+
+      <div class="td-personal-unavailable" *ngIf="!personalSummaryLoading && !personalAttendance">
+        <mat-icon>info_outline</mat-icon>
+        <span>Attendance summary is temporarily unavailable. Open My Check-in to try again.</span>
+      </div>
+    </section>
+
     <!-- ── Stat Cards (class teachers only) ─────────────────────────── -->
     <div class="td-stats-grid" *ngIf="isClassTeacher">
 

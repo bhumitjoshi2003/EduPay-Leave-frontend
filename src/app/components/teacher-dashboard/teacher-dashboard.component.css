@@ -26,6 +26,61 @@
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Personal attendance snapshot ──────────────────────────────── */
+.td-personal {
+  margin: 0 0 20px;
+  padding: 22px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.td-personal-heading, .td-today-strip, .td-progress-copy { display: flex; align-items: center; }
+.td-personal-heading { justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.td-eyebrow { display: block; margin-bottom: 3px; color: #0f766e; font-size: .68rem; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; }
+.td-personal-heading h2 { margin: 0; color: #1e293b; font-size: 1.1rem; font-weight: 800; }
+.td-details-link { display: inline-flex; align-items: center; gap: 4px; color: #0f766e; font-size: .78rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.td-details-link mat-icon { width: 16px; height: 16px; font-size: 16px; }
+
+.td-today-strip { gap: 12px; padding: 13px 14px; border: 1px solid #ccfbf1; border-radius: 14px; background: linear-gradient(135deg, #f0fdfa, #ecfeff); }
+.td-today-copy { display: flex; flex: 1; min-width: 0; flex-direction: column; }
+.td-today-copy span { color: #64748b; font-size: .68rem; font-weight: 600; }
+.td-today-copy strong { color: #134e4a; font-size: .86rem; }
+.td-time-pair { display: flex; gap: 18px; }
+.td-time-pair span { color: #334155; font-size: .78rem; font-weight: 700; }
+.td-time-pair small { display: block; color: #94a3b8; font-size: .54rem; letter-spacing: .5px; }
+.td-checkin-cta { padding: 8px 14px; border-radius: 9px; color: #fff; background: #0f766e; font-size: .74rem; font-weight: 700; text-decoration: none; }
+
+.td-personal-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.td-mini-stat { display: flex; min-width: 0; padding: 12px 6px; align-items: center; flex-direction: column; border-radius: 12px; background: var(--stat-bg); }
+.td-mini-stat mat-icon { width: 20px; height: 20px; color: var(--stat-color); font-size: 20px; }
+.td-mini-stat strong { margin-top: 4px; color: #1e293b; font-size: 1.08rem; line-height: 1; }
+.td-mini-stat span { margin-top: 4px; color: #64748b; font-size: .66rem; font-weight: 700; }
+.td-mini-green { --stat-bg:#ecfdf5; --stat-color:#059669; }
+.td-mini-amber { --stat-bg:#fffbeb; --stat-color:#d97706; }
+.td-mini-red { --stat-bg:#fef2f2; --stat-color:#dc2626; }
+.td-mini-purple { --stat-bg:#f5f3ff; --stat-color:#7c3aed; }
+
+.td-attendance-progress { margin-top: 16px; }
+.td-progress-copy { justify-content: space-between; color: #475569; font-size: .76rem; font-weight: 700; }
+.td-progress-copy strong { color: #0f766e; font-size: .88rem; }
+.td-progress-track { height: 8px; margin-top: 7px; overflow: hidden; border-radius: 20px; background: #e2e8f0; }
+.td-progress-track span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #0f766e, #2dd4bf); transition: width .3s ease; }
+.td-attendance-progress p { margin: 6px 0 0; color: #94a3b8; font-size: .66rem; }
+
+.td-personal-skeleton { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.td-personal-skeleton span { height: 82px; border-radius: 12px; background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: tdShimmer 1.2s infinite; }
+@keyframes tdShimmer { to { background-position: -200% 0; } }
+.td-personal-unavailable { display: flex; align-items: center; gap: 8px; padding: 12px; border-radius: 12px; color: #64748b; background: #f8fafc; font-size: .76rem; }
+.td-personal-unavailable mat-icon { flex: 0 0 auto; width: 18px; height: 18px; font-size: 18px; }
+
+@media (max-width: 600px) {
+  .td-personal { padding: 18px 16px; }
+  .td-time-pair { gap: 9px; }
+  .td-personal-stats { gap: 8px; }
+  .td-mini-stat { padding-inline: 3px; }
+}
+
 /* ── Hero ───────────────────────────────────────────────────────── */
 .td-hero {
   position: relative;

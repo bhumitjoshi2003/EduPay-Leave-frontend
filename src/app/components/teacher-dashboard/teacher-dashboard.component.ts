@@ -19,6 +19,8 @@ import { LoggerService } from '../../services/logger.service';
 import { ToastService } from '../../services/toast.service';
 import { TeacherCheckinService } from '../../services/teacher-checkin.service';
 import { TeacherAttendanceRecord, TeacherAttendanceSummary } from '../../interfaces/teacher-checkin';
+import { TeacherLeaveService } from '../../services/teacher-leave.service';
+import { TeacherLeave } from '../../interfaces/teacher-leave';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -46,6 +48,8 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
   personalAttendance: TeacherAttendanceSummary | null = null;
   todayTeacherRecord: TeacherAttendanceRecord | null = null;
   personalSummaryLoading = true;
+  recentTeacherLeaves: TeacherLeave[] = [];
+  teacherLeavesLoading = true;
 
   constructor(
     private authState: AuthStateService,
@@ -56,7 +60,8 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
     private toast: ToastService,
-    private checkinService: TeacherCheckinService
+    private checkinService: TeacherCheckinService,
+    private teacherLeaveService: TeacherLeaveService
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +73,7 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
     }
 
     this.loadPersonalAttendance();
+    this.loadRecentTeacherLeaves();
 
     this.teacherService
       .getTeacher(user.userId)
@@ -92,6 +98,23 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
           this.toast.error('Error', 'Failed to load teacher profile.');
         },
+      });
+  }
+
+  private loadRecentTeacherLeaves(): void {
+    this.teacherLeaveService.getMyLeaves(0, 3)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: response => {
+          this.recentTeacherLeaves = response.content.slice(0, 3);
+          this.teacherLeavesLoading = false;
+          this.cdr.markForCheck();
+        },
+        error: error => {
+          this.logger.error('Recent teacher leaves load error:', error);
+          this.teacherLeavesLoading = false;
+          this.cdr.markForCheck();
+        }
       });
   }
 

@@ -47,14 +47,13 @@
 
       <ng-container *ngIf="!personalSummaryLoading && personalAttendance as attendance">
         <div class="td-today-strip">
-          <div class="td-today-icon"><mat-icon>fingerprint</mat-icon></div>
           <div class="td-today-copy">
             <span>Today</span>
             <strong>{{ personalAttendanceStatus }}</strong>
           </div>
           <div class="td-time-pair" *ngIf="todayTeacherRecord">
-            <span><small>IN</small>{{ todayTeacherRecord.checkInTime || '—' }}</span>
-            <span><small>OUT</small>{{ todayTeacherRecord.checkOutTime || '—' }}</span>
+            <span><small>IN</small>{{ formatAttendanceTime(todayTeacherRecord.checkInTime) }}</span>
+            <span><small>OUT</small>{{ formatAttendanceTime(todayTeacherRecord.checkOutTime) }}</span>
           </div>
           <a *ngIf="!todayTeacherRecord?.checkInTime" routerLink="/dashboard/teacher-checkin" class="td-checkin-cta">
             Check in
@@ -72,7 +71,7 @@
             <mat-icon>event_busy</mat-icon><strong>{{ attendance.absentDays }}</strong><span>Absent</span>
           </div>
           <div class="td-mini-stat td-mini-purple">
-            <mat-icon>beach_access</mat-icon><strong>{{ attendance.onLeaveDays }}</strong><span>On leave</span>
+            <mat-icon>event_note</mat-icon><strong>{{ attendance.onLeaveDays }}</strong><span>On leave</span>
           </div>
         </div>
 
@@ -83,11 +82,6 @@
           </div>
           <div class="td-progress-track"><span [style.width.%]="personalAttendancePercent"></span></div>
           <p>{{ attendance.totalWorkingDays }} working days counted this month</p>
-        </div>
-
-        <div class="td-working-days" *ngIf="workingDayNames.length">
-          <mat-icon>date_range</mat-icon>
-          <div><span>School working days</span><strong>{{ workingDayNames.join(' · ') }}</strong></div>
         </div>
       </ng-container>
 

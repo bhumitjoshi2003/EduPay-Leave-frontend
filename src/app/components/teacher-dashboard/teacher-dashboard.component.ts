@@ -8,7 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { Subject, catchError, forkJoin, of, takeUntil } from 'rxjs';
+import { Subject, forkJoin, takeUntil } from 'rxjs';
 
 import { AuthStateService } from '../../auth/auth-state.service';
 import { TeacherService } from '../../services/teacher.service';
@@ -45,7 +45,6 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
   recentLeaves: LeaveApplication[] = [];
   personalAttendance: TeacherAttendanceSummary | null = null;
   todayTeacherRecord: TeacherAttendanceRecord | null = null;
-  workingDayNames: string[] = [];
   personalSummaryLoading = true;
 
   constructor(
@@ -100,42 +99,27 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
     const month = this.today.getMonth() + 1;
     const year = this.today.getFullYear();
 
-    forkJoin({
-      summary: this.checkinService.getMyAttendance(month, year).pipe(
-        catchError(error => {
+    this.checkinService.getMyAttendance(month, year)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: summary => {
+          this.personalAttendance = summary;
+          const todayKey = this.toLocalDateKey(this.today);
+          this.todayTeacherRecord = summary.records.find(record => record.date === todayKey) ?? null;
+          this.personalSummaryLoading = false;
+          this.cdr.markForCheck();
+        },
+        error: error => {
           this.logger.error('Personal attendance summary load error:', error);
-          return of(null);
-        })
-      ),
-      calendar: this.attendanceService.getCalendarConfig().pipe(
-        catchError(error => {
-          this.logger.error('Working days load error:', error);
-          return of(null);
-        })
-      )
-    }).pipe(takeUntil(this.destroy$)).subscribe(({ summary, calendar }) => {
-      this.personalAttendance = summary;
-      this.workingDayNames = calendar?.workingDays
-        ? calendar.workingDays.split(',').map(day => this.formatWorkingDay(day.trim())).filter(Boolean)
-        : [];
-
-      if (summary) {
-        const todayKey = this.toLocalDateKey(this.today);
-        this.todayTeacherRecord = summary.records.find(record => record.date === todayKey) ?? null;
-      }
-
-      this.personalSummaryLoading = false;
-      this.cdr.markForCheck();
-    });
+          this.personalSummaryLoading = false;
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   private toLocalDateKey(date: Date): string {
     const pad = (value: number) => String(value).padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-  }
-
-  private formatWorkingDay(day: string): string {
-    return day ? `${day.charAt(0)}${day.slice(1).toLowerCase()}` : '';
   }
 
   ngOnDestroy(): void {
@@ -247,6 +231,14 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
 
   get personalAttendancePercent(): number {
     return Math.max(0, Math.min(100, this.personalAttendance?.attendancePercentage ?? 0));
+  }
+
+  formatAttendanceTime(value: string | null): string {
+    if (!value) return '—';
+    const time = value.includes('T') ? value.split('T')[1] : value;
+    const [hour = '', minute = ''] = time.split(':');
+    if (!hour || !minute) return value;
+    return `${Number(hour)}:${minute}`;
   }
 
   get absentCardState(): 'marked' | 'not-marked' | 'weekend' {

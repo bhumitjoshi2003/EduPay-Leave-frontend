@@ -1444,3 +1444,14 @@ select.ss-input { appearance: auto; cursor: pointer; }
   .ss-sa-save-btn, .ss-sa-cancel-btn { width: 100%; }
   .ss-sa-edit-btn { padding: 7px 11px; }
 }
+.ss-fee-policy-card { margin-bottom: 22px; }
+.ss-policy-loading { padding: 24px; color: #64748b; text-align: center; }
+.ss-policy-options { display: grid; gap: 12px; }
+.ss-policy-option { display: flex; gap: 13px; align-items: flex-start; padding: 16px; border: 1px solid #dbe4ee; border-radius: 14px; background: #f8fafc; cursor: pointer; transition: .2s ease; }
+.ss-policy-option:hover { border-color: #5eead4; background: #f0fdfa; }
+.ss-policy-option.selected { border-color: #14b8a6; background: #ecfdf5; box-shadow: 0 0 0 2px rgba(20,184,166,.08); }
+.ss-policy-option input { margin-top: 4px; accent-color: #0f9f91; }
+.ss-policy-option span { display: grid; gap: 4px; }
+.ss-policy-option strong { color: #172033; font-size: .95rem; }
+.ss-policy-option small, .ss-policy-note { color: #64748b; line-height: 1.5; }
+.ss-policy-note { margin: 2px 0 0; font-size: .82rem; }

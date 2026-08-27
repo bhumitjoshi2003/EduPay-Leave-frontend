@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { FeePayment, RecordPaymentRequest, StudentFeeConfig, CreditNote } from '../interfaces/fee-payment';
+import { FeePayment, RecordPaymentRequest, CreditNote } from '../interfaces/fee-payment';
 import { PaginatedResponse } from './leave.service';
 
 @Injectable({
@@ -10,7 +10,6 @@ import { PaginatedResponse } from './leave.service';
 })
 export class FeePaymentService {
   private paymentUrl = `${environment.apiUrl}/fee-payments`;
-  private configUrl = `${environment.apiUrl}/student-fee-configs`;
   private creditUrl = `${environment.apiUrl}/credit-notes`;
 
   constructor(private http: HttpClient) {}
@@ -34,19 +33,6 @@ export class FeePaymentService {
   getStudentPaymentHistory(studentId: string, page: number, size: number): Observable<PaginatedResponse<FeePayment>> {
     const params = new HttpParams().set('page', page).set('size', size);
     return this.http.get<PaginatedResponse<FeePayment>>(`${this.paymentUrl}/student/${studentId}`, { params });
-  }
-
-  // --- Student Fee Configs ---
-  getStudentConfigs(studentId: string, sessionId: number): Observable<StudentFeeConfig[]> {
-    return this.http.get<StudentFeeConfig[]>(`${this.configUrl}/${studentId}/session/${sessionId}`);
-  }
-
-  createConfig(config: StudentFeeConfig): Observable<StudentFeeConfig> {
-    return this.http.post<StudentFeeConfig>(this.configUrl, config);
-  }
-
-  deleteConfig(configId: number): Observable<void> {
-    return this.http.delete<void>(`${this.configUrl}/${configId}`);
   }
 
   // --- Credit Notes ---

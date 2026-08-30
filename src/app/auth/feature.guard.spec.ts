@@ -21,8 +21,8 @@ describe('featureGuard', () => {
     });
   });
 
-  function runGuard(): boolean | UrlTree {
-    const route = { data: { featureKey: 'BULK_IMPORT' } } as unknown as ActivatedRouteSnapshot;
+  function runGuard(featureKey = 'BULK_IMPORT'): boolean | UrlTree {
+    const route = { data: { featureKey } } as unknown as ActivatedRouteSnapshot;
     return TestBed.runInInjectionContext(() =>
       featureGuard(route, { url: '/dashboard/teacher-bulk-import' } as RouterStateSnapshot)
     ) as boolean | UrlTree;
@@ -39,5 +39,15 @@ describe('featureGuard', () => {
 
     expect(runGuard()).toBe(adminHome);
     expect(router.createUrlTree).toHaveBeenCalledWith(['/dashboard/admin-dashboard']);
+  });
+
+  it('sends a parent to the public home page when the portal is disabled', () => {
+    const publicHome = {} as UrlTree;
+    router.createUrlTree.and.returnValue(publicHome);
+    authState.hasFeature.and.returnValue(false);
+    authState.getUserRole.and.returnValue('PARENT');
+
+    expect(runGuard('PARENT_PORTAL')).toBe(publicHome);
+    expect(router.createUrlTree).toHaveBeenCalledWith(['/home']);
   });
 });

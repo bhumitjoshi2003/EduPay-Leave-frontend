@@ -17,11 +17,12 @@ import { AuthStateService } from '../../auth/auth-state.service';
 import { Capacitor } from '@capacitor/core';
 import { ToastService } from '../../services/toast.service';
 import { environment } from '../../../environments/environment';
+import { ParentChildContextComponent } from '../parent-child-context/parent-child-context.component';
 
 @Component({
   selector: 'app-report-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ParentChildContextComponent],
   templateUrl: './report-card.component.html',
   styleUrl: './report-card.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

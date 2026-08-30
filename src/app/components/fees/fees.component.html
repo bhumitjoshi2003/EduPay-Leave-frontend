@@ -1,5 +1,6 @@
 <div *ngIf="showFeesModule; else comingSoonTemplate">
   <div class="pt-page">
+    <app-parent-child-context [studentId]="studentId"></app-parent-child-context>
     <!-- ── Hero ──────────────────────────────────────────────────────── -->
     <div class="pt-hero">
       <div class="pt-hero-left">
@@ -202,9 +203,10 @@
         [paymentData]="paymentData"
         (paymentSuccess)="handleSuccessfulPayment()"
         (paymentProcessingStarted)="onPaymentProcessingStarted()"
-        [disabled]="isLoadingPayment"
+        [disabled]="isLoadingPayment || (role === 'PARENT' && !parentCanPay)"
       >
       </app-payment>
+      <span class="pt-payment-note" *ngIf="role === 'PARENT' && !parentCanPay">This account has view-only fee access.</span>
     </div>
 
     <ng-template #adminPayment>

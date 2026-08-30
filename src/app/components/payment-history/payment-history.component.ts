@@ -16,6 +16,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
 import { MODULE_MESSAGES } from '../../config/module-messages.config';
 import { Subject, takeUntil } from 'rxjs';
+import { ParentChildContextComponent } from '../parent-child-context/parent-child-context.component';
 
 @Component({
   selector: 'app-payment-history',
@@ -30,7 +31,8 @@ import { Subject, takeUntil } from 'rxjs';
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatIconModule
+    MatIconModule,
+    ParentChildContextComponent
   ],
   styleUrls: ['./payment-history.component.css'],
 })

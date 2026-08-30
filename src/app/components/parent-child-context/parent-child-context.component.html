@@ -1,0 +1,8 @@
+<aside class="child-context" *ngIf="isParent && child" aria-live="polite">
+  <mat-icon>person_pin</mat-icon>
+  <div><span>Currently viewing</span><strong>{{ child.studentName }}</strong></div>
+  <small>{{ child.studentId }} · Class {{ child.className }}{{ child.sectionName ? ' · ' + child.sectionName : '' }}</small>
+</aside>
+<aside class="child-context invalid" *ngIf="isParent && invalid">
+  <mat-icon>link_off</mat-icon><strong>This child is no longer available to this account.</strong>
+</aside>

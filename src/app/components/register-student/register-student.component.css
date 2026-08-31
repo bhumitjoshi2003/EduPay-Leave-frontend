@@ -20,6 +20,12 @@
   border-left: 3px solid #059669;
 }
 
+.rs-section-hint {
+  margin: -6px 0 14px;
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
 /* ── Grid ─────────────────────────────────────────────────────── */
 .rs-grid {
   display: grid;

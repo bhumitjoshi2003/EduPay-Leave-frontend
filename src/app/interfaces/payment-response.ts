@@ -25,4 +25,5 @@ export interface PaymentHistoryDetails {
   additionalCharges: number;
   lateFees: number;
   platformFee: number;
+  schoolName: string;
 }

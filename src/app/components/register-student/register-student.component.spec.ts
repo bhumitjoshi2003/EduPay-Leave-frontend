@@ -52,9 +52,13 @@ describe('RegisterStudentComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('has no studentId control — Edunexify generates the Student ID, it is never admin-entered', () => {
+    expect(component.studentForm.contains('studentId')).toBeFalse();
+  });
+
   it('marks the form invalid when date of birth is missing', () => {
     component.studentForm.patchValue({
-      studentId: 'S1', name: 'Test', email: 'test@test.com',
+      name: 'Test', email: 'test@test.com',
       className: '10', gender: 'MALE', joiningDate: '2024-01-01', dob: ''
     });
     expect(component.studentForm.get('dob')?.valid).toBeFalse();
@@ -62,28 +66,28 @@ describe('RegisterStudentComponent', () => {
   });
 
   it('does not send a password when registering the login account — the backend derives it from DOB', () => {
-    studentService.addStudent.and.returnValue(of({ studentId: 'S1' } as any));
+    studentService.addStudent.and.returnValue(of({ studentId: 'stu_26010001' } as any));
     authService.register.and.returnValue(of('ok'));
 
     component.studentForm.patchValue({
-      studentId: 'S1', name: 'Test', email: 'test@test.com',
+      name: 'Test', email: 'test@test.com',
       className: '10', gender: 'MALE', joiningDate: '2024-01-01', dob: '1990-05-23'
     });
     component.onSubmit();
 
     expect(authService.register).toHaveBeenCalledWith(jasmine.objectContaining({
-      userId: 'S1', role: 'STUDENT', email: 'test@test.com'
+      userId: 'stu_26010001', role: 'STUDENT', email: 'test@test.com'
     }));
     const callArg = authService.register.calls.mostRecent().args[0] as any;
     expect(callArg.password).toBeUndefined();
   });
 
-  it('shows the DOB-based initial-password message on success, not a generated temporary password', () => {
-    studentService.addStudent.and.returnValue(of({ studentId: 'S1' } as any));
+  it('shows the DOB-based initial-password message and the Edunexify-generated Student ID on success', () => {
+    studentService.addStudent.and.returnValue(of({ studentId: 'stu_26010001' } as any));
     authService.register.and.returnValue(of('ok'));
 
     component.studentForm.patchValue({
-      studentId: 'S1', name: 'Test', email: 'test@test.com',
+      name: 'Test', email: 'test@test.com',
       className: '10', gender: 'MALE', joiningDate: '2024-01-01', dob: '1990-05-23'
     });
     component.onSubmit();
@@ -91,14 +95,17 @@ describe('RegisterStudentComponent', () => {
     expect(toast.confirm).toHaveBeenCalledWith(jasmine.objectContaining({
       message: jasmine.stringMatching(/Date of birth in YYYYMMDD format/),
     }));
+    expect(toast.confirm).toHaveBeenCalledWith(jasmine.objectContaining({
+      message: jasmine.stringMatching(/stu_26010001/),
+    }));
   });
 
   it('surfaces an error toast when account setup fails after the student record is created', () => {
-    studentService.addStudent.and.returnValue(of({ studentId: 'S1' } as any));
+    studentService.addStudent.and.returnValue(of({ studentId: 'stu_26010001' } as any));
     authService.register.and.returnValue(throwError(() => ({ status: 500 })));
 
     component.studentForm.patchValue({
-      studentId: 'S1', name: 'Test', email: 'test@test.com',
+      name: 'Test', email: 'test@test.com',
       className: '10', gender: 'MALE', joiningDate: '2024-01-01', dob: '1990-05-23'
     });
     component.onSubmit();

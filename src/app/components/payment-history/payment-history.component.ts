@@ -16,6 +16,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { ComingSoonComponent } from '../coming-soon/coming-soon.component';
 import { MODULE_MESSAGES } from '../../config/module-messages.config';
 import { Subject, takeUntil } from 'rxjs';
+import { ParentChildContextComponent } from '../parent-child-context/parent-child-context.component';
+import { ChildAccess } from '../../interfaces/parent-portal';
 
 @Component({
   selector: 'app-payment-history',
@@ -30,7 +32,8 @@ import { Subject, takeUntil } from 'rxjs';
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatIconModule
+    MatIconModule,
+    ParentChildContextComponent
   ],
   styleUrls: ['./payment-history.component.css'],
 })
@@ -129,6 +132,18 @@ export class PaymentHistoryComponent implements OnInit, OnDestroy {
       this.currentPage = page;
       this.fetchPaymentHistory();
     }
+  }
+
+  onChildTabSelected(child: ChildAccess): void {
+    if (!child.canViewFees) {
+      this.error = "You do not have permission to view this child's payment history.";
+      this.cdr.markForCheck();
+      return;
+    }
+    this.studentId = child.studentId;
+    this.currentPage = 0;
+    this.router.navigate(['/dashboard/payment-history', child.studentId], { replaceUrl: true });
+    this.fetchPaymentHistory();
   }
 
   nextPage(): void {

@@ -48,41 +48,48 @@ describe('RegisterTeacherComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('has no teacherId control — Edunexify generates the Employee ID, it is never admin-entered', () => {
+    expect(component.teacherForm.contains('teacherId')).toBeFalse();
+  });
+
   it('marks the form invalid when date of birth is missing', () => {
     component.teacherForm.patchValue({
-      teacherId: 'T1', name: 'Test', email: 'test@test.com', gender: 'MALE', dob: ''
+      name: 'Test', email: 'test@test.com', gender: 'MALE', dob: ''
     });
     expect(component.teacherForm.get('dob')?.valid).toBeFalse();
     expect(component.teacherForm.valid).toBeFalse();
   });
 
   it('does not send a password when registering the login account — the backend derives it from DOB', () => {
-    teacherService.addTeacher.and.returnValue(of({ teacherId: 'T1' } as any));
+    teacherService.addTeacher.and.returnValue(of({ teacherId: 'emp_26010007' } as any));
     authService.register.and.returnValue(of('ok'));
 
     component.teacherForm.patchValue({
-      teacherId: 'T1', name: 'Test', email: 'test@test.com', gender: 'MALE', dob: '1985-03-20', joiningDate: '2026-04-01'
+      name: 'Test', email: 'test@test.com', gender: 'MALE', dob: '1985-03-20', joiningDate: '2026-04-01'
     });
     component.onSubmit();
 
     expect(authService.register).toHaveBeenCalledWith(jasmine.objectContaining({
-      userId: 'T1', role: 'TEACHER', email: 'test@test.com'
+      userId: 'emp_26010007', role: 'TEACHER', email: 'test@test.com'
     }));
     const callArg = authService.register.calls.mostRecent().args[0] as any;
     expect(callArg.password).toBeUndefined();
   });
 
-  it('shows the DOB-based initial-password message on success, not a generated temporary password', () => {
-    teacherService.addTeacher.and.returnValue(of({ teacherId: 'T1' } as any));
+  it('shows the DOB-based initial-password message and the Edunexify-generated Employee ID on success', () => {
+    teacherService.addTeacher.and.returnValue(of({ teacherId: 'emp_26010007' } as any));
     authService.register.and.returnValue(of('ok'));
 
     component.teacherForm.patchValue({
-      teacherId: 'T1', name: 'Test', email: 'test@test.com', gender: 'MALE', dob: '1985-03-20', joiningDate: '2026-04-01'
+      name: 'Test', email: 'test@test.com', gender: 'MALE', dob: '1985-03-20', joiningDate: '2026-04-01'
     });
     component.onSubmit();
 
     expect(toast.confirm).toHaveBeenCalledWith(jasmine.objectContaining({
       message: jasmine.stringMatching(/Date of birth in YYYYMMDD format/),
+    }));
+    expect(toast.confirm).toHaveBeenCalledWith(jasmine.objectContaining({
+      message: jasmine.stringMatching(/emp_26010007/),
     }));
   });
 });

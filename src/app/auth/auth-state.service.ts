@@ -28,6 +28,7 @@ export interface UserInfo {
   providedIn: 'root'
 })
 export class AuthStateService {
+  private readonly parentChildStorageKey = 'edunexify.parent.selected-child';
   private user: UserInfo | null = null;
   private readonly apiUrl = `${environment.apiUrl}/auth`;
 
@@ -39,14 +40,17 @@ export class AuthStateService {
         this.http.get<UserInfo>(`${this.apiUrl}/me`, { withCredentials: true })
       );
       this.user = userInfo;
+      if (userInfo.role !== 'PARENT') this.clearParentChildSelection();
     } catch (err) {
       // Expected on app start when no valid session exists (e.g. first visit, expired token)
       console.warn('[AuthStateService] Could not load current user — treating as logged out:', err);
       this.user = null;
+      this.clearParentChildSelection();
     }
   }
 
   setUser(userInfo: UserInfo): void {
+    if (this.user?.userId !== userInfo.userId || userInfo.role !== 'PARENT') this.clearParentChildSelection();
     this.user = userInfo;
   }
 
@@ -56,6 +60,11 @@ export class AuthStateService {
 
   clearUser(): void {
     this.user = null;
+    this.clearParentChildSelection();
+  }
+
+  private clearParentChildSelection(): void {
+    if (typeof localStorage !== 'undefined') localStorage.removeItem(this.parentChildStorageKey);
   }
 
   getUserRole(): string {

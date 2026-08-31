@@ -6,6 +6,7 @@ import { RazorpayService, RazorpayOrderResponse, RazorpayPaymentResponse } from 
 import { PaymentData } from '../../interfaces/payment-data';
 import { ToastService } from '../../services/toast.service';
 import { StudentService } from '../../services/student.service';
+import { AuthStateService } from '../../auth/auth-state.service';
 
 declare var Razorpay: any;
 
@@ -24,7 +25,8 @@ export class PaymentComponent implements OnDestroy {
     private studentService: StudentService,
     private ngZone: NgZone,
     private logger: LoggerService,
-    private toast: ToastService
+    private toast: ToastService,
+    private authState: AuthStateService
   ) { }
 
   ngOnDestroy(): void {
@@ -59,13 +61,21 @@ export class PaymentComponent implements OnDestroy {
 
   studentDetails: { name: string; email?: string; phoneNumber?: string } | null = null;
 
-  initiatePayment() {
-    this.paymentProcessingStarted.emit();
+  async initiatePayment(): Promise<void> {
     if (!this.paymentData || !this.paymentData.studentId) {
       this.toast.warning('Payment Error', 'Payment data or student ID is missing.');
       this.paymentProcessCompleted.emit();
       return;
     }
+    if (this.authState.getUserRole() === 'PARENT') {
+      const confirmed = await this.toast.confirm({
+        title: `Pay fees for ${this.paymentData.studentName}?`,
+        message: `You are about to pay ₹${this.paymentData.totalAmount.toLocaleString('en-IN')} for ${this.paymentData.studentName} (${this.paymentData.studentId}).`,
+        confirmText: 'Continue to payment', cancelText: 'Cancel', danger: false, icon: 'info'
+      });
+      if (!confirmed) return;
+    }
+    this.paymentProcessingStarted.emit();
     this.loadStudentDetails(this.paymentData.studentId);
   }
 

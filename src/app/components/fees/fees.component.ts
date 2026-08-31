@@ -16,7 +16,7 @@ import { CheckoutQuote } from '../../interfaces/checkout-quote';
 import { MonthFeeBreakdown } from '../../interfaces/month-fee-breakdown';
 import { ManualPaymentRequest } from '../../interfaces/manual-payment-request';
 import { AuthStateService } from '../../auth/auth-state.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, forkJoin, of, takeUntil } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from '../../auth/auth.service';
@@ -30,6 +30,9 @@ import { FeeBreakdownComponent } from './fee-breakdown.component';
 import { LoggerService } from '../../services/logger.service';
 import { SchoolService } from '../../services/school.service';
 import { take } from 'rxjs/operators';
+import { ParentPortalService } from '../../services/parent-portal.service';
+import { ParentChildContextComponent } from '../parent-child-context/parent-child-context.component';
+import { ChildAccess } from '../../interfaces/parent-portal';
 
 export interface FeeLineItem {
   name: string;
@@ -82,6 +85,7 @@ export interface MonthBreakdownDetails {
     MatFormFieldModule,
     MatInputModule,
     FeeBreakdownComponent,
+    ParentChildContextComponent,
   ],
   templateUrl: './fees.component.html',
   styleUrls: ['./fees.component.css'],
@@ -92,6 +96,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private feesService: FeesService,
@@ -103,6 +108,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     private logger: LoggerService,
     private toast: ToastService,
     private schoolService: SchoolService,
+    private parentPortalService: ParentPortalService,
   ) {}
 
   comingSoonConfig = MODULE_MESSAGES.fees;
@@ -122,6 +128,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
   lastSelectedMonth: MonthViewModel | null = null;
   studentName: string = '';
   role: string = '';
+  parentCanPay = false;
   manualPaymentAmount: number = 0;
   manualPaymentMode: ManualPaymentRequest['paymentMode'] = 'CASH';
   manualPaymentReference: string = '';
@@ -155,6 +162,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
       }
     });
     if (this.role === 'STUDENT') this.getStudentId();
+    if (this.role === 'PARENT') this.loadParentChildAccess();
 
     // Load school settings first so academic year calculations use the correct start month
     this.schoolService
@@ -185,6 +193,41 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
 
   getStudentId(): void {
     this.studentId = this.authStateService.getUserId();
+  }
+
+  private loadParentChildAccess(): void {
+    this.parentPortalService.getMyProfile().pipe(takeUntil(this.destroy$)).subscribe({
+      next: profile => {
+        const child = profile.children.find(item => item.studentId === this.studentId);
+        if (!child || !child.canViewFees) {
+          this.toast.error('Fee access unavailable', 'Please contact the school administrator.');
+          return;
+        }
+        this.studentName = child.studentName;
+        this.className = child.className;
+        this.parentCanPay = child.canPayFees;
+        this.cdr.markForCheck();
+      },
+      error: () => this.toast.error('Could not verify parent access', 'Please try again.'),
+    });
+  }
+
+  onChildTabSelected(child: ChildAccess): void {
+    if (!child.canViewFees) {
+      this.toast.error('Fee access unavailable', 'Please contact the school administrator.');
+      return;
+    }
+    this.studentId = child.studentId;
+    this.studentName = child.studentName;
+    this.className = child.className;
+    this.parentCanPay = child.canPayFees;
+    this.selectedMonthsByYear = {};
+    this.selectedMonthDetails = null;
+    this.lastSelectedMonth = null;
+    this.totalAmountToPay = 0;
+    this.router.navigate(['/dashboard/fees', child.studentId], { replaceUrl: true });
+    this.fetchSessions();
+    this.cdr.markForCheck();
   }
 
   fetchSessions(): void {
@@ -497,8 +540,11 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
 
   populateMonthDetails(month: MonthViewModel): Promise<void> {
     return new Promise((resolve) => {
+      const student$ = this.role === 'PARENT'
+        ? of({ name: this.studentName || this.studentId, className: this.className || '' })
+        : this.studentService.getStudent(this.studentId);
       forkJoin({
-        student: this.studentService.getStudent(this.studentId),
+        student: student$,
         breakdown: this.feesService
           .getMonthFeeBreakdown(this.studentId, this.session, month.month)
           .pipe(

@@ -29,6 +29,9 @@ import { Subject, takeUntil, interval, Subscription } from 'rxjs';
 import { NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AiCopilotComponent } from '../ai-copilot/ai-copilot.component';
+import { ParentPortalService } from '../../services/parent-portal.service';
+import { ParentChildContextService } from '../../services/parent-child-context.service';
+import { ChildAccess } from '../../interfaces/parent-portal';
 
 @Component({
   selector: 'app-dashboard',
@@ -61,6 +64,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   latestAppVersion = '';
   private ngUnsubscribe = new Subject<void>();
   private pollingIntervalSubscription: Subscription | undefined;
+  selectedChild: ChildAccess | null = null;
 
   constructor(
     private router: Router,
@@ -72,6 +76,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private schoolService: SchoolService,
     public tenantService: TenantService,
+    private parentPortalService: ParentPortalService,
+    private childContext: ParentChildContextService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
   ) {}
@@ -81,6 +87,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadAuthenticatedSchoolBranding();
     this.handleInitialNavigation();
     this.fetchUnreadCount();
+    this.initParentChildContext();
     // Re-fetch on every navigation (catches mark-all-read from notice board)
     this.router.events
       .pipe(
@@ -95,6 +102,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.checkForAppUpdate();
     this.onVisibilityChange = this.onVisibilityChange.bind(this);
     document.addEventListener('visibilitychange', this.onVisibilityChange);
+  }
+
+  /** Keeps the PARENT sidebar's permission-gated items in sync with whichever child is
+   *  currently selected — reactively, so switching children (from any page) updates the
+   *  sidebar without a reload. Eagerly reconciles on shell load so a deep link straight into
+   *  a feature page still has a correctly gated sidebar, not just after visiting My Children. */
+  private initParentChildContext(): void {
+    if (this.Role !== 'PARENT') return;
+    this.childContext.selectedChild$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(child => {
+      this.selectedChild = child;
+      this.cdr.markForCheck();
+    });
+    this.parentPortalService.getMyProfile().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: profile => this.childContext.reconcile(profile),
+      error: () => { /* sidebar simply shows no child-specific items until a page reconciles it */ },
+    });
+  }
+
+  /** Gates a PARENT sidebar item on the currently selected child's permission flag. */
+  childCan(permission: keyof ChildAccess): boolean {
+    return !!this.selectedChild && !!this.selectedChild[permission];
   }
 
   private loadAuthenticatedSchoolBranding(): void {

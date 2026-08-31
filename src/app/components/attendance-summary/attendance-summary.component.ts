@@ -18,6 +18,7 @@ import {
   DailyDetail, CalendarCell, CellStatus
 } from '../../interfaces/attendance-summary';
 import { ParentChildContextComponent } from '../parent-child-context/parent-child-context.component';
+import { ChildAccess } from '../../interfaces/parent-portal';
 
 @Component({
   selector: 'app-attendance-summary',
@@ -545,6 +546,22 @@ export class AttendanceSummaryComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     this.router.navigate(['/dashboard/student-list']);
+  }
+
+  onChildTabSelected(child: ChildAccess): void {
+    if (!child.canViewAttendance) {
+      this.error = "You do not have permission to view this child's attendance.";
+      this.cdr.markForCheck();
+      return;
+    }
+    this.selectedStudentId = child.studentId;
+    this.selectedClass = child.className;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { studentId: child.studentId, className: child.className },
+      replaceUrl: true,
+    });
+    this.loadReport();
   }
 
   trackByMonth(_: number, row: MonthlyBreakdown): string { return `${row.month}-${row.year}`; }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { LoggerService } from '../../services/logger.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PaymentHistoryService } from '../../services/payment-history.service';
 import { PaymentHistoryDetails } from '../../interfaces/payment-response';
 import { CommonModule } from '@angular/common';
@@ -8,6 +8,8 @@ import saveAs from 'file-saver';
 import { Subject, take, takeUntil, catchError, of } from 'rxjs';
 import { SchoolService } from '../../services/school.service';
 import { FeesCalculationService } from '../../services/fees-calculation.service';
+import { ParentChildContextComponent } from '../parent-child-context/parent-child-context.component';
+import { ChildAccess } from '../../interfaces/parent-portal';
 
 export interface ReceiptFeeLine {
   name: string;
@@ -17,7 +19,7 @@ export interface ReceiptFeeLine {
 @Component({
   selector: 'app-payment-details',
   templateUrl: './payment-details.component.html',
-  imports: [CommonModule],
+  imports: [CommonModule, ParentChildContextComponent],
   styleUrls: ['./payment-details.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -36,6 +38,7 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private paymentHistoryService: PaymentHistoryService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
@@ -157,5 +160,12 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  /** This page shows one specific payment record — there's nothing to "switch" it to for a
+   *  different child, so picking another child here takes the parent to that child's payment
+   *  history list instead, which is the sensible destination. */
+  onChildTabSelected(child: ChildAccess): void {
+    this.router.navigate(['/dashboard/payment-history', child.studentId]);
   }
 }

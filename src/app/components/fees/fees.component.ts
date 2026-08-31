@@ -16,7 +16,7 @@ import { CheckoutQuote } from '../../interfaces/checkout-quote';
 import { MonthFeeBreakdown } from '../../interfaces/month-fee-breakdown';
 import { ManualPaymentRequest } from '../../interfaces/manual-payment-request';
 import { AuthStateService } from '../../auth/auth-state.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, forkJoin, of, takeUntil } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from '../../auth/auth.service';
@@ -32,6 +32,7 @@ import { SchoolService } from '../../services/school.service';
 import { take } from 'rxjs/operators';
 import { ParentPortalService } from '../../services/parent-portal.service';
 import { ParentChildContextComponent } from '../parent-child-context/parent-child-context.component';
+import { ChildAccess } from '../../interfaces/parent-portal';
 
 export interface FeeLineItem {
   name: string;
@@ -95,6 +96,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private feesService: FeesService,
@@ -208,6 +210,24 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
       },
       error: () => this.toast.error('Could not verify parent access', 'Please try again.'),
     });
+  }
+
+  onChildTabSelected(child: ChildAccess): void {
+    if (!child.canViewFees) {
+      this.toast.error('Fee access unavailable', 'Please contact the school administrator.');
+      return;
+    }
+    this.studentId = child.studentId;
+    this.studentName = child.studentName;
+    this.className = child.className;
+    this.parentCanPay = child.canPayFees;
+    this.selectedMonthsByYear = {};
+    this.selectedMonthDetails = null;
+    this.lastSelectedMonth = null;
+    this.totalAmountToPay = 0;
+    this.router.navigate(['/dashboard/fees', child.studentId], { replaceUrl: true });
+    this.fetchSessions();
+    this.cdr.markForCheck();
   }
 
   fetchSessions(): void {

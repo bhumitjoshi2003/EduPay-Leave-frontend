@@ -255,12 +255,12 @@ export const routes: Routes = [
       {
         path: 'fee-structure',
         loadComponent: () => import('./components/fee-structure/fee-structure.component').then(m => m.FeeStructureComponent),
-        canActivate: [roleGuard, featureGuard], data: { roles: ['STUDENT', 'ADMIN'], featureKey: 'FEE_MANAGEMENT' }
+        canActivate: [roleGuard, featureGuard], data: { roles: ['STUDENT', 'ADMIN', 'PARENT'], featureKey: 'FEE_MANAGEMENT' }
       },
       {
         path: 'bus-fees',
         loadComponent: () => import('./components/bus-fees/bus-fees.component').then(m => m.BusFeesComponent),
-        canActivate: [roleGuard, featureGuard], data: { roles: ['ADMIN'], featureKey: 'FEE_MANAGEMENT' }
+        canActivate: [roleGuard, featureGuard], data: { roles: ['ADMIN', 'STUDENT', 'PARENT'], featureKey: 'FEE_MANAGEMENT' }
       },
       {
         path: 'fee-assignment',
@@ -362,6 +362,11 @@ export const routes: Routes = [
         path: 'parent-portal',
         loadComponent: () => import('./components/parent-portal/parent-portal.component').then(m => m.ParentPortalComponent),
         canActivate: [roleGuard, featureGuard], data: { roles: ['ADMIN', 'PARENT'], featureKey: 'PARENT_PORTAL' }
+      },
+      {
+        path: 'parent-portal/:parentId',
+        loadComponent: () => import('./components/parent-detail/parent-detail.component').then(m => m.ParentDetailComponent),
+        canActivate: [roleGuard, featureGuard], data: { roles: ['ADMIN'], featureKey: 'PARENT_PORTAL' }
       },
       {
         path: 'parent-dashboard',

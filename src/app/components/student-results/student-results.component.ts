@@ -12,6 +12,7 @@ import { AuthStateService } from '../../auth/auth-state.service';
 import { LoggerService } from '../../services/logger.service';
 import { AcademicSessionService } from '../../services/academic-session.service';
 import { ParentPortalService } from '../../services/parent-portal.service';
+import { ChildAccess } from '../../interfaces/parent-portal';
 import { ToastService } from '../../services/toast.service';
 import { ParentChildContextComponent } from '../parent-child-context/parent-child-context.component';
 
@@ -132,6 +133,20 @@ export class StudentResultsComponent implements OnInit, OnDestroy, AfterViewChec
           this.cdr.markForCheck();
         },
       });
+  }
+
+  onChildTabSelected(child: ChildAccess): void {
+    if (!child.canViewResults) {
+      this.toast.error('Results access unavailable', 'Please contact the school administrator.');
+      return;
+    }
+    this.studentId = child.studentId;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { studentId: child.studentId },
+      replaceUrl: true,
+    });
+    this.loadResults();
   }
 
   toggleProgress(): void {

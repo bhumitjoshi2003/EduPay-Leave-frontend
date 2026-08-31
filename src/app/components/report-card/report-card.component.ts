@@ -18,6 +18,7 @@ import { Capacitor } from '@capacitor/core';
 import { ToastService } from '../../services/toast.service';
 import { environment } from '../../../environments/environment';
 import { ParentChildContextComponent } from '../parent-child-context/parent-child-context.component';
+import { ChildAccess } from '../../interfaces/parent-portal';
 
 @Component({
   selector: 'app-report-card',
@@ -116,6 +117,29 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     this.titleService.setTitle(this.originalTitle);
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  onChildTabSelected(child: ChildAccess): void {
+    if (!child.canViewResults) {
+      this.toast.error('Results access unavailable', 'Please contact the school administrator.');
+      return;
+    }
+    this.studentId = child.studentId;
+    this.loading = true;
+    this.reportCardData = null;
+    this.notPublished = false;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { studentId: child.studentId },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+    if (this.templateId) {
+      this.loadTemplateMode();
+    } else {
+      this.loadLegacyMode();
+    }
+    this.cdr.markForCheck();
   }
 
   // ── Template-based mode ───────────────────────────────────────────────

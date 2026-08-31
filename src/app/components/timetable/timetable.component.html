@@ -1,5 +1,5 @@
 <div class="tt-page">
-  <app-parent-child-context *ngIf="isParent()" [studentId]="userId"></app-parent-child-context>
+  <app-parent-child-context *ngIf="isParent()" [studentId]="userId" requiredPermission="canViewTimetable" (childSelected)="onChildTabSelected($event)"></app-parent-child-context>
 
   <!-- ── Hero ─────────────────────────────────────────────────── -->
   <div class="tt-hero">

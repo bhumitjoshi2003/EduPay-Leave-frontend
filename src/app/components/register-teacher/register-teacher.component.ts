@@ -8,9 +8,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
 import { AuthStateService } from '../../auth/auth-state.service';
-import { EMPTY, Subject } from 'rxjs';
+import { EMPTY, Subject, forkJoin } from 'rxjs';
 import { catchError, finalize, switchMap, takeUntil } from 'rxjs/operators';
-import { SchoolService } from '../../services/school.service';
+import { SchoolClass, SchoolService } from '../../services/school.service';
+import { SectionService } from '../../services/section.service';
+import { Section } from '../../interfaces/section';
 import { strictEmailValidator, pastDateValidator, phoneValidator } from '../../validators/shared.validators';
 
 @Component({
@@ -25,6 +27,10 @@ export class RegisterTeacherComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   teacherForm: FormGroup;
   classList: string[] = [];
+  /** Full class records (name + id) — the id is what the section lookup needs. */
+  managedClasses: SchoolClass[] = [];
+  /** Active sections of the currently selected class; empty means the class has none. */
+  sections: Section[] = [];
   isSubmitting = false;
 
   constructor(
@@ -35,6 +41,7 @@ export class RegisterTeacherComponent implements OnInit, OnDestroy {
     private authState: AuthStateService,
     private logger: LoggerService,
     private schoolService: SchoolService,
+    private sectionService: SectionService,
     private toast: ToastService,
     private cdr: ChangeDetectorRef
   ) {
@@ -45,8 +52,15 @@ export class RegisterTeacherComponent implements OnInit, OnDestroy {
       dob: ['', [Validators.required, pastDateValidator()]],
       gender: ['', Validators.required],
       classTeacher: [''],
+      // Validators are attached/removed dynamically: required only while the selected
+      // class actually has active sections (mirrors the backend's own rule).
+      classTeacherSectionId: [null as number | null],
       joiningDate: ['', Validators.required]
     });
+  }
+
+  get sectionControl() {
+    return this.teacherForm.controls['classTeacherSectionId'];
   }
 
   get todayStr(): string {
@@ -61,12 +75,64 @@ export class RegisterTeacherComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.schoolService.getClasses().pipe(takeUntil(this.destroy$)).subscribe({
-      next: classes => { this.classList = classes; },
+    // Class names drive the dropdown; the managed records supply the classId the
+    // section lookup needs.
+    forkJoin({
+      classes: this.schoolService.getClasses(),
+      managed: this.schoolService.getManagedClasses()
+    }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: ({ classes, managed }) => {
+        this.classList = classes;
+        this.managedClasses = managed;
+        this.cdr.markForCheck();
+      },
       error: () => {
         this.toast.error('Error', 'Failed to load class list.');
       }
     });
+
+    // Reacting to valueChanges (rather than a template (change) handler) also covers
+    // programmatic resets, so the section field can never keep a stale value.
+    this.teacherForm.controls['classTeacher'].valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((className: string | null) => this.onClassTeacherChange(className));
+  }
+
+  /**
+   * Clears any previously chosen section, then reloads the section list for the newly
+   * selected class. The section field is shown and made required only when that class
+   * has active sections — otherwise it stays hidden and submits null.
+   */
+  private onClassTeacherChange(className: string | null): void {
+    this.sections = [];
+    this.sectionControl.setValue(null, { emitEvent: false });
+    this.sectionControl.clearValidators();
+    this.sectionControl.updateValueAndValidity({ emitEvent: false });
+    this.cdr.markForCheck();
+
+    if (!className) return;
+    const cls = this.managedClasses.find(c => c.name === className);
+    if (!cls) return;
+
+    this.sectionService.getSectionsForClass(cls.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: sections => {
+          // A slower response for a class the admin has since switched away from must
+          // not repopulate the dropdown.
+          if (this.teacherForm.controls['classTeacher'].value !== className) return;
+          this.sections = sections;
+          if (sections.length > 0) {
+            this.sectionControl.setValidators(Validators.required);
+            this.sectionControl.updateValueAndValidity({ emitEvent: false });
+          }
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.sections = [];
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -85,7 +151,14 @@ export class RegisterTeacherComponent implements OnInit, OnDestroy {
       // generated ID is captured here (switchMap discards the outer emission) so it can
       // still be shown to the admin once account setup completes.
       let generatedTeacherId = '';
-      this.teacherService.addTeacher(this.teacherForm.value).pipe(
+      const payload = {
+        ...this.teacherForm.value,
+        // Belt-and-braces: a class with no sections must never carry a sectionId.
+        classTeacherSectionId: this.sections.length > 0
+          ? this.sectionControl.value
+          : null
+      };
+      this.teacherService.addTeacher(payload).pipe(
         switchMap((response: { teacherId: string }) => {
           generatedTeacherId = response.teacherId;
           return this.authService.register({

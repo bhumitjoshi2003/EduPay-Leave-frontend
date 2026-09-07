@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
 import { PaymentTrackerComponent, MonthViewModel } from './fees.component';
@@ -12,6 +12,8 @@ import { FeesCalculationService } from '../../services/fees-calculation.service'
 import { LoggerService } from '../../services/logger.service';
 import { ToastService } from '../../services/toast.service';
 import { SchoolService } from '../../services/school.service';
+import { AcademicSessionService } from '../../services/academic-session.service';
+import { ParentPortalService } from '../../services/parent-portal.service';
 import { StudentFee } from '../../interfaces/student-fee';
 import { ManualPaymentRequest } from '../../interfaces/manual-payment-request';
 import { CheckoutQuote } from '../../interfaces/checkout-quote';
@@ -23,12 +25,21 @@ import { CheckoutQuote } from '../../interfaces/checkout-quote';
  *   to the backend, and the action is guarded (never fires) when no month is selected.
  * - recalculateTotals (via toggleMonthSelection): totalAmountToPay comes from the backend
  *   checkout quote, never a client-side recomputation.
+ *
+ * Also covers the Phase 1B migration off locally-guessed "current academic year": before,
+ * currentAcademicYear came from FeesCalculationService.getAcademicYear(new Date()) — a value
+ * that depended on the real wall-clock date when a test ran, not on anything these tests
+ * actually controlled. It only ever matched the '2026-2027' fixtures below by coincidence of
+ * when this suite happened to run, and would have silently diverged once real time crossed
+ * into the next academic year. currentAcademicYear now comes from a mocked
+ * AcademicSessionService.getCurrentSession() call, making it fully deterministic.
  */
 describe('PaymentTrackerComponent', () => {
   let component: PaymentTrackerComponent;
   let fixture: ComponentFixture<PaymentTrackerComponent>;
   let feesServiceSpy: jasmine.SpyObj<FeesService>;
   let schoolServiceSpy: jasmine.SpyObj<SchoolService>;
+  let academicSessionServiceSpy: jasmine.SpyObj<AcademicSessionService>;
   let toastSpy: jasmine.SpyObj<ToastService>;
 
   const adminUser = {
@@ -79,6 +90,11 @@ describe('PaymentTrackerComponent', () => {
       of({ academicYearStartMonth: 7 } as any),
     );
 
+    academicSessionServiceSpy = jasmine.createSpyObj('AcademicSessionService', ['getCurrentSession']);
+    academicSessionServiceSpy.getCurrentSession.and.returnValue(
+      of({ id: 1, label: '2026-2027', startDate: '2026-07-01', endDate: '2027-06-30', current: true }),
+    );
+
     toastSpy = jasmine.createSpyObj('ToastService', [
       'success',
       'error',
@@ -109,9 +125,22 @@ describe('PaymentTrackerComponent', () => {
     const authStateServiceSpy = jasmine.createSpyObj('AuthStateService', [
       'getUserId',
       'getUser',
+      'getUserRole',
     ]);
     authStateServiceSpy.getUserId.and.returnValue('admin1');
     authStateServiceSpy.getUser.and.returnValue(adminUser as any);
+    // ParentChildContextComponent (rendered unconditionally at the top of fees.component.html)
+    // calls this at construction time regardless of role — was missing from this spy entirely,
+    // so fixture.detectChanges() threw "authState.getUserRole is not a function" in every test
+    // that rendered the template, independent of anything this Phase 1B change touches.
+    authStateServiceSpy.getUserRole.and.returnValue('ADMIN');
+
+    // Real constructor dependency of PaymentTrackerComponent (only exercised for role ===
+    // 'PARENT', never hit by these ADMIN-role tests) that was previously left unmocked —
+    // Angular then tried to construct the real ParentPortalService, which needs HttpClient,
+    // which isn't provided here either, so every test in this file failed at TestBed
+    // construction with "No provider for HttpClient!" before it could even run.
+    const parentPortalServiceSpy = jasmine.createSpyObj('ParentPortalService', ['getMyProfile']);
 
     await TestBed.configureTestingModule({
       imports: [PaymentTrackerComponent],
@@ -133,6 +162,8 @@ describe('PaymentTrackerComponent', () => {
         },
         { provide: ToastService, useValue: toastSpy },
         { provide: SchoolService, useValue: schoolServiceSpy },
+        { provide: AcademicSessionService, useValue: academicSessionServiceSpy },
+        { provide: ParentPortalService, useValue: parentPortalServiceSpy },
       ],
     }).compileComponents();
 
@@ -391,5 +422,69 @@ describe('PaymentTrackerComponent', () => {
         ?.textContent ?? '';
     expect(amountText).toContain('5,800');
     expect(amountText).not.toContain('3,000');
+  });
+
+  // ── Phase 1B: authoritative current session, not a locally-guessed one ─────
+
+  describe('current-session sourcing', () => {
+    it('uses the backend AcademicSession label, never a value computed from today\'s date and academicYearStartMonth', () => {
+      fixture.detectChanges();
+
+      expect(academicSessionServiceSpy.getCurrentSession).toHaveBeenCalled();
+      expect(component.currentAcademicYear).toBe('2026-2027');
+    });
+
+    it('still loads the fee grid when the school has no current session configured', () => {
+      academicSessionServiceSpy.getCurrentSession.and.returnValue(
+        throwError(() => ({ error: 'No current academic session found.' })),
+      );
+
+      fixture.detectChanges();
+
+      return fixture.whenStable().then(() => {
+        expect(component.currentAcademicYear).toBe('');
+        expect(component.feesLoaded).toBeTrue();
+        expect(feesServiceSpy.getStudentFees).toHaveBeenCalled();
+      });
+    });
+
+    it('suppresses "unpaid this month" warnings for a viewed session strictly after the authoritative current one (historical/future selection)', () => {
+      fixture.detectChanges();
+      component.role = 'STUDENT';
+      component.currentAcademicYear = '2025-2026';
+      component.session = '2026-2027'; // viewed session is after the real current one
+      component.months = [
+        { ...buildFee(5), monthNumber: 5, name: 'November', fee: 5000, busFee: 800, selected: false, amountUnavailable: false, paid: false } as MonthViewModel,
+      ];
+
+      component.checkAndDisplayFeeWarnings();
+
+      expect(component.pastUnpaidMonthNames).toEqual([]);
+      expect(component.unpaidCurrentMonthName).toBe('');
+    });
+
+    it('isLate never flags a month in a session strictly after the authoritative current one', () => {
+      fixture.detectChanges();
+      component.currentAcademicYear = '2025-2026';
+      component.session = '2026-2027';
+      const month = {
+        ...buildFee(1), monthNumber: 1, name: 'July', fee: 5000, busFee: 800,
+        selected: false, amountUnavailable: false, paid: false, manuallyPaid: false,
+      } as MonthViewModel;
+
+      expect(component.isLate(month)).toBeFalse();
+    });
+
+    it('isLate flags an unpaid month in a historical session strictly before the authoritative current one', () => {
+      fixture.detectChanges();
+      component.currentAcademicYear = '2026-2027';
+      component.session = '2025-2026'; // a past session the user has navigated back to
+      const month = {
+        ...buildFee(1), monthNumber: 1, name: 'July', fee: 5000, busFee: 800,
+        selected: false, amountUnavailable: false, paid: false, manuallyPaid: false,
+      } as MonthViewModel;
+
+      expect(component.isLate(month)).toBeTrue();
+    });
   });
 });

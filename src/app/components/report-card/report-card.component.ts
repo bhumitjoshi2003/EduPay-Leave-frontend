@@ -9,7 +9,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { MarksService, ExamResult } from '../../services/marks.service';
 import {
   ReportCardTemplateService, ReportCardData, TemplateSection, BrandingConfig,
-  ExamColumn, SubjectRow
+  ExamColumn, SubjectRow, AmbiguousClassCandidate, isAmbiguousReportCardContext
 } from '../../services/report-card-template.service';
 import { LoggerService } from '../../services/logger.service';
 import { SchoolService } from '../../services/school.service';
@@ -49,9 +49,17 @@ export class ReportCardComponent implements OnInit, OnDestroy {
   // ── Template-based mode ───────────────────────────────────────────────
   templateId: number | null = null;
   reportCardData: ReportCardData | null = null;
+  /** The classId chosen (explicitly, or unambiguously implied) for the current request —
+   *  reused for both the data load and the PDF download so both target the exact same
+   *  historical class context (see E6E's "do not independently recalculate class"). */
+  selectedClassId: number | null = null;
 
   loading = true;
   notPublished = false;  // true when STUDENT hits a 403 (report not yet published)
+  // E6F: the student has more than one legitimate historical class for this session (a
+  // mid-session class change with marked exams on both sides). The user must pick one —
+  // never silently guessed. See ReportCardDataAssembler.ReportCardContextAmbiguousException.
+  ambiguousCandidates: AmbiguousClassCandidate[] | null = null;
   private originalTitle = '';
 
   constructor(
@@ -128,6 +136,8 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.reportCardData = null;
     this.notPublished = false;
+    this.ambiguousCandidates = null;
+    this.selectedClassId = null;
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { studentId: child.studentId },
@@ -145,8 +155,9 @@ export class ReportCardComponent implements OnInit, OnDestroy {
   // ── Template-based mode ───────────────────────────────────────────────
 
   private loadTemplateMode(): void {
+    this.ambiguousCandidates = null;
     this.rcTemplateService
-      .getReportCard(this.studentId, this.templateId!, this.session)
+      .getReportCard(this.studentId, this.templateId!, this.session, this.selectedClassId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
@@ -158,7 +169,11 @@ export class ReportCardComponent implements OnInit, OnDestroy {
           );
         },
         error: (e) => {
-          if (e.status === 403) {
+          if (e.status === 409 && isAmbiguousReportCardContext(e.error)) {
+            // More than one legitimate historical class for this session — show the choice
+            // rather than guessing (see E6E's ReportCardContextAmbiguousException).
+            this.ambiguousCandidates = e.error.candidates;
+          } else if (e.status === 403) {
             this.notPublished = true;
           } else {
             this.logger.error('Error loading template report card:', e);
@@ -168,6 +183,16 @@ export class ReportCardComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         }
       });
+  }
+
+  /** User's choice from the E6F ambiguity picker — retries the same request with the selected
+   *  classId, which is also reused for the PDF download so both target the same context. */
+  selectHistoricalClass(candidate: AmbiguousClassCandidate): void {
+    this.selectedClassId = candidate.classId;
+    this.ambiguousCandidates = null;
+    this.loading = true;
+    this.cdr.markForCheck();
+    this.loadTemplateMode();
   }
 
   // ── Legacy exam-based mode ────────────────────────────────────────────
@@ -479,7 +504,7 @@ export class ReportCardComponent implements OnInit, OnDestroy {
     this.downloadingPdf = true;
     this.cdr.markForCheck();
 
-    this.rcTemplateService.downloadPdf(this.studentId, this.templateId, this.session)
+    this.rcTemplateService.downloadPdf(this.studentId, this.templateId, this.session, this.selectedClassId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (blob) => {

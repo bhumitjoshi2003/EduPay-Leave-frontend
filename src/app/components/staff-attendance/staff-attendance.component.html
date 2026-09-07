@@ -252,9 +252,11 @@
         </ng-container>
         <div class="sa-date-group" *ngIf="individualPeriod === 'session'">
           <label class="sa-date-label">Session</label>
-          <select class="sa-date-input" [(ngModel)]="selectedSession" (change)="loadIndividualReport()">
+          <select class="sa-date-input" [(ngModel)]="selectedSession" (change)="loadIndividualReport()" [disabled]="loadingSessions || sessionOptions.length === 0">
             <option *ngFor="let session of sessionOptions" [value]="session">{{ session }}</option>
           </select>
+          <span *ngIf="loadingSessions" class="sa-session-hint">Loading sessions…</span>
+          <span *ngIf="!loadingSessions && sessionOptions.length === 0" class="sa-session-hint">No academic sessions configured yet.</span>
         </div>
       </div>
     </div>

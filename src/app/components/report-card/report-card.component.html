@@ -65,6 +65,27 @@
     </p>
   </div>
 
+  <!-- ── Multi-class ambiguity (E6F) ──────────────────────────────────
+       The student has more than one legitimate historical class for this session (e.g. a
+       mid-session class change). Never guessed — the user must pick one. -->
+  <div *ngIf="!loading && ambiguousCandidates" class="rc-locked no-print">
+    <div class="rc-locked-icon">🏫</div>
+    <h2 class="rc-locked-title">Multiple Classes Found for {{ session }}</h2>
+    <p class="rc-locked-msg">
+      This student's records show more than one class for this session. Select the class the
+      report card should reflect.
+    </p>
+    <div class="rc-class-choices">
+      <button
+        type="button"
+        class="rc-class-choice"
+        *ngFor="let candidate of ambiguousCandidates"
+        (click)="selectHistoricalClass(candidate)">
+        Class {{ candidate.className }}
+      </button>
+    </div>
+  </div>
+
   <!-- ══════════════════════════════════════════════════════════════════
        TEMPLATE-BASED REPORT CARD
   ══════════════════════════════════════════════════════════════════════ -->

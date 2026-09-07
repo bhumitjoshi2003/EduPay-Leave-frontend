@@ -125,6 +125,18 @@
 .rc-locked-title { font-size: 1.25rem; font-weight: 800; color: #1e293b; margin: 0 0 10px; font-family: 'Segoe UI', sans-serif; }
 .rc-locked-msg   { font-size: 0.9rem; color: #64748b; line-height: 1.7; margin: 0; font-family: 'Segoe UI', sans-serif; }
 
+/* Multi-class ambiguity picker (E6F) */
+.rc-class-choices {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px;
+}
+.rc-class-choice {
+  font-family: 'Segoe UI', sans-serif; font-size: 0.9rem; font-weight: 700;
+  color: #1e293b; background: #f1f5f9; border: 1px solid #cbd5e1;
+  border-radius: 10px; padding: 10px 20px; cursor: pointer; transition: background 0.15s, border-color 0.15s;
+}
+.rc-class-choice:hover { background: #e2e8f0; border-color: #94a3b8; }
+.rc-class-choice:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+
 /* ════════════════════════════════════════════════════════════════════════
    THE DOCUMENT CARD (A4 page)
 ════════════════════════════════════════════════════════════════════════ */

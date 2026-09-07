@@ -134,6 +134,7 @@
   outline: none;
   transition: border-color 0.15s;
 }
+.sa-session-hint { font-size: 0.72rem; color: #94a3b8; }
 .sa-date-input:focus { border-color: #059669; box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1); }
 
 .sa-mark-btn {

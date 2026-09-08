@@ -60,7 +60,7 @@ describe('F6A responsibility management and activation', () => {
     it(`hides and blocks activation for ${session.label}`, async () => {
       fixture.componentRef.setInput('session', session); fixture.detectChanges(); c.loadPreview(); await c.apply();
       expect(service.preview).not.toHaveBeenCalled(); expect(service.apply).not.toHaveBeenCalled();
-      expect(fixture.nativeElement.textContent).not.toContain('Activate current-session');
+      expect(fixture.nativeElement.textContent).not.toContain('Resync Current Session Class Teachers');
     });
   }
   it('creates and updates canonical responsibility configuration', () => {

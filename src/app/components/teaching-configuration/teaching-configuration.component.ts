@@ -17,13 +17,19 @@ import { apiMessage, writableSession, sessionKind } from '../academic-session-se
 @Component({
   selector: 'app-teaching-configuration', standalone: true, imports: [CommonModule, FormsModule],
   templateUrl: './teaching-configuration.component.html',
-  styles: [`:host { display:block; margin:16px 0; } details { border:1px solid #ccd5df; border-radius:8px; padding:16px; margin:12px 0; background:white; } summary { cursor:pointer; font-weight:600; } label { display:inline-block; margin:8px 12px 8px 0; } select, button { padding:8px; margin:4px; } table { width:100%; border-collapse:collapse; } th,td { text-align:left; padding:8px; border-bottom:1px solid #ddd; } .scroll { overflow:auto; } .error { color:#a52020; } button:disabled { opacity:.5; }`]
+  styleUrl: './teaching-configuration.component.css'
 })
 export class TeachingConfigurationComponent implements OnChanges, OnDestroy {
   @Input() session: AcademicSession | null = null;
   @Input() classes: SchoolClass[] = [];
   @Input() teachers: Teacher[] = [];
   @Output() timetableCopied = new EventEmitter<void>();
+  /** Presentational only — which sections are visually expanded. Content stays in the DOM
+   *  either way (collapse is CSS-only, not *ngIf) so nothing here affects data/behavior. */
+  expanded = { copy: false, responsibilities: true, activation: true };
+  toggleSection(key: 'copy' | 'responsibilities' | 'activation'): void {
+    this.expanded[key] = !this.expanded[key];
+  }
   sessions: AcademicSession[] = [];
   rows: Responsibility[] = [];
   sections: Section[] = [];

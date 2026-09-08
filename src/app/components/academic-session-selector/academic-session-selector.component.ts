@@ -21,13 +21,8 @@ export function apiMessage(error: any, fallback = 'Request failed. Please try ag
 }
 @Component({
   selector: 'app-academic-session-selector', standalone: true, imports: [CommonModule, FormsModule],
-  template: `<label>Academic session
-    <select [ngModel]="selectedId" (ngModelChange)="select($event)" [disabled]="disabled || loading">
-      <option [ngValue]="null">Select a session</option>
-      <option *ngFor="let s of sessions" [ngValue]="s.id">{{ s.label }} — {{ kind(s) }}</option>
-    </select>
-  </label><p *ngIf="error" role="alert">{{ error }}</p>`,
-  styles: [`:host { display:block; margin:16px 0; } select { padding:10px; margin-left:12px; max-width:100%; }`]
+  templateUrl: './academic-session-selector.component.html',
+  styleUrl: './academic-session-selector.component.css'
 })
 export class AcademicSessionSelectorComponent implements OnInit, OnDestroy {
   @Input() initialId: number | null = null;
@@ -40,6 +35,22 @@ export class AcademicSessionSelectorComponent implements OnInit, OnDestroy {
   error = '';
   kind = sessionKind;
   private destroy$ = new Subject<void>();
+
+  get selectedSession(): AcademicSession | null {
+    return this.sessions.find(s => s.id === this.selectedId) ?? null;
+  }
+
+  /** Presentational only — maps sessionKind()'s label to a status-pill colour, mirroring
+   *  the dashboard's existing role/status chip convention (one accent per state). */
+  pillClass(kind: string): string {
+    switch (kind) {
+      case 'CURRENT': return 'ass-pill-current';
+      case 'HISTORICAL': return 'ass-pill-historical';
+      case 'FUTURE': return 'ass-pill-future';
+      case 'NON-CURRENT': return 'ass-pill-noncurrent';
+      default: return '';
+    }
+  }
   constructor(private service: AcademicSessionService) {}
   ngOnInit(): void {
     this.service.getAllSessions().pipe(takeUntil(this.destroy$)).subscribe({

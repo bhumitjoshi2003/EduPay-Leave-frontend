@@ -106,7 +106,7 @@
             <div class="tt-card-content">
               <div class="tt-icon-box">{{ getSubjectIcon(group.entries[0].subjectName) }}</div>
               <div class="tt-card-info">
-                <span class="tt-section-badge" *ngIf="group.entries[0].sectionName && !selectedSectionId">§ {{ group.entries[0].sectionName }}</span>
+                <span class="tt-section-badge" *ngIf="group.entries[0].sectionName && !selectedSectionId">{{ group.entries[0].sectionName }}</span>
                 <div class="tt-card-subject">{{ group.entries[0].subjectName }}</div>
                 <div class="tt-card-teacher">{{ group.entries[0].teacherName }}</div>
               </div>
@@ -131,7 +131,7 @@
               (click)="canWrite() && openEdit(entry)">
               <span class="tt-icon-box">{{ getSubjectIcon(entry.subjectName) }}</span>
               <span class="tt-simul-info">
-                <span class="tt-section-badge" *ngIf="entry.sectionName && !selectedSectionId">§ {{ entry.sectionName }}</span>
+                <span class="tt-section-badge" *ngIf="entry.sectionName && !selectedSectionId">{{ entry.sectionName }}</span>
                 <span class="tt-simul-subject">{{ entry.subjectName }}</span>
                 <span class="tt-simul-teacher">{{ entry.teacherName }}</span>
               </span>

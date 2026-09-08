@@ -1,3 +1,5 @@
+import { AcademicSession } from './academic-session';
+
 export interface SessionCopyRequest {
   sourceAcademicSessionId: number;
   targetAcademicSessionId: number;
@@ -60,8 +62,21 @@ export interface ActivationResult {
 export interface ActivationPreview extends ActivationResult {
   inSync: boolean;
   hasIssues: boolean;
+  /** Raw class_teacher_responsibility row count for this session, BEFORE validity filtering —
+   *  lets a caller distinguish "zero rows configured" from "rows configured but all ineligible/
+   *  invalid" from "rows configured and valid but already matching live," none of which can be
+   *  told apart from becomingLive/changing/clearing alone. Optional only so existing test
+   *  literals need not be touched; always present on a real backend response. */
+  configuredCount?: number;
   becomingLive: number;
   changing: number;
   clearing: number;
 }
 export interface ActivationApply extends ActivationResult { applied: number; cleared: number; }
+export interface SessionActivationOutcome {
+  session: AcademicSession;
+  /** False only when the target was ALREADY the current session — a genuine no-op, not a
+   *  redundant re-apply. {@code activation} is null in that case. */
+  activationPerformed: boolean;
+  activation: ActivationApply | null;
+}

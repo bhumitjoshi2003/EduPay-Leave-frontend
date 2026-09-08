@@ -21,6 +21,19 @@ import { catchError, filter, switchMap, take, tap } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class AuthInterceptor implements HttpInterceptor {
 
+  /** Guard-free top-level routes in app.routes.ts (home, reset-password, verify-rc) — the
+   *  only routes usable with zero session. An anonymous visitor's failed silent-refresh here
+   *  is expected (there is no session to refresh) and must never hijack navigation away from
+   *  the page they're legitimately allowed to be on. Update this list if app.routes.ts's
+   *  guard-free routes change. */
+  private static readonly PUBLIC_ROUTES = ['/home', '/reset-password', '/verify-rc'];
+
+  private isPublicRoute(): boolean {
+    if (typeof window === 'undefined') return false;
+    const path = window.location.pathname;
+    return AuthInterceptor.PUBLIC_ROUTES.some(publicPath => path === publicPath || path.startsWith(publicPath + '/'));
+  }
+
   private isRefreshing = false;
   /**
    * While isRefreshing=true, queued requests wait on this Subject.
@@ -141,7 +154,11 @@ export class AuthInterceptor implements HttpInterceptor {
           this.refreshDone$.error(new HttpErrorResponse({ status: 401, statusText: 'Token refresh failed' }));
           this.refreshDone$ = new BehaviorSubject<boolean>(false);
           this.authStateService.clearUser();
-          this.router.navigate(['/home']);
+          // Only hijack navigation away from a protected route — an anonymous visitor
+          // legitimately on a public route (e.g. reset-password) has no session to lose.
+          if (!this.isPublicRoute()) {
+            this.router.navigate(['/home']);
+          }
           return throwError(() => refreshError);
         })
       );

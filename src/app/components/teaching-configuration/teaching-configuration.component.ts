@@ -130,7 +130,10 @@ export class TeachingConfigurationComponent implements OnChanges, OnDestroy {
     if (!this.canCopy()) return;
     const source = this.sessions.find(s => s.id === this.sourceId)!;
     const target = this.sessions.find(s => s.id === this.targetId)!;
-    const confirmed = await this.toast.confirm({ title: `Copy ${type}?`, message: `${source.label} → ${target.label}. Existing target rows will be preserved; conflicts will be reported.${type === 'timetable' && target.current ? ' This adds periods to the CURRENT operational timetable.' : ''}`, confirmText: 'Copy' });
+    const conflictNote = type === 'timetable'
+      ? 'Existing target rows are preserved; any number of periods may share the same slot.'
+      : 'Existing target rows will be preserved; conflicts will be reported.';
+    const confirmed = await this.toast.confirm({ title: `Copy ${type}?`, message: `${source.label} → ${target.label}. ${conflictNote}${type === 'timetable' && target.current ? ' This adds periods to the CURRENT operational timetable.' : ''}`, confirmText: 'Copy' });
     if (!confirmed || this.destroyed || !this.canCopy() || source.id !== this.sourceId || target.id !== this.targetId) return;
     const body = { sourceAcademicSessionId: source.id, targetAcademicSessionId: target.id };
     this.copyResult = null;

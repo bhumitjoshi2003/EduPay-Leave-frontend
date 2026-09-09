@@ -51,7 +51,7 @@
         <span class="tc-stat">Scanned <strong>{{ r.scanned }}</strong></span>
         <span class="tc-stat tc-stat-good">Copied <strong>{{ r.copied }}</strong></span>
         <span class="tc-stat">Already copied <strong>{{ r.alreadyCopied }}</strong></span>
-        <span class="tc-stat" [class.tc-stat-warn]="r.conflicts > 0">Conflicts <strong>{{ r.conflicts }}</strong></span>
+        <span class="tc-stat" *ngIf="r.conflicts !== undefined" [class.tc-stat-warn]="r.conflicts > 0">Conflicts <strong>{{ r.conflicts }}</strong></span>
         <span class="tc-stat" [class.tc-stat-warn]="r.failures > 0">Failures <strong>{{ r.failures }}</strong></span>
       </div>
       <p class="tc-hint">Skipped: ineligible teachers {{ r.skippedIneligibleTeacher }}, invalid classes {{ r.skippedInvalidClass }}, invalid sections {{ r.skippedInvalidSection }}.</p>

@@ -13,7 +13,10 @@ export interface SessionCopyResult {
   skippedIneligibleTeacher: number;
   skippedInvalidClass: number;
   skippedInvalidSection: number;
-  conflicts: number;
+  /** Only present on the class-teacher-responsibility copy result (a separate backend endpoint
+   *  sharing this TS shape) — the timetable copy no longer has a conflict concept, since any
+   *  number of rows may occupy the same target slot. */
+  conflicts?: number;
   failures: number;
   details: { sourceEntryId?: number; targetEntryId?: number; sourceId?: number; targetId?: number; outcome: string; reason: string | null }[];
 }

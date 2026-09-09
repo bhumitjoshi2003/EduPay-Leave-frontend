@@ -39,13 +39,13 @@ describe('F6A responsibility management and activation', () => {
   it('renders NEVER_APPLIED separately from inSync=true', () => {
     c.loadPreview(); fixture.detectChanges();
     const text = fixture.nativeElement.textContent;
-    expect(text).toContain('NEVER_APPLIED'); expect(text).toContain('inSync): true');
-    expect(text).toContain('has never been explicitly applied'); expect(service.apply).not.toHaveBeenCalled();
+    expect(text).toContain('Never Applied'); expect(text).toContain('In Sync');
+    expect(service.apply).not.toHaveBeenCalled();
   });
   it('renders drift, provenance, gains, changes, removals and issues', () => {
     service.preview.and.returnValue(of({ ...preview, activationState: 'APPLIED_BUT_DRIFTED', inSync: false, becomingLive: 2, changing: 3, clearing: 4, hasIssues: true, ineligibleTeacher: 1, lastAppliedBy: 'admin', lastAppliedAt: '2026-09-01T10:00:00', details: [{ className: '8', outcome: 'INELIGIBLE_TEACHER', reason: 'Teacher is inactive' }] }));
     c.loadPreview(); fixture.detectChanges(); const text = fixture.nativeElement.textContent;
-    for (const expected of ['APPLIED_BUT_DRIFTED', 'Gains 2', 'changes 3', 'removals 4', 'admin', 'Teacher is inactive']) expect(text).toContain(expected);
+    for (const expected of ['Applied · Drifted', 'Gains 2', 'changes 3', 'removals 4', 'admin', '1 ineligible teacher', 'Teacher is inactive']) expect(text).toContain(expected);
   });
   it('requires explicit confirmation before apply, even if in sync', async () => {
     c.loadPreview(); await c.apply(); expect(toast.confirm).toHaveBeenCalled(); expect(service.apply).toHaveBeenCalledTimes(1);
@@ -60,7 +60,7 @@ describe('F6A responsibility management and activation', () => {
     it(`hides and blocks activation for ${session.label}`, async () => {
       fixture.componentRef.setInput('session', session); fixture.detectChanges(); c.loadPreview(); await c.apply();
       expect(service.preview).not.toHaveBeenCalled(); expect(service.apply).not.toHaveBeenCalled();
-      expect(fixture.nativeElement.textContent).not.toContain('Resync Current Session Class Teachers');
+      expect(fixture.nativeElement.textContent).not.toContain('Resync Class Teachers');
     });
   }
   it('creates and updates canonical responsibility configuration', () => {

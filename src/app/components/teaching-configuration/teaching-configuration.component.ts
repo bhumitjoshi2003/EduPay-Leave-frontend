@@ -52,6 +52,9 @@ export class TeachingConfigurationComponent implements OnChanges, OnDestroy {
   loading = false;
   kind = sessionKind;
   writable = writableSession;
+  sessionLabel(id: number | null): string {
+    return this.sessions.find(s => s.id === id)?.label ?? '';
+  }
   private destroy$ = new Subject<void>();
   private reload$ = new Subject<void>();
   private sectionChange$ = new Subject<void>();

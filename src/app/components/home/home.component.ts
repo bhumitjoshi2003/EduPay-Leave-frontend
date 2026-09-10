@@ -7,6 +7,7 @@ import { DemoService } from '../../services/demo.service';
 import { ToastService } from '../../services/toast.service';
 import { TenantService } from '../../services/tenant.service';
 import { SchoolService, PlanDetail } from '../../services/school.service';
+import { consumeIntendedRoute, clearIntendedRoute } from '../../auth/redirect-url.util';
 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -66,9 +67,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    // Bootstrap/AuthStateService is the authoritative source of truth for whether a session
+    // exists — this component only ever reacts to an ALREADY-settled isLoggedIn(), it never
+    // itself decides or repairs auth state. Honors a saved redirectUrl (set by a guard, or by
+    // AuthInterceptor before an authoritative logout) so a user who ends up here mid-session —
+    // then recovers, whether by logging back in or simply because a later check confirms the
+    // session was fine all along — returns to the page they were using, not always /dashboard.
     if (this.authStateService.isLoggedIn()) {
       this.authenticated = true;
-      this.router.navigate(['/dashboard']);
+      this.router.navigateByUrl(consumeIntendedRoute());
     }
     this.loadPlans();
   }
@@ -209,7 +216,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         // School user → ensure they're on their school subdomain.
         // SUPER_ADMIN has no schoolSlug and stays on the root domain.
         if (response.schoolSlug) {
-          localStorage.removeItem('redirectUrl');
+          clearIntendedRoute();
           if (response.schoolSlug === this.tenantService.slug || this.tenantService.isLocalDev) {
             // Already on the correct subdomain — navigate locally, no reload needed.
             this.authenticated = true;
@@ -232,9 +239,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           return;
         }
 
-        const redirectUrl = localStorage.getItem('redirectUrl') || '/dashboard';
-        localStorage.removeItem('redirectUrl');
-        this.router.navigateByUrl(redirectUrl);
+        this.router.navigateByUrl(consumeIntendedRoute());
       },
       error: (error) => {
         let text: string;

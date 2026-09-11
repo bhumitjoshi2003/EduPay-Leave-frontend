@@ -1,4 +1,3 @@
-<app-wisdom-cards *ngIf="hasFeature('WISDOM')"></app-wisdom-cards>
 <div class="ad-page">
 
   <!-- ── Loading ──────────────────────────────────────────────────── -->
@@ -28,6 +27,8 @@
       <div class="ad-blob ad-blob-1"></div>
       <div class="ad-blob ad-blob-2"></div>
     </div>
+
+    <app-wisdom-cards *ngIf="hasFeature('WISDOM')"></app-wisdom-cards>
 
     <!-- ── Stats error ──────────────────────────────────────────────── -->
     <div class="ad-stats-error" *ngIf="!stats">

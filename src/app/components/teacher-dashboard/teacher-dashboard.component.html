@@ -1,4 +1,3 @@
-<app-wisdom-cards *ngIf="hasFeature('WISDOM')"></app-wisdom-cards>
 <div class="td-page">
   <div class="td-loading" *ngIf="isLoading">
     <div class="td-spinner"></div>
@@ -22,6 +21,8 @@
         ><mat-icon>schedule</mat-icon><span>View timetable</span></a
       >
     </header>
+
+    <app-wisdom-cards *ngIf="hasFeature('WISDOM')"></app-wisdom-cards>
 
     <section class="td-priorities">
       <div class="td-heading">

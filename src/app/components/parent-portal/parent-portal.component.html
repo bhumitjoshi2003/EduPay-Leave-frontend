@@ -1,4 +1,3 @@
-<app-wisdom-cards *ngIf="hasFeature('WISDOM')"></app-wisdom-cards>
 <div class="parent-page">
   <section class="hero" [class.parent-hero]="!isAdmin">
     <div class="hero-left">
@@ -19,6 +18,8 @@
       </button>
     </div>
   </section>
+
+  <app-wisdom-cards *ngIf="hasFeature('WISDOM')"></app-wisdom-cards>
 
   <div class="loading-card" *ngIf="loading"><span class="spinner"></span> Loading parent portal…</div>
 

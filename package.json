@@ -3,9 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "prestart": "node scripts/generate-observability-config.mjs",
     "start": "ng serve",
+    "prebuild": "node scripts/generate-observability-config.mjs",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
+    "pretest": "node scripts/generate-observability-config.mjs",
     "test": "ng test",
     "serve:ssr:ias": "node dist/ias/server/server.mjs"
   },
@@ -28,6 +31,7 @@
     "@capacitor/cli": "^8.2.0",
     "@capacitor/core": "^8.2.0",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@sentry/angular": "^10.27.0",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@types/date-fns": "^2.5.3",
     "chart.js": "^4.4.8",

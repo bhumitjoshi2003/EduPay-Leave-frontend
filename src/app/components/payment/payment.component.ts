@@ -89,8 +89,15 @@ export class PaymentComponent implements OnDestroy {
           this.paymentProcessCompleted.emit();
           return EMPTY;
         }
-        // Use a copy to avoid mutating the @Input across multiple payment attempts
-        const orderData: PaymentData = { ...this.paymentData, totalAmount: this.paymentData.totalAmount * 100 };
+        // Use a copy to avoid mutating the @Input across multiple payment attempts. paymentData
+        // is rupee-domain throughout the UI (see PaymentData) — totalAmount and additionalCharges
+        // are the only two fields the backend actually validates from this request, so both (and
+        // only both) are converted to paise here, at the HTTP boundary.
+        const orderData: PaymentData = {
+          ...this.paymentData,
+          totalAmount: this.paymentData.totalAmount * 100,
+          additionalCharges: this.paymentData.additionalCharges * 100
+        };
         return this.razorpayService.createOrder(orderData);
       })
     ).subscribe({

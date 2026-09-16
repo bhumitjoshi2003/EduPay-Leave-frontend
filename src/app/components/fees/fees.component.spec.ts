@@ -255,7 +255,7 @@ describe('PaymentTrackerComponent', () => {
 
   // ── recalculateTotals via toggleMonthSelection: authoritative backend total ──
 
-  it('selecting an unpaid ₹5,800 month reflects the backend-computed total (school fee + late + platform fee), never a client recomputation', () => {
+  it('selecting an unpaid ₹5,800 month reflects the backend-computed total (school fee + late + online convenience fee), never a client recomputation', () => {
     fixture.detectChanges();
     component.studentId = 'S1';
     component.session = '2026-2027';
@@ -264,10 +264,12 @@ describe('PaymentTrackerComponent', () => {
       studentId: 'S1',
       session: '2026-2027',
       months: [5],
-      schoolFeeDue: 5800,
-      lateFee: 0,
-      platformFee: 87,
-      totalAmount: 5887,
+      schoolFeePaise: 580000,
+      onlineConvenienceFeePaise: 8700,
+      totalPayablePaise: 588700,
+      currency: 'INR',
+      additionalChargesPaise: 0,
+      lateFeePaise: 0,
       unresolvedMonths: [],
     };
     feesServiceSpy.getCheckoutQuote.and.returnValue(of(quote));

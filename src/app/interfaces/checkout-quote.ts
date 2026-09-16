@@ -1,17 +1,24 @@
 /**
  * Backend-authoritative checkout quote — mirrors CheckoutQuoteDto on the Spring Boot side.
- * schoolFeeDue/lateFee/platformFee/totalAmount are all computed server-side; Angular must
- * only display them, never recompute. A non-empty unresolvedMonths means the quote is
- * partial (one or more selected months' fee couldn't be confidently determined) — the
- * caller must not treat totalAmount as covering those months.
+ * All money fields are paise-native and server-computed; Angular must only format them for
+ * display, never recompute. Internal gateway/Edunexify component fields are never exposed
+ * here (schoolFeePaise + onlineConvenienceFeePaise is the parent-facing breakdown; the
+ * component split behind onlineConvenienceFeePaise stays server-side). A non-empty
+ * unresolvedMonths means the quote is partial (one or more selected months' fee couldn't be
+ * confidently determined) — the caller must not treat totalPayablePaise as covering those
+ * months.
  */
 export interface CheckoutQuote {
   studentId: string;
   session: string;
   months: number[];
-  schoolFeeDue: number;
-  lateFee: number;
-  platformFee: number;
-  totalAmount: number;
+  schoolFeePaise: number;
+  onlineConvenienceFeePaise: number;
+  totalPayablePaise: number;
+  currency: string;
+  /** Itemized breakdown lines (paise) — legitimate to show a parent, unlike the gateway/
+   * Edunexify component split inside onlineConvenienceFeePaise, which is never exposed. */
+  additionalChargesPaise: number;
+  lateFeePaise: number;
   unresolvedMonths: number[];
 }

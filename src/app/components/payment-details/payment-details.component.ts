@@ -170,7 +170,14 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
     const lines: { label: string; amount: number }[] = this.feeLineItems.map(li => ({ label: li.name, amount: li.amount }));
     if (d.additionalCharges > 0) lines.push({ label: 'Unapplied Leave Charges', amount: d.additionalCharges });
     if (d.lateFees > 0) lines.push({ label: 'Late Fee', amount: d.lateFees });
-    if (d.platformFee > 0) lines.push({ label: 'Platform Fee', amount: d.platformFee });
+    // Modern (ONLINE_CONVENIENCE_FEE_V1) payments never populate platformFee — show the
+    // Online Convenience Fee instead. A legacy pre-refactor row keeps its historical Platform
+    // Fee label; never falsify history by relabeling it.
+    if (d.pricingVersion === 'ONLINE_CONVENIENCE_FEE_V1' && d.onlineConvenienceFeePaise > 0) {
+      lines.push({ label: 'Online Convenience Fee', amount: d.onlineConvenienceFeePaise / 100 });
+    } else if (d.platformFee > 0) {
+      lines.push({ label: 'Platform Fee', amount: d.platformFee });
+    }
     return lines;
   }
 

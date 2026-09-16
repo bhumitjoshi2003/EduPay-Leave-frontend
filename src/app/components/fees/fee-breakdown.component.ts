@@ -12,6 +12,8 @@ import { MonthBreakdownDetails } from './fees.component';
 })
 export class FeeBreakdownComponent {
   @Input() details: MonthBreakdownDetails | null = null;
-  @Input() platformFeeAmount: number = 0;
+  /** Rupees — the parent-facing Online Convenience Fee total (gateway recovery + Edunexify
+   * transaction fee combined). Never shown as "Platform Fee" for a modern payment. */
+  @Input() convenienceFeeAmount: number = 0;
   @Input() selectedMonthCount: number = 0;
 }

@@ -147,7 +147,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
   totalUnappliedLeaveCharge: number = 0;
   lateFees: number = 0;
   isLoadingPayment: boolean = false;
-  platformFeeAmount: number = 0;
+  onlineConvenienceFeeAmount: number = 0;
 
   currentMonth = new Date().getMonth() + 1;
   academicCurrentMonth: number = 0;
@@ -396,7 +396,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     const selectedMonths = this.selectedMonthsByYear[this.selectedYear] || [];
     if (selectedMonths.length === 0) {
       this.totalAmountToPay = 0;
-      this.platformFeeAmount = 0;
+      this.onlineConvenienceFeeAmount = 0;
       this.lateFees = 0;
       this.paymentData.totalAmount = 0;
       this.paymentData.platformFee = 0;
@@ -436,10 +436,21 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
       );
     }
 
-    this.totalAmountToPay = quote.totalAmount;
-    if (this.role === 'ADMIN') this.manualPaymentAmount = quote.totalAmount;
-    this.platformFeeAmount = quote.platformFee;
-    this.lateFees = quote.lateFee;
+    // Every money field on CheckoutQuote is paise-native and server-authoritative; the UI
+    // (rupee-domain throughout, see PaymentData) converts to rupees only here, for display —
+    // it never recomputes the online convenience fee or the total itself.
+    const totalPayable = quote.totalPayablePaise / 100;
+    const onlineConvenienceFee = quote.onlineConvenienceFeePaise / 100;
+    const lateFee = quote.lateFeePaise / 100;
+    // schoolFeePaise is the parent-facing aggregate (school fee + late fee + leave charge);
+    // the legacy "totalTuitionFee" bucket below is cosmetic-only on the backend now (see
+    // PaymentController.createOrder), so it's given just the bare school-fee-due portion.
+    const schoolFeeDueAlone = (quote.schoolFeePaise - quote.additionalChargesPaise - quote.lateFeePaise) / 100;
+
+    this.totalAmountToPay = totalPayable;
+    if (this.role === 'ADMIN') this.manualPaymentAmount = totalPayable;
+    this.onlineConvenienceFeeAmount = onlineConvenienceFee;
+    this.lateFees = lateFee;
 
     let monthSelectionString = '000000000000';
     let totalBusFee = 0;
@@ -455,30 +466,30 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     this.paymentData = {
       ...this.paymentData,
       monthSelectionString,
-      totalAmount: quote.totalAmount,
+      totalAmount: totalPayable,
       // Legacy per-fee-head buckets are display-only on the backend now (see
-      // PaymentController.createOrder) — schoolFeeDue is the authoritative figure.
-      totalTuitionFee: quote.schoolFeeDue,
+      // PaymentController.createOrder) — schoolFeeDueAlone is the authoritative figure.
+      totalTuitionFee: schoolFeeDueAlone,
       totalAnnualCharges: 0,
       totalLabCharges: 0,
       totalEcaProject: 0,
       totalExaminationFee: 0,
       totalBusFee,
-      lateFees: quote.lateFee,
-      platformFee: quote.platformFee,
+      lateFees: lateFee,
+      platformFee: onlineConvenienceFee,
       additionalCharges: this.totalUnappliedLeaveCharge,
       studentId: this.studentId,
       studentName: this.studentName,
       className: this.className,
       session: this.session,
       paidManually: this.paidManually,
-      amountPaid: this.paidManually ? this.amountPaid : quote.totalAmount,
+      amountPaid: this.paidManually ? this.amountPaid : totalPayable,
     };
 
     if (this.selectedMonthDetails) {
       this.selectedMonthDetails = {
         ...this.selectedMonthDetails,
-        lateFee: quote.lateFee,
+        lateFee,
       };
     }
 
@@ -646,7 +657,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
     this.paymentData = this.feesCalc.createEmptyPaymentData();
     this.totalUnappliedLeaves = 0;
     this.totalUnappliedLeaveCharge = 0;
-    this.platformFeeAmount = 0;
+    this.onlineConvenienceFeeAmount = 0;
   }
 
   /** Submits only what the admin observed (student, months, amount received, mode,

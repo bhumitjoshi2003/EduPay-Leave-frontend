@@ -10,5 +10,15 @@ export interface PaymentHistory {
     paymentDate: string;
     status: string;
     className: string;
+    /** Legacy field — always 0 for a modern (ONLINE_CONVENIENCE_FEE_V1) payment. */
     platformFee: number;
+    /** "ONLINE_CONVENIENCE_FEE_V1" for a modern payment, "MANUAL" for an offline one, or
+     * null/absent for a legacy pre-refactor row. */
+    pricingVersion?: string | null;
+    /** Paise — the modern allocation authority (school fee + late fee + leave charges); absent
+     * on legacy rows. Never includes the online convenience fee. */
+    schoolLiabilityPrincipalPaise?: number | null;
+    /** Paise — derived (gatewayRecoveryFee + edunexifyTransactionFee); 0 for legacy/manual rows.
+     * The gateway/Edunexify component split itself is never sent to the client. */
+    onlineConvenienceFeePaise?: number;
 }

@@ -24,6 +24,27 @@ export interface PaymentHistoryDetails {
   amountPaid: number;
   additionalCharges: number;
   lateFees: number;
+  /** Legacy field — always 0 for a modern (ONLINE_CONVENIENCE_FEE_V1) payment; populated only
+   * on historical rows predating the Online Convenience Fee refactor. */
   platformFee: number;
   schoolName: string;
+  /** Paise — school-side portion actually paid (school fee + late fee + leave charges for a
+   * modern payment; amount - platformFee for a legacy one). */
+  schoolFeePaise: number;
+  /** Paise — the parent-facing convenience-fee total. Its gateway/Edunexify component split is
+   * never sent to a non-admin caller. */
+  onlineConvenienceFeePaise: number;
+  /** Paise — equals `amount`; kept as a paise-explicit alias for display code. */
+  totalPaidPaise: number;
+  currency: string;
+  /** "ONLINE_CONVENIENCE_FEE_V1" for a modern payment, "MANUAL" for an offline one, or null/
+   * absent for a legacy pre-refactor row. */
+  pricingVersion: string | null;
+  /** Admin-only — null for every non-admin caller (the backend actively nulls these fields
+   * before serializing for STUDENT/PARENT roles). */
+  schoolLiabilityPrincipalPaise?: number | null;
+  gatewayRateBps?: number | null;
+  gatewayTaxRateBps?: number | null;
+  gatewayRecoveryFeePaise?: number | null;
+  edunexifyTransactionFeePaise?: number | null;
 }

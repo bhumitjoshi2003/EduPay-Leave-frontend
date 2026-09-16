@@ -6,8 +6,15 @@ import { environment } from '../../environments/environment';
 
 export interface RazorpayOrderResponse {
   razorpayKey: string;
+  /** Paise — the actual Razorpay order amount, freshly computed at order-creation time from
+   * the CURRENTLY effective payment pricing (never the earlier checkout-quote figure). This is
+   * what the Razorpay widget itself displays and charges — the true final confirmation. */
   amount: number;
   orderId: string;
+  schoolFeePaise?: number;
+  onlineConvenienceFeePaise?: number;
+  totalPayablePaise?: number;
+  currency?: string;
 }
 
 export interface RazorpayPaymentResponse {

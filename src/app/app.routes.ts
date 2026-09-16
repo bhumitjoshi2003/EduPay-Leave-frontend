@@ -130,6 +130,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/super-admin-dashboard/super-admin-dashboard.component').then(m => m.SuperAdminDashboardComponent),
         canActivate: [roleGuard], data: { roles: ['SUPER_ADMIN'] }
       },
+      {
+        path: 'payment-pricing',
+        loadComponent: () => import('./components/payment-pricing/payment-pricing.component').then(m => m.PaymentPricingComponent),
+        canActivate: [roleGuard], data: { roles: ['SUPER_ADMIN'] }
+      },
 
       // ── School settings ───────────────────────────────────────────────
       {

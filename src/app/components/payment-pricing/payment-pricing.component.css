@@ -1,0 +1,75 @@
+.pp-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+}
+.pp-title { margin: 0 0 4px; font-size: 1.5rem; }
+.pp-subtitle { margin: 0 0 20px; color: #666; font-size: 0.9rem; }
+.pp-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.pp-card h2 { margin: 0 0 12px; font-size: 1.1rem; }
+.pp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.pp-grid > div { display: flex; flex-direction: column; gap: 2px; }
+.pp-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.03em; }
+.pp-value { font-size: 1.05rem; font-weight: 600; }
+.pp-empty { color: #888; font-style: italic; }
+.pp-row {
+  padding: 10px 0;
+  border-top: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pp-row:first-of-type { border-top: none; }
+.pp-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-size: 0.9rem;
+  align-self: flex-start;
+}
+.pp-btn-primary { background: #4fbdbd; border-color: #4fbdbd; color: #fff; }
+.pp-btn-danger { background: #fdecec; border-color: #f5b5b5; color: #b42318; }
+.pp-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.pp-form { display: flex; flex-direction: column; gap: 12px; max-width: 420px; }
+.pp-form label { display: flex; flex-direction: column; gap: 4px; font-size: 0.9rem; }
+.pp-form input[type="text"], .pp-form input[type="datetime-local"] {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+.pp-note { color: #888; font-size: 0.85rem; margin: -4px 0 4px; }
+.pp-effective { border: 1px solid #eee; border-radius: 8px; padding: 10px 12px; }
+.pp-effective legend { font-size: 0.8rem; color: #888; padding: 0 4px; }
+.pp-radio { flex-direction: row !important; align-items: center; gap: 8px !important; }
+.pp-radio input { width: auto; }
+.pp-form-actions { display: flex; gap: 10px; margin-top: 4px; }
+.pp-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.pp-table th, .pp-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eee; }
+.pp-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #eef7f7;
+  color: #2a7a7a;
+  font-size: 0.78rem;
+}
+.pp-badge-cancelled { background: #fdecec; color: #b42318; }
+.pp-loading { color: #888; padding: 20px 0; }
+
+@media (max-width: 480px) {
+  .pp-page { padding: 12px; }
+  .pp-table { display: block; overflow-x: auto; }
+}

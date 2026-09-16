@@ -148,6 +148,10 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
   lateFees: number = 0;
   isLoadingPayment: boolean = false;
   onlineConvenienceFeeAmount: number = 0;
+  /** True when the backend reports no active payment pricing configuration (409) — online
+   * payment must be disabled with a clean, non-technical message; manual/admin recording is
+   * unaffected (it never consults pricing at all). */
+  onlinePaymentPricingUnavailable: boolean = false;
 
   currentMonth = new Date().getMonth() + 1;
   academicCurrentMonth: number = 0;
@@ -406,6 +410,7 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.onlinePaymentPricingUnavailable = false;
     this.feesService
       .getCheckoutQuote(this.studentId, this.session, selectedMonths)
       .pipe(takeUntil(this.destroy$))
@@ -413,10 +418,20 @@ export class PaymentTrackerComponent implements OnInit, OnDestroy {
         next: (quote) => this.applyCheckoutQuote(quote, selectedMonths),
         error: (error) => {
           this.logger.error('Error fetching checkout quote:', error);
-          this.toast.error(
-            'Error',
-            'Could not calculate the payment amount. Please try again.',
-          );
+          if (error?.status === 409 && this.role !== 'ADMIN') {
+            // Backend-authoritative: no active payment_pricing_config version exists yet.
+            // Never expose the raw message/internals — a fixed, friendly explanation only.
+            this.onlinePaymentPricingUnavailable = true;
+            this.toast.warning(
+              'Online Payments Unavailable',
+              'Online payments are temporarily unavailable because payment pricing has not been configured. Please try again later or contact the school office.',
+            );
+          } else {
+            this.toast.error(
+              'Error',
+              'Could not calculate the payment amount. Please try again.',
+            );
+          }
         },
       });
   }

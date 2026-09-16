@@ -200,13 +200,15 @@
         }}</span>
       </div>
       <app-payment
+        *ngIf="!onlinePaymentPricingUnavailable"
         [paymentData]="paymentData"
         (paymentSuccess)="handleSuccessfulPayment()"
         (paymentProcessingStarted)="onPaymentProcessingStarted()"
         [disabled]="isLoadingPayment || (role === 'PARENT' && !parentCanPay)"
       >
       </app-payment>
-      <span class="pt-payment-note" *ngIf="role === 'PARENT' && !parentCanPay">This account has view-only fee access.</span>
+      <span class="pt-payment-note" *ngIf="onlinePaymentPricingUnavailable">Online payments are temporarily unavailable. Please contact the school office.</span>
+      <span class="pt-payment-note" *ngIf="!onlinePaymentPricingUnavailable && role === 'PARENT' && !parentCanPay">This account has view-only fee access.</span>
     </div>
 
     <ng-template #adminPayment>

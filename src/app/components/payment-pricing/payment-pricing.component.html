@@ -1,0 +1,98 @@
+<div class="pp-page">
+  <h1 class="pp-title">Payment Pricing</h1>
+  <p class="pp-subtitle">Platform-level Online Convenience Fee pricing — applies to every school, not a per-school setting.</p>
+
+  <div *ngIf="loading" class="pp-loading">Loading…</div>
+
+  <ng-container *ngIf="!loading">
+    <!-- CURRENT -->
+    <section class="pp-card">
+      <h2>Current Payment Pricing</h2>
+      <div *ngIf="current; else noCurrent" class="pp-grid">
+        <div><span class="pp-label">Razorpay Gateway Rate</span><span class="pp-value">{{ bpsToPercent(current.gatewayRateBps) }}%</span></div>
+        <div><span class="pp-label">Gateway GST</span><span class="pp-value">{{ bpsToPercent(current.gatewayTaxRateBps) }}%</span></div>
+        <div><span class="pp-label">Edunexify Transaction Fee</span><span class="pp-value">&#8377;{{ paiseToRupees(current.edunexifyTransactionFeePaise) }}</span></div>
+        <div><span class="pp-label">Effective Since</span><span class="pp-value">{{ current.effectiveFrom | date: 'medium' }}</span></div>
+        <div><span class="pp-label">Created By</span><span class="pp-value">{{ current.createdBy || '—' }}</span></div>
+      </div>
+      <ng-template #noCurrent>
+        <p class="pp-empty">No active pricing configured yet — online payments are unavailable to parents/students until one is scheduled.</p>
+      </ng-template>
+    </section>
+
+    <!-- UPCOMING -->
+    <section class="pp-card" *ngIf="scheduled.length">
+      <h2>Upcoming Pricing</h2>
+      <div class="pp-row" *ngFor="let c of scheduled">
+        <div class="pp-grid">
+          <div><span class="pp-label">Gateway Rate</span><span class="pp-value">{{ bpsToPercent(c.gatewayRateBps) }}%</span></div>
+          <div><span class="pp-label">Gateway GST</span><span class="pp-value">{{ bpsToPercent(c.gatewayTaxRateBps) }}%</span></div>
+          <div><span class="pp-label">Edunexify Fee</span><span class="pp-value">&#8377;{{ paiseToRupees(c.edunexifyTransactionFeePaise) }}</span></div>
+          <div><span class="pp-label">Effective</span><span class="pp-value">{{ c.effectiveFrom | date: 'medium' }}</span></div>
+        </div>
+        <button type="button" class="pp-btn pp-btn-danger" (click)="cancelScheduled(c)">Cancel Scheduled Change</button>
+      </div>
+    </section>
+
+    <!-- SCHEDULE NEW -->
+    <section class="pp-card">
+      <button type="button" class="pp-btn pp-btn-primary" *ngIf="!showForm" (click)="openForm()">Schedule New Pricing</button>
+
+      <form *ngIf="showForm" (ngSubmit)="submit()" class="pp-form">
+        <h2>Schedule New Pricing Version</h2>
+        <p class="pp-note">This never edits current pricing — it schedules a new immutable version.</p>
+
+        <label>
+          Gateway Rate (%)
+          <input type="text" inputmode="decimal" name="gatewayRatePercent" [(ngModel)]="gatewayRatePercent" placeholder="2.20" required />
+        </label>
+        <label>
+          Gateway Tax / GST (%)
+          <input type="text" inputmode="decimal" name="gatewayTaxPercent" [(ngModel)]="gatewayTaxPercent" placeholder="18.00" required />
+        </label>
+        <label>
+          Edunexify Transaction Fee (&#8377;)
+          <input type="text" inputmode="decimal" name="edunexifyFeeRupees" [(ngModel)]="edunexifyFeeRupees" placeholder="20.00" required />
+        </label>
+
+        <fieldset class="pp-effective">
+          <legend>Effective</legend>
+          <label class="pp-radio">
+            <input type="radio" name="scheduleMode" value="immediate" [(ngModel)]="scheduleMode" />
+            Immediately
+          </label>
+          <label class="pp-radio">
+            <input type="radio" name="scheduleMode" value="scheduled" [(ngModel)]="scheduleMode" />
+            Schedule for later
+          </label>
+          <input *ngIf="scheduleMode === 'scheduled'" type="datetime-local" name="effectiveFromLocal" [(ngModel)]="effectiveFromLocal" />
+        </fieldset>
+
+        <div class="pp-form-actions">
+          <button type="button" class="pp-btn" (click)="cancelForm()" [disabled]="submitting">Cancel</button>
+          <button type="submit" class="pp-btn pp-btn-primary" [disabled]="submitting">{{ submitting ? 'Scheduling…' : 'Review & Schedule' }}</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="pp-card" *ngIf="history.length">
+      <h2>Pricing History</h2>
+      <table class="pp-table">
+        <thead>
+          <tr><th>Rate</th><th>GST</th><th>Edunexify Fee</th><th>Effective From</th><th>Status</th><th>Created By</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of history">
+            <td>{{ bpsToPercent(c.gatewayRateBps) }}%</td>
+            <td>{{ bpsToPercent(c.gatewayTaxRateBps) }}%</td>
+            <td>&#8377;{{ paiseToRupees(c.edunexifyTransactionFeePaise) }}</td>
+            <td>{{ c.effectiveFrom | date: 'medium' }}</td>
+            <td><span class="pp-badge" [class.pp-badge-cancelled]="c.status === 'CANCELLED'">{{ c.status }}</span></td>
+            <td>{{ c.createdBy || '—' }}<span *ngIf="c.cancelledBy"> / cancelled by {{ c.cancelledBy }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </ng-container>
+</div>

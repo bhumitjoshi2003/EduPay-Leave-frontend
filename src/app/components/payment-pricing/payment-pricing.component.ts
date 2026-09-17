@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
@@ -26,6 +26,7 @@ export class PaymentPricingComponent implements OnInit, OnDestroy {
 
   configs: PaymentPricingConfig[] = [];
   loading = true;
+  loadError = false;
   showForm = false;
   submitting = false;
 
@@ -40,6 +41,7 @@ export class PaymentPricingComponent implements OnInit, OnDestroy {
     private pricingService: PaymentPricingService,
     private toast: ToastService,
     private logger: LoggerService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -53,17 +55,30 @@ export class PaymentPricingComponent implements OnInit, OnDestroy {
 
   private load(): void {
     this.loading = true;
+    this.loadError = false;
+    this.cdr.markForCheck();
     this.pricingService.list('RAZORPAY').pipe(takeUntil(this.destroy$)).subscribe({
       next: (configs) => {
         this.configs = configs;
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.logger.error('Error loading payment pricing configuration:', err);
         this.toast.error('Error', 'Could not load payment pricing configuration.');
         this.loading = false;
+        this.loadError = true;
+        this.cdr.markForCheck();
       },
     });
+  }
+
+  retry(): void {
+    this.load();
+  }
+
+  get isEmpty(): boolean {
+    return !this.loading && !this.loadError && this.configs.length === 0;
   }
 
   get current(): PaymentPricingConfig | undefined {
@@ -119,10 +134,12 @@ export class PaymentPricingComponent implements OnInit, OnDestroy {
     this.scheduleMode = 'immediate';
     this.effectiveFromLocal = '';
     this.showForm = true;
+    this.cdr.markForCheck();
   }
 
   cancelForm(): void {
     this.showForm = false;
+    this.cdr.markForCheck();
   }
 
   async submit(): Promise<void> {
@@ -181,6 +198,7 @@ export class PaymentPricingComponent implements OnInit, OnDestroy {
     };
 
     this.submitting = true;
+    this.cdr.markForCheck();
     this.pricingService.create(request).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.submitting = false;
@@ -190,6 +208,7 @@ export class PaymentPricingComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.submitting = false;
+        this.cdr.markForCheck();
         this.logger.error('Error creating payment pricing version:', err);
         const message = err?.error?.message || 'Could not schedule the new pricing version.';
         this.toast.error('Error', message);

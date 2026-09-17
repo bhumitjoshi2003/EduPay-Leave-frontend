@@ -1,22 +1,25 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { Subject, takeUntil } from 'rxjs';
 import { SessionService } from '../../services/session.service';
-import { AuthService } from '../../auth/auth.service';
 import { UserSession } from '../../interfaces/user-session';
 import { ToastService } from '../../services/toast.service';
 import { LoggerService } from '../../services/logger.service';
-import { deviceLabel } from '../../utils/device-label.util';
+import { deviceLabel, deviceIcon } from '../../utils/device-label.util';
 
 /** Lets a signed-in user see and manage their own active sessions — one login
  * instance each, never a physical device (two browsers on the same laptop are
  * two independent sessions). Every action here is scoped to the caller's own
- * account server-side; nothing here can see or touch another user's sessions. */
+ * account server-side; nothing here can see or touch another user's sessions.
+ * Deliberately does NOT offer a page-level "log out everywhere" — that would
+ * duplicate the sidebar/profile-menu Sign Out (for the current session) and
+ * "Log out all other sessions" (for every other session) already cover the
+ * complete set of intents this page needs to support. */
 @Component({
   selector: 'app-active-sessions',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './active-sessions.component.html',
   styleUrl: './active-sessions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -29,14 +32,11 @@ export class ActiveSessionsComponent implements OnInit, OnDestroy {
   loadError = false;
   revokingId: number | null = null;
   revokingOthers = false;
-  loggingOutAll = false;
 
   constructor(
     private sessionService: SessionService,
-    private authService: AuthService,
     private toast: ToastService,
     private logger: LoggerService,
-    private router: Router,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -82,6 +82,10 @@ export class ActiveSessionsComponent implements OnInit, OnDestroy {
 
   label(session: UserSession): string {
     return deviceLabel(session.userAgent);
+  }
+
+  icon(session: UserSession): string {
+    return deviceIcon(session.userAgent);
   }
 
   async revoke(session: UserSession): Promise<void> {
@@ -135,29 +139,6 @@ export class ActiveSessionsComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
         this.logger.error('Error revoking other sessions:', err);
         this.toast.error('Error', 'Could not log out other sessions. Please try again.');
-      },
-    });
-  }
-
-  async logoutEverywhere(): Promise<void> {
-    const confirmed = await this.toast.confirm({
-      title: 'Log out everywhere?',
-      message: 'This signs you out of every device and browser, including this one. You will need to sign in again.',
-      confirmText: 'Log out everywhere',
-      cancelText: 'Cancel',
-      danger: true,
-    });
-    if (!confirmed) return;
-
-    this.loggingOutAll = true;
-    this.cdr.markForCheck();
-    this.authService.logoutAll().pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.router.navigate(['/home']),
-      error: (err) => {
-        this.loggingOutAll = false;
-        this.cdr.markForCheck();
-        this.logger.error('Error logging out everywhere:', err);
-        this.toast.error('Error', 'Could not log out everywhere. Please try again.');
       },
     });
   }

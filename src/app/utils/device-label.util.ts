@@ -33,6 +33,19 @@ function detectOs(ua: string): string | null {
   return null;
 }
 
+/** Maps a stored user-agent to one of this app's already-used Material icon
+ * ligature names (computer/laptop_mac/smartphone/tablet_mac/devices) — no new
+ * icon library, no fingerprinting, just a coarse device-type hint alongside
+ * the text label. */
+export function deviceIcon(userAgent: string | null | undefined): string {
+  if (!userAgent) return 'devices';
+  if (/iPad/i.test(userAgent)) return 'tablet_mac';
+  if (/iPhone/i.test(userAgent) || /Android/i.test(userAgent)) return 'smartphone';
+  if (/Mac OS X/i.test(userAgent)) return 'laptop_mac';
+  if (/Windows/i.test(userAgent) || /Linux/i.test(userAgent)) return 'computer';
+  return 'devices';
+}
+
 function detectBrowser(ua: string): string | null {
   // A Capacitor Android WebView (this app's own Android build) sometimes — not
   // always, this varies by Android/WebView version — includes a "; wv)" marker.

@@ -1,10 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
 import { ActiveSessionsComponent } from './active-sessions.component';
 import { SessionService } from '../../services/session.service';
-import { AuthService } from '../../auth/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { LoggerService } from '../../services/logger.service';
 import { UserSession } from '../../interfaces/user-session';
@@ -13,9 +11,7 @@ describe('ActiveSessionsComponent', () => {
   let component: ActiveSessionsComponent;
   let fixture: ComponentFixture<ActiveSessionsComponent>;
   let sessionServiceSpy: jasmine.SpyObj<SessionService>;
-  let authServiceSpy: jasmine.SpyObj<AuthService>;
   let toastSpy: jasmine.SpyObj<ToastService>;
-  let routerSpy: jasmine.SpyObj<Router>;
 
   const currentSession: UserSession = {
     id: 1, userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/128.0.0.0 Safari/537.36',
@@ -30,18 +26,14 @@ describe('ActiveSessionsComponent', () => {
 
   beforeEach(async () => {
     sessionServiceSpy = jasmine.createSpyObj('SessionService', ['list', 'revoke', 'revokeOthers']);
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['logoutAll']);
     toastSpy = jasmine.createSpyObj('ToastService', ['confirm', 'success', 'error']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
       imports: [ActiveSessionsComponent],
       providers: [
         { provide: SessionService, useValue: sessionServiceSpy },
-        { provide: AuthService, useValue: authServiceSpy },
         { provide: ToastService, useValue: toastSpy },
         { provide: LoggerService, useValue: jasmine.createSpyObj('LoggerService', ['error', 'warn', 'info']) },
-        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
@@ -88,30 +80,42 @@ describe('ActiveSessionsComponent', () => {
     expect(component.otherSessions).toEqual([otherSession]);
   });
 
-  it('renders the CURRENT badge and no revoke action for the current session', () => {
+  it('renders the current session card with a CURRENT SESSION badge and no revoke/log-out action', () => {
     sessionServiceSpy.list.and.returnValue(of([currentSession]));
     fixture.detectChanges();
 
-    const html: string = fixture.nativeElement.innerHTML;
-    expect(html).toContain('CURRENT');
-    // The current-session block must not offer a "Log out" action.
-    const currentBlock = fixture.nativeElement.querySelector('.as-card');
-    expect(currentBlock.querySelector('.as-btn-danger-ghost')).toBeNull();
+    // "SESSION" is its own span (hidden at narrow widths, see .as-status-badge-full)
+    // so the full text only assembles correctly via textContent, not innerHTML.
+    const text: string = fixture.nativeElement.textContent;
+    expect(text).toContain('CURRENT');
+    expect(text).toContain('SESSION');
+    const currentBlock = fixture.nativeElement.querySelector('.as-current-card');
+    expect(currentBlock).not.toBeNull();
+    expect(currentBlock.querySelector('button')).toBeNull();
   });
 
   it('renders a "Log out" button for a non-current session', () => {
     sessionServiceSpy.list.and.returnValue(of([currentSession, otherSession]));
     fixture.detectChanges();
 
-    const buttons: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('.as-btn-danger-ghost'));
+    const buttons: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('.as-btn-danger-sm'));
     expect(buttons.length).toBe(1);
   });
 
-  it('shows "No other active sessions." when only the current session exists', () => {
+  it('shows a polished empty state when only the current session exists', () => {
     sessionServiceSpy.list.and.returnValue(of([currentSession]));
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('No other active sessions.');
+    expect(fixture.nativeElement.textContent).toContain("You're not signed in anywhere else");
+    expect(fixture.nativeElement.querySelector('.as-empty-card')).not.toBeNull();
+  });
+
+  it('does not render a page-level "Log out everywhere" action anywhere', () => {
+    sessionServiceSpy.list.and.returnValue(of([currentSession, otherSession]));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).not.toContain('Log out everywhere');
+    expect((component as any).logoutEverywhere).toBeUndefined();
   });
 
   it('revoke: cancelling the confirmation never calls the API', async () => {
@@ -152,26 +156,13 @@ describe('ActiveSessionsComponent', () => {
     expect(component.sessions).toEqual([currentSession]);
   });
 
-  it('logout-everywhere: confirming clears auth state (via AuthService.logoutAll) and navigates to /home', async () => {
-    sessionServiceSpy.list.and.returnValue(of([currentSession]));
-    fixture.detectChanges();
-    toastSpy.confirm.and.resolveTo(true);
-    authServiceSpy.logoutAll.and.returnValue(of({ revokedCount: 1 }));
-
-    await component.logoutEverywhere();
-
-    expect(authServiceSpy.logoutAll).toHaveBeenCalled();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
-  });
-
-  it('logout-everywhere: cancelling the confirmation never calls the API or navigates', async () => {
-    sessionServiceSpy.list.and.returnValue(of([currentSession]));
+  it('revoke-others: cancelling the confirmation never calls the API', async () => {
+    sessionServiceSpy.list.and.returnValue(of([currentSession, otherSession]));
     fixture.detectChanges();
     toastSpy.confirm.and.resolveTo(false);
 
-    await component.logoutEverywhere();
+    await component.revokeOthers();
 
-    expect(authServiceSpy.logoutAll).not.toHaveBeenCalled();
-    expect(routerSpy.navigate).not.toHaveBeenCalled();
+    expect(sessionServiceSpy.revokeOthers).not.toHaveBeenCalled();
   });
 });

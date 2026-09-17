@@ -22,6 +22,20 @@ import { TeacherCheckinService } from '../../services/teacher-checkin.service';
 import { TeacherAttendanceRecord, TeacherAttendanceSummary } from '../../interfaces/teacher-checkin';
 import { TeacherLeaveService } from '../../services/teacher-leave.service';
 import { TeacherLeave } from '../../interfaces/teacher-leave';
+import { TimetableService } from '../../services/timetable.service';
+import { TimetableEntry } from '../../interfaces/timetable';
+import {
+  buildTodayClassesView,
+  TeacherTodayClassEntry,
+  TeacherTodayClassesView,
+} from '../../utils/teacher-timetable-today.util';
+
+const EMPTY_TODAY_VIEW: TeacherTodayClassesView = {
+  current: null,
+  upcoming: [],
+  allDone: false,
+  hasAnyToday: false,
+};
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -33,6 +47,7 @@ import { TeacherLeave } from '../../interfaces/teacher-leave';
 })
 export class TeacherDashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  readonly timetableRoute = '/dashboard/timetable';
 
   teacherName = '';
   className = '';
@@ -51,6 +66,10 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
   personalSummaryLoading = true;
   recentTeacherLeaves: TeacherLeave[] = [];
   teacherLeavesLoading = true;
+  timetableEntries: TimetableEntry[] = [];
+  todayClassesLoading = true;
+  todayClassesError: string | null = null;
+  todayView: TeacherTodayClassesView = EMPTY_TODAY_VIEW;
 
   constructor(
     private authState: AuthStateService,
@@ -62,7 +81,8 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private toast: ToastService,
     private checkinService: TeacherCheckinService,
-    private teacherLeaveService: TeacherLeaveService
+    private teacherLeaveService: TeacherLeaveService,
+    private timetableService: TimetableService
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +95,7 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
 
     this.loadPersonalAttendance();
     this.loadRecentTeacherLeaves();
+    this.loadTodayClasses(user.userId);
 
     this.teacherService
       .getTeacher(user.userId)
@@ -144,6 +165,61 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
   private toLocalDateKey(date: Date): string {
     const pad = (value: number) => String(value).padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  }
+
+  private loadTodayClasses(teacherId: string): void {
+    this.todayClassesLoading = true;
+    this.todayClassesError = null;
+    this.cdr.markForCheck();
+
+    this.timetableService.getTeacherTimetable(teacherId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: entries => {
+          this.timetableEntries = entries;
+          this.todayView = buildTodayClassesView(entries, new Date());
+          this.todayClassesLoading = false;
+          this.cdr.markForCheck();
+        },
+        error: error => {
+          this.logger.error('Today\'s classes load error:', error);
+          this.todayClassesError = this.timetableErrorMessage(error);
+          this.todayClassesLoading = false;
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  retryTodayClasses(): void {
+    const teacherId = this.authState.getUser()?.userId;
+    if (teacherId) this.loadTodayClasses(teacherId);
+  }
+
+  classLabel(entry: TeacherTodayClassEntry): string {
+    return entry.sectionName
+      ? `Class ${entry.className} – ${entry.sectionName}`
+      : `Class ${entry.className}`;
+  }
+
+  classTimeLabel(entry: TeacherTodayClassEntry): string {
+    if (!entry.startTime || !entry.endTime) return `Period ${entry.periodNumber}`;
+    return `${this.formatClockTime(entry.startTime)} – ${this.formatClockTime(entry.endTime)}`;
+  }
+
+  private formatClockTime(value: string): string {
+    const match = /^(\d{1,2}):(\d{2})/.exec(value);
+    if (!match) return value;
+    const hour = Number(match[1]);
+    const suffix = hour >= 12 ? 'PM' : 'AM';
+    return `${hour % 12 || 12}:${match[2]} ${suffix}`;
+  }
+
+  private timetableErrorMessage(error: any): string {
+    const message = error?.error?.message;
+    if (typeof message === 'string' && message.trim() && !/<[a-z][\s\S]*>/i.test(message)) {
+      return message.trim();
+    }
+    return 'Unable to load today\'s classes.';
   }
 
   ngOnDestroy(): void {

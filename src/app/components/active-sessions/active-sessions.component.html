@@ -1,0 +1,74 @@
+<div class="as-page">
+
+  <!-- ── Header ─────────────────────────────────────────────────────── -->
+  <div class="as-header">
+    <h1 class="as-title">Active Sessions</h1>
+    <p class="as-subtitle">Manage where your Edunexify account is currently signed in.</p>
+  </div>
+
+  <!-- ── Loading ─────────────────────────────────────────────────────── -->
+  <div class="as-loading-card" *ngIf="loading">
+    <div class="as-spinner"></div>
+    <p>Loading sessions…</p>
+  </div>
+
+  <!-- ── Error ───────────────────────────────────────────────────────── -->
+  <div class="as-card as-error-card" *ngIf="!loading && loadError">
+    <div class="as-empty-icon">⚠️</div>
+    <p class="as-empty-title">Unable to load sessions.</p>
+    <button type="button" class="as-btn as-btn-primary" (click)="retry()">Retry</button>
+  </div>
+
+  <ng-container *ngIf="!loading && !loadError">
+
+    <!-- ── Current Session ───────────────────────────────────────────── -->
+    <div class="as-card" *ngIf="current">
+      <div class="as-session-row">
+        <div class="as-session-main">
+          <div class="as-session-label-row">
+            <span class="as-session-label">{{ label(current) }}</span>
+            <span class="as-status-badge as-status-current">CURRENT</span>
+          </div>
+          <span class="as-session-meta">Signed in: {{ current.createdAt | date: 'medium' }}</span>
+          <span class="as-session-meta">Last refreshed: {{ current.lastUsedAt | date: 'medium' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Other Active Sessions ─────────────────────────────────────── -->
+    <div class="as-card">
+      <div class="as-card-header">
+        <h2 class="as-card-title">Other Active Sessions</h2>
+      </div>
+
+      <p class="as-inline-empty" *ngIf="otherSessions.length === 0">No other active sessions.</p>
+
+      <div class="as-session-row" *ngFor="let session of otherSessions">
+        <div class="as-session-main">
+          <span class="as-session-label">{{ label(session) }}</span>
+          <span class="as-session-meta">Signed in: {{ session.createdAt | date: 'medium' }}</span>
+          <span class="as-session-meta">Last refreshed: {{ session.lastUsedAt | date: 'medium' }}</span>
+        </div>
+        <button type="button" class="as-btn as-btn-danger-ghost" [disabled]="revokingId === session.id"
+                (click)="revoke(session)">
+          {{ revokingId === session.id ? 'Logging out…' : 'Log out' }}
+        </button>
+      </div>
+
+      <div class="as-form-actions" *ngIf="otherSessions.length > 0">
+        <button type="button" class="as-btn as-btn-ghost" [disabled]="revokingOthers" (click)="revokeOthers()">
+          {{ revokingOthers ? 'Logging out others…' : 'Log out all other sessions' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Log out everywhere ────────────────────────────────────────── -->
+    <div class="as-logout-all-row">
+      <button type="button" class="as-link-danger" [disabled]="loggingOutAll" (click)="logoutEverywhere()">
+        {{ loggingOutAll ? 'Logging out…' : 'Log out everywhere' }}
+      </button>
+    </div>
+
+  </ng-container>
+
+</div>

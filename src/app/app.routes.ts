@@ -417,6 +417,16 @@ export const routes: Routes = [
         canActivate: [roleGuard], data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUB_ADMIN', 'PARENT'] }
       },
       {
+        // Personal account security, not a school-scoped feature — every real
+        // role gets it, including SUPER_ADMIN (deliberately NOT reusing the
+        // "open to all authenticated users" role list above, which omits
+        // SUPER_ADMIN since it's meant for school-scoped features only).
+        path: 'active-sessions',
+        loadComponent: () => import('./components/active-sessions/active-sessions.component').then(m => m.ActiveSessionsComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUB_ADMIN', 'PARENT', 'SUPER_ADMIN'] }
+      },
+      {
         path: 'payment',
         loadComponent: () => import('./components/payment/payment.component').then(m => m.PaymentComponent),
         canActivate: [roleGuard, featureGuard],

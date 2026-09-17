@@ -57,6 +57,20 @@ export class AuthService {
     );
   }
 
+  /** "Log out everywhere" — revokes every session for this account, including the
+   * one making this request. Mirrors logout() exactly: the backend has no
+   * access-token blacklist (access tokens are stateless and simply expire
+   * naturally), so clearing local auth state here is what actually makes the app
+   * behave as logged-out immediately, regardless of the cookie's own expiry. */
+  logoutAll(): Observable<unknown> {
+    return this.http.post(`${this.apiUrl}/logout-all`, {}, { withCredentials: true }).pipe(
+      tap(() => {
+        this.authStateService.clearUser();
+        clearIntendedRoute();
+      })
+    );
+  }
+
   changePassword(request: ChangePasswordRequest): Observable<string> {
     return this.http.post(`${this.apiUrl}/change-password`, request, { responseType: 'text', withCredentials: true });
   }

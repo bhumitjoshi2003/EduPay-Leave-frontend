@@ -2,7 +2,9 @@ import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
+import { timeout } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { STARTUP_HTTP_TIMEOUT_MS } from '../core/startup.constants';
 
 export interface PublicSchoolInfo {
   name: string;
@@ -63,6 +65,14 @@ export class TenantService {
   /**
    * Loads branding for an authenticated user's school. This is needed on
    * localhost and other hosts where a school slug cannot be read from the URL.
+   *
+   * Bounded by the same startup HTTP timeout AuthStateService's /auth/me check uses — without
+   * it, a hung backend here would block the APP_INITIALIZER's Promise.all() indefinitely on its
+   * own, independent of whatever the auth check is doing (the same root cause as the original
+   * white-screen incident, just via a different request). On any failure — timeout included —
+   * this resolves to "no branding" exactly as before: a missing/slow school lookup degrades to
+   * the plain marketing/login page rather than blocking startup, since branding is cosmetic and
+   * never the sole signal that the backend is unreachable (loadCurrentUser() owns that).
    */
   async loadSchoolBySlug(slug: string): Promise<void> {
     const normalizedSlug = slug.trim();
@@ -75,7 +85,7 @@ export class TenantService {
         this.http.get<PublicSchoolInfo>(
           `${environment.apiUrl}/public/school/${normalizedSlug}`,
           { headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' } },
-        ),
+        ).pipe(timeout(STARTUP_HTTP_TIMEOUT_MS)),
       );
       this._school = info ?? null;
     } catch {

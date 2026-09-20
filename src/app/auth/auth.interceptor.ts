@@ -20,7 +20,7 @@ import { ObservabilityService } from '../core/observability.service';
 import { newRequestId, REQUEST_ID_HEADER, validRequestId } from '../core/request-id';
 
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, filter, switchMap, take, tap } from 'rxjs/operators';
+import { catchError, filter, finalize, switchMap, take, tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class AuthInterceptor implements HttpInterceptor {
@@ -179,7 +179,16 @@ export class AuthInterceptor implements HttpInterceptor {
           // failure is not proof the credentials are invalid. The caller's own request fails
           // this one time; a later request, tab-resume, or `online` event can retry.
           return throwError(() => refreshError);
-        })
+        }),
+        // Belt-and-braces alongside the explicit resets above: if this whole chain is instead
+        // torn down via unsubscribe (e.g. a caller wrapped the original request — such as
+        // AuthStateService.loadCurrentUser()'s startup /auth/me call — in an outer
+        // rxjs timeout() that fires while this refresh is still in flight), neither the
+        // switchMap nor catchError callback above runs at all, since RxJS teardown doesn't
+        // trigger error handlers. Without this, isRefreshing would stay stuck true and every
+        // later request (including a user-initiated Retry) would queue behind a refreshDone$
+        // that can never emit again.
+        finalize(() => { this.isRefreshing = false; })
       );
     } else {
       // Other requests that fail while refresh is in progress wait here.

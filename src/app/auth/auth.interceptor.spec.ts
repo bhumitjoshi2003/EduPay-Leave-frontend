@@ -1,7 +1,8 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClient, HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
+import { timeout } from 'rxjs/operators';
 import { AuthInterceptor } from './auth.interceptor';
 import { AuthStateService } from './auth-state.service';
 import { environment } from '../../environments/environment';
@@ -237,6 +238,38 @@ describe('AuthInterceptor — transient vs. authoritative refresh failure', () =
     expect(authState.clearUser).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
   });
+
+  it('15c. isRefreshing is reset even when the whole chain is torn down by an outer timeout (not just by catchError) — a subsequent Retry can still refresh', fakeAsync(() => {
+    // Mirrors exactly what AuthStateService.loadCurrentUser() does around /auth/me: wrap the
+    // request in an outer rxjs timeout(). If a 401 triggers a refresh attempt that itself hangs
+    // (never responds), the timeout fires and unsubscribes the ENTIRE chain — RxJS teardown
+    // does not invoke catchError/tap, only finalize(). Without the interceptor's own finalize()
+    // safety net (see handleTokenExpiry), isRefreshing would stay stuck true forever, and the
+    // Retry button's next attempt would queue behind a refreshDone$ that can never emit again.
+    simulatePath('/dashboard/timetable');
+    let outerError: unknown;
+    httpClient.get(`${base}/auth/me`, { withCredentials: true }).pipe(timeout(10000)).subscribe({
+      error: (e) => { outerError = e; },
+    });
+
+    http.expectOne(`${base}/auth/me`).flush('unauthorized', { status: 401, statusText: 'Unauthorized' });
+    // The refresh call is made but deliberately never responded to — it hangs.
+    const hungRefresh = http.expectOne(`${base}/auth/refresh-token`);
+
+    tick(10000); // the outer timeout fires and tears the whole chain down — cancelling hungRefresh
+    expect(outerError).toBeTruthy();
+    expect(hungRefresh.cancelled).toBeTrue();
+
+    // A brand-new request 401s — if isRefreshing were stuck true, this would queue behind a
+    // dead refreshDone$ and never resolve.
+    let succeeded = false;
+    httpClient.get(`${base}/endpoint-a`, { withCredentials: true }).subscribe({ next: () => { succeeded = true; } });
+    http.expectOne(`${base}/endpoint-a`).flush('unauthorized', { status: 401, statusText: 'Unauthorized' });
+    http.expectOne(`${base}/auth/refresh-token`).flush(userInfo);
+    http.expectOne(`${base}/endpoint-a`).flush({ ok: true });
+
+    expect(succeeded).toBeTrue();
+  }));
 
   it('15b. a later request after a transient refresh failure can still trigger a fresh refresh attempt (not stuck)', () => {
     simulatePath('/dashboard/timetable');

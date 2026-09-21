@@ -4,19 +4,8 @@ import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Teacher, TeacherExitRequest } from '../interfaces/teacher';
+import { UploadRequestResponse, UploadCompleteResponse } from '../interfaces/upload';
 import { BulkImportResult } from './student.service';
-
-export interface UploadRequestResponse {
-  objectKey: string;
-  uploadUrl: string;
-  expiresAt: string;
-  requiredHeaders: Record<string, string>;
-}
-
-export interface UploadCompleteResponse {
-  objectKey: string;
-  displayUrl: string;
-}
 
 export interface TeacherAttendanceSchedule {
   id: number;

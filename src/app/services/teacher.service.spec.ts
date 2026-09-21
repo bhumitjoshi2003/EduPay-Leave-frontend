@@ -127,11 +127,7 @@ describe('TeacherService — uploadTeacherPhotoDirect', () => {
     expect(sawError).toBeTrue();
   });
 
-  it('the legacy multipart upload method still exists and is untouched (rollback path)', () => {
-    service.uploadTeacherPhoto('T1', aFile()).subscribe();
-    const req = http.expectOne(`${environment.apiUrl}/teachers/T1/photo`);
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body instanceof FormData).toBeTrue();
-    req.flush({ photoUrl: '/uploads/teacher-photos/T1.jpg' });
+  it('the legacy multipart upload method no longer exists on the service (Phase 3 cleanup)', () => {
+    expect((service as any).uploadTeacherPhoto).toBeUndefined();
   });
 });

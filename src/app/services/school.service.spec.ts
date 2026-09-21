@@ -67,11 +67,8 @@ describe('SchoolService — direct-to-object-storage uploads', () => {
       http.expectOne(completeUrl).flush({ objectKey: uploadRequestResponse.objectKey, displayUrl: 'https://object-storage.example.com/signed-get' });
     });
 
-    it('the legacy multipart upload method still exists and is untouched (rollback path)', () => {
-      service.uploadLogo(aFile()).subscribe();
-      const req = http.expectOne(`${environment.apiUrl}/school/logo`);
-      expect(req.request.body instanceof FormData).toBeTrue();
-      req.flush({ logoUrl: '/uploads/school-logos/1.png' });
+    it('the legacy multipart upload method no longer exists on the service (Phase 3 cleanup)', () => {
+      expect((service as any).uploadLogo).toBeUndefined();
     });
   });
 
@@ -101,11 +98,8 @@ describe('SchoolService — direct-to-object-storage uploads', () => {
       http.expectOne(completeUrl).flush({ objectKey: uploadRequestResponse.objectKey, displayUrl: 'https://object-storage.example.com/signed-get' });
     });
 
-    it('the legacy multipart upload method still exists and is untouched (rollback path)', () => {
-      service.uploadReportCardHeader(aFile()).subscribe();
-      const req = http.expectOne(`${environment.apiUrl}/school/report-card-header`);
-      expect(req.request.body instanceof FormData).toBeTrue();
-      req.flush({ headerImageUrl: '/uploads/report-card-headers/1.png' });
+    it('the legacy multipart upload method no longer exists on the service (Phase 3 cleanup)', () => {
+      expect((service as any).uploadReportCardHeader).toBeUndefined();
     });
   });
 });

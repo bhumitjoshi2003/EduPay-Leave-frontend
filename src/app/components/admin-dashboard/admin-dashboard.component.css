@@ -265,6 +265,31 @@
   .ad-staff-att-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
+.ad-setup-card {
+  margin: 20px 0;
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 240px) auto;
+  align-items: center;
+  gap: 20px;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  border: 1px solid #c7d2fe;
+  border-radius: 16px;
+}
+.ad-setup-copy { display: flex; align-items: center; gap: 12px; }
+.ad-setup-copy h2 { margin: 0; color: #1e293b; font-size: 1rem; }
+.ad-setup-copy p { margin: 3px 0 0; color: #64748b; font-size: .78rem; }
+.ad-setup-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 11px; background: #4f46e5; color: white; }
+.ad-setup-progress { height: 9px; overflow: hidden; border-radius: 999px; background: #e2e8f0; }
+.ad-setup-progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #4f46e5, #14b8a6); transition: width .4s ease; }
+.ad-setup-action { display: inline-flex; align-items: center; gap: 5px; color: #4338ca; font-size: .78rem; font-weight: 800; text-decoration: none; white-space: nowrap; }
+.ad-setup-action mat-icon { width: 16px; height: 16px; font-size: 16px; }
+.ad-setup-retry { border: 0; background: none; cursor: pointer; }
+@media (max-width: 760px) {
+  .ad-setup-card { grid-template-columns: 1fr; gap: 12px; }
+  .ad-setup-action { justify-self: start; }
+}
+
 /* ── Plan Section ────────────────────────────────────────────────── */
 .ad-plan-section {
   margin-bottom: 16px;

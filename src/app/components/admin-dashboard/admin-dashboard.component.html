@@ -30,6 +30,26 @@
 
     <app-wisdom-cards *ngIf="hasFeature('WISDOM')"></app-wisdom-cards>
 
+    <section class="ad-setup-card" *ngIf="setupHealthLoading || setupHealth || setupHealthError">
+      <div class="ad-setup-copy">
+        <div class="ad-setup-icon"><mat-icon>task_alt</mat-icon></div>
+        <div>
+          <h2>School Setup</h2>
+          <p *ngIf="setupHealthLoading">Checking your school's readiness…</p>
+          <p *ngIf="setupHealth">{{ setupHealth.completionPercentage }}% complete · {{ setupHealth.completedRequired }} of {{ setupHealth.totalRequired }} essentials ready</p>
+          <p *ngIf="setupHealthError">Setup status is temporarily unavailable.</p>
+        </div>
+      </div>
+      <div class="ad-setup-progress" *ngIf="setupHealth">
+        <span [style.width.%]="setupHealth.completionPercentage"></span>
+      </div>
+      <a class="ad-setup-action" routerLink="/dashboard/school-setup" *ngIf="setupHealth">
+        {{ setupHealth.status === 'READY' ? 'Review Setup' : 'Continue Setup' }}
+        <mat-icon>arrow_forward</mat-icon>
+      </a>
+      <button class="ad-setup-action ad-setup-retry" type="button" *ngIf="setupHealthError" (click)="loadSetupHealth()">Retry</button>
+    </section>
+
     <!-- ── Stats error ──────────────────────────────────────────────── -->
     <div class="ad-stats-error" *ngIf="!stats">
       <span>⚠️</span>

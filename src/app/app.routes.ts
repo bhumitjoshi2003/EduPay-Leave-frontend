@@ -385,6 +385,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
         canActivate: [roleGuard], data: { roles: ['ADMIN', 'SUB_ADMIN'] }
       },
+      {
+        path: 'school-setup',
+        loadComponent: () => import('./components/school-setup/school-setup.component').then(m => m.SchoolSetupComponent),
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
 
       // ── Analytics Dashboard ───────────────────────────────────────────
       {

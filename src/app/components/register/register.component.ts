@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RegisterStudentComponent } from '../register-student/register-student.component'; 
+import { ActivatedRoute } from '@angular/router';
+import { RegisterStudentComponent } from '../register-student/register-student.component';
 import { RegisterTeacherComponent } from '../register-teacher/register-teacher.component';
 
 
@@ -15,9 +16,14 @@ import { RegisterTeacherComponent } from '../register-teacher/register-teacher.c
 export class RegisterComponent implements OnInit {
   showStudentForm: boolean = true;
 
-  constructor() { }
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit(): void {
+    // Supports deep-linking straight to the teacher form, e.g. from School Setup's
+    // "Add teachers" CTA (?type=teacher) — defaults to the student form otherwise, unchanged.
+    if (this.route.snapshot.queryParamMap.get('type') === 'teacher') {
+      this.toggleForm('teacher');
+    }
   }
 
   toggleForm(type: 'student' | 'teacher') {

@@ -12,7 +12,7 @@ import { AuthStateService } from '../../auth/auth-state.service';
 import { AdminService } from '../../services/admin.service';
 import { DashboardAnalyticsService, DashboardStats } from '../../services/dashboard-analytics.service';
 import { LeaveService, LeaveApplication } from '../../services/leave.service';
-import { SchoolService, SchoolEntitlementSummary } from '../../services/school.service';
+import { SchoolService, SchoolEntitlementSummary, SchoolSetupHealth } from '../../services/school.service';
 import { TeacherCheckinService } from '../../services/teacher-checkin.service';
 import { TeacherAttendanceTodaySummary } from '../../interfaces/teacher-checkin';
 import { LoggerService } from '../../services/logger.service';
@@ -37,6 +37,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   recentLeaves: LeaveApplication[] = [];
   entitlement: SchoolEntitlementSummary | null = null;
   staffAttendance: TeacherAttendanceTodaySummary | null = null;
+  setupHealth: SchoolSetupHealth | null = null;
+  setupHealthLoading = false;
+  setupHealthError = false;
 
   constructor(
     private authState: AuthStateService,
@@ -62,6 +65,25 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     }
 
     this.loadDashboardData();
+    if (user?.role === 'ADMIN') this.loadSetupHealth();
+  }
+
+  loadSetupHealth(): void {
+    this.setupHealthLoading = true;
+    this.setupHealthError = false;
+    this.schoolService.getSetupHealth().pipe(takeUntil(this.destroy$)).subscribe({
+      next: health => {
+        this.setupHealth = health;
+        this.setupHealthLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: e => {
+        this.logger.error('School setup health load error:', e);
+        this.setupHealthLoading = false;
+        this.setupHealthError = true;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   loadDashboardData(): void {

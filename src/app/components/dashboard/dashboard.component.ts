@@ -24,6 +24,7 @@ import { TeacherService } from '../../services/teacher.service';
 import { AdminService } from '../../services/admin.service';
 import { NotificationService } from '../../services/notification.service';
 import { SchoolService } from '../../services/school.service';
+import { WhatsNewService } from '../../services/whats-new.service';
 import { TenantService } from '../../services/tenant.service';
 import { Subject, takeUntil, interval, Subscription } from 'rxjs';
 import { NavigationEnd } from '@angular/router';
@@ -80,10 +81,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private childContext: ParentChildContextService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
+    private whatsNewService: WhatsNewService,
   ) {}
 
   ngOnInit() {
     this.getDetails();
+    this.whatsNewService.checkOnStartup();
     this.loadAuthenticatedSchoolBranding();
     this.handleInitialNavigation();
     this.fetchUnreadCount();
@@ -441,5 +444,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.isAdmin() && this.Id) {
       this.router.navigate(['/dashboard/admin-details', this.Id]);
     }
+  }
+
+  openWhatsNew(): void {
+    this.whatsNewService.openManually();
   }
 }

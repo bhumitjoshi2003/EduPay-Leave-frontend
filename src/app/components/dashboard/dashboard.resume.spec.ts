@@ -13,6 +13,7 @@ import { TenantService } from '../../services/tenant.service';
 import { ParentPortalService } from '../../services/parent-portal.service';
 import { ParentChildContextService } from '../../services/parent-child-context.service';
 import { LoggerService } from '../../services/logger.service';
+import { WhatsNewService } from '../../services/whats-new.service';
 
 /**
  * D22-24 (tab-resume / online-event session restoration). Rendered/integration-style: real
@@ -53,6 +54,7 @@ describe('DashboardComponent — tab-resume / online session restoration', () =>
         { provide: ParentPortalService, useValue: {} },
         { provide: ParentChildContextService, useValue: {} },
         { provide: LoggerService, useValue: { error: () => {} } },
+        { provide: WhatsNewService, useValue: { checkOnStartup: () => {}, openManually: () => {} } },
       ],
     }).compileComponents();
 

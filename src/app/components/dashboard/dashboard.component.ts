@@ -89,6 +89,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.whatsNewService.checkOnStartup();
     this.loadAuthenticatedSchoolBranding();
     this.handleInitialNavigation();
+    this.notificationService.unreadCountState$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(state => {
+        // 'loading'/'error' intentionally leave the last known badge count on screen — a
+        // failed refresh has never zeroed the badge, only a successful one updates it.
+        if (state.status === 'success') {
+          this.unreadNotificationCount = state.count;
+          this.cdr.markForCheck();
+        }
+      });
     this.fetchUnreadCount();
     this.initParentChildContext();
     // Re-fetch on every navigation (catches mark-all-read from notice board)
@@ -355,16 +365,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   fetchUnreadCount(): void {
     if (this.Role === 'SUPER_ADMIN') return;
-    this.notificationService
-      .getUnreadNotificationCount()
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe({
-        next: (count) => {
-          this.unreadNotificationCount = count;
-          this.cdr.markForCheck();
-        },
-        error: (e) => this.logger.error('Error fetching unread count:', e),
-      });
+    this.notificationService.refreshUnreadCount();
   }
 
   navigateToNoticeBoard(): void {

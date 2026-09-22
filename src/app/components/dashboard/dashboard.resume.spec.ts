@@ -48,7 +48,7 @@ describe('DashboardComponent — tab-resume / online session restoration', () =>
         { provide: StudentService, useValue: {} },
         { provide: TeacherService, useValue: {} },
         { provide: AdminService, useValue: {} },
-        { provide: NotificationService, useValue: { getUnreadNotificationCount: () => of(0) } },
+        { provide: NotificationService, useValue: { unreadCountState$: of({ status: 'success', count: 0 }), refreshUnreadCount: () => {} } },
         { provide: SchoolService, useValue: {} },
         { provide: TenantService, useValue: { school: null } },
         { provide: ParentPortalService, useValue: {} },

@@ -84,6 +84,7 @@ describe('AdminDashboardComponent — Daily Action Center (Phase 1)', () => {
   let component: AdminDashboardComponent;
   let teacherLeaveService: jasmine.SpyObj<TeacherLeaveService>;
   let eventService: jasmine.SpyObj<EventService>;
+  let adminService: jasmine.SpyObj<AdminService>;
 
   function configure(role: string, opts: {
     stats?: any;
@@ -109,13 +110,15 @@ describe('AdminDashboardComponent — Daily Action Center (Phase 1)', () => {
     }));
     eventService = jasmine.createSpyObj('EventService', ['getEventsForMonthAndYear']);
     eventService.getEventsForMonthAndYear.and.returnValue(of(opts.events ?? []));
+    adminService = jasmine.createSpyObj('AdminService', ['getAdminById']);
+    adminService.getAdminById.and.returnValue(of({ name: 'Test Admin' } as any));
 
     TestBed.configureTestingModule({
       imports: [AdminDashboardComponent],
       providers: [
         provideRouter([]),
         { provide: AuthStateService, useValue: authState },
-        { provide: AdminService, useValue: { getAdminById: () => of({ name: 'Test Admin' }) } },
+        { provide: AdminService, useValue: adminService },
         { provide: DashboardAnalyticsService, useValue: { getStats: () => of(stats) } },
         { provide: LeaveService, useValue: { getLeavesPaginated: () => of({ content: [] }) } },
         {
@@ -135,6 +138,22 @@ describe('AdminDashboardComponent — Daily Action Center (Phase 1)', () => {
     fixture = TestBed.createComponent(AdminDashboardComponent);
     component = fixture.componentInstance;
   }
+
+  // ─── Admin profile — reuses the session's /auth/me name, no separate admin-profile fetch ───
+
+  it('renders the greeting name from the session user without a duplicate admin-profile request, for ADMIN', () => {
+    configure('ADMIN');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Test');
+    expect(adminService.getAdminById).not.toHaveBeenCalled();
+  });
+
+  it('renders the greeting name from the session user without a duplicate admin-profile request, for SUB_ADMIN', () => {
+    configure('SUB_ADMIN');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Test');
+    expect(adminService.getAdminById).not.toHaveBeenCalled();
+  });
 
   it('renders Staff Attendance Today before School Setup and Staff Adoption', () => {
     configure('ADMIN');

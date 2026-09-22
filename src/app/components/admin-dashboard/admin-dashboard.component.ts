@@ -13,6 +13,8 @@ import { AdminService } from '../../services/admin.service';
 import { DashboardAnalyticsService, DashboardStats } from '../../services/dashboard-analytics.service';
 import { LeaveService, LeaveApplication } from '../../services/leave.service';
 import { SchoolService, SchoolEntitlementSummary, SchoolSetupHealth } from '../../services/school.service';
+import { StaffAdoptionService } from '../../services/staff-adoption.service';
+import { StaffAdoptionSummary } from '../../interfaces/staff-adoption';
 import { TeacherCheckinService } from '../../services/teacher-checkin.service';
 import { TeacherAttendanceTodaySummary } from '../../interfaces/teacher-checkin';
 import { LoggerService } from '../../services/logger.service';
@@ -40,6 +42,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   setupHealth: SchoolSetupHealth | null = null;
   setupHealthLoading = false;
   setupHealthError = false;
+  staffAdoption: StaffAdoptionSummary | null = null;
+  staffAdoptionLoading = false;
+  staffAdoptionError = false;
 
   constructor(
     private authState: AuthStateService,
@@ -48,6 +53,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private leaveService: LeaveService,
     private schoolService: SchoolService,
     private teacherCheckinService: TeacherCheckinService,
+    private staffAdoptionService: StaffAdoptionService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
     private toast: ToastService,
@@ -65,7 +71,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     }
 
     this.loadDashboardData();
-    if (user?.role === 'ADMIN') this.loadSetupHealth();
+    if (user?.role === 'ADMIN') {
+      this.loadSetupHealth();
+      this.loadStaffAdoption();
+    }
   }
 
   loadSetupHealth(): void {
@@ -84,6 +93,35 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  loadStaffAdoption(): void {
+    this.staffAdoptionLoading = true;
+    this.staffAdoptionError = false;
+    this.staffAdoptionService.getStaffAdoption().pipe(takeUntil(this.destroy$)).subscribe({
+      next: response => {
+        this.staffAdoption = response.summary;
+        this.staffAdoptionLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: e => {
+        this.logger.error('Staff adoption load error:', e);
+        this.staffAdoptionLoading = false;
+        this.staffAdoptionError = true;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  /** Rolls DISABLED accounts into "not started" for this compact card's arithmetic — the
+   *  dedicated Staff Adoption page shows the precise per-teacher distinction. */
+  get staffAdoptionNotStarted(): number {
+    return this.staffAdoption ? this.staffAdoption.notStartedTeachers + this.staffAdoption.disabledTeachers : 0;
+  }
+
+  get staffAdoptionPercent(): number {
+    if (!this.staffAdoption || this.staffAdoption.totalTeachers === 0) return 0;
+    return Math.round((this.staffAdoption.startedTeachers / this.staffAdoption.totalTeachers) * 100);
   }
 
   loadDashboardData(): void {

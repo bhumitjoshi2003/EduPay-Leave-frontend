@@ -1,0 +1,131 @@
+<main class="sa-page">
+  <a class="sa-back" routerLink="/dashboard/admin-dashboard"><mat-icon>arrow_back</mat-icon> Admin dashboard</a>
+
+  <div class="sa-loading" *ngIf="loading"><span class="sa-spinner"></span>Loading staff adoption…</div>
+  <div class="sa-error" *ngIf="error">
+    <mat-icon>cloud_off</mat-icon>
+    <h2>Staff adoption could not be loaded</h2>
+    <p>Your school data is safe. Please try again.</p>
+    <button type="button" (click)="load()">Retry</button>
+  </div>
+
+  <ng-container *ngIf="data as d">
+    <header class="sa-hero">
+      <div class="sa-hero-blob sa-hero-blob-1"></div>
+      <div class="sa-hero-blob sa-hero-blob-2"></div>
+      <div class="sa-hero-left">
+        <div class="sa-hero-icon"><mat-icon>groups</mat-icon></div>
+        <div>
+          <span class="sa-eyebrow">ROLLOUT VISIBILITY</span>
+          <h1 class="sa-hero-title">Staff Adoption</h1>
+          <p class="sa-hero-sub">See how your teaching staff are getting started with Edunexify.</p>
+        </div>
+      </div>
+      <div class="sa-hero-score">
+        <strong>{{ adoptionRatePercent }}%</strong>
+        <span>teachers started</span>
+      </div>
+      <div class="sa-hero-progress-wrap">
+        <div class="sa-hero-progress"><span [style.width.%]="adoptionRatePercent"></span></div>
+      </div>
+    </header>
+
+    <section class="sa-summary-grid">
+      <div class="sa-summary-card sa-summary-total">
+        <div class="sa-summary-icon"><mat-icon>groups</mat-icon></div>
+        <div class="sa-summary-copy">
+          <span class="sa-summary-value">{{ d.summary.totalTeachers }}</span>
+          <span class="sa-summary-label">Teachers</span>
+        </div>
+      </div>
+      <div class="sa-summary-card sa-summary-started">
+        <div class="sa-summary-icon"><mat-icon>check_circle</mat-icon></div>
+        <div class="sa-summary-copy">
+          <span class="sa-summary-value">{{ d.summary.startedTeachers }}</span>
+          <span class="sa-summary-label">Started</span>
+        </div>
+      </div>
+      <div class="sa-summary-card sa-summary-attendance">
+        <div class="sa-summary-icon"><mat-icon>fingerprint</mat-icon></div>
+        <div class="sa-summary-copy">
+          <span class="sa-summary-value">{{ d.summary.attendanceUsedTeachers }}</span>
+          <span class="sa-summary-label">Attendance Used</span>
+        </div>
+      </div>
+      <div class="sa-summary-card sa-summary-pending">
+        <div class="sa-summary-icon"><mat-icon>hourglass_empty</mat-icon></div>
+        <div class="sa-summary-copy">
+          <span class="sa-summary-value">{{ notStartedForSummary }}</span>
+          <span class="sa-summary-label">Not Started</span>
+        </div>
+      </div>
+    </section>
+
+    <ng-container *ngIf="d.teachers.length > 0 && d.summary.startedTeachers > 0; else emptyState">
+      <section class="sa-controls">
+        <div class="sa-search">
+          <mat-icon>search</mat-icon>
+          <input type="text" placeholder="Search by name or teacher ID" [(ngModel)]="searchTerm" aria-label="Search teachers" />
+        </div>
+        <div class="sa-filters">
+          <select [(ngModel)]="accountFilter" aria-label="Filter by account status">
+            <option value="ALL">All accounts</option>
+            <option value="STARTED">Started</option>
+            <option value="NOT_STARTED">Not started</option>
+          </select>
+          <select [(ngModel)]="attendanceFilter" aria-label="Filter by attendance usage">
+            <option value="ALL">All attendance</option>
+            <option value="USED">Attendance used</option>
+            <option value="NOT_USED">Attendance not yet used</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="sa-table-wrap">
+        <div class="sa-no-results" *ngIf="filteredTeachers.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <p>No teachers match your search or filters.</p>
+        </div>
+
+        <table class="sa-table" *ngIf="filteredTeachers.length > 0">
+          <thead>
+            <tr><th>Teacher</th><th>Account</th><th>Last Active</th><th>Attendance</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let teacher of filteredTeachers; let i = index" [style.animation-delay.ms]="i * 25">
+              <td data-label="Teacher">
+                <div class="sa-teacher-cell">
+                  <span class="sa-teacher-avatar">{{ teacher.name.charAt(0).toUpperCase() }}</span>
+                  <div>
+                    <span class="sa-teacher-name">{{ teacher.name }}</span>
+                    <span class="sa-teacher-id">{{ teacher.teacherId }}</span>
+                  </div>
+                </div>
+              </td>
+              <td data-label="Account">
+                <span class="sa-chip" [ngClass]="statusClass(teacher.accountStatus)"><i class="sa-dot"></i>{{ statusLabel(teacher.accountStatus) }}</span>
+              </td>
+              <td data-label="Last Active"><span class="sa-last-active">{{ formatDate(teacher.lastActiveAt) }}</span></td>
+              <td data-label="Attendance">
+                <span class="sa-chip" [class.sa-chip-used]="teacher.hasUsedAttendance" [class.sa-chip-not-used]="!teacher.hasUsedAttendance">
+                  <i class="sa-dot"></i>{{ teacher.hasUsedAttendance ? 'Used' : 'Not yet used' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </ng-container>
+
+    <ng-template #emptyState>
+      <div class="sa-empty">
+        <div class="sa-empty-icon"><mat-icon>groups</mat-icon></div>
+        <p *ngIf="d.summary.totalTeachers === 0">No teachers have been added yet.</p>
+        <a *ngIf="d.summary.totalTeachers === 0" routerLink="/dashboard/register" [queryParams]="{ type: 'teacher' }" class="sa-empty-cta">
+          Add teachers <mat-icon>arrow_forward</mat-icon>
+        </a>
+        <p *ngIf="d.summary.totalTeachers > 0">Teacher accounts are ready, but no one has started using Edunexify yet.</p>
+      </div>
+    </ng-template>
+  </ng-container>
+</main>

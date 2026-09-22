@@ -50,6 +50,29 @@
       <button class="ad-setup-action ad-setup-retry" type="button" *ngIf="setupHealthError" (click)="loadSetupHealth()">Retry</button>
     </section>
 
+    <section class="ad-adoption-card" *ngIf="staffAdoptionLoading || staffAdoption || staffAdoptionError">
+      <div class="ad-setup-copy">
+        <div class="ad-adoption-icon"><mat-icon>groups</mat-icon></div>
+        <div>
+          <h2>Staff Adoption</h2>
+          <p *ngIf="staffAdoptionLoading">Checking staff adoption…</p>
+          <p *ngIf="staffAdoption">
+            {{ staffAdoptionPercent }}% started · {{ staffAdoption.attendanceUsedTeachers }} have used attendance ·
+            {{ staffAdoptionNotStarted }} haven't started yet
+          </p>
+          <p *ngIf="staffAdoptionError">Staff adoption is temporarily unavailable.</p>
+        </div>
+      </div>
+      <div class="ad-setup-progress" *ngIf="staffAdoption">
+        <span [style.width.%]="staffAdoptionPercent"></span>
+      </div>
+      <a class="ad-setup-action" routerLink="/dashboard/staff-adoption" *ngIf="staffAdoption">
+        View Staff Adoption
+        <mat-icon>arrow_forward</mat-icon>
+      </a>
+      <button class="ad-setup-action ad-setup-retry" type="button" *ngIf="staffAdoptionError" (click)="loadStaffAdoption()">Retry</button>
+    </section>
+
     <!-- ── Stats error ──────────────────────────────────────────────── -->
     <div class="ad-stats-error" *ngIf="!stats">
       <span>⚠️</span>

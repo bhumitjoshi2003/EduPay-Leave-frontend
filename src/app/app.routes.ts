@@ -390,6 +390,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/school-setup/school-setup.component').then(m => m.SchoolSetupComponent),
         canActivate: [roleGuard], data: { roles: ['ADMIN'] }
       },
+      {
+        path: 'staff-adoption',
+        loadComponent: () => import('./components/staff-adoption/staff-adoption.component').then(m => m.StaffAdoptionComponent),
+        canActivate: [roleGuard], data: { roles: ['ADMIN'] }
+      },
 
       // ── Analytics Dashboard ───────────────────────────────────────────
       {

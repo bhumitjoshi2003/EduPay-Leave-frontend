@@ -6,7 +6,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { Subject, forkJoin, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 
 import { AuthStateService } from '../../auth/auth-state.service';
 import { AdminService } from '../../services/admin.service';
@@ -18,7 +18,6 @@ import { StaffAdoptionSummary } from '../../interfaces/staff-adoption';
 import { TeacherCheckinService } from '../../services/teacher-checkin.service';
 import { TeacherAttendanceTodaySummary } from '../../interfaces/teacher-checkin';
 import { LoggerService } from '../../services/logger.service';
-import { ToastService } from '../../services/toast.service';
 import { TeacherLeaveService } from '../../services/teacher-leave.service';
 import { EventService } from '../../services/event.service';
 import { CalendarEvent } from '../../interfaces/event-calendar.component';
@@ -56,6 +55,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   upcomingEvent: CalendarEvent | null = null;
   upcomingEventLoading = true;
   upcomingEventFailed = false;
+  statsFailed = false;
+  studentLeavesFailed = false;
+  entitlementFailed = false;
+  staffAttendanceFailed = false;
 
   constructor(
     private authState: AuthStateService,
@@ -67,14 +70,15 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private staffAdoptionService: StaffAdoptionService,
     private cdr: ChangeDetectorRef,
     private logger: LoggerService,
-    private toast: ToastService,
     private teacherLeaveService: TeacherLeaveService,
     private eventService: EventService,
   ) {}
 
   ngOnInit(): void {
     const user = this.authState.getUser();
-    if (user?.userId) {
+    this.isAdmin = user?.role === 'ADMIN';
+    this.adminName = user?.name ?? '';
+    if (this.isAdmin && user?.userId) {
       this.adminService.getAdminById(user.userId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
@@ -83,13 +87,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         });
     }
 
-    this.isAdmin = user?.role === 'ADMIN';
-    this.loadDashboardData();
     this.loadUpcomingEvent();
     if (this.isAdmin) {
+      this.loadDashboardData();
       this.loadSetupHealth();
       this.loadStaffAdoption();
       this.loadTeacherPendingLeaveCount();
+    } else {
+      this.isLoading = false;
     }
   }
 
@@ -214,29 +219,22 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   loadDashboardData(): void {
-    forkJoin([
-      this.analyticsService.getStats(),
-      this.leaveService.getLeavesPaginated(0, 10),
-      this.schoolService.getEntitlement(),
-      this.teacherCheckinService.getTodaySummary(),
-    ]).pipe(takeUntil(this.destroy$)).subscribe({
-      next: ([stats, leavesPage, entitlement, staffAttendance]) => {
-        // DashboardStatsDto.feesCollectedThisMonth is paise on the backend (nets
-        // Payment.amountPaid, itself paise) — convert once here rather than in the template.
-        this.stats = { ...(stats as DashboardStats), feesCollectedThisMonth: (stats as DashboardStats).feesCollectedThisMonth / 100 };
-        const pending = (leavesPage as any).content.filter((l: any) => l.status === 'PENDING');
-        this.recentLeaves = pending.slice(0, 5);
-        this.entitlement = entitlement as SchoolEntitlementSummary;
-        this.staffAttendance = staffAttendance as TeacherAttendanceTodaySummary;
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-      error: (e: any) => {
-        this.logger.error('Admin dashboard load error:', e);
-        this.isLoading = false;
-        this.cdr.markForCheck();
-        this.toast.error('Error', 'Failed to load dashboard data.');
-      }
+    this.isLoading = false;
+    this.analyticsService.getStats().pipe(takeUntil(this.destroy$)).subscribe({
+      next: stats => { this.stats = { ...stats, feesCollectedThisMonth: stats.feesCollectedThisMonth / 100 }; this.cdr.markForCheck(); },
+      error: e => { this.statsFailed = true; this.logger.error('Dashboard stats load error:', e); this.cdr.markForCheck(); }
+    });
+    this.leaveService.getLeavesPaginated(0, 10).pipe(takeUntil(this.destroy$)).subscribe({
+      next: page => { this.recentLeaves = page.content.filter(l => l.status === 'PENDING').slice(0, 5); this.cdr.markForCheck(); },
+      error: e => { this.studentLeavesFailed = true; this.logger.error('Student leave preview load error:', e); this.cdr.markForCheck(); }
+    });
+    this.schoolService.getEntitlement().pipe(takeUntil(this.destroy$)).subscribe({
+      next: entitlement => { this.entitlement = entitlement; this.cdr.markForCheck(); },
+      error: e => { this.entitlementFailed = true; this.logger.error('Plan entitlement load error:', e); this.cdr.markForCheck(); }
+    });
+    this.teacherCheckinService.getTodaySummary().pipe(takeUntil(this.destroy$)).subscribe({
+      next: attendance => { this.staffAttendance = attendance; this.cdr.markForCheck(); },
+      error: e => { this.staffAttendanceFailed = true; this.logger.error('Staff attendance summary load error:', e); this.cdr.markForCheck(); }
     });
   }
 

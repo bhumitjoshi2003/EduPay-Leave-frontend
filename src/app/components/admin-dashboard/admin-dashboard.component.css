@@ -149,7 +149,7 @@
 }
 .ad-staff-att-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 10px;
 }
 .ad-staff-att-pill {
@@ -169,6 +169,11 @@
 .ad-actions-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+.ad-daily-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
 .ad-action-card {
@@ -256,13 +261,15 @@
 @media (max-width: 900px) {
   .ad-stats-grid { grid-template-columns: repeat(2, 1fr); }
   .ad-actions-grid { grid-template-columns: repeat(4, 1fr); }
-  .ad-staff-att-grid { grid-template-columns: repeat(5, 1fr); }
+  .ad-daily-actions-grid { grid-template-columns: repeat(4, 1fr); }
+  .ad-staff-att-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 600px) {
   .ad-stats-grid { grid-template-columns: repeat(2, 1fr); }
   .ad-actions-grid { grid-template-columns: repeat(3, 1fr); }
+  .ad-daily-actions-grid { grid-template-columns: repeat(2, 1fr); }
   .ad-hero-name { font-size: 1.3rem; }
-  .ad-staff-att-grid { grid-template-columns: repeat(3, 1fr); }
+  .ad-staff-att-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 .ad-setup-card {

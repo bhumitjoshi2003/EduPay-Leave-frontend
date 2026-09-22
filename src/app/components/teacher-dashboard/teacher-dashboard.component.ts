@@ -19,6 +19,7 @@ import { AttendanceService } from '../../services/attendance.service';
 import { LeaveService, LeaveApplication } from '../../services/leave.service';
 import { LoggerService } from '../../services/logger.service';
 import { ToastService } from '../../services/toast.service';
+import { NotificationService } from '../../services/notification.service';
 import { TeacherCheckinService } from '../../services/teacher-checkin.service';
 import { TeacherAttendanceRecord, TeacherAttendanceSummary } from '../../interfaces/teacher-checkin';
 import { TeacherLeaveService } from '../../services/teacher-leave.service';
@@ -51,6 +52,7 @@ const EMPTY_TODAY_VIEW: TeacherTodayClassesView = {
 export class TeacherDashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   readonly timetableRoute = '/dashboard/timetable';
+  readonly updatesRoute = '/dashboard/notice';
 
   teacherName = '';
   className = '';
@@ -73,6 +75,11 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
   todayClassesLoading = true;
   todayClassesError: string | null = null;
   todayView: TeacherTodayClassesView = EMPTY_TODAY_VIEW;
+  unreadCount = 0;
+  unreadCountLoading = true;
+  /** true only when the unread-count call itself failed — the dashboard must stay fully
+   *  usable either way, so this only swaps the Updates panel to a neutral fallback line. */
+  unreadCountFailed = false;
   /** Read synchronously at construction — never loaded asynchronously, so the UI can never
    * briefly show clock times before the real "show times" preference is known. This is the
    * same per-device viewer preference as the full Timetable page's own "Show times" toggle
@@ -90,7 +97,8 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private checkinService: TeacherCheckinService,
     private teacherLeaveService: TeacherLeaveService,
-    private timetableService: TimetableService
+    private timetableService: TimetableService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -104,6 +112,7 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
     this.loadPersonalAttendance();
     this.loadRecentTeacherLeaves();
     this.loadTodayClasses(user.userId);
+    this.loadUnreadCount();
 
     this.teacherService
       .getTeacher(user.userId)
@@ -165,6 +174,26 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
         error: error => {
           this.logger.error('Personal attendance summary load error:', error);
           this.personalSummaryLoading = false;
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  /** Isolated from every other dashboard section on purpose — a failure here must never
+   *  block or blank out check-in status, Today's Classes, or leave data. */
+  private loadUnreadCount(): void {
+    this.notificationService.getUnreadNotificationCount()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: count => {
+          this.unreadCount = count;
+          this.unreadCountLoading = false;
+          this.cdr.markForCheck();
+        },
+        error: error => {
+          this.logger.error('Unread notification count load error:', error);
+          this.unreadCountLoading = false;
+          this.unreadCountFailed = true;
           this.cdr.markForCheck();
         }
       });

@@ -25,10 +25,44 @@
         <strong>{{ adoptionRatePercent }}%</strong>
         <span>teachers started</span>
       </div>
+      <button type="button" class="sa-reminder-toggle" (click)="toggleReminderPanel()">
+        <mat-icon>campaign</mat-icon> Send Reminder
+      </button>
       <div class="sa-hero-progress-wrap">
         <div class="sa-hero-progress"><span [style.width.%]="adoptionRatePercent"></span></div>
       </div>
     </header>
+
+    <section class="sa-reminder-panel" *ngIf="reminderPanelOpen">
+      <div class="sa-reminder-head">
+        <mat-icon>notifications_active</mat-icon>
+        <div>
+          <h2>Send a reminder</h2>
+          <p>A professional nudge to help staff finish setting up Edunexify. Sent only when you choose to send it.</p>
+        </div>
+      </div>
+
+      <div class="sa-reminder-options">
+        <label class="sa-reminder-option" *ngFor="let option of reminderOptions" [class.sa-reminder-option-selected]="selectedReminderType === option.type">
+          <input type="radio" name="reminderType" [value]="option.type" [(ngModel)]="selectedReminderType" />
+          <span class="sa-reminder-option-copy">
+            <strong>{{ option.label }}</strong>
+            <small>{{ option.description }}</small>
+          </span>
+        </label>
+      </div>
+
+      <p class="sa-reminder-error" *ngIf="reminderError">{{ reminderError }}</p>
+
+      <div class="sa-reminder-actions">
+        <button type="button" class="sa-reminder-cancel" (click)="toggleReminderPanel()" [disabled]="reminderPreviewLoading || reminderSendLoading">Cancel</button>
+        <button type="button" class="sa-reminder-preview" (click)="previewAndSendReminder()" [disabled]="reminderPreviewLoading || reminderSendLoading">
+          <span *ngIf="!reminderPreviewLoading && !reminderSendLoading">Preview &amp; Send</span>
+          <span *ngIf="reminderPreviewLoading">Loading recipients&hellip;</span>
+          <span *ngIf="reminderSendLoading">Sending&hellip;</span>
+        </button>
+      </div>
+    </section>
 
     <section class="sa-summary-grid">
       <div class="sa-summary-card sa-summary-total">

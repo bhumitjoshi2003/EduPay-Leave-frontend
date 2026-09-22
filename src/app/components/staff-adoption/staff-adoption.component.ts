@@ -6,11 +6,25 @@ import { RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { StaffAdoptionService } from '../../services/staff-adoption.service';
 import { LoggerService } from '../../services/logger.service';
+import { ToastService } from '../../services/toast.service';
 import { StaffAdoptionResponse, StaffAdoptionTeacherRow } from '../../interfaces/staff-adoption';
+import { StaffAdoptionReminderType } from '../../interfaces/staff-adoption-reminder';
 
 type AccountFilter = 'ALL' | 'STARTED' | 'NOT_STARTED';
 type AttendanceFilter = 'ALL' | 'USED' | 'NOT_USED';
 type ActivityFilter = 'ALL' | 'LAST_7_DAYS' | 'OLDER' | 'NEVER';
+
+interface ReminderOption {
+  type: StaffAdoptionReminderType;
+  label: string;
+  description: string;
+}
+
+const REMINDER_OPTIONS: ReminderOption[] = [
+  { type: 'NOT_STARTED', label: 'Not started', description: 'Nudge teachers who have not yet signed in.' },
+  { type: 'OUTDATED_APP', label: 'Outdated app', description: 'Ask teachers to update the Edunexify Android app.' },
+  { type: 'ONBOARDING_INCOMPLETE', label: 'Onboarding incomplete', description: 'Remind teachers to finish Getting Started.' },
+];
 
 @Component({
   selector: 'app-staff-adoption',
@@ -32,9 +46,17 @@ export class StaffAdoptionComponent implements OnInit, OnDestroy {
   attendanceFilter: AttendanceFilter = 'ALL';
   activityFilter: ActivityFilter = 'ALL';
 
+  readonly reminderOptions = REMINDER_OPTIONS;
+  reminderPanelOpen = false;
+  selectedReminderType: StaffAdoptionReminderType = 'NOT_STARTED';
+  reminderPreviewLoading = false;
+  reminderSendLoading = false;
+  reminderError: string | null = null;
+
   constructor(
     private staffAdoptionService: StaffAdoptionService,
     private logger: LoggerService,
+    private toast: ToastService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -142,5 +164,91 @@ export class StaffAdoptionComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  // ── Reminders (admin-triggered, never automatic) ────────────────
+
+  toggleReminderPanel(): void {
+    this.reminderPanelOpen = !this.reminderPanelOpen;
+    this.reminderError = null;
+    this.cdr.markForCheck();
+  }
+
+  /** Preview → confirm → send. The backend re-resolves recipients itself from `type` alone;
+   *  this only ever asks it to preview, then to send — it never submits a recipient list. */
+  previewAndSendReminder(): void {
+    if (this.reminderPreviewLoading || this.reminderSendLoading) return;
+    const type = this.selectedReminderType;
+    this.reminderPreviewLoading = true;
+    this.reminderError = null;
+    this.cdr.markForCheck();
+
+    this.staffAdoptionService.previewReminder(type).pipe(takeUntil(this.destroy$)).subscribe({
+      next: preview => {
+        this.reminderPreviewLoading = false;
+        this.cdr.markForCheck();
+        if (preview.count === 0) {
+          this.toast.info('No recipients', 'No teachers currently match this reminder.');
+          return;
+        }
+        this.confirmAndSend(type, preview.count, preview.teachers.map(t => t.name));
+      },
+      error: e => {
+        this.logger.error('Reminder preview failed:', e);
+        this.reminderPreviewLoading = false;
+        this.reminderError = 'Could not load recipients. Please try again.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  private confirmAndSend(type: StaffAdoptionReminderType, count: number, names: string[]): void {
+    const shown = names.slice(0, 8);
+    const more = names.length > shown.length ? `<p>&hellip; and ${names.length - shown.length} more</p>` : '';
+    this.toast.confirm({
+      title: `Send reminder to ${count} teacher${count > 1 ? 's' : ''}?`,
+      html: `<p>${shown.join(', ')}</p>${more}`,
+      icon: 'question',
+      confirmText: 'Send reminder',
+      cancelText: 'Cancel',
+    }).then(confirmed => {
+      if (!confirmed) return;
+      this.sendReminder(type);
+    });
+  }
+
+  private sendReminder(type: StaffAdoptionReminderType): void {
+    this.reminderSendLoading = true;
+    this.cdr.markForCheck();
+
+    this.staffAdoptionService.sendReminder(type).pipe(takeUntil(this.destroy$)).subscribe({
+      next: result => {
+        this.reminderSendLoading = false;
+        this.reminderPanelOpen = false;
+        this.cdr.markForCheck();
+        this.toastForSendResult(result.sentCount, result.skippedRecentCount);
+      },
+      error: e => {
+        this.logger.error('Reminder send failed:', e);
+        this.reminderSendLoading = false;
+        this.reminderError = 'Could not send the reminder. Please try again.';
+        this.cdr.markForCheck();
+        this.toast.error('Error', 'Failed to send reminder. Please try again.');
+      }
+    });
+  }
+
+  /** Truthful wording: "sent" here means accepted for delivery, never a claim that email/push
+   *  was actually received. */
+  private toastForSendResult(sentCount: number, skippedRecentCount: number): void {
+    if (sentCount === 0 && skippedRecentCount > 0) {
+      this.toast.info('Already reminded', `All ${skippedRecentCount} teacher${skippedRecentCount > 1 ? 's were' : ' was'} reminded recently.`);
+      return;
+    }
+    let message = `Reminder sent to ${sentCount} teacher${sentCount === 1 ? '' : 's'}.`;
+    if (skippedRecentCount > 0) {
+      message += ` ${skippedRecentCount} skipped because they were reminded recently.`;
+    }
+    this.toast.success('Reminder sent', message);
   }
 }

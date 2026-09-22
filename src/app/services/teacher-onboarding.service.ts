@@ -1,4 +1,7 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export type TeacherOnboardingVisit = 'profileVisited' | 'todaysClassesVisited' | 'attendanceVisited' | 'leaveVisited';
 export type PermissionState = 'granted' | 'denied' | 'prompt' | 'unavailable';
@@ -9,6 +12,8 @@ const DEFAULT_STATE: TeacherOnboardingState = { profileVisited: false, todaysCla
 
 @Injectable({ providedIn: 'root' })
 export class TeacherOnboardingService {
+  private completionSynced = new Set<string>();
+  constructor(private http?: HttpClient) {}
   private key(userId: string): string { return `edunexify.teacher-onboarding.v1.${userId}`; }
 
   async load(userId: string): Promise<TeacherOnboardingState> {
@@ -19,7 +24,14 @@ export class TeacherOnboardingService {
   }
 
   async save(userId: string, state: TeacherOnboardingState): Promise<void> {
-    try { localStorage.setItem(this.key(userId), JSON.stringify(state)); } catch { /* optional UI */ }
+    try {
+      localStorage.setItem(this.key(userId), JSON.stringify(state));
+      if (state.completedAt && !this.completionSynced.has(userId) && this.http) {
+        this.completionSynced.add(userId);
+        firstValueFrom(this.http.post<void>(`${environment.apiUrl}/me/adoption/onboarding-completed`, {}, { withCredentials: true }))
+          .catch(() => { this.completionSynced.delete(userId); });
+      }
+    } catch { /* optional UI */ }
   }
 
   async markVisited(userId: string, state: TeacherOnboardingState, field: TeacherOnboardingVisit): Promise<TeacherOnboardingState> {

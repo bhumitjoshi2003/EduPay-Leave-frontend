@@ -10,6 +10,7 @@ import { StaffAdoptionResponse, StaffAdoptionTeacherRow } from '../../interfaces
 
 type AccountFilter = 'ALL' | 'STARTED' | 'NOT_STARTED';
 type AttendanceFilter = 'ALL' | 'USED' | 'NOT_USED';
+type ActivityFilter = 'ALL' | 'LAST_7_DAYS' | 'OLDER' | 'NEVER';
 
 @Component({
   selector: 'app-staff-adoption',
@@ -29,6 +30,7 @@ export class StaffAdoptionComponent implements OnInit, OnDestroy {
   searchTerm = '';
   accountFilter: AccountFilter = 'ALL';
   attendanceFilter: AttendanceFilter = 'ALL';
+  activityFilter: ActivityFilter = 'ALL';
 
   constructor(
     private staffAdoptionService: StaffAdoptionService,
@@ -84,6 +86,11 @@ export class StaffAdoptionComponent implements OnInit, OnDestroy {
       if (this.accountFilter === 'NOT_STARTED' && teacher.accountStatus === 'STARTED') return false;
       if (this.attendanceFilter === 'USED' && !teacher.hasUsedAttendance) return false;
       if (this.attendanceFilter === 'NOT_USED' && teacher.hasUsedAttendance) return false;
+      const activeAt = teacher.lastActiveAt ? new Date(teacher.lastActiveAt).getTime() : null;
+      const sevenDaysAgo = Date.now() - 7 * 86_400_000;
+      if (this.activityFilter === 'LAST_7_DAYS' && (!activeAt || activeAt < sevenDaysAgo)) return false;
+      if (this.activityFilter === 'OLDER' && (!activeAt || activeAt >= sevenDaysAgo)) return false;
+      if (this.activityFilter === 'NEVER' && activeAt) return false;
       return true;
     });
   }
@@ -99,6 +106,19 @@ export class StaffAdoptionComponent implements OnInit, OnDestroy {
 
   statusClass(status: StaffAdoptionTeacherRow['accountStatus']): string {
     return 'sa-chip-' + status.toLowerCase().replace(/_/g, '-');
+  }
+
+  onboardingLabel(teacher: StaffAdoptionTeacherRow): string {
+    return teacher.onboardingStatus === 'COMPLETED' ? 'Completed' : 'Not reported';
+  }
+
+  appStatusLabel(teacher: StaffAdoptionTeacherRow): string {
+    switch (teacher.appVersionStatus) {
+      case 'UP_TO_DATE': return 'Up to date';
+      case 'UPDATE_AVAILABLE': return 'Update available';
+      case 'UPDATE_REQUIRED': return 'Update required';
+      default: return 'No version reported';
+    }
   }
 
   /** Today / Yesterday / "N days ago" (up to a week) / "MMM D, YYYY" — never a raw ISO string,

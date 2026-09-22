@@ -78,6 +78,12 @@
             <option value="USED">Attendance used</option>
             <option value="NOT_USED">Attendance not yet used</option>
           </select>
+          <select [(ngModel)]="activityFilter" aria-label="Filter by recent activity">
+            <option value="ALL">Activity: any time</option>
+            <option value="LAST_7_DAYS">Active in last 7 days</option>
+            <option value="OLDER">More than 7 days ago</option>
+            <option value="NEVER">Never started</option>
+          </select>
         </div>
       </section>
 
@@ -89,7 +95,7 @@
 
         <table class="sa-table" *ngIf="filteredTeachers.length > 0">
           <thead>
-            <tr><th>Teacher</th><th>Account</th><th>Last Active</th><th>Attendance</th></tr>
+            <tr><th>Teacher</th><th>Account</th><th>Last Active</th><th>Attendance</th><th>Onboarding</th><th>App</th></tr>
           </thead>
           <tbody>
             <tr *ngFor="let teacher of filteredTeachers; let i = index" [style.animation-delay.ms]="i * 25">
@@ -110,6 +116,13 @@
                 <span class="sa-chip" [class.sa-chip-used]="teacher.hasUsedAttendance" [class.sa-chip-not-used]="!teacher.hasUsedAttendance">
                   <i class="sa-dot"></i>{{ teacher.hasUsedAttendance ? 'Used' : 'Not yet used' }}
                 </span>
+              </td>
+              <td data-label="Onboarding">
+                <span class="sa-readiness-value">{{ onboardingLabel(teacher) }}</span>
+              </td>
+              <td data-label="App">
+                <span class="sa-readiness-value">{{ teacher.appVersionName || 'Unknown' }}</span>
+                <small class="sa-readiness-note">{{ appStatusLabel(teacher) }}</small>
               </td>
             </tr>
           </tbody>

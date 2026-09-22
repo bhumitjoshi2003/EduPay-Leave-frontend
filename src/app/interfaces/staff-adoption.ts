@@ -6,6 +6,8 @@ export interface StaffAdoptionSummary {
   notStartedTeachers: number;
   attendanceUsedTeachers: number;
   disabledTeachers: number;
+  onboardingCompletedTeachers?: number;
+  appUpToDateTeachers?: number;
 }
 
 export interface StaffAdoptionTeacherRow {
@@ -15,6 +17,12 @@ export interface StaffAdoptionTeacherRow {
   lastActiveAt: string | null;
   hasUsedAttendance: boolean;
   lastAttendanceAt: string | null;
+  onboardingStatus?: 'COMPLETED' | 'UNKNOWN';
+  onboardingCompletedAt?: string | null;
+  clientPlatform?: string | null;
+  appVersionName?: string | null;
+  appVersionCode?: number | null;
+  appVersionStatus?: 'UP_TO_DATE' | 'UPDATE_AVAILABLE' | 'UPDATE_REQUIRED' | 'UNKNOWN';
 }
 
 export interface StaffAdoptionResponse {

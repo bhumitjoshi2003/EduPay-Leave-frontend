@@ -38,14 +38,13 @@ describe('NotificationDeliveryLogComponent', () => {
     inApp: { stored: 500, opened: 212, unopened: 288 },
     push: { total: 500, accepted: 487, failed: 13, retrying: 0, skipped: 0, queued: 0 },
     email: { total: 500, accepted: 492, failed: 8, retrying: 0, skipped: 0, queued: 0 },
-    deliveryHistoryMayBeIncomplete: false,
     ...overrides,
   });
 
   beforeEach(() => {
     service = jasmine.createSpyObj('NotificationDeliveryService', ['search', 'summary', 'eventCodes', 'detail']);
     service.search.and.returnValue(of({ content: [row()], page: 0, size: 25, hasNext: false }));
-    service.summary.and.returnValue(of({ content: [summaryRow()], page: 0, size: 25, hasNext: false, deliveryRetentionDays: 90 }));
+    service.summary.and.returnValue(of({ content: [summaryRow()], page: 0, size: 25, hasNext: false }));
     service.eventCodes.and.returnValue(of(['FEE_REMINDER', 'NOTICE_PUBLISHED']));
 
     TestBed.configureTestingModule({
@@ -90,15 +89,17 @@ describe('NotificationDeliveryLogComponent', () => {
     expect(text.toLowerCase()).not.toContain('delivered');
   });
 
-  it('labels an unused channel "Not sent" and old publications as possibly incomplete', () => {
+  it('labels a channel with no delivery rows "Not sent"', () => {
     service.summary.and.returnValue(of({ content: [
       summaryRow({ notificationId: 1, email: null }),
-      summaryRow({ notificationId: 2, push: null, email: null, deliveryHistoryMayBeIncomplete: true }),
-    ], page: 0, size: 25, hasNext: false, deliveryRetentionDays: 90 }));
+      summaryRow({ notificationId: 2, push: null, email: null }),
+    ], page: 0, size: 25, hasNext: false }));
     fixture.detectChanges();
     const text: string = fixture.nativeElement.textContent;
+    expect(fixture.nativeElement.querySelectorAll('.ndl-none').length).toBe(3);
     expect(text).toContain('Not sent');
-    expect(text).toContain('Records expired');
+    expect(text).not.toContain('Records expired');
+    expect(text).not.toContain('May be incomplete');
   });
 
   it('shows only summary filters on Summary and only recipient filters on Details', () => {
@@ -160,7 +161,7 @@ describe('NotificationDeliveryLogComponent', () => {
   });
 
   it('pages the summary and shows a validation message on 400', () => {
-    service.summary.and.returnValue(of({ content: [summaryRow()], page: 0, size: 25, hasNext: true, deliveryRetentionDays: 90 }));
+    service.summary.and.returnValue(of({ content: [summaryRow()], page: 0, size: 25, hasNext: true }));
     fixture.detectChanges();
     component.nextSummaryPage();
     expect(service.summary).toHaveBeenCalledWith(1, 25, jasmine.any(Object));

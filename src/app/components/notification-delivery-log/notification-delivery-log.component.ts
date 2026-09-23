@@ -49,7 +49,6 @@ export class NotificationDeliveryLogComponent implements OnInit, OnDestroy {
   summaryError = '';
   summaryPage = 0;
   summaryHasNext = false;
-  retentionDays = 90;
   filterSearch = '';
 
   /** Set when the Details view was opened from a summary row: pins it to that notification. */
@@ -120,7 +119,6 @@ export class NotificationDeliveryLogComponent implements OnInit, OnDestroy {
         this.summaryRows = result.content;
         this.summaryPage = result.page;
         this.summaryHasNext = result.hasNext;
-        this.retentionDays = result.deliveryRetentionDays;
         this.summaryLoading = false;
         this.cdr.markForCheck();
       },

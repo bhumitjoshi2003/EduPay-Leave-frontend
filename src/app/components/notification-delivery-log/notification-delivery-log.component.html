@@ -98,8 +98,8 @@
               <span class="ndl-summary-meta">{{ s.createdAt | date:'d MMM yyyy, h:mm a' }} · {{ s.schoolName || (s.schoolId ? '#' + s.schoolId : 'Platform-wide') }} · {{ eventLabel(s.eventCode) }}</span>
             </td>
             <td class="ndl-summary-total">{{ s.totalRecipients | number }}</td>
-            <td><ng-container *ngTemplateOutlet="channelCell; context: { $implicit: s.push, row: s }"></ng-container></td>
-            <td><ng-container *ngTemplateOutlet="channelCell; context: { $implicit: s.email, row: s }"></ng-container></td>
+            <td><ng-container *ngTemplateOutlet="channelCell; context: { $implicit: s.push }"></ng-container></td>
+            <td><ng-container *ngTemplateOutlet="channelCell; context: { $implicit: s.email }"></ng-container></td>
             <td>
               <div class="ndl-bar" *ngIf="s.inApp.stored" [attr.aria-label]="s.inApp.opened + ' of ' + s.inApp.stored + ' opened'">
                 <span class="seg seg-opened" [style.width.%]="pct(s.inApp.opened, s.inApp.stored)"></span>
@@ -125,7 +125,7 @@
     </div>
   </ng-container>
 
-  <ng-template #channelCell let-c let-row="row">
+  <ng-template #channelCell let-c>
     <ng-container *ngIf="c; else noChannel">
       <div class="ndl-bar" [attr.aria-label]="c.accepted + ' of ' + c.total + ' accepted'">
         <span class="seg seg-accepted" [style.width.%]="pct(c.accepted, c.total)"></span>
@@ -141,12 +141,8 @@
         <li class="c-muted" *ngIf="c.queued">{{ c.queued | number }} queued</li>
         <li class="c-muted" *ngIf="c.skipped">{{ c.skipped | number }} skipped</li>
       </ul>
-      <span class="ndl-expired" *ngIf="row.deliveryHistoryMayBeIncomplete" [title]="'Finished delivery records are removed after ' + retentionDays + ' days'">May be incomplete</span>
     </ng-container>
-    <ng-template #noChannel>
-      <span class="ndl-none" *ngIf="!row.deliveryHistoryMayBeIncomplete">Not sent</span>
-      <span class="ndl-expired" *ngIf="row.deliveryHistoryMayBeIncomplete" [title]="'Finished delivery records are removed after ' + retentionDays + ' days'">Records expired</span>
-    </ng-template>
+    <ng-template #noChannel><span class="ndl-none">Not sent</span></ng-template>
   </ng-template>
 
   <!-- ── Delivery Details: recipient-level log (unchanged), optionally pinned to one notification ── -->

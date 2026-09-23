@@ -152,7 +152,6 @@
 .ndl-counts .c-opened { color: #15803d; font-weight: 700; }
 .ndl-counts .c-muted { color: #64748b; }
 .ndl-none { font-size: 0.74rem; color: #94a3b8; }
-.ndl-expired { display: inline-block; margin-top: 4px; font-size: 0.68rem; font-weight: 700; color: #92400e; background: #fef3c7; border-radius: 6px; padding: 1px 6px; }
 
 @media (max-width: 600px) {
   .ndl-hero { padding: 16px; }

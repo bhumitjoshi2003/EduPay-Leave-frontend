@@ -122,7 +122,6 @@ export interface DeliverySummaryRow {
   inApp: InAppCounts;
   push: ChannelCounts | null;
   email: ChannelCounts | null;
-  deliveryHistoryMayBeIncomplete: boolean;
 }
 
 export interface DeliverySummaryPage {
@@ -130,7 +129,6 @@ export interface DeliverySummaryPage {
   page: number;
   size: number;
   hasNext: boolean;
-  deliveryRetentionDays: number;
 }
 
 export interface SummaryFilters {

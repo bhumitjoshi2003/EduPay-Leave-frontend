@@ -148,6 +148,39 @@ describe('TeacherDashboardComponent today classes', () => {
     expect(component.isLoading).toBeFalse();
   });
 
+  it('a class-data failure never fabricates "0 active students" / "no pending requests" — it flags classDataFailed instead', () => {
+    teacherService.getTeacher.and.returnValue(of({ name: 'Mr Shah', classTeacher: 'X' }));
+    studentService.getActiveStudentsByClass.and.returnValue(throwError(() => new Error('offline')));
+    attendanceService.getAttendanceByDateAndClass.and.returnValue(of([]));
+    leaveService.getLeavesPaginated.and.returnValue(of({ content: [], totalElements: 0, totalPages: 0 }));
+    attendanceService.getClassSummary.and.returnValue(of([]));
+    const component = build();
+    component.ngOnInit();
+    expect(component.classDataFailed).toBeTrue();
+    expect(component.isLoading).toBeFalse();
+    // Nothing else on the dashboard should be disturbed by this isolated failure.
+    expect(component.teacherName).toBe('Mr Shah');
+    expect(component.todayView.hasAnyToday).toBeFalse();
+  });
+
+  it('retrying class data re-requests only the class-data sources, and clears the failure on success', () => {
+    teacherService.getTeacher.and.returnValue(of({ name: 'Mr Shah', classTeacher: 'X' }));
+    studentService.getActiveStudentsByClass.and.returnValue(throwError(() => new Error('offline')));
+    attendanceService.getAttendanceByDateAndClass.and.returnValue(of([]));
+    leaveService.getLeavesPaginated.and.returnValue(of({ content: [], totalElements: 0, totalPages: 0 }));
+    attendanceService.getClassSummary.and.returnValue(of([]));
+    const component = build();
+    component.ngOnInit();
+    expect(component.classDataFailed).toBeTrue();
+
+    studentService.getActiveStudentsByClass.and.returnValue(of([{ studentId: 'S1' }]));
+    component.loadClassData();
+    expect(component.classDataFailed).toBeFalse();
+    expect(component.totalStudents).toBe(1);
+    expect(timetableService.getTeacherTimetable).toHaveBeenCalledTimes(1);
+    expect(teacherService.getTeacher).toHaveBeenCalledTimes(1);
+  });
+
   it('uses the existing timetable route for the dashboard action', () => {
     expect(build().timetableRoute).toBe('/dashboard/timetable');
   });

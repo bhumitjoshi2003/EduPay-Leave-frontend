@@ -441,6 +441,29 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUB_ADMIN', 'PARENT', 'SUPER_ADMIN'] }
       },
+      // Technical support — every normal role; reporting/tracking a platform problem is a
+      // personal action, never routed to the reporter's own school admin. SUPER_ADMIN receives
+      // these tickets via support-queue below, so never reports or tracks its own.
+      {
+        path: 'report-problem',
+        loadComponent: () => import('./components/report-support-ticket/report-support-ticket.component').then(m => m.ReportSupportTicketComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUB_ADMIN', 'PARENT'] }
+      },
+      {
+        path: 'my-support-requests',
+        loadComponent: () => import('./components/my-support-requests/my-support-requests.component').then(m => m.MySupportRequestsComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['STUDENT', 'TEACHER', 'ADMIN', 'SUB_ADMIN', 'PARENT'] }
+      },
+      // SUPER_ADMIN-only global queue — school ADMIN/SUB_ADMIN must never reach this; they
+      // only ever see their own tickets via /my-support-requests, same as any other role.
+      {
+        path: 'support-queue',
+        loadComponent: () => import('./components/super-admin-support-queue/super-admin-support-queue.component').then(m => m.SuperAdminSupportQueueComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN'] }
+      },
       {
         path: 'payment',
         loadComponent: () => import('./components/payment/payment.component').then(m => m.PaymentComponent),

@@ -97,30 +97,30 @@ describe('teacher today classes', () => {
     expect(complete.allDone).toBeTrue();
   });
 
-  // ─── Cover-class visibility — a substitution must never silently disappear ───
+  // ─── Cover-class visibility — a substitution follows the same rules as any other
+  //     period: once its time has passed, it's 'done' and drops off the list. ───
 
-  it('still shows an active cover class after its period has ended ("done"), instead of dropping it', () => {
+  it('a cover class whose period has already ended is not shown, same as a normal completed class', () => {
     const view = buildTodayClassesView([
       entry({ id: 9, startTime: '09:00', endTime: '09:40', isSubstitution: true, originalTeacherName: 'Mr Original' }),
-    ], at(12, 0)); // well past 09:40 — would normally be classified 'done' and excluded
+    ], at(12, 0)); // well past 09:40
 
     expect(view.current).toBeNull();
-    expect(view.upcoming.map(item => item.key)).toEqual(['9']);
-    expect(view.upcoming[0].isSubstitution).toBeTrue();
-    expect(view.allDone).toBeFalse();
+    expect(view.upcoming).toEqual([]);
+    expect(view.allDone).toBeTrue();
   });
 
-  it('a done cover class alongside otherwise-complete normal classes still renders the list, not the "complete" empty state', () => {
+  it('a completed cover class alongside other completed classes still reports allDone', () => {
     const view = buildTodayClassesView([
       entry({ id: 1, startTime: '08:00', endTime: '08:40' }),
       entry({ id: 9, startTime: '09:00', endTime: '09:40', isSubstitution: true }),
     ], at(12, 0));
 
-    expect(view.allDone).toBeFalse();
-    expect(view.upcoming.map(item => item.key)).toEqual(['9']);
+    expect(view.allDone).toBeTrue();
+    expect(view.upcoming).toEqual([]);
   });
 
-  it('a cover class is never trimmed out by the 3-row visible cap, even when normal periods already fill it', () => {
+  it('an upcoming cover class is still subject to the normal 3-row visible cap, like any other period', () => {
     const view = buildTodayClassesView([
       entry({ id: 1, startTime: '09:00', endTime: '09:40' }),
       entry({ id: 2, startTime: '09:50', endTime: '10:30' }),
@@ -129,6 +129,7 @@ describe('teacher today classes', () => {
     ], at(9, 15));
 
     expect(view.current?.key).toBe('1');
-    expect(view.upcoming.some(item => item.key === '9')).toBeTrue();
+    expect(view.upcoming.map(item => item.key)).toEqual(['2', '3']);
+    expect(view.upcoming.some(item => item.key === '9')).toBeFalse();
   });
 });

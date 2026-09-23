@@ -14,6 +14,7 @@ import { ToastService } from '../../services/toast.service';
 import { StaffAdoptionResponse } from '../../interfaces/staff-adoption';
 import { TeacherLeaveService } from '../../services/teacher-leave.service';
 import { EventService } from '../../services/event.service';
+import { TeacherSubstitutionService } from '../../services/teacher-substitution.service';
 
 describe('AdminDashboardComponent — Staff Adoption card', () => {
   let fixture: ComponentFixture<AdminDashboardComponent>;
@@ -36,6 +37,7 @@ describe('AdminDashboardComponent — Staff Adoption card', () => {
       imports: [AdminDashboardComponent],
       providers: [
         provideRouter([]),
+        { provide: TeacherSubstitutionService, useValue: { getUncovered: () => of([]) } },
         { provide: AuthStateService, useValue: authState },
         { provide: AdminService, useValue: { getAdminById: () => of({ name: 'Test Admin' }) } },
         { provide: DashboardAnalyticsService, useValue: { getStats: () => of({ totalStudents: 0, totalTeachers: 0, feesCollectedThisMonth: 0, overdueStudents: 0, todayAttendanceRate: 0, pendingLeaves: 0 }) } },
@@ -129,6 +131,7 @@ describe('AdminDashboardComponent — Daily Action Center (Phase 1)', () => {
       providers: [
         provideRouter([]),
         { provide: AuthStateService, useValue: authState },
+        { provide: TeacherSubstitutionService, useValue: { getUncovered: () => of([]) } },
         { provide: AdminService, useValue: adminService },
         {
           provide: DashboardAnalyticsService, useValue: {
@@ -335,6 +338,7 @@ describe('AdminDashboardComponent — Daily Action Center (Phase 1)', () => {
         provideRouter([]),
         { provide: AuthStateService, useValue: authState },
         { provide: AdminService, useValue: { getAdminById: () => of({ name: 'Test Admin' }) } },
+        { provide: TeacherSubstitutionService, useValue: { getUncovered: () => of([]) } },
         { provide: DashboardAnalyticsService, useValue: { getStats: () => of({ totalStudents: 0, totalTeachers: 10, feesCollectedThisMonth: 0, overdueStudents: 0, todayAttendanceRate: 0, pendingLeaves: 0 }) } },
         { provide: LeaveService, useValue: { getLeavesPaginated: () => of({ content: [] }) } },
         { provide: SchoolService, useValue: { getEntitlement: () => of(null), getSetupHealth: () => of({ completionPercentage: 80, completedRequired: 4, totalRequired: 5, status: 'IN_PROGRESS', items: [] }) } },
@@ -396,6 +400,7 @@ describe('AdminDashboardComponent — Daily Action Center (Phase 1)', () => {
       imports: [AdminDashboardComponent],
       providers: [
         provideRouter([]),
+        { provide: TeacherSubstitutionService, useValue: { getUncovered: () => of([]) } },
         { provide: AuthStateService, useValue: authState },
         { provide: AdminService, useValue: { getAdminById: () => of({ name: 'Test Admin' }) } },
         { provide: DashboardAnalyticsService, useValue: { getStats: () => of({ totalStudents: 0, totalTeachers: 10, feesCollectedThisMonth: 0, overdueStudents: 0, todayAttendanceRate: 0, pendingLeaves: 0 }) } },
@@ -557,6 +562,7 @@ describe('AdminDashboardComponent — Daily Action Center (Phase 1)', () => {
         provideRouter([]),
         { provide: AuthStateService, useValue: authState },
         { provide: AdminService, useValue: { getAdminById: () => of({ name: 'Test Admin' }) } },
+        { provide: TeacherSubstitutionService, useValue: { getUncovered: () => of([]) } },
         { provide: DashboardAnalyticsService, useValue: { getStats } },
         { provide: LeaveService, useValue: { getLeavesPaginated } },
         { provide: SchoolService, useValue: { getEntitlement, getSetupHealth: () => of(null) } },

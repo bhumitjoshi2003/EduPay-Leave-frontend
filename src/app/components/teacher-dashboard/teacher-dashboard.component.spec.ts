@@ -218,6 +218,17 @@ describe('TeacherDashboardComponent today classes', () => {
     expect(cover!.className).toBe('VII');
   });
 
+  it('counts only current or upcoming cover classes for teacher attention', () => {
+    timetableService.getTeacherTimetable.and.returnValue(of([]));
+    substitutionService.getMine.and.returnValue(of([coverClass()]));
+    const component = build();
+    component.ngOnInit();
+
+    expect(component.coverClassCount).toBe(1);
+    component.todayView = { current: null, upcoming: [], allDone: true, hasAnyToday: true };
+    expect(component.coverClassCount).toBe(0);
+  });
+
   it('never marks a normal (non-cover) class as a substitution', () => {
     timetableService.getTeacherTimetable.and.returnValue(of([
       timetableEntry({ id: 1, startTime: '09:10', endTime: '09:50' }),

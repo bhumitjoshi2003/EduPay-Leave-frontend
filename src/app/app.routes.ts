@@ -464,6 +464,13 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: ['SUPER_ADMIN'] }
       },
+      // SUPER_ADMIN-only platform operations view of notification delivery across every school.
+      {
+        path: 'notification-deliveries',
+        loadComponent: () => import('./components/notification-delivery-log/notification-delivery-log.component').then(m => m.NotificationDeliveryLogComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN'] }
+      },
       {
         path: 'payment',
         loadComponent: () => import('./components/payment/payment.component').then(m => m.PaymentComponent),

@@ -4,7 +4,13 @@ import { NotificationDeliveryLogComponent } from './notification-delivery-log.co
 import { NotificationDeliveryService } from '../../services/notification-delivery.service';
 import { SchoolService } from '../../services/school.service';
 import { LoggerService } from '../../services/logger.service';
-import { DeliveryDetail, DeliveryRow, deliveryStatusLabel, eventCodeLabel } from '../../interfaces/notification-delivery';
+import {
+  DeliveryDetail,
+  DeliveryRow,
+  DeliverySummaryRow,
+  deliveryStatusLabel,
+  eventCodeLabel,
+} from '../../interfaces/notification-delivery';
 
 describe('NotificationDeliveryLogComponent', () => {
   let fixture: ComponentFixture<NotificationDeliveryLogComponent>;
@@ -25,10 +31,22 @@ describe('NotificationDeliveryLogComponent', () => {
     relatedChannels: [], ...overrides,
   });
 
+  const summaryRow = (overrides: Partial<DeliverySummaryRow> = {}): DeliverySummaryRow => ({
+    notificationId: 4812, schoolId: 1, schoolName: 'Indra Academy', eventCode: 'NOTICE_PUBLISHED',
+    title: 'Exam Notice', messagePreview: 'Exams start Monday', createdAt: '2026-09-20T09:00:00',
+    totalRecipients: 500,
+    inApp: { stored: 500, opened: 212, unopened: 288 },
+    push: { total: 500, accepted: 487, failed: 13, retrying: 0, skipped: 0, queued: 0 },
+    email: { total: 500, accepted: 492, failed: 8, retrying: 0, skipped: 0, queued: 0 },
+    deliveryHistoryMayBeIncomplete: false,
+    ...overrides,
+  });
+
   beforeEach(() => {
-    service = jasmine.createSpyObj('NotificationDeliveryService', ['search', 'eventCodes', 'detail']);
+    service = jasmine.createSpyObj('NotificationDeliveryService', ['search', 'summary', 'eventCodes', 'detail']);
     service.search.and.returnValue(of({ content: [row()], page: 0, size: 25, hasNext: false }));
-    service.eventCodes.and.returnValue(of(['FEE_REMINDER', 'SUPPORT_TICKET_RESOLVED']));
+    service.summary.and.returnValue(of({ content: [summaryRow()], page: 0, size: 25, hasNext: false, deliveryRetentionDays: 90 }));
+    service.eventCodes.and.returnValue(of(['FEE_REMINDER', 'NOTICE_PUBLISHED']));
 
     TestBed.configureTestingModule({
       imports: [NotificationDeliveryLogComponent],
@@ -42,17 +60,128 @@ describe('NotificationDeliveryLogComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('loads the first page unfiltered plus the school and event-type filter options', () => {
+  function openDetails(): void {
     fixture.detectChanges();
-    expect(service.search).toHaveBeenCalledWith(0, 25, jasmine.objectContaining({ status: null, channel: null, schoolId: null }));
+    component.showDetails();
+    fixture.detectChanges();
+  }
+
+  // ─── Summary (default view) ────────────────────────────────────────
+
+  it('opens on the Summary view and loads it — the recipient log is not fetched until needed', () => {
+    fixture.detectChanges();
+    expect(component.view).toBe('summary');
+    expect(service.summary).toHaveBeenCalledWith(0, 25, { eventCode: null, schoolId: null, from: null, to: null, search: null });
+    expect(service.search).not.toHaveBeenCalled();
+  });
+
+  it('shows per-channel accepted/failed counts and in-app stored/opened — never "delivered"', () => {
+    fixture.detectChanges();
+    const text: string = fixture.nativeElement.textContent;
+    expect(text).toContain('Exam Notice');
+    expect(text).toContain('500');
+    expect(text).toContain('487 accepted');
+    expect(text).toContain('13 failed');
+    expect(text).toContain('492 accepted');
+    expect(text).toContain('8 failed');
+    expect(text).toContain('500 stored');
+    expect(text).toContain('212 opened');
+    expect(text).toContain('288 unopened');
+    expect(text.toLowerCase()).not.toContain('delivered');
+  });
+
+  it('labels an unused channel "Not sent" and old publications as possibly incomplete', () => {
+    service.summary.and.returnValue(of({ content: [
+      summaryRow({ notificationId: 1, email: null }),
+      summaryRow({ notificationId: 2, push: null, email: null, deliveryHistoryMayBeIncomplete: true }),
+    ], page: 0, size: 25, hasNext: false, deliveryRetentionDays: 90 }));
+    fixture.detectChanges();
+    const text: string = fixture.nativeElement.textContent;
+    expect(text).toContain('Not sent');
+    expect(text).toContain('Records expired');
+  });
+
+  it('shows only summary filters on Summary and only recipient filters on Details', () => {
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('#ndl-search')).toBeTruthy();
+    expect(el.querySelector('#ndl-status')).toBeNull();
+    expect(el.querySelector('#ndl-recipient')).toBeNull();
+
+    component.showDetails();
+    fixture.detectChanges();
+    expect(el.querySelector('#ndl-search')).toBeNull();
+    expect(el.querySelector('#ndl-status')).toBeTruthy();
+    expect(el.querySelector('#ndl-channel')).toBeTruthy();
+    expect(el.querySelector('#ndl-recipient')).toBeTruthy();
+  });
+
+  it('applies summary filters (event type, school, dates, search) to the summary', () => {
+    fixture.detectChanges();
+    component.filterEventCode = 'NOTICE_PUBLISHED';
+    component.filterSchoolId = 1;
+    component.filterFrom = '2026-09-01';
+    component.filterTo = '2026-09-30';
+    component.filterSearch = 'exam';
+
+    component.applyFilters();
+
+    expect(service.summary).toHaveBeenCalledWith(0, 25,
+      { eventCode: 'NOTICE_PUBLISHED', schoolId: 1, from: '2026-09-01', to: '2026-09-30', search: 'exam' });
+    expect(service.search).not.toHaveBeenCalled();
+  });
+
+  it('clicking a summary drills into the existing recipient log for that notification', () => {
+    fixture.detectChanges();
+    component.filterStatus = 'FAILED_FINAL';
+    component.filterChannel = 'EMAIL';
+    component.filterRecipient = 'S9';
+
+    component.drillDown(component.summaryRows[0]);
+    fixture.detectChanges();
+
+    expect(component.view).toBe('details');
+    expect(service.search).toHaveBeenCalledWith(0, 25, jasmine.objectContaining({
+      notificationId: 4812, status: null, channel: null, recipient: null,
+    }));
+    expect(fixture.nativeElement.textContent).toContain('Showing recipients of');
+    expect(fixture.nativeElement.textContent).toContain('Exam Notice');
+  });
+
+  it('clearing the drill-down reloads the full recipient log', () => {
+    fixture.detectChanges();
+    component.drillDown(component.summaryRows[0]);
+    service.search.calls.reset();
+
+    component.clearDrillDown();
+
+    expect(component.drillNotification).toBeNull();
+    expect(service.search).toHaveBeenCalledWith(0, 25, jasmine.objectContaining({ notificationId: null }));
+  });
+
+  it('pages the summary and shows a validation message on 400', () => {
+    service.summary.and.returnValue(of({ content: [summaryRow()], page: 0, size: 25, hasNext: true, deliveryRetentionDays: 90 }));
+    fixture.detectChanges();
+    component.nextSummaryPage();
+    expect(service.summary).toHaveBeenCalledWith(1, 25, jasmine.any(Object));
+
+    service.summary.and.returnValue(throwError(() => ({ status: 400, error: { detail: 'The end date is before the start date.' } })));
+    component.applyFilters();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('The end date is before the start date.');
+  });
+
+  // ─── Delivery Details (recipient-level log) ────────────────────────
+
+  it('loads the recipient log the first time Details is opened', () => {
+    openDetails();
+    expect(service.search).toHaveBeenCalledWith(0, 25, jasmine.objectContaining({ notificationId: null, status: null, channel: null }));
     expect(component.rows.length).toBe(1);
-    expect(component.schools.length).toBe(1);
-    expect(component.eventCodes).toContain('FEE_REMINDER');
     expect(fixture.nativeElement.textContent).toContain('Indra Academy');
   });
 
-  it('applies every filter and restarts from the first page', () => {
-    fixture.detectChanges();
+  it('applies every details filter and restarts from the first page', () => {
+    openDetails();
     component.page = 3;
     component.filterStatus = 'FAILED_FINAL';
     component.filterChannel = 'EMAIL';
@@ -65,14 +194,14 @@ describe('NotificationDeliveryLogComponent', () => {
     component.applyFilters();
 
     expect(service.search).toHaveBeenCalledWith(0, 25, {
-      status: 'FAILED_FINAL', channel: 'EMAIL', eventCode: 'FEE_REMINDER', schoolId: 1,
+      notificationId: null, status: 'FAILED_FINAL', channel: 'EMAIL', eventCode: 'FEE_REMINDER', schoolId: 1,
       recipient: 'S1', from: '2026-09-01', to: '2026-09-30',
     });
   });
 
   it('pages with Next only while the backend reports more rows', () => {
     service.search.and.returnValue(of({ content: [row()], page: 0, size: 25, hasNext: true }));
-    fixture.detectChanges();
+    openDetails();
     component.nextPage();
     expect(service.search).toHaveBeenCalledWith(1, 25, jasmine.any(Object));
 
@@ -86,7 +215,7 @@ describe('NotificationDeliveryLogComponent', () => {
     service.search.and.returnValue(of({ content: [
       row(), row({ id: 22, channel: 'EMAIL' }), row({ id: 70, channel: 'IN_APP', status: 'STORED', read: true }),
     ], page: 0, size: 25, hasNext: false }));
-    fixture.detectChanges();
+    openDetails();
 
     const text: string = fixture.nativeElement.textContent;
     expect(text).toContain('Accepted by FCM');
@@ -97,7 +226,7 @@ describe('NotificationDeliveryLogComponent', () => {
   });
 
   it('opening a row loads its detail with the status meaning and the other channels', () => {
-    fixture.detectChanges();
+    openDetails();
     service.detail.and.returnValue(of(detail({
       channel: 'EMAIL', status: 'FAILED_FINAL', maskedDestination: 'pr***@gmail.com', attemptCount: 5,
       lastError: 'Retry limit reached: MailSendException', providerMessageId: null,
@@ -121,7 +250,7 @@ describe('NotificationDeliveryLogComponent', () => {
   });
 
   it('shows a truthful fallback when a detail record cannot be loaded, and close clears it', () => {
-    fixture.detectChanges();
+    openDetails();
     service.detail.and.returnValue(throwError(() => ({ status: 404 })));
     component.open(component.rows[0]);
     fixture.detectChanges();
@@ -134,7 +263,7 @@ describe('NotificationDeliveryLogComponent', () => {
 
   it('shows the backend validation message on a 400 and a generic fallback otherwise', () => {
     service.search.and.returnValue(throwError(() => ({ status: 400, error: { detail: 'The end date is before the start date.' } })));
-    fixture.detectChanges();
+    openDetails();
     expect(fixture.nativeElement.textContent).toContain('The end date is before the start date.');
 
     service.search.and.returnValue(throwError(() => ({ status: 500 })));

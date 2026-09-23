@@ -79,6 +79,7 @@ export interface DeliveryDetail {
 }
 
 export interface DeliveryFilters {
+  notificationId?: number | null;
   status?: DeliveryStatus | null;
   channel?: DeliveryChannel | null;
   eventCode?: string | null;
@@ -86,6 +87,58 @@ export interface DeliveryFilters {
   recipient?: string | null;
   from?: string | null;
   to?: string | null;
+}
+
+/**
+ * Per-channel outcome counts for one notification. accepted = the provider accepted it (never a
+ * delivery receipt); failed = gave up (permanent or retry limit); retrying = will retry;
+ * skipped = not attempted; queued = waiting or sending.
+ */
+export interface ChannelCounts {
+  total: number;
+  accepted: number;
+  failed: number;
+  retrying: number;
+  skipped: number;
+  queued: number;
+}
+
+export interface InAppCounts {
+  stored: number;
+  opened: number;
+  unopened: number;
+}
+
+/** One notification publication. push/email are null when that channel has no delivery rows. */
+export interface DeliverySummaryRow {
+  notificationId: number;
+  schoolId: number | null;
+  schoolName: string | null;
+  eventCode: string;
+  title: string;
+  messagePreview: string | null;
+  createdAt: string;
+  totalRecipients: number;
+  inApp: InAppCounts;
+  push: ChannelCounts | null;
+  email: ChannelCounts | null;
+  deliveryHistoryMayBeIncomplete: boolean;
+}
+
+export interface DeliverySummaryPage {
+  content: DeliverySummaryRow[];
+  page: number;
+  size: number;
+  hasNext: boolean;
+  deliveryRetentionDays: number;
+}
+
+export interface SummaryFilters {
+  eventCode?: string | null;
+  schoolId?: number | null;
+  from?: string | null;
+  to?: string | null;
+  search?: string | null;
 }
 
 export const DELIVERY_CHANNELS: { value: DeliveryChannel; label: string }[] = [

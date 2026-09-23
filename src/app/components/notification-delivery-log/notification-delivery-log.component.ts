@@ -10,6 +10,7 @@ import {
   DeliveryDetail,
   DeliveryRow,
   DeliveryStatus,
+  DeliverySummaryRow,
   deliveryChannelLabel,
   deliveryStatusLabel,
   deliveryStatusMeaning,
@@ -40,6 +41,21 @@ export class NotificationDeliveryLogComponent implements OnInit, OnDestroy {
   schools: SchoolSettings[] = [];
   eventCodes: string[] = [];
 
+  view: 'summary' | 'details' = 'summary';
+
+  summaryRows: DeliverySummaryRow[] = [];
+  summaryLoading = true;
+  summaryFailed = false;
+  summaryError = '';
+  summaryPage = 0;
+  summaryHasNext = false;
+  retentionDays = 90;
+  filterSearch = '';
+
+  /** Set when the Details view was opened from a summary row: pins it to that notification. */
+  drillNotification: { id: number; title: string } | null = null;
+  private detailsLoaded = false;
+
   filterStatus: DeliveryStatus | '' = '';
   filterChannel: DeliveryChannel | '' = '';
   filterEventCode = '';
@@ -49,7 +65,7 @@ export class NotificationDeliveryLogComponent implements OnInit, OnDestroy {
   filterTo = '';
 
   rows: DeliveryRow[] = [];
-  loading = true;
+  loading = false;
   failed = false;
   errorMessage = '';
   page = 0;
@@ -76,14 +92,73 @@ export class NotificationDeliveryLogComponent implements OnInit, OnDestroy {
       next: codes => { this.eventCodes = codes; this.cdr.markForCheck(); },
       error: error => this.logger.error('Event codes load failed (delivery log filter):', error),
     });
+    this.loadSummary(0);
+  }
+
+  showSummary(): void {
+    this.view = 'summary';
+    this.close();
+  }
+
+  showDetails(): void {
+    this.view = 'details';
+    if (!this.detailsLoaded) this.load(0);
+  }
+
+  loadSummary(page: number): void {
+    this.summaryLoading = true;
+    this.summaryFailed = false;
+    this.cdr.markForCheck();
+    this.deliveryService.summary(page, this.pageSize, {
+      eventCode: this.filterEventCode || null,
+      schoolId: this.filterSchoolId || null,
+      from: this.filterFrom || null,
+      to: this.filterTo || null,
+      search: this.filterSearch || null,
+    }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: result => {
+        this.summaryRows = result.content;
+        this.summaryPage = result.page;
+        this.summaryHasNext = result.hasNext;
+        this.retentionDays = result.deliveryRetentionDays;
+        this.summaryLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: error => {
+        this.logger.error('Notification delivery summary load failed:', error);
+        this.summaryError = error?.status === 400 ? (error?.error?.detail || error?.error?.message || '') : '';
+        this.summaryLoading = false;
+        this.summaryFailed = true;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  /** Opens the existing recipient-level log pinned to one notification — no separate detail UI. */
+  drillDown(row: DeliverySummaryRow): void {
+    this.drillNotification = { id: row.notificationId, title: row.title };
+    this.filterStatus = '';
+    this.filterChannel = '';
+    this.filterRecipient = '';
+    this.view = 'details';
     this.load(0);
   }
 
+  clearDrillDown(): void {
+    this.drillNotification = null;
+    this.load(0);
+  }
+
+  prevSummaryPage(): void { if (this.summaryPage > 0) this.loadSummary(this.summaryPage - 1); }
+  nextSummaryPage(): void { if (this.summaryHasNext) this.loadSummary(this.summaryPage + 1); }
+
   load(page: number): void {
+    this.detailsLoaded = true;
     this.loading = true;
     this.failed = false;
     this.cdr.markForCheck();
     this.deliveryService.search(page, this.pageSize, {
+      notificationId: this.drillNotification?.id ?? null,
       status: this.filterStatus || null,
       channel: this.filterChannel || null,
       eventCode: this.filterEventCode || null,
@@ -109,7 +184,10 @@ export class NotificationDeliveryLogComponent implements OnInit, OnDestroy {
     });
   }
 
-  applyFilters(): void { this.load(0); }
+  applyFilters(): void {
+    if (this.view === 'summary') this.loadSummary(0);
+    else this.load(0);
+  }
 
   resetFilters(): void {
     this.filterStatus = '';
@@ -119,7 +197,9 @@ export class NotificationDeliveryLogComponent implements OnInit, OnDestroy {
     this.filterRecipient = '';
     this.filterFrom = '';
     this.filterTo = '';
-    this.load(0);
+    this.filterSearch = '';
+    this.drillNotification = null;
+    this.applyFilters();
   }
 
   prevPage(): void { if (this.page > 0) this.load(this.page - 1); }
@@ -148,6 +228,11 @@ export class NotificationDeliveryLogComponent implements OnInit, OnDestroy {
   }
 
   statusClass(status: DeliveryStatus): string { return 'ndl-status--' + status.toLowerCase(); }
+
+  /** Share of a channel's rows in one outcome, for the stacked bar (0–100). */
+  pct(part: number, total: number): number { return total > 0 ? (part / total) * 100 : 0; }
+
+  summaryKey(_: number, row: DeliverySummaryRow): number { return row.notificationId; }
 
   rowKey(_: number, row: DeliveryRow): string { return row.channel + ':' + row.id; }
 

@@ -17,6 +17,8 @@ import { StudentService } from '../../services/student.service';
 import { AttendanceService } from '../../services/attendance.service';
 import { LeaveService, LeaveApplication } from '../../services/leave.service';
 import { LoggerService } from '../../services/logger.service';
+import { HomeworkService } from '../../services/homework.service';
+import { HomeworkClasswork, dueLabel, homeworkKind } from '../../interfaces/homework';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -42,6 +44,14 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   pendingLeavesCount = 0;
   recentLeaves: LeaveApplication[] = [];
 
+  /** Isolated from the main dashboard load: a homework outage never blocks the rest. */
+  todayHomework: HomeworkClasswork[] = [];
+  homeworkLoading = true;
+  homeworkFailed = false;
+  readonly homeworkPreviewLimit = 3;
+  readonly homeworkKind = homeworkKind;
+  readonly dueLabel = dueLabel;
+
   constructor(
     private authState: AuthStateService,
     private studentService: StudentService,
@@ -49,7 +59,8 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     private leaveService: LeaveService,
     private logger: LoggerService,
     private cdr: ChangeDetectorRef,
-    private toast: ToastService
+    private toast: ToastService,
+    private homework: HomeworkService
   ) {}
 
   ngOnInit(): void {
@@ -85,7 +96,27 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  loadTodayHomework(): void {
+    this.homeworkLoading = true;
+    this.homeworkFailed = false;
+    this.cdr.markForCheck();
+    this.homework.studentOn().pipe(takeUntil(this.destroy$)).subscribe({
+      next: items => {
+        this.todayHomework = items;
+        this.homeworkLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: err => {
+        this.logger.error('Today\'s homework load failed (isolated):', err);
+        this.homeworkLoading = false;
+        this.homeworkFailed = true;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
   private loadDashboardData(): void {
+    this.loadTodayHomework();
     const now = new Date();
     const month = now.getMonth() + 1;
     const year = now.getFullYear();

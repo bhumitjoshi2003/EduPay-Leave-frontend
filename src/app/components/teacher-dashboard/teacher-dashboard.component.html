@@ -108,9 +108,12 @@
           <span class="td-today-title-icon"><mat-icon>schedule</mat-icon></span>
           <div><h2>Today's Classes</h2></div>
         </div>
-        <a [routerLink]="timetableRoute"
-          >View timetable <mat-icon>arrow_forward</mat-icon></a
-        >
+        <div class="td-today-links">
+          <a routerLink="/dashboard/homework-classwork">Homework &amp; Classwork <mat-icon>edit_note</mat-icon></a>
+          <a [routerLink]="timetableRoute"
+            >View timetable <mat-icon>arrow_forward</mat-icon></a
+          >
+        </div>
       </div>
 
       <div class="td-skeleton" *ngIf="todayClassesLoading">
@@ -132,6 +135,9 @@
               <small>{{ todayView.current.subjectName }}<span class="td-cover-chip" *ngIf="todayView.current.isSubstitution">Arrangement</span></small>
             </span>
             <span class="td-today-time" *ngIf="classTimeRange(todayView.current) as time">{{ time }}</span>
+            <a class="td-today-hw" *ngIf="todayView.current.timetableEntryId" routerLink="/dashboard/homework-classwork"
+               [queryParams]="{ entry: todayView.current.timetableEntryId }" title="Add Homework / Classwork"
+               aria-label="Add Homework / Classwork"><mat-icon>edit_note</mat-icon></a>
           </div>
           <div class="td-today-row" [class.is-later]="i > 0" [class.is-cover-highlight]="coverClassesHighlighted && entry.isSubstitution" *ngFor="let entry of todayView.upcoming; let i = index">
             <span class="td-today-badge" [class.is-next]="i === 0">{{ i === 0 ? "Next" : "Later" }}</span>
@@ -140,6 +146,9 @@
               <small>{{ entry.subjectName }}<span class="td-cover-chip" *ngIf="entry.isSubstitution">Arrangement</span></small>
             </span>
             <span class="td-today-time" *ngIf="classTimeRange(entry) as time">{{ time }}</span>
+            <a class="td-today-hw" *ngIf="entry.timetableEntryId" routerLink="/dashboard/homework-classwork"
+               [queryParams]="{ entry: entry.timetableEntryId }" title="Add Homework / Classwork"
+               aria-label="Add Homework / Classwork"><mat-icon>edit_note</mat-icon></a>
           </div>
         </div>
 

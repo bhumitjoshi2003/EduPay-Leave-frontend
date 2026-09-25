@@ -71,6 +71,7 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
 
   totalStudents = 0;
   todayAbsent = 0;
+  todayPresent = 0;
   attendanceTaken = false;
   pendingLeavesCount = 0;
   monthlyAttendanceRate = 0;
@@ -390,32 +391,35 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
-    const todayStr = `${year}-${String(month).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
     forkJoin({
       students: this.studentService.getActiveStudentsByClass(this.className),
-      absentToday: this.attendanceService.getAttendanceByDateAndClass(todayStr, this.className),
+      // Today's sheet for the teacher's own class/section (the server picks the school's today).
+      // A sheet failure (e.g. no current session) only hides today's figures.
+      todaySheet: this.attendanceService.getSheet(null).pipe(catchError(err => {
+        this.logger.error('Failed to load today\'s attendance', err);
+        return of(null);
+      })),
       leaves: this.leaveService.getLeavesPaginated(0, 50, this.className),
       summary: this.attendanceService.getClassSummary(this.className, { year, month }),
     })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: ({ students, absentToday, leaves, summary }) => {
+        next: ({ students, todaySheet, leaves, summary }) => {
           this.totalStudents = students.length;
-          // `X` is an internal sentinel proving attendance was submitted even when every
-          // student is present. It must never appear to the teacher or count as an absence.
-          this.attendanceTaken = absentToday.some(a => a.studentId === 'X');
-          this.todayAbsent = absentToday.filter(a => a.studentId !== 'X'
-            && (!a.status || a.status === 'ABSENT')).length;
+          this.attendanceTaken = !!todaySheet?.submitted;
+          const todayRows = this.attendanceTaken ? todaySheet!.students : [];
+          this.todayAbsent = todayRows.filter(s => s.status === 'ABSENT').length;
+          this.todayPresent = todayRows.filter(s => s.status === 'PRESENT').length;
 
           const pending = leaves.content.filter((l) => l.status === 'PENDING');
           this.pendingLeavesCount = pending.length;
           this.recentLeaves = pending.slice(0, 10);
 
-          if (summary.length > 0) {
-            const total = summary.reduce((sum, s) => sum + s.attendancePercentage, 0);
-            this.monthlyAttendanceRate = total / summary.length;
-          }
+          // Class rate = all present days / all submitted days (the same formula as each student's %).
+          const workingDays = summary.reduce((sum, s) => sum + s.totalWorkingDays, 0);
+          const presentDays = summary.reduce((sum, s) => sum + s.daysPresent, 0);
+          this.monthlyAttendanceRate = workingDays > 0 ? Math.round(presentDays * 1000 / workingDays) / 10 : 0;
 
           this.isLoading = false;
           this.cdr.markForCheck();
@@ -480,7 +484,7 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
   }
 
   get todayPresentCount(): number {
-    return Math.max(0, this.totalStudents - this.todayAbsent);
+    return this.todayPresent;
   }
 
   get personalAttendanceStatus(): string {

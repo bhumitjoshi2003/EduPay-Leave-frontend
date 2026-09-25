@@ -58,7 +58,7 @@ describe('TeacherDashboardComponent today classes', () => {
     teacherService = jasmine.createSpyObj('TeacherService', ['getTeacher']);
     teacherService.getTeacher.and.returnValue(of({ name: 'Ms Rao', classTeacher: null }));
     studentService = jasmine.createSpyObj('StudentService', ['getActiveStudentsByClass']);
-    attendanceService = jasmine.createSpyObj('AttendanceService', ['getAttendanceByDateAndClass', 'getClassSummary']);
+    attendanceService = jasmine.createSpyObj('AttendanceService', ['getSheet', 'getClassSummary']);
     leaveService = jasmine.createSpyObj('LeaveService', ['getLeavesPaginated', 'updateLeaveStatus']);
     logger = jasmine.createSpyObj('LoggerService', ['error']);
     cdr = jasmine.createSpyObj('ChangeDetectorRef', ['markForCheck']);
@@ -143,7 +143,7 @@ describe('TeacherDashboardComponent today classes', () => {
   it('keeps existing class-teacher dashboard loading independent', () => {
     teacherService.getTeacher.and.returnValue(of({ name: 'Mr Shah', classTeacher: 'X' }));
     studentService.getActiveStudentsByClass.and.returnValue(of([{ studentId: 'S1' }]));
-    attendanceService.getAttendanceByDateAndClass.and.returnValue(of([]));
+    attendanceService.getSheet.and.returnValue(of(null));
     leaveService.getLeavesPaginated.and.returnValue(of({ content: [], totalElements: 0, totalPages: 0 }));
     attendanceService.getClassSummary.and.returnValue(of([]));
     const component = build();
@@ -156,7 +156,7 @@ describe('TeacherDashboardComponent today classes', () => {
   it('a class-data failure never fabricates "0 active students" / "no pending requests" — it flags classDataFailed instead', () => {
     teacherService.getTeacher.and.returnValue(of({ name: 'Mr Shah', classTeacher: 'X' }));
     studentService.getActiveStudentsByClass.and.returnValue(throwError(() => new Error('offline')));
-    attendanceService.getAttendanceByDateAndClass.and.returnValue(of([]));
+    attendanceService.getSheet.and.returnValue(of(null));
     leaveService.getLeavesPaginated.and.returnValue(of({ content: [], totalElements: 0, totalPages: 0 }));
     attendanceService.getClassSummary.and.returnValue(of([]));
     const component = build();
@@ -171,7 +171,7 @@ describe('TeacherDashboardComponent today classes', () => {
   it('retrying class data re-requests only the class-data sources, and clears the failure on success', () => {
     teacherService.getTeacher.and.returnValue(of({ name: 'Mr Shah', classTeacher: 'X' }));
     studentService.getActiveStudentsByClass.and.returnValue(throwError(() => new Error('offline')));
-    attendanceService.getAttendanceByDateAndClass.and.returnValue(of([]));
+    attendanceService.getSheet.and.returnValue(of(null));
     leaveService.getLeavesPaginated.and.returnValue(of({ content: [], totalElements: 0, totalPages: 0 }));
     attendanceService.getClassSummary.and.returnValue(of([]));
     const component = build();
@@ -184,6 +184,46 @@ describe('TeacherDashboardComponent today classes', () => {
     expect(component.totalStudents).toBe(1);
     expect(timetableService.getTeacherTimetable).toHaveBeenCalledTimes(1);
     expect(teacherService.getTeacher).toHaveBeenCalledTimes(1);
+  });
+
+  it('reads today\'s explicit statuses and a weighted monthly rate (Attendance V2)', () => {
+    teacherService.getTeacher.and.returnValue(of({ name: 'Mr Shah', classTeacher: 'X' }));
+    studentService.getActiveStudentsByClass.and.returnValue(of([{ studentId: 'S1' }, { studentId: 'S2' }, { studentId: 'S3' }]));
+    attendanceService.getSheet.and.returnValue(of({
+      submitted: true, markable: true, students: [
+        { studentId: 'S1', name: 'A', status: 'PRESENT', approvedLeave: false },
+        { studentId: 'S2', name: 'B', status: 'ABSENT', approvedLeave: true },
+        { studentId: 'S3', name: 'C', status: 'PRESENT', approvedLeave: false },
+      ],
+    }));
+    leaveService.getLeavesPaginated.and.returnValue(of({ content: [], totalElements: 0, totalPages: 0 }));
+    attendanceService.getClassSummary.and.returnValue(of([
+      { studentId: 'S1', studentName: 'A', totalWorkingDays: 20, daysPresent: 20, daysAbsent: 0, approvedLeaveDays: 0, attendancePercentage: 100 },
+      { studentId: 'S2', studentName: 'B', totalWorkingDays: 2, daysPresent: 0, daysAbsent: 2, approvedLeaveDays: 1, attendancePercentage: 0 },
+    ]));
+    const component = build();
+    component.ngOnInit();
+
+    expect(attendanceService.getSheet).toHaveBeenCalledWith(null);
+    expect(component.attendanceTaken).toBeTrue();
+    expect(component.todayPresentCount).toBe(2);
+    expect(component.todayAbsent).toBe(1);
+    expect(component.monthlyAttendanceRate).toBe(90.9); // 20 / 22, not the 50% average of percentages
+  });
+
+  it('an unsubmitted day shows as not marked', () => {
+    teacherService.getTeacher.and.returnValue(of({ name: 'Mr Shah', classTeacher: 'X' }));
+    studentService.getActiveStudentsByClass.and.returnValue(of([{ studentId: 'S1' }]));
+    attendanceService.getSheet.and.returnValue(of({ submitted: false, markable: true, students: [
+      { studentId: 'S1', name: 'A', status: null, approvedLeave: false }] }));
+    leaveService.getLeavesPaginated.and.returnValue(of({ content: [], totalElements: 0, totalPages: 0 }));
+    attendanceService.getClassSummary.and.returnValue(of([]));
+    const component = build();
+    component.ngOnInit();
+
+    expect(component.attendanceTaken).toBeFalse();
+    expect(component.todayAbsent).toBe(0);
+    expect(component.monthlyAttendanceRate).toBe(0);
   });
 
   it('uses the existing timetable route for the dashboard action', () => {
@@ -608,7 +648,7 @@ describe('TeacherDashboardComponent layout order', () => {
         { provide: AuthStateService, useValue: authState },
         { provide: TeacherService, useValue: teacherService },
         { provide: StudentService, useValue: jasmine.createSpyObj('StudentService', ['getActiveStudentsByClass']) },
-        { provide: AttendanceService, useValue: jasmine.createSpyObj('AttendanceService', ['getAttendanceByDateAndClass', 'getClassSummary']) },
+        { provide: AttendanceService, useValue: jasmine.createSpyObj('AttendanceService', { getSheet: of(null), getClassSummary: of([]) }) },
         { provide: LeaveService, useValue: jasmine.createSpyObj('LeaveService', ['getLeavesPaginated', 'updateLeaveStatus']) },
         { provide: LoggerService, useValue: jasmine.createSpyObj('LoggerService', ['error']) },
         { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['success', 'info', 'error']) },
